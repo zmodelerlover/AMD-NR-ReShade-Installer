@@ -350,7 +350,17 @@ public sealed class PayloadCache(HttpClient http)
             {
                 var source = Path.Combine(from, file.RelativePath);
                 var target = Path.Combine(staging, file.RelativePath);
-                if (Engine.SizeOf(target) == file.Size) continue;
+                // Remade every time, rather than skipped when the size matches. Size is not
+                // identity: a build re-cut and published under an unchanged version is the same
+                // number of bytes with different content, and the stale link then survived here
+                // while the component cache beside it had already corrected itself -- the install
+                // failed at verification with "does not match the expected SHA-256" against a file
+                // the app had just downloaded correctly. The staging key is versions only, so this
+                // is the layer that has to notice.
+                //
+                // A hard link costs nothing to remake, so there is nothing to save by being clever.
+                // On a volume that refuses links this re-copies instead, weights included; that is
+                // the price of the folder being right, and it is only paid where linking fails.
                 Engine.MakeParent(target);
                 if (File.Exists(target)) File.Delete(target);
                 if (!TryHardLink(source, target)) File.Copy(source, target, overwrite: true);

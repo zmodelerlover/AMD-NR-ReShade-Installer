@@ -139,6 +139,45 @@ public class PayloadTests
         return (PayloadManifest.Parse(json), blob, PayloadManifest.RuntimeComponent);
     }
 
+    /// <summary>A component re-cut and published under a version that did not change is the same
+    /// number of bytes with different content. The component cache notices, because it hashes; the
+    /// staging folder did not, because its key is the versions and it skipped any file whose size
+    /// already matched. The install then failed verification against a file the app had just
+    /// downloaded correctly -- reported from a real run, on an add-on that came out at 550912 bytes
+    /// both times.</summary>
+    [Fact]
+    public async Task StagingFollowsBytesThatChangedUnderAVersionThatDidNot()
+    {
+        var version = $"st-{Guid.NewGuid():N}"[..12];
+        var first = Enumerable.Range(0, 4096).Select(i => (byte)(i % 251)).ToArray();
+        var second = (byte[])first.Clone();
+        second[0] ^= 0xFF; // Same length, different bytes: exactly what a size check cannot see.
+
+        static PayloadManifest ManifestFor(string version, byte[] blob) => PayloadManifest.Parse($$"""
+            {
+              "schema": 1, "owner": "someone", "repo": "Extras", "tag": "{{version}}",
+              "components": { "runtime": { "version": "{{version}}", "files": [
+                { "name": "dlssnr_amd_pass1.dll", "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}" } ] } }
+            }
+            """);
+
+        var before = ManifestFor(version, first);
+        var cache = new PayloadCache(new HttpClient(new BlobServer(first)));
+        await cache.EnsureAsync(before, PayloadManifest.RuntimeComponent);
+        var staged = cache.Stage(before, PayloadManifest.RuntimeComponent);
+        Assert.Equal(first, await File.ReadAllBytesAsync(Path.Combine(staged, Work.RuntimeName)));
+
+        var after = ManifestFor(version, second);
+        var recut = new PayloadCache(new HttpClient(new BlobServer(second)));
+        await recut.EnsureAsync(after, PayloadManifest.RuntimeComponent);
+        var restaged = recut.Stage(after, PayloadManifest.RuntimeComponent);
+
+        // The same folder, because the key is the versions and neither moved. What is in it has to
+        // be the new bytes all the same.
+        Assert.Equal(staged, restaged);
+        Assert.Equal(second, await File.ReadAllBytesAsync(Path.Combine(restaged, Work.RuntimeName)));
+    }
+
     [Fact]
     public async Task ADownloadIsVerifiedAndKept()
     {
