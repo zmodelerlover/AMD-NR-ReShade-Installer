@@ -6,6 +6,23 @@
        lives, and that none of it is for sale. Each row is one target, so the logo is the link. -->
   <StackPanel Spacing="12">
 
+    <!-- Discord's own blue, because a logo in the wrong colour reads as a screenshot of a logo. -->
+    <Button x:Name="DiscordLink" Classes="pick" Padding="14,13" Click="OnOpen"
+            HorizontalAlignment="Stretch">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Border Classes="iconTile" Margin="0,0,13,0" Background="#5865F2">
+          <PathIcon Data="{StaticResource IconDiscord}" Foreground="White" />
+        </Border>
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="{DynamicResource Str.CreditDiscordTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{DynamicResource Str.CreditDiscordBody}" Classes="muted" TextWrapping="Wrap"
+                     LineHeight="18" />
+        </StackPanel>
+        <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="13" Height="13"
+                  Foreground="{DynamicResource Faint}" VerticalAlignment="Center" Margin="12,0,0,0" />
+      </Grid>
+    </Button>
+
     <Border Classes="callout">
       <Grid ColumnDefinitions="Auto,*">
         <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="17" Height="17"
@@ -14,6 +31,8 @@
           <TextBlock Text="{DynamicResource Str.FreeTitle}" FontWeight="SemiBold" TextWrapping="Wrap"
                      Foreground="{DynamicResource Warn}" />
           <TextBlock Text="{DynamicResource Str.FreeBody}" TextWrapping="Wrap" LineHeight="19"
+                     Foreground="#F2D7A6" />
+          <TextBlock Text="{DynamicResource Str.OpenSourceBody}" TextWrapping="Wrap" LineHeight="19"
                      Foreground="#F2D7A6" />
         </StackPanel>
       </Grid>
@@ -47,39 +66,6 @@
         <StackPanel Grid.Column="1" Spacing="4">
           <TextBlock Text="{DynamicResource Str.CreditAddonTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
           <TextBlock Text="{DynamicResource Str.CreditAddonBody}" Classes="muted" TextWrapping="Wrap"
-                     LineHeight="18" />
-        </StackPanel>
-        <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="13" Height="13"
-                  Foreground="{DynamicResource Faint}" VerticalAlignment="Center" Margin="12,0,0,0" />
-      </Grid>
-    </Button>
-
-    <Button x:Name="InstallerLink" Classes="pick" Padding="14,13" Click="OnOpen"
-            HorizontalAlignment="Stretch">
-      <Grid ColumnDefinitions="Auto,*,Auto">
-        <Border Classes="iconTile" Margin="0,0,13,0" Background="{DynamicResource SurfaceTop}">
-          <PathIcon Data="{StaticResource IconGitHub}" Foreground="{DynamicResource Text}" />
-        </Border>
-        <StackPanel Grid.Column="1" Spacing="4">
-          <TextBlock Text="{DynamicResource Str.CreditInstallerTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
-          <TextBlock Text="{DynamicResource Str.CreditInstallerBody}" Classes="muted" TextWrapping="Wrap"
-                     LineHeight="18" />
-        </StackPanel>
-        <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="13" Height="13"
-                  Foreground="{DynamicResource Faint}" VerticalAlignment="Center" Margin="12,0,0,0" />
-      </Grid>
-    </Button>
-
-    <!-- Discord's own blue, because a logo in the wrong colour reads as a screenshot of a logo. -->
-    <Button x:Name="DiscordLink" Classes="pick" Padding="14,13" Click="OnOpen"
-            HorizontalAlignment="Stretch">
-      <Grid ColumnDefinitions="Auto,*,Auto">
-        <Border Classes="iconTile" Margin="0,0,13,0" Background="#5865F2">
-          <PathIcon Data="{StaticResource IconDiscord}" Foreground="White" />
-        </Border>
-        <StackPanel Grid.Column="1" Spacing="4">
-          <TextBlock Text="{DynamicResource Str.CreditDiscordTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
-          <TextBlock Text="{DynamicResource Str.CreditDiscordBody}" Classes="muted" TextWrapping="Wrap"
                      LineHeight="18" />
         </StackPanel>
         <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="13" Height="13"

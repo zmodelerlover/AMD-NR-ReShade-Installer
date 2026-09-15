@@ -4,7 +4,7 @@
         x:Class="AmdNr.App.SetupWindow"
         Title="AMD-NR ReShade Installer"
         Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
-        Width="720" Height="620" CanResize="False"
+        Width="820" Height="840" MinWidth="560" MinHeight="470"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Bg}">
 

@@ -51,6 +51,8 @@ public partial class SetupWindow : Window
         FoundList.ItemsSource = _found;
 
         _settingLanguage = true;
+        // It used to be 720x620 and fixed: a page either fitted that or was scrolled to blind, and
+        // the first page did not fit. It resizes now, and WindowFit keeps it inside the screen.
         LanguageBox.ItemsSource = App.Languages.Select(l => l.Name).ToList();
         LanguageBox.SelectedIndex = Math.Max(0, Array.FindIndex(App.Languages, l => l.Code == App.CurrentLanguage));
         _settingLanguage = false;
@@ -354,6 +356,12 @@ public partial class SetupWindow : Window
         >= 1_048_576 => $"{bytes / 1_048_576.0:0.0} MB",
         _ => $"{Math.Max(1, bytes / 1024)} KB",
     };
+
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        WindowFit.ToScreen(this);
+    }
 
     private static Geometry? Vector(string key) =>
         Application.Current?.TryFindResource(key, out var value) == true ? value as Geometry : null;

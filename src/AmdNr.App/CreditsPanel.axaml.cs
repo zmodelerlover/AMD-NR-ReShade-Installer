@@ -17,7 +17,6 @@ public partial class CreditsPanel : UserControl
         var config = AppConfig.Load();
         RuntimeLink.Tag = config.RuntimeUrl;
         AddonLink.Tag = $"https://github.com/{config.Addon.Owner}/{config.Addon.Repo}";
-        InstallerLink.Tag = $"https://github.com/{config.App.Owner}/{config.App.Repo}";
         DiscordLink.Tag = config.DiscordUrl;
     }
 

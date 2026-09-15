@@ -724,6 +724,12 @@ public partial class MainWindow : Window
         if (!Drawer.Classes.Contains("open")) Drawer.IsVisible = false;
     }
 
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        WindowFit.ToScreen(this);
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.Escape && Drawer.Classes.Contains("open"))
