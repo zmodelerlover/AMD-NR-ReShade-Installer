@@ -1,0 +1,142 @@
+// The 32-bit bridge route. Ported from the Installer struct in installer/src/engine.rs.
+//
+// Unlike the x64 route, the payloads here are pinned by the release's own payload.sha256 rather
+// than by constants: the bridge frontend and its 64-bit helper have to be the pair that shipped
+// together, and coupling is proved by hash, not by embedding bytes.
+
+using System.Text;
+
+namespace AmdNr.Core;
+
+public sealed class X86Installer(string release)
+{
+    public string Release { get; } = release;
+    public uint Width { get; set; } = 1920;
+    public uint Height { get; set; } = 1080;
+    public List<string> Log { get; } = [];
+
+    public void Note(string s) => Log.Add(s);
+
+    private byte[] Payload(string name, string expected)
+    {
+        var bytes = Engine.Read(Path.Combine(Release, "files", name));
+        Engine.HashIs(bytes, expected, name);
+        return bytes;
+    }
+
+    /// <summary>Reads the release's own checksum list so the bridge pair is pinned to the build it
+    /// shipped with.</summary>
+    internal static string BridgeSum(string sums, string name)
+    {
+        foreach (var line in sums.Split('\n'))
+        {
+            var at = line.IndexOf("  ", StringComparison.Ordinal);
+            if (at < 0) continue;
+            var hash = Engine.Lower(line[..at]);
+            var file = line[(at + 2)..].Trim();
+            if (file == name && Engine.IsHex(hash, 64)) return hash;
+        }
+        throw new InstallException("Missing bridge release checksum");
+    }
+
+    /// <summary>Everything that would be written, with nothing written. Every payload hash, the PE
+    /// machine type and the chaining rule are decided here, so a refusal happens before any file
+    /// moves.</summary>
+    public SortedDictionary<string, byte[]> Plan(string target, string preset)
+    {
+        Engine.Require(preset is "D3D11" or "D3D9" or "D3D8", "Unsupported x86 preset");
+        Engine.SafePath(target);
+        Engine.Require(Engine.Machine(Engine.Read(target)) == Engine.MachineX86,
+            "Target must be PE32/x86; x64 targets are not supported");
+        var dir = Engine.InstallDirectory(target);
+        var p = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
+
+        // Say what the folder is, not that a file could not be read. Getting field 1 wrong is the
+        // ordinary mistake here, and "Cannot read ...\payload.sha256" tells nobody what to do.
+        var manifest = Path.Combine(Release, "payload.sha256");
+        Engine.Require(File.Exists(manifest),
+            $"{Release} does not look like the unpacked download: it has no payload.sha256 beside a "
+            + "files folder. Point it at the folder you unzipped.");
+        var sums = Encoding.UTF8.GetString(Engine.Read(manifest));
+
+        foreach (var name in new[] { "dlss5-neural.addon32", "dlss5-neural-host64.exe" })
+        {
+            var bytes = Payload(name, BridgeSum(sums, name));
+            var want = name.Contains("addon32", StringComparison.Ordinal)
+                ? Engine.MachineX86
+                : Engine.MachineX64;
+            Engine.Require(Engine.Machine(bytes) == want, "Wrong bridge architecture");
+            p[name] = bytes;
+        }
+
+        p["dlssnr_amd_pass1.dll"] = Payload("dlssnr_amd_pass1.dll", Engine.RuntimeSha);
+        p["dlssnr_on_amd_weights.bin"] = Payload("dlssnr_on_amd_weights.bin", Engine.WeightsSha);
+
+        if (preset == "D3D8")
+        {
+            var translator = Payload("d3d8to9.dll", Engine.D3d8To9Sha);
+            Engine.Require(Engine.Machine(translator) == Engine.MachineX86, "d3d8to9 must be x86");
+            var name = "d3d8.dll";
+            var existing = Path.Combine(dir, name);
+            Engine.SafePath(existing);
+            if (File.Exists(existing) && Engine.HashFile(existing) != Engine.D3d8To9Sha)
+            {
+                Engine.Require(Engine.AdvertisesD3d8Sidecar(Engine.Read(existing)),
+                    "Existing d3d8.dll does not advertise d3d8R.dll chaining; preserved");
+                name = "d3d8R.dll";
+            }
+            p[name] = translator;
+        }
+
+        var reShadeName = preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
+        byte[] reShade;
+        if (File.Exists(Path.Combine(Release, "files", "dxgi.dll")))
+        {
+            reShade = Payload("dxgi.dll", Engine.ReShadeSha);
+        }
+        else
+        {
+            var existing = Path.Combine(dir, reShadeName);
+            Engine.Require(File.Exists(existing),
+                $"ReShade is not installed for this API: there is no {reShadeName} in the game folder. "
+                + "Install ReShade 6.8.0.2156 with full add-on support, 32-bit, against the game's own "
+                + "executable and pick the API it uses.");
+            reShade = Engine.Read(existing);
+            // Having *a* ReShade is not the same as having the one this was tested against, and the
+            // difference is invisible unless it is said out loud.
+            Engine.Require(Engine.Sha(reShade) == Engine.ReShadeSha,
+                $"The {reShadeName} already in the game folder is a different build from the one this "
+                + "was tested with. It has to be ReShade 6.8.0.2156 with full add-on support, 32-bit "
+                + "-- a newer version is refused too, not just an older one.");
+        }
+        Engine.Require(Engine.Machine(reShade) == Engine.MachineX86, "ReShade must be x86");
+        p[reShadeName] = reShade;
+
+        var tuning = Path.Combine(dir, "dlss5-neural.ini");
+        Engine.SafePath(tuning);
+        if (!File.Exists(tuning)) p["dlss5-neural.ini"] = Encoding.UTF8.GetBytes(Engine.FreshIni());
+
+        var ini = Path.Combine(dir, "ReShade.ini");
+        Engine.SafePath(ini);
+        var before = File.Exists(ini) ? Encoding.UTF8.GetString(Engine.Read(ini)) : string.Empty;
+        var after = Engine.FirstDock(before, Width, Height);
+        if (before != after) p["ReShade.ini"] = Encoding.UTF8.GetBytes(after);
+
+        return p;
+    }
+
+    public void Install(string target, string preset)
+    {
+        var dir = Engine.InstallDirectory(target);
+        Engine.SafePath(dir);
+        var desired = Plan(Engine.Absolute(target), preset);
+        Transaction.Apply(dir, preset, Route.X86, desired, Log);
+        var how = preset == "D3D8"
+            ? $"d3d8to9 {Engine.D3d8To9Version} -> native D3D9 frontend"
+            : "native frontend";
+        Note($"Installed {preset} x86; {how}; same-frame protocol v2");
+    }
+
+    public void Uninstall(string directory, bool removeConfigs) =>
+        Transaction.Uninstall(directory, Route.X86, removeConfigs, Log);
+}

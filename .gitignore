@@ -1,0 +1,12 @@
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+
+# Payloads are never committed: the weights are NVIDIA-derived and the runtime is a third-party
+# build. They are downloaded at run time and pinned by hash.
+*.addon32
+*.addon64
+dlssnr_amd_pass1.dll
+dlssnr_on_amd_weights.bin
