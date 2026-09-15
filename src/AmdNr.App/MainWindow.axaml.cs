@@ -37,6 +37,8 @@ public partial class MainWindow : Window
     private readonly List<VersionChoice> _versions = [];
     private VersionChoice? _version;
     private bool _settingVersion;
+    private string? _proxy;
+    private bool _settingProxy;
     private ApiDatabase? _apiDb;
     private AppRelease? _update;
     private GameCard? _selected;
@@ -784,6 +786,7 @@ public partial class MainWindow : Window
         card.RefreshRoute();
         PresetNote.Text = PresetNote_(card.Entry.Preset);
         ShowVersions(card.Entry.Preset);
+        ShowProxies(card.Entry.Preset);
 
         await RefreshAsync();
     }
@@ -907,6 +910,7 @@ public partial class MainWindow : Window
         _selected.RefreshRoute();
         PresetNote.Text = PresetNote_(_selected.Entry.Preset);
         ShowVersions(_selected.Entry.Preset);
+        ShowProxies(_selected.Entry.Preset);
         Save();
         await RefreshAsync();
     }
@@ -968,7 +972,7 @@ public partial class MainWindow : Window
         var (report, payloads) = await Task.Run(() =>
         {
             var staged = CachedPayloadFolder(card.Entry.Preset);
-            return (Work.Preflight(TargetFor(card), staged ?? "", card.Entry.Preset, pins), staged);
+            return (Work.Preflight(TargetFor(card), staged ?? "", card.Entry.Preset, pins, _proxy), staged);
         });
 
         Show(report);
@@ -983,6 +987,39 @@ public partial class MainWindow : Window
     /// decoration -- v0.5.0 published its 32-bit pair inside the archive rather than beside it,
     /// so for a bridge route the manifest is the only place those two files can be pinned from.
     /// </summary>
+    /// <summary>The name ReShade goes in as. Automatic is the first entry and what almost every
+    /// game wants; the list under it is only the names the pinned ReShade can actually be loaded
+    /// under for this API, because a name it does not export is a file nothing opens.</summary>
+    private void ShowProxies(Preset preset)
+    {
+        var choices = Work.ProxyChoicesFor(preset);
+        ProxySection.IsVisible = choices.Length > 0;
+        if (choices.Length == 0)
+        {
+            // Vulkan: ReShade is a layer there, so there is no name to choose.
+            _proxy = null;
+            return;
+        }
+
+        // A name chosen for one API is not carried into another, where it would be ignored anyway.
+        if (!Work.ProxyAllowed(preset, _proxy)) _proxy = null;
+
+        _settingProxy = true;
+        ProxyBox.ItemsSource = new[] { Text("Str.ProxyAuto") }.Concat(choices).ToList();
+        ProxyBox.SelectedIndex = _proxy is null ? 0 : Array.IndexOf(choices, _proxy) + 1;
+        _settingProxy = false;
+        ProxyNote.Text = Text("Str.ProxyNote");
+    }
+
+    private void OnProxyChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_settingProxy || _selected is null) return;
+        var choices = Work.ProxyChoicesFor(_selected.Entry.Preset);
+        var i = ProxyBox.SelectedIndex;
+        _proxy = i >= 1 && i - 1 < choices.Length ? choices[i - 1] : null;
+        _ = RefreshAsync();
+    }
+
     private void ShowVersions(Preset preset)
     {
         var route = preset.Route();
@@ -1068,7 +1105,7 @@ public partial class MainWindow : Window
             Status(Text("Str.Working"));
             var pins = Pins();
             Report report;
-            try { report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins)); }
+            try { report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins, _proxy)); }
             catch (Exception ex)
             {
                 // The engine turns everything it expects into a report line, and rolls back before

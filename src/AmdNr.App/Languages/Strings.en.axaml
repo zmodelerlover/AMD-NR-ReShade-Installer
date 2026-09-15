@@ -96,6 +96,9 @@
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
+  <sys:String x:Key="Str.ProxySection">ReShade loads as</sys:String>
+  <sys:String x:Key="Str.ProxyNote">Automatic picks dxgi.dll, which serves every Direct3D. Choose another only when a game refuses to load that one -- some load d3d12.dll and nothing else.</sys:String>
+  <sys:String x:Key="Str.ProxyAuto">Automatic</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Download all now</sys:String>
   <sys:String x:Key="Str.ClearCache">Clear the cache</sys:String>
   <sys:String x:Key="Str.ClearCacheBody">Deletes the downloaded files, the covers and the version list. Nothing installed in a game is touched; the next install downloads what it needs again.</sys:String>

@@ -93,6 +93,9 @@
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
   <sys:String x:Key="Str.RouteSection">Rota</sys:String>
   <sys:String x:Key="Str.VersionSection">Versão do add-on</sys:String>
+  <sys:String x:Key="Str.ProxySection">ReShade carrega como</sys:String>
+  <sys:String x:Key="Str.ProxyNote">Automático escolhe dxgi.dll, que serve todo Direct3D. Troque só quando um jogo se recusar a carregar esse -- alguns carregam d3d12.dll e mais nada.</sys:String>
+  <sys:String x:Key="Str.ProxyAuto">Automático</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Baixar tudo agora</sys:String>
   <sys:String x:Key="Str.ClearCache">Limpar o cache</sys:String>
   <sys:String x:Key="Str.ClearCacheBody">Apaga os arquivos baixados, as capas e a lista de versões. Nada instalado em jogo é tocado; a próxima instalação baixa de novo o que precisar.</sys:String>

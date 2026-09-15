@@ -641,4 +641,25 @@ public class WorkTests
         Assert.False(removed.Failed, removed.ToLog("real uninstall"));
         Assert.False(File.Exists(Path.Combine(game, Work.WeightsName)));
     }
+
+    /// <summary>The name ReShade goes in as can be chosen, and only from names this API can be
+    /// loaded under. Automatic takes dxgi.dll because it serves every Direct3D, which is wrong for
+    /// the games that only ever load d3d12.dll -- that is the whole reason the choice exists.
+    /// A name from another API is ignored rather than installed: writing d3d12.dll into a D3D11
+    /// game leaves a file nothing opens, and the install would look like it worked.</summary>
+    [Fact]
+    public void TheProxyNameCanBeChosenFromWhatTheApiCanActuallyLoad()
+    {
+        Assert.Equal(["dxgi.dll", "d3d12.dll", "dinput8.dll"], Work.ProxyChoicesFor(Preset.Dx12));
+        Assert.Equal(["dxgi.dll", "d3d11.dll", "dinput8.dll"], Work.ProxyChoicesFor(Preset.Dx11));
+        Assert.Empty(Work.ProxyChoicesFor(Preset.Vulkan));
+
+        // version.dll is the one people ask for, and the pinned ReShade exports nothing of it --
+        // a game importing it would fail to resolve rather than load ReShade.
+        Assert.False(Work.ProxyAllowed(Preset.Dx12, "version.dll"));
+        Assert.False(Work.ProxyAllowed(Preset.Dx11, "d3d12.dll"));
+        Assert.True(Work.ProxyAllowed(Preset.Dx12, "d3d12.dll"));
+        Assert.True(Work.ProxyAllowed(Preset.Dx12, "D3D12.DLL"));
+        Assert.False(Work.ProxyAllowed(Preset.Dx12, null));
+    }
 }

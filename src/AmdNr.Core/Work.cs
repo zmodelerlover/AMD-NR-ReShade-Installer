@@ -206,9 +206,42 @@ public static class Work
     /// place rather than doubled; when dxgi.dll belongs to something else -- OptiScaler, DXVK -- the
     /// API's own DLL is used so both keep loading. Vulkan has no proxy at all: ReShade is a layer
     /// there, registered by its own setup, and this returns null.</summary>
-    internal static string? ReShadeProxyFor(Preset preset, string dir)
+    /// <summary>Every name the pinned ReShade can actually be loaded under for this API, best first.
+    ///
+    /// Not a guess and not ReShade's setup menu: these are the names whose entry points the pinned
+    /// ReShade64.dll really exports, read out of it. That is why `version.dll` is not here, however
+    /// often it is suggested — this build exports nothing of version.dll's, so a game that imports
+    /// it would fail to resolve rather than load ReShade. `dinput8.dll` is here because the build
+    /// does export `DirectInput8Create`, and it is the way into a game that reaches its graphics
+    /// API through something this list cannot displace.
+    ///
+    /// The first entry is what the automatic pick prefers; a person may choose any of them, and
+    /// some games only ever load one. Vulkan has none: ReShade is a layer there.</summary>
+    public static string[] ProxyChoicesFor(Preset preset) => preset switch
+    {
+        _ when preset.IsVulkan() => [],
+        Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "dinput8.dll"],
+        Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
+        Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "dinput8.dll"],
+        _ => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
+    };
+
+    /// <summary>Whether a chosen name is one this API can be loaded under at all. A choice that is
+    /// not is ignored rather than installed: writing d3d12.dll into a D3D11 game produces a file
+    /// nothing opens, and the install would look like it worked.</summary>
+    public static bool ProxyAllowed(Preset preset, string? name) =>
+        name is { Length: > 0 } &&
+        ProxyChoicesFor(preset).Contains(name, StringComparer.OrdinalIgnoreCase);
+
+    internal static string? ReShadeProxyFor(Preset preset, string dir, string? wanted = null)
     {
         if (preset.IsVulkan()) return null;
+
+        // What the person asked for, when this API can be loaded under it. Deliberately ahead of
+        // everything below: a game that only loads d3d12.dll is exactly the case the automatic pick
+        // gets wrong, because dxgi.dll is free there and so it takes it.
+        if (ProxyAllowed(preset, wanted))
+            return ProxyChoicesFor(preset).First(n => string.Equals(n, wanted, StringComparison.OrdinalIgnoreCase));
 
         string[] candidates = preset == Preset.Dx12 ? ["dxgi.dll", "d3d12.dll"] : ["dxgi.dll", "d3d11.dll"];
         var existing = candidates.FirstOrDefault(n =>
@@ -403,7 +436,8 @@ public static class Work
     // Everything that can be known before a single byte is written, and cheap enough to redo while
     // a path is still being pasted: metadata, one open(), one free-space call.
 
-    public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins)
+    public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
+        string? proxy = null)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -522,7 +556,7 @@ public static class Work
         if (reShadeShipped)
             report.Ok(preset.Route() == Route.X86
                 ? "The pinned 32-bit ReShade 6.8.0 is part of this install; nothing to install by hand."
-                : $"ReShade 6.8.0 with full add-on support is part of this install, as {ReShadeProxyFor(preset, dir)}; nothing to install by hand.");
+                : $"ReShade 6.8.0 with full add-on support is part of this install, as {ReShadeProxyFor(preset, dir, proxy)}; nothing to install by hand.");
         else
             CheckReShade(dir, preset, report);
 
@@ -616,7 +650,8 @@ public static class Work
         return report;
     }
 
-    public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins)
+    public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
+        string? proxy = null)
     {
         if (preset.Route() == Route.X86) return InstallX86(gameDir, payloadDir, preset);
 
@@ -666,15 +701,16 @@ public static class Work
 
         // ReShade itself, when the payload carries it: the add-on does nothing without it, and asking
         // someone to run a second installer and pick the right API is the step people get wrong.
-        if (File.Exists(Path.Combine(payloads, "ReShade64.dll")) && ReShadeProxyFor(preset, dir) is { } proxy
+        if (File.Exists(Path.Combine(payloads, "ReShade64.dll"))
+            && ReShadeProxyFor(preset, dir, proxy) is { } proxyName
             && VerifiedPayload(payloads, "ReShade64.dll", pins.ReShade64Sha, report) is { } reShade)
         {
-            files[proxy] = reShade;
+            files[proxyName] = reShade;
             var iniPath = Path.Combine(dir, "ReShade.ini");
             var before = File.Exists(iniPath) ? File.ReadAllText(iniPath) : "";
             var after = ReadyReShadeIni(before);
             if (after != before) files["ReShade.ini"] = System.Text.Encoding.UTF8.GetBytes(after);
-            report.Info($"ReShade 6.8.0 with full add-on support goes in as {proxy}.");
+            report.Info($"ReShade 6.8.0 with full add-on support goes in as {proxyName}.");
         }
 
         // A refused payload stops the whole install rather than leaving the add-on behind on its own.

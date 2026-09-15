@@ -409,6 +409,16 @@
                           <TextBlock x:Name="PresetNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                         </StackPanel>
 
+                        <!-- The name ReShade is loaded under. Automatic is right almost always;
+                             the games that only ever load one specific name are why this exists. -->
+                        <StackPanel x:Name="ProxySection" Spacing="8" IsVisible="False">
+                          <TextBlock Text="{DynamicResource Str.ProxySection}" Classes="section" />
+                          <ComboBox x:Name="ProxyBox" HorizontalAlignment="Stretch"
+                                    SelectionChanged="OnProxyChanged"
+                                    AutomationProperties.Name="{DynamicResource Str.ProxySection}" />
+                          <TextBlock x:Name="ProxyNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
+
                         <!-- Which release of the add-on goes in -->
                         <StackPanel x:Name="VersionSection" Spacing="8" IsVisible="False">
                           <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
