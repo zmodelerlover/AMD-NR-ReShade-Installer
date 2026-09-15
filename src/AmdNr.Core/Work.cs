@@ -89,9 +89,45 @@ public static class Work
             : string.Join(", ", shown);
     }
 
+    /// <summary>What a proxy DLL actually is, from its version resource. The filename says nothing:
+    /// OptiScaler, DXVK and SpecialK all install as dxgi.dll too, and calling one of them "ReShade
+    /// found" sends someone to look for an add-on in a ReShade that is not there.</summary>
+    internal static (bool IsReShade, string? Product, string? Version) Identify(string path)
+    {
+        try
+        {
+            var info = System.Diagnostics.FileVersionInfo.GetVersionInfo(path);
+            var product = string.IsNullOrWhiteSpace(info.ProductName) ? info.FileDescription : info.ProductName;
+            var isReShade = (product ?? "").Contains("ReShade", StringComparison.OrdinalIgnoreCase);
+            return (isReShade, string.IsNullOrWhiteSpace(product) ? null : product.Trim(), info.ProductVersion?.Trim());
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or FileNotFoundException)
+        {
+            return (false, null, null);
+        }
+    }
+
     private static void CheckReShade(string dir, Preset preset, Report report)
     {
-        var found = Proxies.Where(n => File.Exists(Path.Combine(dir, n))).ToList();
+        var present = Proxies.Where(n => File.Exists(Path.Combine(dir, n))).ToList();
+
+        // Anything identified as something else is named, and not counted as ReShade. A proxy with no
+        // version resource at all is kept as possibly-ReShade: every ReShade build carries one, but
+        // saying "not ReShade" about a file nothing can be read from would be a guess.
+        var found = new List<string>();
+        foreach (var name in present)
+        {
+            var (isReShade, product, version) = Identify(Path.Combine(dir, name));
+            if (isReShade || product is null)
+            {
+                found.Add(isReShade && version is not null ? $"{name} (ReShade {version})" : name);
+                continue;
+            }
+            report.Warn(
+                $"{name} here is {product}{(version is null ? "" : $" {version}")}, not ReShade. The add-on only loads "
+                + "inside ReShade with full add-on support; if both are meant to run, ReShade has to be loaded "
+                + "under another name, and two programs cannot both be the game's " + name + ".");
+        }
 
         if (preset.IsVulkan())
         {

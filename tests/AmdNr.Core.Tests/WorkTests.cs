@@ -426,6 +426,21 @@ public class WorkTests
         Assert.True(Fixture.HasAny(report, "Nothing in the way"));
     }
 
+    /// <summary>OptiScaler, DXVK and SpecialK all install as dxgi.dll. A DLL that says in its own
+    /// version resource that it is something else must not be reported as ReShade.</summary>
+    [Fact]
+    public void AProxyThatIsNotReShadeIsNamedAsWhatItIs()
+    {
+        var game = Fixture.Temp("not-reshade");
+        var (src, pins) = Fixture.Payloads("not-reshade");
+        // Windows' own dxgi.dll: a real version resource that says Microsoft, not ReShade.
+        File.Copy(Path.Combine(Environment.SystemDirectory, "dxgi.dll"), Path.Combine(game, "dxgi.dll"));
+
+        var report = Work.Preflight(game, src, Preset.Dx11, pins);
+        Assert.False(Fixture.HasAny(report, "ReShade found"), report.ToLog("not reshade"));
+        Assert.True(Fixture.HasAny(report, "not ReShade"), report.ToLog("not reshade"));
+    }
+
     [Fact]
     public void UninstallWithNoFolderSaysWhichFieldIsEmpty()
     {
