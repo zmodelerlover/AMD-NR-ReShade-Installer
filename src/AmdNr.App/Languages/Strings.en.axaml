@@ -95,7 +95,16 @@
   <sys:String x:Key="Str.InstalledBadge">Installed</sys:String>
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
+  <sys:String x:Key="Str.ExeSection">The game's executable</sys:String>
+  <sys:String x:Key="Str.ExeChoose">Choose...</sys:String>
+  <sys:String x:Key="Str.ExeUseDetected">Use the detected one</sys:String>
+  <sys:String x:Key="Str.ExeNone">No executable found in this folder.</sys:String>
+  <sys:String x:Key="Str.ExeNote">The width and the API are read off this file, and the routes below follow from it. A game that keeps a small launcher in the root and the real thing in Bin64 is the case this gets wrong -- if the bitness here is not the one you expect, point it at the right file.</sys:String>
+  <sys:String x:Key="Str.ExeNoteChosen">You chose this file, so detection leaves it alone -- including after a re-scan.</sys:String>
+  <sys:String x:Key="Str.ExeNotHere">That file is not inside this game's folder.</sys:String>
+  <sys:String x:Key="Str.ExeUnreadable">That file is not a Windows executable this can read.</sys:String>
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
+  <sys:String x:Key="Str.RouteMismatch">This route is for {0} games and the executable above is {1}. Nothing stops you -- the detection may have read the wrong file -- but if it read the right one, this will not load.</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade loads as</sys:String>
   <sys:String x:Key="Str.ProxyNote">Automatic picks dxgi.dll, which serves every Direct3D. Choose another only when a game refuses to load that one -- some load d3d12.dll and nothing else.</sys:String>

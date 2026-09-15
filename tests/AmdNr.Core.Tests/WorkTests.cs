@@ -158,19 +158,59 @@ public class WorkTests
         Assert.False(d.IsMixed);
     }
 
+    /// <summary>The detected width leads the list and nothing is dropped from it. It used to be a
+    /// filter, which is a dead end exactly when the detection is wrong: BeamNG.drive keeps a 32-bit
+    /// launcher in the root and the game in Bin64, was read as 32-bit, and then offered the three
+    /// routes that cannot work on it and no others.</summary>
     [Fact]
-    public void TheOfferedPresetsFollowTheDetectedWidth()
+    public void TheOfferedPresetsLeadWithTheDetectedWidthAndHideNothing()
     {
         Assert.Equal(Presets.All.Length, Presets.Offered(Detected.Unknown).Count);
 
         var x64 = Presets.Offered(Detected.On(Route.X64, string.Empty));
         Assert.Contains(Preset.Pcsx2, x64);
         Assert.Contains(Preset.Vulkan, x64);
-        Assert.DoesNotContain(x64, p => p.Route() == Route.X86);
+        Assert.Equal(Presets.All.Length, x64.Count);
+        Assert.All(x64.Take(5), p => Assert.Equal(Route.X64, p.Route()));
 
         var x86 = Presets.Offered(Detected.On(Route.X86, string.Empty));
-        Assert.Equal([Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8], x86);
-        Assert.DoesNotContain(x86, p => p.Route() == Route.X64);
+        Assert.Equal([Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8], x86.Take(3));
+        Assert.Equal(Presets.All.Length, x86.Count);
+        Assert.Contains(Preset.Dx12, x86);
+
+        // Every preset appears exactly once, whichever width led.
+        foreach (var offered in new[] { x64, x86, Presets.Offered(Detected.Unknown) })
+            Assert.Equal(Presets.All.Order(), offered.Order());
+    }
+
+    /// <summary>A 32-bit launcher in the root with the real game in Bin64 -- BeamNG.drive's layout,
+    /// reported as "shows as 32 bit only". The width comes off whichever executable is picked, so
+    /// picking the launcher made every route offered afterwards the wrong architecture.</summary>
+    [Fact]
+    public void ALauncherInTheRootDoesNotMakeASixtyFourBitGameThirtyTwoBit()
+    {
+        var game = Fixture.Temp("BeamNG.drive");
+        File.WriteAllBytes(Path.Combine(game, "BeamNG.drive.exe"), Fixture.Pe(x64: false));
+        var bin64 = Directory.CreateDirectory(Path.Combine(game, "Bin64")).FullName;
+        var real = Path.Combine(bin64, "BeamNG.drive.x64.exe");
+        File.WriteAllBytes(real, Fixture.PeWithImports(x64: true, ["d3d11.dll"]));
+
+        var found = GraphicsDetector.Detect(game, "BeamNG.drive");
+        Assert.Equal(real, found.Executable);
+        Assert.Equal(Route.X64, found.Width);
+
+        // A 64-bit binary in x64\ that is not the game is not taken instead: a crash handler beside
+        // a genuinely 32-bit game would otherwise turn it into a 64-bit one.
+        var other = Fixture.Temp("small-game");
+        File.WriteAllBytes(Path.Combine(other, "small-game.exe"), Fixture.Pe(x64: false));
+        Directory.CreateDirectory(Path.Combine(other, "x64"));
+        File.WriteAllBytes(Path.Combine(other, "x64", "reporter.exe"), Fixture.Pe(x64: true));
+        Assert.Equal(Route.X86, GraphicsDetector.Detect(other, "small-game").Width);
+
+        // And the person can point at whichever file they like, which is the way back when this is
+        // still wrong -- it is read instead of the folder being searched at all.
+        var launcher = Path.Combine(game, "BeamNG.drive.exe");
+        Assert.Equal(Route.X86, GraphicsDetector.Detect(game, "BeamNG.drive", launcher).Width);
     }
 
     [Fact]

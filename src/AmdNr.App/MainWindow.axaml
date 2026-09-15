@@ -401,6 +401,20 @@
                           </Grid>
                         </Border>
 
+                        <!-- Which file the width and the API were read off. Detection picks it out
+                             of the folder and can pick the launcher instead of the game, so it is
+                             shown rather than assumed, and it can be changed. -->
+                        <StackPanel x:Name="ExeSection" Spacing="8">
+                          <TextBlock Text="{DynamicResource Str.ExeSection}" Classes="section" />
+                          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <TextBlock Grid.Column="0" x:Name="ExeLine" TextWrapping="Wrap" LineHeight="18"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1" x:Name="ExeButton" Click="OnChooseExecutable"
+                                    Content="{DynamicResource Str.ExeChoose}" VerticalAlignment="Center" />
+                          </Grid>
+                          <TextBlock x:Name="ExeNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
+
                         <!-- Route -->
                         <StackPanel Spacing="8">
                           <TextBlock Text="{DynamicResource Str.RouteSection}" Classes="section" />

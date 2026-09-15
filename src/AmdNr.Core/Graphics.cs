@@ -229,37 +229,21 @@ public static class GraphicsDetector
         if (File.Exists(root) && root.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) return root;
         if (!Directory.Exists(root)) return null;
 
+        var hints = Hints(root, gameName);
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var folder in CandidateFolders(root))
         {
-            if (!seen.Add(folder) || !Directory.Exists(folder)) continue;
+            if (!seen.Add(folder)) continue;
+            if (PickIn(folder, hints) is not { } exe) continue;
 
-            List<string> exes;
-            try
-            {
-                exes = Directory.EnumerateFiles(folder, "*.exe")
-                    .Where(LooksLikeTheGame)
-                    .Where(e => Engine.MachineOfFile(e) is not null)
-                    .ToList();
-            }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { continue; }
-            if (exes.Count == 0) continue;
-
-            var shipping = exes.FirstOrDefault(e =>
-                e.EndsWith("-Win64-Shipping.exe", StringComparison.OrdinalIgnoreCase)
-                || e.EndsWith("-WinGDK-Shipping.exe", StringComparison.OrdinalIgnoreCase));
-            if (shipping is not null) return shipping;
-
-            var hints = Hints(root, gameName);
-            var named = exes
-                .Select(e => (Exe: e, Score: Similarity(Path.GetFileNameWithoutExtension(e), hints)))
-                .Where(x => x.Score > 0)
-                .OrderByDescending(x => x.Score)
-                .ThenByDescending(x => Engine.SizeOf(x.Exe) ?? 0)
-                .FirstOrDefault();
-            if (named.Exe is not null) return named.Exe;
-
-            return exes.OrderByDescending(e => Engine.SizeOf(e) ?? 0).First();
+            // A 32-bit executable beside a folder holding the same game built 64-bit is a launcher,
+            // not the game. BeamNG.drive ships exactly that -- BeamNG.drive.exe in the root starts
+            // Bin64\BeamNG.drive.x64.exe -- and the root is searched first, so it was detected as a
+            // 32-bit game. That is not a cosmetic mistake: the width then filtered the route list
+            // down to the three 32-bit routes, none of which can work, with no way to pick another.
+            if (Engine.MachineOfFile(exe) == Engine.MachineX86 && SixtyFourTwin(root, hints) is { } real)
+                return real;
+            return exe;
         }
 
         // Every executable matched a not-the-game word. Rather than report no game at all, take the
@@ -275,6 +259,59 @@ public static class GraphicsDetector
         {
             return null;
         }
+    }
+
+    /// <summary>The likeliest game executable in one folder, or null when it holds none. An Unreal
+    /// shipping binary wins outright; otherwise the one whose name looks like the folder or the
+    /// game, and failing that the largest.</summary>
+    private static string? PickIn(string folder, List<string> hints)
+    {
+        if (!Directory.Exists(folder)) return null;
+
+        List<string> exes;
+        try
+        {
+            exes = Directory.EnumerateFiles(folder, "*.exe")
+                .Where(LooksLikeTheGame)
+                .Where(e => Engine.MachineOfFile(e) is not null)
+                .ToList();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return null; }
+        if (exes.Count == 0) return null;
+
+        var shipping = exes.FirstOrDefault(e =>
+            e.EndsWith("-Win64-Shipping.exe", StringComparison.OrdinalIgnoreCase)
+            || e.EndsWith("-WinGDK-Shipping.exe", StringComparison.OrdinalIgnoreCase));
+        if (shipping is not null) return shipping;
+
+        var named = exes
+            .Select(e => (Exe: e, Score: Similarity(Path.GetFileNameWithoutExtension(e), hints)))
+            .Where(x => x.Score > 0)
+            .OrderByDescending(x => x.Score)
+            .ThenByDescending(x => Engine.SizeOf(x.Exe) ?? 0)
+            .FirstOrDefault();
+        if (named.Exe is not null) return named.Exe;
+
+        return exes.OrderByDescending(e => Engine.SizeOf(e) ?? 0).First();
+    }
+
+    /// <summary>Folders a game keeps its 64-bit build in when the root holds only a launcher.</summary>
+    private static readonly string[] WideFolders =
+        ["Bin64", @"bin\x64", @"bin\win64", "x64", "bin_x64", @"Binaries\Win64"];
+
+    /// <summary>The 64-bit build of the same game, in one of the folders that only ever hold one.
+    /// The name still has to look like the game: a crash handler in x64\ is not the game, and taking
+    /// it would trade one wrong executable for another.</summary>
+    private static string? SixtyFourTwin(string root, List<string> hints)
+    {
+        foreach (var sub in WideFolders)
+        {
+            if (PickIn(Path.Combine(root, sub), hints) is not { } found) continue;
+            if (Engine.MachineOfFile(found) == Engine.MachineX64
+                && Similarity(Path.GetFileNameWithoutExtension(found), hints) > 0)
+                return found;
+        }
+        return null;
     }
 
     /// <summary>Unreal ships both RHIs in every Windows build, so an Unreal executable importing
@@ -420,7 +457,11 @@ public static class GraphicsDetector
         };
     }
 
-    public static GraphicsDetection Detect(string root, string? gameName = null)
+    /// <param name="executable">The executable to read, when somebody has pointed at one. Detection
+    /// picks the game's binary out of a folder and is occasionally wrong about which file that is --
+    /// and everything downstream, the width above all, is read off whichever file it picked. This is
+    /// how that is corrected without asking anyone to believe the guess.</param>
+    public static GraphicsDetection Detect(string root, string? gameName = null, string? executable = null)
     {
         // 0. A known emulator, before anything else. Its executable links every renderer it can be
         //    set to, so reading the imports here answers a different question than the one asked:
@@ -428,7 +469,11 @@ public static class GraphicsDetector
         if (Emulators.Identify(root) is { } emulator)
             return ForEmulator(root, emulator);
 
-        var exe = FindExecutable(root, gameName);
+        var chosen = executable is { Length: > 0 } && File.Exists(executable)
+                     && Engine.MachineOfFile(executable) is not null
+            ? executable
+            : null;
+        var exe = chosen ?? FindExecutable(root, gameName);
         if (exe is null) return new GraphicsDetection(null, null, GraphicsApi.Unknown, false, "No executable found in that folder.");
 
         // A Source game answers from its renderer module, not from the launcher stub in the root.

@@ -92,7 +92,16 @@
   <sys:String x:Key="Str.InstalledBadge">Instalado</sys:String>
   <sys:String x:Key="Str.Close">Fechar</sys:String>
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
+  <sys:String x:Key="Str.ExeSection">O executável do jogo</sys:String>
+  <sys:String x:Key="Str.ExeChoose">Escolher...</sys:String>
+  <sys:String x:Key="Str.ExeUseDetected">Usar o detectado</sys:String>
+  <sys:String x:Key="Str.ExeNone">Nenhum executável encontrado nesta pasta.</sys:String>
+  <sys:String x:Key="Str.ExeNote">A largura e a API são lidas deste arquivo, e as rotas abaixo seguem dele. Um jogo que deixa um lançador pequeno na raiz e a coisa real em Bin64 é o caso que isto erra -- se o número de bits aqui não for o que você espera, aponte para o arquivo certo.</sys:String>
+  <sys:String x:Key="Str.ExeNoteChosen">Você escolheu este arquivo, então a detecção não mexe nele -- nem depois de um re-scan.</sys:String>
+  <sys:String x:Key="Str.ExeNotHere">Esse arquivo não está dentro da pasta deste jogo.</sys:String>
+  <sys:String x:Key="Str.ExeUnreadable">Esse arquivo não é um executável do Windows que dê para ler.</sys:String>
   <sys:String x:Key="Str.RouteSection">Rota</sys:String>
+  <sys:String x:Key="Str.RouteMismatch">Esta rota é para jogos {0} e o executável acima é {1}. Nada impede você -- a detecção pode ter lido o arquivo errado -- mas se ela leu o certo, isto não vai carregar.</sys:String>
   <sys:String x:Key="Str.VersionSection">Versão do add-on</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade carrega como</sys:String>
   <sys:String x:Key="Str.ProxyNote">Automático escolhe dxgi.dll, que serve todo Direct3D. Troque só quando um jogo se recusar a carregar esse -- alguns carregam d3d12.dll e mais nada.</sys:String>

@@ -53,8 +53,11 @@ Ported verbatim from the Rust engine, because these were paid for the hard way:
 - **The manifest is a compatibility surface.** It is accepted only when re-encoding reproduces it
   byte for byte, which is what makes hand-editing detectable — and what keeps installs written by
   the older C++ and Rust installers readable. The captured literal in the test suite is the guard.
-- **Bitness is detected, never asked**, by reading the PE header; five of the ten
-  API-by-architecture combinations do not exist and are never offered.
+- **Bitness is read from the PE header, not asked** — and the file it was read from is shown, with
+  a way to point at a different one. Detection picks the game's binary out of the folder and a
+  folder that keeps a launcher in the root and the game in `Bin64` is picked wrong; the routes that
+  match the detected width lead the list, and the rest stay reachable, because a list that hides
+  every working route is a dead end exactly when the guess was wrong.
 
 ## Building
 

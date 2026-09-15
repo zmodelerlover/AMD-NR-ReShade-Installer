@@ -406,7 +406,7 @@ public static class Engine
     }
 
     /// <summary>Component-aware containment: C:\game must not contain C:\gameX.</summary>
-    internal static bool IsInside(string root, string candidate)
+    public static bool IsInside(string root, string candidate)
     {
         var r = root.TrimEnd(Path.DirectorySeparatorChar);
         return candidate.Length > r.Length

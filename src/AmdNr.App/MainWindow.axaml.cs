@@ -32,6 +32,10 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<ReportLine> _report = [];
     private readonly List<Preset> _offered = [];
 
+    /// <summary>What the width detection said about the selected game, kept so the route note can
+    /// say when the chosen route disagrees with it.</summary>
+    private Detected _detected = Detected.Unknown;
+
     private PayloadManifest? _manifest;
     private IReadOnlyList<AddonRelease> _releases = [];
     private readonly List<VersionChoice> _versions = [];
@@ -413,7 +417,8 @@ public partial class MainWindow : Window
         {
             var db = _apiDb;
             var detection = await Task.Run(() =>
-                GraphicsDetector.Detect(card.Path, card.Entry.Name).With(db?.Lookup(card.Entry.AppId, card.Entry.Name)));
+                GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
+                    .With(db?.Lookup(card.Entry.AppId, card.Entry.Name)));
             card.Graphics = detection;
             if (!card.Entry.PresetChosen && detection.Preset is { } preset) card.Entry.Preset = preset;
         }
@@ -742,7 +747,7 @@ public partial class MainWindow : Window
         DrawerHeader.DataContext = card;
         OpenDrawer();
 
-        var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name);
+        var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable);
         ApiTag.Text = graphics.Tag;
         DetectedLine.Text = graphics.Why;
         ApiCheckBody.Text = string.Format(Text("Str.CheckApiBody"), graphics.Tag);
@@ -776,10 +781,14 @@ public partial class MainWindow : Window
             ? Detected.On(width, Path.GetFileName(graphics.Executable ?? card.Path))
             : Work.Detect(card.Path);
 
-        // Five of the ten API-by-architecture combinations do not exist; the detected width rules
-        // out the rest, so a route that cannot work is never on the list.
+        ShowExecutable(graphics, card.Entry);
+
+        // The routes the detected width says can work come first; the rest stay reachable, because
+        // a wrong width is wrong about which file is the game, and a list that hides every working
+        // route leaves nowhere to go. PresetNote_ says so when the selected one does not match.
         _offered.Clear();
         _offered.AddRange(Presets.Offered(detected));
+        _detected = detected;
         _settingPreset = true;
         PresetBox.ItemsSource = _offered.Select(PresetLabel).ToList();
         var index = _offered.IndexOf(card.Entry.Preset);
@@ -917,6 +926,78 @@ public partial class MainWindow : Window
         ShowProxies(_selected.Entry.Preset);
         Save();
         await RefreshAsync();
+    }
+
+    /// <summary>Which file the width and the API were read off, and the way to change it.
+    ///
+    /// It is shown because it is the one input everything else is derived from and the one the app
+    /// can get wrong on its own: a folder with a launcher in the root and the game in Bin64 is read
+    /// as the launcher, and every route offered after that is for the wrong architecture.</summary>
+    private void ShowExecutable(GraphicsDetection graphics, GameEntry entry)
+    {
+        var chosen = entry.Executable is { Length: > 0 };
+        var exe = graphics.Executable;
+        var width = exe is null ? null : Engine.MachineOfFile(exe) switch
+        {
+            Engine.MachineX86 => "32-bit",
+            Engine.MachineX64 => "64-bit",
+            _ => null,
+        };
+
+        ExeLine.Text = exe is null
+            ? Text("Str.ExeNone")
+            : Path.GetFileName(exe) + (width is null ? "" : $"  ·  {width}");
+        ExeNote.Text = chosen ? Text("Str.ExeNoteChosen") : Text("Str.ExeNote");
+        ExeButton.Content = chosen ? Text("Str.ExeUseDetected") : Text("Str.ExeChoose");
+    }
+
+    /// <summary>Point the detection at a file, or put it back on its own answer. The route list is
+    /// rebuilt from it, because the width it reads is what orders that list.</summary>
+    private async void OnChooseExecutable(object? sender, RoutedEventArgs e)
+    {
+        if (_selected is not { } card || _busy) return;
+
+        if (card.Entry.Executable is { Length: > 0 })
+        {
+            card.Entry.Executable = null;
+        }
+        else
+        {
+            var picked = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = Text("Str.ExeSection"),
+                AllowMultiple = false,
+                FileTypeFilter = [new FilePickerFileType("*.exe") { Patterns = ["*.exe"] }],
+                SuggestedStartLocation = await StorageProvider.TryGetFolderFromPathAsync(card.Path),
+            });
+            if (picked.Count == 0) return;
+
+            var path = picked[0].TryGetLocalPath();
+            if (string.IsNullOrWhiteSpace(path)) return;
+
+            // Inside this game's folder, and a PE this can read. Both are refusals with a sentence
+            // rather than a silent fallback to detection, which would look like the pick was taken.
+            var root = Engine.WeaklyCanonical(card.Path);
+            if (!Engine.IsInside(root, Engine.WeaklyCanonical(path)))
+            {
+                ShowToast(Text("Str.ExeNotHere"), Level.Err);
+                return;
+            }
+            if (Engine.MachineOfFile(path) is null)
+            {
+                ShowToast(Text("Str.ExeUnreadable"), Level.Err);
+                return;
+            }
+            card.Entry.Executable = path;
+        }
+
+        // Detection has to run again: the width, the API and the folder the install writes into all
+        // come off the executable, and so does the order of the route list.
+        card.Graphics = GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
+            .With(_apiDb?.Lookup(card.Entry.AppId, card.Entry.Name));
+        if (!card.Entry.PresetChosen && card.Graphics.Preset is { } preset) card.Entry.Preset = preset;
+        Save();
+        Select(card);
     }
 
     private void OnTabChanged(object? sender, RoutedEventArgs e)
@@ -1497,7 +1578,18 @@ public partial class MainWindow : Window
     /// when a key is missing.</summary>
     private string PresetLabel(Preset preset) => Translated($"Str.Preset.{preset}", preset.Label());
 
-    private string PresetNote_(Preset preset) => Translated($"Str.PresetNote.{preset}", preset.Note());
+    /// <summary>What the route does, and — when it disagrees with the width read off the executable
+    /// — that it disagrees. The list no longer hides a mismatched route, so this is what keeps the
+    /// choice informed rather than merely possible.</summary>
+    private string PresetNote_(Preset preset)
+    {
+        var note = Translated($"Str.PresetNote.{preset}", preset.Note());
+        if (preset.MatchesDetected(_detected)) return note;
+
+        var wants = preset.Route() == Route.X86 ? "32-bit" : "64-bit";
+        var found = _detected.Route == Route.X86 ? "32-bit" : "64-bit";
+        return string.Format(Text("Str.RouteMismatch"), wants, found) + "\n\n" + note;
+    }
 
     private static string Translated(string key, string fallback) =>
         Application.Current?.TryFindResource(key, out var value) == true && value is string s && s.Length > 0

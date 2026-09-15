@@ -136,6 +136,12 @@ public sealed class GameEntry
     /// detection says, including when a newer API database changes its mind.</summary>
     public bool PresetChosen { get; set; }
 
+    /// <summary>The executable to read the width and the API off, when the person pointed at one.
+    /// Detection picks the game's binary out of the folder, and a folder that keeps a launcher in
+    /// the root and the game in Bin64 is picked wrong -- which made BeamNG.drive a 32-bit game.
+    /// Null means "whatever detection finds", which is the ordinary case and stays the default.</summary>
+    public string? Executable { get; set; }
+
     /// <summary>The add-on version this game was last installed with, or last set to by hand. It
     /// lives per game rather than per app because that is the scope it means anything in: pinning
     /// one game to an older build is a thing people do, and the rest of the library should not

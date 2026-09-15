@@ -34,16 +34,30 @@ public static class Presets
     public static Route Route(this Preset p) =>
         p is Preset.X86Dx11 or Preset.X86Dx9 or Preset.X86Dx8 ? AmdNr.Core.Route.X86 : AmdNr.Core.Route.X64;
 
-    /// <summary>What the target row offers. Five of the ten API-by-bitness combinations do not
-    /// exist, and the detected width rules out the rest, so a person is never shown a choice that
-    /// cannot work. When nothing could be detected the whole list stays available rather than
-    /// guessing.</summary>
-    public static IReadOnlyList<Preset> Offered(Detected detected) => detected.Route switch
+    /// <summary>What the target row offers: the routes the detected width says can work, first, and
+    /// then every other one.
+    ///
+    /// It used to return only the first group. That reads as helpful and is not, because when the
+    /// width is wrong it is wrong about *which executable is the game* — BeamNG.drive keeps a
+    /// 32-bit launcher in the root and the real game in Bin64, and a folder detected as 32-bit then
+    /// offered the three 32-bit routes and nothing else, with no way back. A detection this app
+    /// makes has to be correctable by the person looking at it; the ordering is the recommendation,
+    /// and the rest of the list is the way out when the recommendation is wrong.</summary>
+    public static IReadOnlyList<Preset> Offered(Detected detected)
     {
-        AmdNr.Core.Route.X64 => X64,
-        AmdNr.Core.Route.X86 => X86,
-        _ => All,
-    };
+        IReadOnlyList<Preset> first = detected.Route switch
+        {
+            AmdNr.Core.Route.X64 => X64,
+            AmdNr.Core.Route.X86 => X86,
+            _ => All,
+        };
+        return [.. first, .. All.Where(p => !first.Contains(p))];
+    }
+
+    /// <summary>Whether this route matches what the detection read off the executable. False is not
+    /// a refusal -- it is the line that has to be said out loud next to the choice.</summary>
+    public static bool MatchesDetected(this Preset p, Detected detected) =>
+        detected.Route is null || p.Route() == detected.Route;
 
     /// <summary>The string recorded in the install manifest. Kept separate from <see cref="Label"/>,
     /// which is prose that can be reworded, while this one has to keep matching manifests already

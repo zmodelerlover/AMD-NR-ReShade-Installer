@@ -148,6 +148,10 @@ public static class SupportReport
             {
                 o.AppendLine("detection");
                 o.AppendLine($"  executable    {g.Executable ?? "-"}");
+                // The width and the API are read off this one file, so which file it was -- and
+                // whether the app chose it or a person did -- is the first thing to check when the
+                // architecture in a report does not match the game it names.
+                o.AppendLine($"  exe chosen by {(card.Entry.Executable is { Length: > 0 } ? "the user" : "detection")}");
                 o.AppendLine($"  installs into {g.Target ?? "-"}");
                 o.AppendLine($"  architecture  {g.Width?.ToString() ?? "unknown"}");
                 o.AppendLine($"  apis          {(g.All.Count == 0 ? "unknown" : string.Join(", ", g.All.Select(GraphicsDetection.Short)))}");
