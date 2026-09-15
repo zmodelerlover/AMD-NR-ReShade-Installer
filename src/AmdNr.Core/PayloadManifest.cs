@@ -64,6 +64,7 @@ public sealed class PayloadManifest
     public const string RuntimeComponent = "runtime";
     public const string X86ExtrasComponent = "x86-extras";
     public const string BridgeComponent = "bridge";
+    public const string ReShadeComponent = "reshade";
 
     private static readonly JsonSerializerOptions Options = new()
     {
