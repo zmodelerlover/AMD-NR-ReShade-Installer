@@ -8,7 +8,7 @@
           "name": "dlss5-neural.addon64",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon64",
           "size": 550912,
-          "sha256": "2af2181679dfdba87d4db387fbdfc8a656a1ef9b2496089bd687161421c1ec44"
+          "sha256": "77629da1fb55a12ae7b5557bbd485fa0a114e1e47c8179ac07ef1fe4ab2f6ca6"
         }
       ]
     },
@@ -63,20 +63,20 @@
           "path": "files/dlss5-neural.addon32",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon32",
           "size": 247808,
-          "sha256": "a8ce92478b449c4dd69158930e4c687c424ca7299099ad545c2af346a8032784"
+          "sha256": "cdf2480ac72a573d0fe892efc76997af8900ea24f388933779364a020beee54f"
         },
         {
           "name": "dlss5-neural-host64.exe",
           "path": "files/dlss5-neural-host64.exe",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural-host64.exe",
-          "size": 440832,
-          "sha256": "4dba4a979147211704d012c3122c1a7112ceac2dc26eda8abc06e024a117c88d"
+          "size": 441344,
+          "sha256": "4eda296226bbefa78c46d7629763d303f29e65c061e08e0dd424897667430476"
         },
         {
           "name": "payload.sha256",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
           "size": 179,
-          "sha256": "0fe12d8a5c58284231ca5abbeaecc9b65acfa117321724f4a3072d757f6ee0af"
+          "sha256": "131a23a6a6c043c86b839db20757fa1c9da4b14a16f24c73c6d7d2dc87e9f3dd"
         }
       ]
     },
