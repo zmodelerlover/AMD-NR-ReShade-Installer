@@ -298,7 +298,16 @@ public partial class MainWindow : Window
 
     private void OnCardClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: GameCard card }) Select(card);
+        if (sender is not Button { Tag: GameCard card }) return;
+
+        // The drawer belongs to the game being installed until the work finishes: switching it
+        // away mid-install would put that game's result banner on another game's drawer.
+        if (_busy && card != _selected)
+        {
+            ShowToast(Text("Str.Working"), Level.Info);
+            return;
+        }
+        Select(card);
     }
 
     private async void Select(GameCard card)
