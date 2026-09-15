@@ -88,8 +88,23 @@ public sealed class GameEntry
     public string? Name { get; set; }
     public Preset Preset { get; set; } = Preset.Dx11;
 
+    /// <summary>Which library it came from, for the badge on the tile.</summary>
+    public GamePlatform Platform { get; set; } = GamePlatform.Manual;
+
+    /// <summary>Steam's app id, when it has one. It is what the cover art is keyed by.</summary>
+    public string? AppId { get; set; }
+
     [JsonIgnore]
     public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
+
+    public static GameEntry From(ScannedGame game) => new()
+    {
+        Path = game.InstallPath,
+        Name = game.Name,
+        Platform = game.Platform,
+        AppId = game.AppId,
+        Preset = GameScanner.GuessPreset(game.InstallPath),
+    };
 }
 
 /// <summary>games.json. Written whole every time -- it is a list of folders, not a database.</summary>

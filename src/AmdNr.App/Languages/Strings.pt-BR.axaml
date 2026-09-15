@@ -40,4 +40,14 @@
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
   <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
   <sys:String x:Key="Str.Credits">A rede é a DLSS-NR-on-AMD do danielblnc. A runtime e os pesos são trabalho dele.</sys:String>
+
+  <sys:String x:Key="Str.Scan">Procurar jogos</sys:String>
+  <sys:String x:Key="Str.Scanning">Lendo Steam, Epic, GOG, EA, Ubisoft, Battle.net e Xbox…</sys:String>
+  <sys:String x:Key="Str.Found">encontrados</sys:String>
+  <sys:String x:Key="Str.Added">novos</sys:String>
+  <sys:String x:Key="Str.FirstScanHint">Lista vazia. Procurar jogos lê seus launchers; olhar não muda nada.</sys:String>
+  <sys:String x:Key="Str.Search">Buscar jogos…</sys:String>
+  <sys:String x:Key="Str.Settings">Configurações</sys:String>
+  <sys:String x:Key="Str.NotDownloaded">ainda não baixado</sys:String>
+  <sys:String x:Key="Str.WillDownload">Os arquivos são baixados e conferidos na hora de instalar.</sys:String>
 </ResourceDictionary>

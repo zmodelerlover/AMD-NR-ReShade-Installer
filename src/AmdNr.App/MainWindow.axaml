@@ -2,144 +2,250 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="AmdNr.App.MainWindow"
         Title="AMD-NR ReShade Installer"
-        Width="1040" Height="680" MinWidth="880" MinHeight="560"
-        WindowStartupLocation="CenterScreen">
+        Width="1240" Height="800" MinWidth="980" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Bg}">
 
-  <Grid RowDefinitions="Auto,Auto,*,Auto">
+  <Grid ColumnDefinitions="64,*">
 
-    <!-- Header -->
-    <Border Grid.Row="0" Background="{DynamicResource Chrome}" Padding="18,12">
-      <Grid ColumnDefinitions="*,Auto">
-        <StackPanel Grid.Column="0" Spacing="2">
-          <TextBlock Classes="h1" Text="{DynamicResource Str.AppTitle}" />
-          <TextBlock Classes="muted" Text="{DynamicResource Str.Subtitle}" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Classes="muted" VerticalAlignment="Center" Text="{DynamicResource Str.Language}" />
-          <ComboBox x:Name="LanguageBox" MinWidth="170" SelectionChanged="OnLanguageChanged" />
-        </StackPanel>
-      </Grid>
-    </Border>
-
-    <!-- Update banner: a notice and a link, never a self-replacing download -->
-    <Border x:Name="UpdateBanner" Grid.Row="1" IsVisible="False"
-            Background="{DynamicResource SurfaceHigh}" BorderBrush="{DynamicResource Accent}"
-            BorderThickness="0,0,0,2" Padding="18,10">
-      <Grid ColumnDefinitions="*,Auto,Auto">
-        <TextBlock Grid.Column="0" x:Name="UpdateText" VerticalAlignment="Center" TextWrapping="Wrap" />
-        <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0"
-                Content="{DynamicResource Str.OpenReleases}" Click="OnOpenReleases" />
-        <Button Grid.Column="2" Classes="ghost" Margin="8,0,0,0"
-                Content="{DynamicResource Str.Dismiss}" Click="OnDismissUpdate" />
-      </Grid>
-    </Border>
-
-    <!-- Body -->
-    <Grid Grid.Row="2" ColumnDefinitions="330,*" Margin="18">
-
-      <!-- Left: the machine, then the games -->
-      <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto" Margin="0,0,14,0">
-
-        <Border Grid.Row="0" Classes="card" Margin="0,0,0,14">
-          <StackPanel Spacing="6">
-            <TextBlock Text="{DynamicResource Str.System}" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" >
-              <TextBlock Grid.Row="0" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Gpu}" Margin="0,0,10,0" />
-              <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuText" TextWrapping="Wrap" FontSize="12" />
-              <TextBlock Grid.Row="1" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Driver}" Margin="0,0,10,0" />
-              <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DriverText" FontSize="12" />
-              <TextBlock Grid.Row="2" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Hip}" Margin="0,0,10,0" />
-              <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HipText" FontSize="12" />
-            </Grid>
-            <TextBlock x:Name="SystemWarning" TextWrapping="Wrap" FontSize="12"
-                       Foreground="{DynamicResource Warn}" IsVisible="False" />
-          </StackPanel>
+    <!-- Rail -->
+    <Border Grid.Column="0" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+            BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0" Width="34" Height="34" Margin="0,16,0,18" CornerRadius="8"
+                Background="{DynamicResource Accent}">
+          <TextBlock Text="NR" Foreground="White" FontWeight="Bold" FontSize="13"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
 
-        <TextBlock Grid.Row="1" Text="{DynamicResource Str.Games}" FontWeight="SemiBold" Margin="2,0,0,8" />
+        <StackPanel Grid.Row="1" Spacing="6">
+          <RadioButton x:Name="TabGames" Classes="rail" GroupName="nav" IsChecked="True"
+                       Content="▦" ToolTip.Tip="{DynamicResource Str.Games}" Checked="OnTabChanged" />
+          <RadioButton x:Name="TabSystem" Classes="rail" GroupName="nav"
+                       Content="◈" ToolTip.Tip="{DynamicResource Str.System}" Checked="OnTabChanged" />
+          <RadioButton x:Name="TabSettings" Classes="rail" GroupName="nav"
+                       Content="⚙" ToolTip.Tip="{DynamicResource Str.Settings}" Checked="OnTabChanged" />
+        </StackPanel>
 
-        <Border Grid.Row="2" Classes="card" Padding="4">
-          <Grid>
-            <ListBox x:Name="GameList" Background="Transparent" BorderThickness="0"
-                     SelectionChanged="OnGameSelected">
-              <ListBox.ItemTemplate>
+        <TextBlock Grid.Row="2" x:Name="VersionText" Classes="muted" FontSize="10" Margin="0,0,0,10"
+                   HorizontalAlignment="Center" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto">
+
+      <!-- Top bar -->
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="18,14,18,10">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+          <Button x:Name="ScanButton" Classes="primary" Click="OnScan">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <TextBlock Text="⟳" />
+              <TextBlock Text="{DynamicResource Str.Scan}" />
+            </StackPanel>
+          </Button>
+          <Button Classes="ghost" Content="{DynamicResource Str.AddGame}" Click="OnAddGame" />
+        </StackPanel>
+
+        <TextBox Grid.Column="1" x:Name="SearchBox" Margin="14,0" MaxWidth="420"
+                 Watermark="{DynamicResource Str.Search}" TextChanged="OnSearch"
+                 Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+                 CornerRadius="6" Padding="10,7" />
+
+        <Border Grid.Column="2" Classes="pill" x:Name="GpuPill">
+          <StackPanel Orientation="Horizontal" Spacing="7">
+            <Ellipse x:Name="GpuDot" Width="8" Height="8" Fill="{DynamicResource Ok}" VerticalAlignment="Center" />
+            <TextBlock x:Name="GpuPillText" FontSize="12" VerticalAlignment="Center" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Update banner -->
+      <Border x:Name="UpdateBanner" Grid.Row="1" IsVisible="False" Margin="18,0,18,8"
+              Background="{DynamicResource SurfaceHigh}" BorderBrush="{DynamicResource Accent}"
+              BorderThickness="1" CornerRadius="6" Padding="14,9">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <TextBlock Grid.Column="0" x:Name="UpdateText" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0"
+                  Content="{DynamicResource Str.OpenReleases}" Click="OnOpenReleases" />
+          <Button Grid.Column="2" Classes="ghost" Margin="8,0,0,0"
+                  Content="{DynamicResource Str.Dismiss}" Click="OnDismissUpdate" />
+        </Grid>
+      </Border>
+
+      <!-- Content -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+
+        <!-- Games -->
+        <Grid Grid.Column="0" x:Name="GamesPage">
+          <ScrollViewer Padding="18,0,18,18">
+            <ItemsControl x:Name="CardList">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <StackPanel Spacing="1" Margin="4">
-                    <TextBlock Text="{Binding Display}" FontWeight="SemiBold" />
-                    <TextBlock Classes="muted" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
-                  </StackPanel>
+                  <Button Classes="card" Click="OnCardClick" Tag="{Binding}" Margin="0,0,14,16"
+                          AutomationProperties.Name="{Binding Name}" ToolTip.Tip="{Binding Path}">
+                    <StackPanel Width="164" Spacing="8">
+                      <Panel Height="232">
+                        <Border CornerRadius="8" Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                          <TextBlock Text="{Binding Initials}" FontSize="52" FontWeight="Bold"
+                                     Foreground="#40FFFFFF" HorizontalAlignment="Center"
+                                     VerticalAlignment="Center" />
+                        </Border>
+                        <Border CornerRadius="8" ClipToBounds="True" IsVisible="{Binding HasCover}">
+                          <Image Source="{Binding Cover}" Stretch="UniformToFill" />
+                        </Border>
+                        <Border Classes="badge" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="7">
+                          <TextBlock Text="{Binding Platform}" FontSize="10" />
+                        </Border>
+                        <Border Classes="state" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7"
+                                IsVisible="{Binding Installed}">
+                          <TextBlock Text="{Binding StateLabel}" FontSize="10" FontWeight="Bold"
+                                     Foreground="White" />
+                        </Border>
+                      </Panel>
+                      <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                 TextTrimming="CharacterEllipsis" MaxWidth="164" />
+                      <Border Classes="tag" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding RouteLabel}" FontSize="10" />
+                      </Border>
+                    </StackPanel>
+                  </Button>
                 </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-            <TextBlock x:Name="EmptyHint" Classes="muted" Margin="10" TextWrapping="Wrap"
-                       VerticalAlignment="Center" Text="{DynamicResource Str.NoGames}" />
-          </Grid>
-        </Border>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
-          <Button Classes="primary" Content="{DynamicResource Str.AddGame}" Click="OnAddGame" />
-          <Button Classes="ghost" Content="{DynamicResource Str.RemoveGame}" Click="OnRemoveGame" />
-        </StackPanel>
-      </Grid>
-
-      <!-- Right: what this folder is, and what would happen -->
-      <Border Grid.Column="1" Classes="card">
-        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
-
-          <StackPanel Grid.Row="0" Spacing="3">
-            <TextBlock x:Name="TargetName" Classes="h1" Text="—" />
-            <TextBlock x:Name="TargetPath" Classes="muted" TextTrimming="CharacterEllipsis" />
-            <TextBlock x:Name="DetectedLine" FontSize="12" Foreground="{DynamicResource Muted}"
-                       TextWrapping="Wrap" Margin="0,4,0,0" />
+          <StackPanel x:Name="EmptyHint" VerticalAlignment="Center" HorizontalAlignment="Center"
+                      Spacing="10" MaxWidth="380" IsVisible="False">
+            <TextBlock Text="{DynamicResource Str.NoGames}" TextWrapping="Wrap" Classes="muted"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <Button Classes="primary" HorizontalAlignment="Center" Content="{DynamicResource Str.Scan}"
+                    Click="OnScan" />
           </StackPanel>
+        </Grid>
 
-          <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
-            <TextBlock Text="{DynamicResource Str.Preset}" VerticalAlignment="Center" Classes="muted" />
-            <ComboBox x:Name="PresetBox" MinWidth="220" SelectionChanged="OnPresetChanged" />
+        <!-- System -->
+        <ScrollViewer Grid.Column="0" x:Name="SystemPage" IsVisible="False" Padding="18,0,18,18">
+          <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Text="{DynamicResource Str.System}" Classes="h1" />
+                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto" >
+                  <TextBlock Grid.Row="0" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Gpu}" />
+                  <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuText" TextWrapping="Wrap" />
+                  <TextBlock Grid.Row="1" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Driver}" />
+                  <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DriverText" />
+                  <TextBlock Grid.Row="2" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Hip}" />
+                  <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HipText" />
+                </Grid>
+                <TextBlock x:Name="SystemWarning" TextWrapping="Wrap" FontSize="12"
+                           Foreground="{DynamicResource Warn}" IsVisible="False" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{DynamicResource Str.Payloads}" FontWeight="SemiBold" />
+                <TextBlock x:Name="PayloadState" Classes="muted" TextWrapping="Wrap" />
+                <TextBlock x:Name="CacheFolder" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
           </StackPanel>
+        </ScrollViewer>
 
-          <TextBlock Grid.Row="2" x:Name="PresetNote" FontSize="12" TextWrapping="Wrap"
-                     Foreground="{DynamicResource Muted}" Margin="0,10,0,0" />
+        <!-- Settings -->
+        <ScrollViewer Grid.Column="0" x:Name="SettingsPage" IsVisible="False" Padding="18,0,18,18">
+          <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Text="{DynamicResource Str.Language}" FontWeight="SemiBold" />
+                <ComboBox x:Name="LanguageBox" MinWidth="230" SelectionChanged="OnLanguageChanged" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource Str.Credits}" TextWrapping="Wrap" Classes="muted" />
+                <TextBlock x:Name="AboutVersion" Classes="muted" FontSize="11" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
 
-          <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
-                  BorderThickness="1" CornerRadius="4" Margin="0,14,0,0">
-            <ScrollViewer x:Name="ReportScroll" Padding="10">
-              <ItemsControl x:Name="ReportList">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Grid ColumnDefinitions="18,*" Margin="0,2">
-                      <TextBlock Grid.Column="0" Text="{Binding Glyph}" Foreground="{Binding Brush}"
-                                 FontWeight="Bold" />
-                      <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"
-                                 Foreground="{Binding Brush}" FontSize="12" />
-                    </Grid>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </ScrollViewer>
-          </Border>
+        <!-- Details drawer -->
+        <Border Grid.Column="1" x:Name="Drawer" IsVisible="False" Width="450"
+                Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+                BorderThickness="1,0,0,0" Padding="18">
+          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-          <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
-            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
-              <TextBlock x:Name="StatusText" Classes="muted" TextWrapping="Wrap" />
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock x:Name="TargetName" Classes="h1" TextWrapping="Wrap" />
+                <TextBlock x:Name="TargetPath" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+              </StackPanel>
+              <Button Grid.Column="1" Classes="ghost" Content="✕" Padding="10,4" Click="OnCloseDrawer"
+                      VerticalAlignment="Top" />
+            </Grid>
+
+            <TextBlock Grid.Row="1" x:Name="DetectedLine" FontSize="12" Classes="muted"
+                       TextWrapping="Wrap" Margin="0,10,0,0" />
+
+            <StackPanel Grid.Row="2" Spacing="8" Margin="0,14,0,0">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="{DynamicResource Str.Preset}" VerticalAlignment="Center" Classes="muted" />
+                <ComboBox x:Name="PresetBox" MinWidth="230" SelectionChanged="OnPresetChanged" />
+              </StackPanel>
+              <TextBlock x:Name="PresetNote" FontSize="11" TextWrapping="Wrap" Classes="muted" />
+            </StackPanel>
+
+            <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                    BorderThickness="1" CornerRadius="6" Margin="0,14,0,0">
+              <ScrollViewer x:Name="ReportScroll" Padding="10">
+                <ItemsControl x:Name="ReportList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="16,*" Margin="0,2">
+                        <TextBlock Grid.Column="0" Text="{Binding Glyph}" Foreground="{Binding Brush}"
+                                   FontWeight="Bold" FontSize="11" />
+                        <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"
+                                   Foreground="{Binding Brush}" FontSize="11" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </Border>
+
+            <StackPanel Grid.Row="4" Spacing="10" Margin="0,14,0,0">
               <ProgressBar x:Name="Progress" Height="4" IsVisible="False"
                            Foreground="{DynamicResource Accent}" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-              <Button x:Name="RecheckButton" Classes="ghost" Content="{DynamicResource Str.Recheck}" Click="OnRecheck" />
-              <Button x:Name="UninstallButton" Classes="ghost" Content="{DynamicResource Str.Uninstall}" Click="OnUninstall" />
-              <Button x:Name="InstallButton" Classes="primary" Content="{DynamicResource Str.Install}" Click="OnInstall" />
+              <TextBlock x:Name="StatusText" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                <Button x:Name="FolderButton" Classes="ghost" Content="{DynamicResource Str.OpenFolder}"
+                        Click="OnOpenFolder" />
+                <Button x:Name="UninstallButton" Classes="ghost" Content="{DynamicResource Str.Uninstall}"
+                        Click="OnUninstall" />
+                <Button x:Name="InstallButton" Classes="primary" Content="{DynamicResource Str.Install}"
+                        Click="OnInstall" />
+              </StackPanel>
             </StackPanel>
           </Grid>
+        </Border>
+      </Grid>
+
+      <!-- Status bar -->
+      <Border Grid.Row="3" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+              BorderThickness="0,1,0,0" Padding="18,7">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" x:Name="FootText" Classes="muted" FontSize="11"
+                     TextTrimming="CharacterEllipsis" />
+          <ProgressBar Grid.Column="1" x:Name="ScanSpinner" Width="120" Height="3" IsIndeterminate="True"
+                       IsVisible="False" Foreground="{DynamicResource Accent}" />
         </Grid>
       </Border>
     </Grid>
-
-    <Border Grid.Row="3" Background="{DynamicResource Surface}" Padding="18,8">
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Credits}" TextWrapping="Wrap" />
-        <TextBlock Grid.Column="1" x:Name="VersionText" Classes="muted" />
-      </Grid>
-    </Border>
   </Grid>
 </Window>

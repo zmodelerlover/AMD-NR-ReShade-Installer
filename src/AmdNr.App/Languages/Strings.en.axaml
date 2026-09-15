@@ -43,4 +43,14 @@
   <sys:String x:Key="Str.LogSaved">The full log was written next to this app.</sys:String>
   <sys:String x:Key="Str.Working">Working…</sys:String>
   <sys:String x:Key="Str.Credits">The network is DLSS-NR-on-AMD by danielblnc. Runtime and weights are its work.</sys:String>
+
+  <sys:String x:Key="Str.Scan">Scan games</sys:String>
+  <sys:String x:Key="Str.Scanning">Reading Steam, Epic, GOG, EA, Ubisoft, Battle.net and Xbox…</sys:String>
+  <sys:String x:Key="Str.Found">found</sys:String>
+  <sys:String x:Key="Str.Added">new</sys:String>
+  <sys:String x:Key="Str.FirstScanHint">Nothing in the list yet. Scan games reads your launchers; nothing is changed by looking.</sys:String>
+  <sys:String x:Key="Str.Search">Search games…</sys:String>
+  <sys:String x:Key="Str.Settings">Settings</sys:String>
+  <sys:String x:Key="Str.NotDownloaded">not downloaded yet</sys:String>
+  <sys:String x:Key="Str.WillDownload">The files are downloaded and verified when you install.</sys:String>
 </ResourceDictionary>

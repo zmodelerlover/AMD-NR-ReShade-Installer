@@ -1,8 +1,10 @@
-using Avalonia;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AmdNr.Core;
@@ -17,12 +19,14 @@ public partial class MainWindow : Window
 {
     private readonly AppConfig _config = AppConfig.Load();
     private readonly HttpClient _http = PayloadCache.DefaultClient(App.Version);
-    private readonly ObservableCollection<GameEntry> _games = [];
+    private readonly List<GameCard> _all = [];
+    private readonly ObservableCollection<GameCard> _shown = [];
     private readonly ObservableCollection<ReportLine> _report = [];
     private readonly List<Preset> _offered = [];
 
     private PayloadManifest? _manifest;
     private AppRelease? _update;
+    private GameCard? _selected;
     private bool _busy;
     private bool _settingPreset;
 
@@ -30,27 +34,31 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        GameList.ItemsSource = _games;
+        CardList.ItemsSource = _shown;
         ReportList.ItemsSource = _report;
         VersionText.Text = $"v{App.Version}";
+        AboutVersion.Text = $"v{App.Version} · {AppPaths.Root}";
+        CacheFolder.Text = AppPaths.Cache;
 
         LanguageBox.ItemsSource = App.Languages.Select(l => l.Name).ToList();
         LanguageBox.SelectedIndex = Math.Max(0, Array.FindIndex(App.Languages, l => l.Code == App.CurrentLanguage));
 
-        foreach (var game in GameStore.Load()) _games.Add(game);
-        UpdateEmptyHint();
+        foreach (var game in GameStore.Load())
+        {
+            // The install state is read from the folder, never stored: something could have been
+            // installed or removed by hand since the last run.
+            var card = new GameCard(game);
+            card.RefreshInstalled();
+            _all.Add(card);
+        }
+        RefreshGrid();
         ShowSystem();
-
-        if (_games.Count > 0) GameList.SelectedIndex = 0;
-        else SetButtons(false);
 
         _ = StartBackgroundWorkAsync();
     }
 
     // -- Startup ---------------------------------------------------------------------------------
 
-    /// <summary>The manifest and the update check, neither of which may hold the window up. If
-    /// either is unreachable the app still installs from whatever is already in the cache.</summary>
     private async Task StartBackgroundWorkAsync()
     {
         var cache = new PayloadCache(_http);
@@ -61,11 +69,13 @@ public partial class MainWindow : Window
         }
         catch (Exception e) when (e is HttpRequestException or InstallException or TaskCanceledException)
         {
-            // Offline, or the content repository is not up yet: the copy beside the executable
-            // pins the same hashes, so everything still works against whatever is already cached.
+            // Offline, or the content repository is not up yet: the copy beside the executable pins
+            // the same hashes, so everything still works against whatever is already cached.
             _manifest = PayloadCache.LoadLocalManifest();
-            Status(_manifest is null ? Text("Str.ManifestFailed") : Text("Str.ManifestLocal"));
         }
+
+        ShowPayloadState();
+        await LoadCoversAsync();
 
         _update = await AppUpdate.CheckAsync(_http, _config.App, App.Version);
         if (_update is not null)
@@ -74,7 +84,9 @@ public partial class MainWindow : Window
             UpdateBanner.IsVisible = true;
         }
 
-        if (_manifest is not null && GameList.SelectedItem is GameEntry) await RefreshAsync();
+        // A first run has nothing in the list, and a scan is what it wants. Reading the launchers
+        // is read-only -- nothing is installed or changed by looking -- so it just happens.
+        if (_all.Count == 0) OnScan(null, new RoutedEventArgs());
     }
 
     private void ShowSystem()
@@ -84,6 +96,9 @@ public partial class MainWindow : Window
         DriverText.Text = state.Driver;
         HipText.Text = state.Hip7 ? Text("Str.Ready") : "—";
         HipText.Foreground = state.Hip7 ? Brush("Ok") : Brush("Err");
+
+        GpuPillText.Text = state.Gpu.Length > 34 ? state.Gpu[..34] + "…" : state.Gpu;
+        GpuDot.Fill = state.Ready ? Brush("Ok") : Brush("Err");
 
         if (!state.Hip7) ShowWarning(Text("Str.HipMissing"));
         else if (!state.LooksLikeRadeon) ShowWarning(Text("Str.NotRadeon"));
@@ -96,7 +111,97 @@ public partial class MainWindow : Window
         SystemWarning.IsVisible = true;
     }
 
-    // -- The game list ---------------------------------------------------------------------------
+    private void ShowPayloadState()
+    {
+        if (_manifest is null)
+        {
+            PayloadState.Text = Text("Str.ManifestFailed");
+            return;
+        }
+
+        var lines = new List<string>();
+        foreach (var (name, component) in _manifest.Components)
+        {
+            var complete = false;
+            try { complete = PayloadCache.IsComplete(_manifest, name); }
+            catch (InstallException)
+            {
+                // A component this build does not understand is not a reason to show nothing.
+            }
+            lines.Add($"{name} {component.Version} — {(complete ? Text("Str.PayloadsReady") : Text("Str.NotDownloaded"))}");
+        }
+        PayloadState.Text = string.Join("\n", lines);
+    }
+
+    // -- The library -----------------------------------------------------------------------------
+
+    private void RefreshGrid()
+    {
+        var needle = SearchBox.Text?.Trim() ?? "";
+        _shown.Clear();
+        foreach (var card in _all.Where(c => needle.Length == 0
+                                             || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)))
+            _shown.Add(card);
+
+        EmptyHint.IsVisible = _all.Count == 0;
+        Foot(_all.Count == 0 ? "" : $"{_all.Count} {Text("Str.Games").ToLowerInvariant()}");
+    }
+
+    private void OnSearch(object? sender, TextChangedEventArgs e) => RefreshGrid();
+
+    private async void OnScan(object? sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        ScanSpinner.IsVisible = true;
+        Foot(Text("Str.Scanning"));
+        ScanButton.IsEnabled = false;
+        try
+        {
+            var found = await Task.Run(GameScanner.ScanAll);
+            var added = 0;
+            foreach (var game in found)
+            {
+                // A folder that is already in the list keeps the route the person chose for it.
+                if (_all.Any(c => Engine.SamePath(c.Path, game.InstallPath))) continue;
+                _all.Add(new GameCard(GameEntry.From(game)));
+                added++;
+            }
+
+            _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+            Save();
+            RefreshGrid();
+            foreach (var card in _all) card.RefreshInstalled();
+            Foot($"{found.Count} {Text("Str.Found")} · {added} {Text("Str.Added")}");
+            await LoadCoversAsync();
+        }
+        finally
+        {
+            ScanSpinner.IsVisible = false;
+            ScanButton.IsEnabled = true;
+        }
+    }
+
+    /// <summary>Cover art, a few at a time, and only for what has none yet. Steam publishes it on
+    /// its own CDN keyed by the app id the scan already read; everything else keeps its tile.</summary>
+    private async Task LoadCoversAsync()
+    {
+        var covers = new CoverCache(_http);
+        foreach (var card in _all.Where(c => c.Cover is null && c.Entry.AppId is not null).ToList())
+        {
+            try
+            {
+                var file = await covers.EnsureAsync(card.Entry.AppId);
+                if (file is null) continue;
+                await using var stream = File.OpenRead(file);
+                var bitmap = new Bitmap(stream);
+                Dispatcher.UIThread.Post(() => card.Cover = bitmap);
+            }
+            catch (Exception e) when (e is IOException or HttpRequestException or ArgumentException)
+            {
+                // A cover that will not load is a tile, which is what it already is.
+            }
+        }
+    }
 
     private async void OnAddGame(object? sender, RoutedEventArgs e)
     {
@@ -109,88 +214,88 @@ public partial class MainWindow : Window
 
         var path = picked[0].TryGetLocalPath();
         if (string.IsNullOrWhiteSpace(path)) return;
-        if (_games.Any(g => Engine.SamePath(g.Path, path)))
+
+        var existing = _all.FirstOrDefault(c => Engine.SamePath(c.Path, path));
+        if (existing is not null)
         {
-            GameList.SelectedItem = _games.First(g => Engine.SamePath(g.Path, path));
+            Select(existing);
             return;
         }
 
-        var entry = new GameEntry { Path = path, Preset = Guess(path) };
-        _games.Add(entry);
-        GameStore.Save(_games);
-        UpdateEmptyHint();
-        GameList.SelectedItem = entry;
-    }
-
-    /// <summary>A first guess only, and always overridable: the emulators name themselves, and
-    /// anything 32-bit can only be a bridge route.</summary>
-    private static Preset Guess(string path)
-    {
-        if (File.Exists(Path.Combine(path, "pcsx2-qt.exe"))) return Preset.Pcsx2;
-        if (File.Exists(Path.Combine(path, "rpcs3.exe"))) return Preset.Rpcs3;
-        return Work.Detect(path).Route == Route.X86 ? Preset.X86Dx11 : Preset.Dx11;
-    }
-
-    private void OnRemoveGame(object? sender, RoutedEventArgs e)
-    {
-        if (GameList.SelectedItem is not GameEntry entry) return;
-        _games.Remove(entry);
-        GameStore.Save(_games);
-        UpdateEmptyHint();
-        if (_games.Count == 0) ClearDetails();
-    }
-
-    private void UpdateEmptyHint() => EmptyHint.IsVisible = _games.Count == 0;
-
-    private async void OnGameSelected(object? sender, SelectionChangedEventArgs e)
-    {
-        if (GameList.SelectedItem is not GameEntry entry)
+        var card = new GameCard(new GameEntry
         {
-            ClearDetails();
-            return;
-        }
+            Path = path,
+            Name = Path.GetFileName(path.TrimEnd('\\', '/')),
+            Preset = GameScanner.GuessPreset(path),
+        });
+        _all.Add(card);
+        _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        card.RefreshInstalled();
+        Save();
+        RefreshGrid();
+        Select(card);
+    }
 
-        TargetName.Text = entry.Display;
-        TargetPath.Text = entry.Path;
+    private void Save() => GameStore.Save(_all.Select(c => c.Entry));
 
-        var detected = Work.Detect(entry.Path);
-        DetectedLine.Text = detected.Line ?? "";
+    // -- The drawer ------------------------------------------------------------------------------
+
+    private void OnCardClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: GameCard card }) Select(card);
+    }
+
+    private async void Select(GameCard card)
+    {
+        _selected = card;
+        Drawer.IsVisible = true;
+
+        TargetName.Text = card.Name;
+        TargetPath.Text = card.Path;
+        DetectedLine.Text = Work.Detect(card.Path).Line ?? "";
 
         // Five of the ten API-by-architecture combinations do not exist; the detected width rules
         // out the rest, so a route that cannot work is never on the list.
         _offered.Clear();
-        _offered.AddRange(Presets.Offered(detected));
+        _offered.AddRange(Presets.Offered(Work.Detect(card.Path)));
         _settingPreset = true;
         PresetBox.ItemsSource = _offered.Select(p => p.Label()).ToList();
-        var index = _offered.IndexOf(entry.Preset);
+        var index = _offered.IndexOf(card.Entry.Preset);
         PresetBox.SelectedIndex = index >= 0 ? index : 0;
         _settingPreset = false;
-        entry.Preset = _offered[PresetBox.SelectedIndex];
-        PresetNote.Text = entry.Preset.Note();
+
+        card.Entry.Preset = _offered[PresetBox.SelectedIndex];
+        card.RefreshRoute();
+        PresetNote.Text = card.Entry.Preset.Note();
 
         await RefreshAsync();
     }
 
-    private void ClearDetails()
+    private void OnCloseDrawer(object? sender, RoutedEventArgs e)
     {
-        TargetName.Text = "—";
-        TargetPath.Text = "";
-        DetectedLine.Text = "";
-        PresetNote.Text = "";
-        PresetBox.ItemsSource = null;
-        _report.Clear();
-        SetButtons(false);
+        Drawer.IsVisible = false;
+        _selected = null;
     }
 
     private async void OnPresetChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (_settingPreset || GameList.SelectedItem is not GameEntry entry) return;
+        if (_settingPreset || _selected is null) return;
         if (PresetBox.SelectedIndex < 0 || PresetBox.SelectedIndex >= _offered.Count) return;
 
-        entry.Preset = _offered[PresetBox.SelectedIndex];
-        PresetNote.Text = entry.Preset.Note();
-        GameStore.Save(_games);
+        _selected.Entry.Preset = _offered[PresetBox.SelectedIndex];
+        _selected.RefreshRoute();
+        PresetNote.Text = _selected.Entry.Preset.Note();
+        Save();
         await RefreshAsync();
+    }
+
+    private void OnTabChanged(object? sender, RoutedEventArgs e)
+    {
+        if (GamesPage is null) return; // Fires once while the window is still being built.
+        GamesPage.IsVisible = TabGames.IsChecked == true;
+        SystemPage.IsVisible = TabSystem.IsChecked == true;
+        SettingsPage.IsVisible = TabSettings.IsChecked == true;
+        if (TabSystem.IsChecked == true) ShowPayloadState();
     }
 
     private void OnLanguageChanged(object? sender, SelectionChangedEventArgs e)
@@ -206,42 +311,52 @@ public partial class MainWindow : Window
         settings.Save();
     }
 
+    private void OnOpenFolder(object? sender, RoutedEventArgs e)
+    {
+        if (_selected is null) return;
+        try { Process.Start(new ProcessStartInfo(_selected.Path) { UseShellExecute = true }); }
+        catch (Exception e2) when (e2 is System.ComponentModel.Win32Exception or FileNotFoundException)
+        {
+            // No shell association for a folder is not something to interrupt anyone over.
+        }
+    }
+
     // -- Pre-flight, install, uninstall -----------------------------------------------------------
 
     private async Task RefreshAsync()
     {
-        if (GameList.SelectedItem is not GameEntry entry || _busy) return;
+        if (_selected is not { } card || _busy) return;
         var pins = Pins();
 
         // Off the UI thread: deciding whether the cache is complete means hashing 141 MB of
         // weights, which is about a second and would be a second of frozen window.
         var (report, payloads) = await Task.Run(() =>
         {
-            var staged = CachedPayloadFolder(entry.Preset);
-            return (Work.Preflight(entry.Path, staged ?? "", entry.Preset, pins), staged);
+            var staged = CachedPayloadFolder(card.Entry.Preset);
+            return (Work.Preflight(card.Path, staged ?? "", card.Entry.Preset, pins), staged);
         });
 
         Show(report);
+        card.RefreshInstalled();
         SetButtons(true);
-        Status(payloads is null ? Text("Str.Verifying") : Text("Str.PayloadsReady"));
+        Status(payloads is null ? Text("Str.WillDownload") : Text("Str.PayloadsReady"));
     }
-
-    private async void OnRecheck(object? sender, RoutedEventArgs e) => await RefreshAsync();
 
     private async void OnInstall(object? sender, RoutedEventArgs e)
     {
-        if (GameList.SelectedItem is not GameEntry entry || _busy) return;
+        if (_selected is not { } card || _busy) return;
         Busy(true);
         try
         {
-            var folder = await EnsurePayloadsAsync(entry.Preset);
+            var folder = await EnsurePayloadsAsync(card.Entry.Preset);
             if (folder is null) return;
 
             Status(Text("Str.Working"));
             var pins = Pins();
-            var report = await Task.Run(() => Work.Install(entry.Path, folder, entry.Preset, pins));
+            var report = await Task.Run(() => Work.Install(card.Path, folder, card.Entry.Preset, pins));
             Show(report);
-            WriteLog(report, $"install {entry.Preset.Label()} -> {entry.Path}");
+            WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
+            card.RefreshInstalled();
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
         }
         finally
@@ -252,13 +367,14 @@ public partial class MainWindow : Window
 
     private async void OnUninstall(object? sender, RoutedEventArgs e)
     {
-        if (GameList.SelectedItem is not GameEntry entry || _busy) return;
+        if (_selected is not { } card || _busy) return;
         Busy(true);
         try
         {
-            var report = await Task.Run(() => Work.Uninstall(entry.Path, entry.Preset));
+            var report = await Task.Run(() => Work.Uninstall(card.Path, card.Entry.Preset));
             Show(report);
-            WriteLog(report, $"uninstall {entry.Preset.Label()} -> {entry.Path}");
+            WriteLog(report, $"uninstall {card.Entry.Preset.Label()} -> {card.Path}");
+            card.RefreshInstalled();
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
         }
         finally
@@ -268,8 +384,8 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Downloads whatever this route needs, then hands back the folder to install from --
-    /// which is the same shape of folder someone would have unzipped by hand, so the engine cannot
-    /// tell the difference.</summary>
+    /// the same shape someone would have unzipped by hand, so the engine cannot tell the
+    /// difference.</summary>
     private async Task<string?> EnsurePayloadsAsync(Preset preset)
     {
         if (_manifest is null)
@@ -380,18 +496,18 @@ public partial class MainWindow : Window
     {
         _busy = on;
         SetButtons(!on);
+        ScanButton.IsEnabled = !on;
         if (!on) Progress.IsVisible = false;
     }
 
     private void SetButtons(bool enabled)
     {
-        var has = GameList.SelectedItem is GameEntry;
-        InstallButton.IsEnabled = enabled && has;
-        UninstallButton.IsEnabled = enabled && has;
-        RecheckButton.IsEnabled = enabled && has;
+        InstallButton.IsEnabled = enabled && _selected is not null;
+        UninstallButton.IsEnabled = enabled && _selected is not null;
     }
 
     private void Status(string text) => StatusText.Text = text;
+    private void Foot(string text) => FootText.Text = text;
 
     private void OnOpenReleases(object? sender, RoutedEventArgs e)
     {
