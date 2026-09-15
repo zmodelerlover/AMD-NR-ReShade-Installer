@@ -199,6 +199,8 @@
                 </StackPanel>
               </Button>
               <TextBlock x:Name="ScanStatus" Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="{DynamicResource Str.SetupGamesApi}" Classes="muted" TextWrapping="Wrap"
+                         LineHeight="19" />
               <ItemsControl x:Name="FoundList">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>

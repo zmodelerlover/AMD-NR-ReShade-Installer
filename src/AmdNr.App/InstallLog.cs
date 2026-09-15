@@ -13,6 +13,22 @@ namespace AmdNr.App;
 
 public static class InstallLog
 {
+    /// <summary>One entry in the rolling log, which is the one a person is pointed at when
+    /// something went wrong anywhere. Never throws: a log that could not be written is not worth a
+    /// second error on top of the first.</summary>
+    public static void Append(string text)
+    {
+        try
+        {
+            File.AppendAllText(Path.Combine(AppPaths.Logs, "amd-nr-installer.log"),
+                text + Environment.NewLine);
+        }
+        catch (IOException)
+        {
+            // Nothing to do about it, and the failure it describes is already on screen.
+        }
+    }
+
     /// <summary>Writes one log for an action and returns its path, or null if it could not be
     /// written. Never throws: a log that failed must not fail the install it describes.</summary>
     public static string? Write(

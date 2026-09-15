@@ -47,7 +47,16 @@ public static class SupportReport
 
         // Every per-action log, newest first, plus the rolling one. These carry the route, who chose
         // it, the detection evidence and the payload hashes.
-        foreach (var log in Recent(AppPaths.Logs, "*.log", 12))
+        //
+        // Counted per kind rather than "the twelve newest": a burst of uninstalls pushed every
+        // install out of the zip, and the pair is what a report gets read against -- what went in,
+        // and what came back out. "*-install-*" does not match "-uninstall-", which is why the two
+        // patterns can be counted separately at all.
+        var logs = Recent(AppPaths.Logs, "*-install-*.log", 8)
+            .Concat(Recent(AppPaths.Logs, "*uninstall*.log", 8))
+            .Concat(Recent(AppPaths.Logs, "amd-nr-installer.log", 1))
+            .DistinctBy(f => f.FullName);
+        foreach (var log in logs)
             Copy(zip, log, $"logs/{log.Name}");
 
         // What the app is configured with, which is how a wrong manifest or a stale config shows up.

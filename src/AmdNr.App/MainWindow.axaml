@@ -283,6 +283,15 @@
                         <TextBlock Text="{DynamicResource Str.OpenFolder}" VerticalAlignment="Center" />
                       </StackPanel>
                     </Button>
+                    <Button x:Name="RemoveButton" Classes="ghost" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" Click="OnRemoveGame"
+                            ToolTip.Tip="{DynamicResource Str.RemoveGameHint}"
+                            AutomationProperties.Name="{DynamicResource Str.RemoveGame}">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconDelete}" />
+                        <TextBlock Text="{DynamicResource Str.RemoveGame}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
                   </StackPanel>
 
                   <!-- Right: the verdict first, the choice second, the evidence folded away. -->
@@ -358,6 +367,30 @@
                             </Border>
                           </Grid>
                         </StackPanel>
+
+                        <!-- On every game, always: the route follows the detected API, and a
+                             wrong one installs perfectly and does nothing in the game. -->
+                        <Border Classes="callout check">
+                          <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Grid.Column="0" Data="{StaticResource IconInfo}" Width="16" Height="16"
+                                      Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
+                            <StackPanel Grid.Column="1" Spacing="6">
+                              <TextBlock Text="{DynamicResource Str.CheckApiTitle}" FontWeight="SemiBold"
+                                         FontSize="13" TextWrapping="Wrap" />
+                              <TextBlock x:Name="ApiCheckBody" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                              <Button Classes="ghost" Padding="0" Background="Transparent" Click="OnOpenWiki"
+                                      HorizontalAlignment="Left"
+                                      AutomationProperties.Name="{DynamicResource Str.CheckWiki}">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                  <PathIcon Data="{StaticResource IconExternal}" Width="14" Height="14"
+                                            Foreground="{DynamicResource AccentText}" />
+                                  <TextBlock Text="{DynamicResource Str.CheckWiki}" FontSize="13"
+                                             Foreground="{DynamicResource AccentText}" VerticalAlignment="Center" />
+                                </StackPanel>
+                              </Button>
+                            </StackPanel>
+                          </Grid>
+                        </Border>
 
                         <Border x:Name="ApiHintBox" Classes="callout" IsVisible="False">
                           <Grid ColumnDefinitions="Auto,*">
@@ -583,13 +616,16 @@
                 </StackPanel>
                 <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"
                         Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
-                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
                     <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" Foreground="{DynamicResource Faint}" />
                     <TextBlock Grid.Column="1" x:Name="CacheFolder" Classes="muted" Margin="10,0,16,0"
                                VerticalAlignment="Center" TextTrimming="PathSegmentEllipsis" />
                     <Button Grid.Column="2" x:Name="PrefetchButton" Classes="ghost" Margin="0,0,8,0"
                             Click="OnPrefetch" Content="{DynamicResource Str.PrefetchAll}" />
-                    <Button Grid.Column="3" Classes="ghost" Content="{DynamicResource Str.OpenFolder}" Click="OnOpenCache" />
+                    <Button Grid.Column="3" x:Name="ClearCacheButton" Classes="ghost" Margin="0,0,8,0"
+                            Click="OnClearCache" Content="{DynamicResource Str.ClearCache}"
+                            ToolTip.Tip="{DynamicResource Str.ClearCacheBody}" />
+                    <Button Grid.Column="4" Classes="ghost" Content="{DynamicResource Str.OpenFolder}" Click="OnOpenCache" />
                   </Grid>
                 </Border>
               </StackPanel>

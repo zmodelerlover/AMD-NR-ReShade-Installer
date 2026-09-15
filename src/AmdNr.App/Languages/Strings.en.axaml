@@ -11,8 +11,19 @@
   <sys:String x:Key="Str.Games">Games</sys:String>
   <sys:String x:Key="Str.AddGame">Add a game…</sys:String>
   <sys:String x:Key="Str.RemoveGame">Remove from list</sys:String>
+  <sys:String x:Key="Str.RemoveGameHint">Takes the row out of the list. No file in the game folder is touched.</sys:String>
+  <sys:String x:Key="Str.RemovedGame">{0} is off the list. Nothing in its folder was touched.</sys:String>
+  <sys:String x:Key="Str.RemovedGameInstalled">{0} is off the list, but the add-on is still installed in its folder. Add the folder back if you want to uninstall it.</sys:String>
   <sys:String x:Key="Str.NoGames">Nothing here yet. Add the folder a game or emulator runs from.</sys:String>
   <sys:String x:Key="Str.PickFolder">Pick the folder the game runs from</sys:String>
+  <sys:String x:Key="Str.AddGameTitle">Add games</sys:String>
+  <sys:String x:Key="Str.AddGameBody">Either one game, or everything in a folder you keep games in.</sys:String>
+  <sys:String x:Key="Str.AddGameMany">Search a folder</sys:String>
+  <sys:String x:Key="Str.AddGameManyBody">Point at the folder your games live in — a Games drive, a library copied off another machine — and every game under it is added at once. Only reads; nothing is installed or changed by looking.</sys:String>
+  <sys:String x:Key="Str.AddGameOne">Add one game</sys:String>
+  <sys:String x:Key="Str.AddGameOneBody">Point straight at the folder that one game runs from.</sys:String>
+  <sys:String x:Key="Str.AddGamePickLibrary">Pick the folder your games are kept in</sys:String>
+  <sys:String x:Key="Str.AddGameNone">Nothing that looks like a game was found under "{0}".</sys:String>
 
   <sys:String x:Key="Str.Preset">Route</sys:String>
   <sys:String x:Key="Str.Install">Install</sys:String>
@@ -54,7 +65,7 @@
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — by danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">The network itself, and the reason any of this exists: it is what got DLSS 5's neural rendering running on Radeon at all. The runtime and the weights this app downloads are his work, not ours. Thank you, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — the add-on</sys:String>
-  <sys:String x:Key="Str.CreditAddonBody">What plugs that network into a game through ReShade, and where this installer lives too. MIT licensed.</sys:String>
+  <sys:String x:Key="Str.CreditAddonBody">What plugs that network into a game through ReShade: the add-on this installs, and the releases this offers you a choice of. MIT licensed, and a separate repository from this installer.</sys:String>
   <sys:String x:Key="Str.CreditDiscordTitle">Discord — where everyone is</sys:String>
   <sys:String x:Key="Str.CreditDiscordBody">New builds, what works in which game, and where to ask when something breaks.</sys:String>
   <sys:String x:Key="Str.CreditsSection">Credits</sys:String>
@@ -71,6 +82,9 @@
   <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12 and Vulkan, and on D3D8, D3D9 and D3D11 for 32-bit games. OpenGL has none.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings -- that is the route picked here, and on another API the add-on sees a different game.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
+  <sys:String x:Key="Str.CheckApiTitle">Check the API before you install</sys:String>
+  <sys:String x:Key="Str.CheckApiBody">{0} was read out of this game's own files, and files say what they link against, not what the game runs on. One folder can hold a D3D11 and a D3D12 executable; one game can start on D3D10 from an executable that will also do D3D9. Both answers are true and only one of them is the route you want — and a wrong route installs perfectly and then does nothing in the game.</sys:String>
+  <sys:String x:Key="Str.CheckWiki">Look this game up on PCGamingWiki</sys:String>
   <!-- Feedback and layout -->
   <sys:String x:Key="Str.EmptyTitle">No games yet</sys:String>
   <sys:String x:Key="Str.NoMatchTitle">No matches</sys:String>
@@ -83,6 +97,12 @@
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Download all now</sys:String>
+  <sys:String x:Key="Str.ClearCache">Clear the cache</sys:String>
+  <sys:String x:Key="Str.ClearCacheBody">Deletes the downloaded files, the covers and the version list. Nothing installed in a game is touched; the next install downloads what it needs again.</sys:String>
+  <sys:String x:Key="Str.ClearCacheYes">Clear it</sys:String>
+  <sys:String x:Key="Str.ClearCacheYesBody">About 165 MB has to be downloaded again the next time you install.</sys:String>
+  <sys:String x:Key="Str.ClearCacheNoBody">Leave the cache as it is.</sys:String>
+  <sys:String x:Key="Str.CacheCleared">Cache emptied — {0} freed.</sys:String>
   <sys:String x:Key="Str.PayloadsAllReady">{0} of {1} components ready — {2} in the cache</sys:String>
   <sys:String x:Key="Str.PayloadsMissing">{0} of {1} components ready — {2} left to download</sys:String>
   <sys:String x:Key="Str.PayloadsAlreadyThere">Everything was already there, and every byte just checked out.</sys:String>
@@ -103,6 +123,13 @@
   <sys:String x:Key="Str.UninstallOk">Removed from {0}.</sys:String>
   <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning(s) to read below.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Could not remove everything from {0}.</sys:String>
+  <sys:String x:Key="Str.UninstallLeft">{0} still counts as installed: files that changed after the install were left in place.</sys:String>
+  <sys:String x:Key="Str.UninstallLeftTitle">Some files were left in place</sys:String>
+  <sys:String x:Key="Str.UninstallLeftBody">Files in {0} are not the ones this installer wrote — they changed after the install, so the uninstall kept them rather than deleting somebody else's work. That is why the game still shows as installed. The list is under Details.</sys:String>
+  <sys:String x:Key="Str.UninstallForce">Remove them anyway</sys:String>
+  <sys:String x:Key="Str.UninstallForceBody">Deletes them and puts back whatever they replaced. Your dlss5-neural.ini is kept either way.</sys:String>
+  <sys:String x:Key="Str.UninstallKeep">Leave them</sys:String>
+  <sys:String x:Key="Str.UninstallKeepBody">Nothing more is touched, and the game goes on counting as installed.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problem(s) listed below.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
   <sys:String x:Key="Str.Folder">Folder</sys:String>
@@ -178,6 +205,7 @@
   <sys:String x:Key="Str.SetupFilesOffline">Could not read the download list — most likely no connection. You can continue: the app tries again when you install.</sys:String>
 
   <sys:String x:Key="Str.SetupGamesBody">Reading the launchers is read-only: nothing is installed or changed by looking. You can add folders by hand afterwards.</sys:String>
+  <sys:String x:Key="Str.SetupGamesApi">Each game is read to work out which graphics API it uses, and that reading is usually right but not always: one folder can hold a D3D11 and a D3D12 executable, and a game can default to one API while its executable also supports an older one. Before installing, it is worth checking the game on pcgamingwiki.com — every game card has a link straight to it.</sys:String>
   <sys:String x:Key="Str.SetupGamesNone">No games found. You can add a folder by hand in the main window.</sys:String>
   <sys:String x:Key="Str.SetupGamesFound">{0} games found.</sys:String>
   <sys:String x:Key="Str.SetupDoneBody">All set. The main window opens with your library.</sys:String>

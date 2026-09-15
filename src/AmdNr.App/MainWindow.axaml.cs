@@ -130,8 +130,10 @@ public partial class MainWindow : Window
         }
 
         // A first run has nothing in the list, and a scan is what it wants. Reading the launchers
-        // is read-only -- nothing is installed or changed by looking -- so it just happens.
-        if (_all.Count == 0) OnScan(null, new RoutedEventArgs());
+        // is read-only -- nothing is installed or changed by looking -- so it just happens, unless
+        // the wizard was told not to: skipping that step and then watching it scan anyway is the
+        // app ignoring the only answer it asked for.
+        if (_all.Count == 0 && !Settings.Load().ScanDeclined) OnScan(null, new RoutedEventArgs());
     }
 
     private void ShowSystem()
@@ -360,24 +362,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            var added = 0;
-            foreach (var game in found)
-            {
-                // A folder that is already in the list keeps the route the person chose for it.
-                if (_all.Any(c => Engine.SamePath(c.Path, game.InstallPath))) continue;
-                _all.Add(new GameCard(GameEntry.From(game)));
-                added++;
-            }
-
-            _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
-            Save();
-            RefreshGrid();
-            foreach (var card in _all) card.RefreshInstalled();
-            Foot($"{found.Count} {Text("Str.Found")} · {added} {Text("Str.Added")}");
-            await DetectAllAsync();
-            await LoadCoversAsync();
-            // Said once the button stops spinning, so the toast and the button agree it is over.
-            ShowToast(string.Format(Text("Str.ScanDone"), found.Count, added), Level.Ok);
+            await MergeFoundAsync(found);
         }
         finally
         {
@@ -388,6 +373,30 @@ public partial class MainWindow : Window
             ScanSpin.IsVisible = false;
             Localize(ScanLabel, "Str.Scan");
         }
+    }
+
+    /// <summary>Everything a scan turned up, folded into the list. Shared by the launcher scan and
+    /// by searching one folder, so both count, sort, detect and report the same way.</summary>
+    private async Task MergeFoundAsync(IReadOnlyList<ScannedGame> found)
+    {
+        var added = 0;
+        foreach (var game in found)
+        {
+            // A folder that is already in the list keeps the route the person chose for it.
+            if (_all.Any(c => Engine.SamePath(c.Path, game.InstallPath))) continue;
+            _all.Add(new GameCard(GameEntry.From(game)));
+            added++;
+        }
+
+        _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        Save();
+        RefreshGrid();
+        foreach (var card in _all) card.RefreshInstalled();
+        Foot($"{found.Count} {Text("Str.Found")} · {added} {Text("Str.Added")}");
+        await DetectAllAsync();
+        await LoadCoversAsync();
+        // Said once the button stops spinning, so the toast and the button agree it is over.
+        ShowToast(string.Format(Text("Str.ScanDone"), found.Count, added), Level.Ok);
     }
 
     /// <summary>Reads every game's graphics API off the UI thread. It only opens files -- headers and
@@ -430,8 +439,25 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Two different things wear one button. Pointing at a game's own folder is what this
+    /// always did; pointing at the folder games are kept in -- a Games drive, a library copied off
+    /// another machine -- was only ever possible one game at a time, which nobody does for forty of
+    /// them. Asked the same way Add emulator asks, because it is the same shape of question.</summary>
     private async void OnAddGame(object? sender, RoutedEventArgs e)
     {
+        if (_busy) return;
+        var how = await EmulatorPicker.ShowAsync(this, Text("Str.AddGameTitle"), Text("Str.AddGameBody"),
+        [
+            ("many", Text("Str.AddGameMany"), Text("Str.AddGameManyBody")),
+            ("one", Text("Str.AddGameOne"), Text("Str.AddGameOneBody")),
+        ]);
+        if (how is null) return;
+        if (how == "many")
+        {
+            await AddFromLibraryAsync();
+            return;
+        }
+
         var picked = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             Title = Text("Str.PickFolder"),
@@ -463,6 +489,52 @@ public partial class MainWindow : Window
         Save();
         RefreshGrid();
         Select(card);
+    }
+
+    /// <summary>Every game under one folder. The search is the slow part -- it reads a PE header per
+    /// candidate -- so it runs off the UI thread with the same spinner the launcher scan uses.
+    /// </summary>
+    private async Task AddFromLibraryAsync()
+    {
+        var picked = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = Text("Str.AddGamePickLibrary"),
+            AllowMultiple = false,
+        });
+        if (picked.Count == 0) return;
+        var path = picked[0].TryGetLocalPath();
+        if (string.IsNullOrWhiteSpace(path)) return;
+
+        Busy(true);
+        ScanSpinner.IsVisible = true;
+        Foot(Text("Str.Scanning"));
+        try
+        {
+            IReadOnlyList<ScannedGame> found;
+            // Somebody else's folder tree, read on a background thread: an escape here is a dead
+            // window, exactly as it is for the launcher scan.
+            try { found = await Task.Run(() => GameScanner.UnderFolder(path)); }
+            catch (Exception ex)
+            {
+                WriteLog(Failure(ex), $"search {path}");
+                ShowToast(Text("Str.Unexpected"), Level.Err);
+                return;
+            }
+
+            if (found.Count == 0)
+            {
+                Foot("");
+                ShowToast(string.Format(Text("Str.AddGameNone"), Path.GetFileName(path.TrimEnd('\\', '/'))),
+                    Level.Warn);
+                return;
+            }
+            await MergeFoundAsync(found);
+        }
+        finally
+        {
+            ScanSpinner.IsVisible = false;
+            Busy(false);
+        }
     }
 
     /// <summary>Adding an emulator, which is the one case where the folder someone picks is usually
@@ -546,6 +618,37 @@ public partial class MainWindow : Window
             $"{Text("Str.EmulatorOtherBody")} ({string.Join(", ", rest.Take(6).Select(e => e.Name))}…)"));
 
         return await EmulatorPicker.ShowAsync(this, Text("Str.EmulatorTitle"), Text("Str.EmulatorBody"), options);
+    }
+
+    /// <summary>Takes a game out of the list. It removes a row and nothing else: whatever is
+    /// installed in that folder stays installed, which is why the message says so when there is
+    /// something there. This is for the folder that was picked by mistake and for the game nobody
+    /// is going to use this on -- the detection is per folder, so a wrong folder is otherwise a row
+    /// that keeps offering a route for a game that is not in it.</summary>
+    private void OnRemoveGame(object? sender, RoutedEventArgs e)
+    {
+        if (_selected is not { } card || _busy) return;
+
+        // Read before the drawer closes, because closing it clears the selection.
+        var installed = card.Installed;
+        _all.Remove(card);
+        Save();
+        CloseDrawer();
+        RefreshGrid();
+        ShowToast(string.Format(Text(installed ? "Str.RemovedGameInstalled" : "Str.RemovedGame"), card.Name),
+            installed ? Level.Warn : Level.Ok);
+    }
+
+    /// <summary>The game's page on PCGamingWiki, which is where the API question is actually
+    /// settled. Detection reads the files, and files are honest about what they link and silent
+    /// about what the game offers: Control ships a D3D11 and a D3D12 executable in one folder, and
+    /// Crysis starts in D3D10 from an executable that will also do D3D9. Both answers here are
+    /// true and neither is the whole of it, so the route is worth a second opinion.</summary>
+    private void OnOpenWiki(object? sender, RoutedEventArgs e)
+    {
+        if (_selected is not { } card) return;
+        AppUpdate.OpenInBrowser(
+            "https://www.pcgamingwiki.com/w/index.php?search=" + Uri.EscapeDataString(card.Name));
     }
 
     /// <summary>Starts the game. Through Steam when it has an app id, because that is the path the
@@ -632,6 +735,7 @@ public partial class MainWindow : Window
         var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name);
         ApiTag.Text = graphics.Tag;
         DetectedLine.Text = graphics.Why;
+        ApiCheckBody.Text = string.Format(Text("Str.CheckApiBody"), graphics.Tag);
         ApiHint.Text = graphics switch
         {
             { Preset: null, All.Count: > 0 } => Text("Str.NoRoute"),
@@ -700,6 +804,35 @@ public partial class MainWindow : Window
     private void OnBackdropPressed(object? sender, PointerPressedEventArgs e) => CloseDrawer();
 
     private void OnGpuPill(object? sender, RoutedEventArgs e) => TabSystem.IsChecked = true;
+
+    /// <summary>Empties the download cache. Nothing in it is unrecoverable -- the payloads, the
+    /// covers and the release list all come back -- but it is about 165 MB of coming back, so it
+    /// asks first. What is installed in a game is not in here and is not touched.</summary>
+    private async void OnClearCache(object? sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        var answer = await EmulatorPicker.ShowAsync(this, Text("Str.ClearCache"), Text("Str.ClearCacheBody"),
+        [
+            ("clear", Text("Str.ClearCacheYes"), Text("Str.ClearCacheYesBody")),
+            ("keep", Text("Str.Dismiss"), Text("Str.ClearCacheNoBody")),
+        ]);
+        if (answer != "clear") return;
+
+        Busy(true);
+        Status(Text("Str.Working"));
+        try
+        {
+            var freed = await Task.Run(PayloadCache.Clear);
+            Status(string.Format(Text("Str.CacheCleared"), Megabytes(freed)));
+            ShowToast(string.Format(Text("Str.CacheCleared"), Megabytes(freed)), Level.Ok);
+        }
+        finally
+        {
+            Busy(false);
+            // Re-read rather than assume: a file something else had open is still there.
+            await ShowPayloadStateAsync();
+        }
+    }
 
     private void OnOpenCache(object? sender, RoutedEventArgs e)
     {
@@ -872,12 +1005,15 @@ public partial class MainWindow : Window
 
         _versions.Sort((a, b) => b.Version.CompareTo(a.Version));
 
-        // The choice is kept across routes and games while the app is open, so retrying an
-        // install somewhere else does not quietly change which version is going in.
-        var index = _version is null ? 0 : _versions.FindIndex(v => v.Version == _version.Version);
+        // What this game was last installed with, then whatever the app is currently set to, then
+        // the newest. The rule lives in Core so it can be asserted against: "it never remembers
+        // which one I chose" is the loudest complaint about the tool this one is modelled on, and
+        // "does a new release actually become the default" is not a question to answer by reading.
+        var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
+            _selected?.Entry.AddonVersion, _version?.Version);
         _settingVersion = true;
         AddonVersionBox.ItemsSource = _versions.Select(v => v.Label).ToList();
-        AddonVersionBox.SelectedIndex = _versions.Count == 0 ? -1 : Math.Max(0, index);
+        AddonVersionBox.SelectedIndex = index;
         _settingVersion = false;
 
         _version = AddonVersionBox.SelectedIndex >= 0 ? _versions[AddonVersionBox.SelectedIndex] : null;
@@ -897,6 +1033,8 @@ public partial class MainWindow : Window
         if (AddonVersionBox.SelectedIndex < 0 || AddonVersionBox.SelectedIndex >= _versions.Count) return;
 
         _version = _versions[AddonVersionBox.SelectedIndex];
+        _selected.Entry.AddonVersion = _version.Version.ToString();
+        Save();
         VersionNote.Text = VersionNoteText();
         // A different version is a different pair of hashes, so the pre-flight has to be redone:
         // "already installed" is only true of the version that is actually in the folder.
@@ -938,6 +1076,13 @@ public partial class MainWindow : Window
             WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
             _lastLog = InstallLog.Write("install", card, TargetFor(card), report, Selected(), pins, folder);
             card.RefreshInstalled();
+            // Recorded from the install and not only from the menu, so the version is remembered
+            // for somebody who never opened that menu -- which is nearly everybody.
+            if (!report.Failed && _version is { } installed)
+            {
+                card.Entry.AddonVersion = installed.Version.ToString();
+                Save();
+            }
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
             ShowOutcome(report, "Str.Install", card.Name);
             if (!report.Failed && card.Installed) card.Pulse();
@@ -957,14 +1102,24 @@ public partial class MainWindow : Window
         ResultBanner.IsVisible = false;
         try
         {
-            Report report;
-            try { report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset)); }
-            catch (Exception ex) { report = Failure(ex); }
-            Show(report);
-            WriteLog(report, $"uninstall {card.Entry.Preset.Label()} -> {card.Path}");
-            _lastLog = InstallLog.Write("uninstall", card, TargetFor(card), report, Selected(), Pins(), null);
-            card.RefreshInstalled();
-            ShowOutcome(report, "Str.Uninstall", card.Name);
+            var report = await RunUninstallAsync(card, force: false);
+
+            // An uninstall can finish cleanly and leave the add-on exactly where it was: a file that
+            // no longer hashes to what the install wrote belongs to whoever changed it, so the
+            // transaction keeps it, rewrites the manifest around it, and the folder goes on counting
+            // as installed. The banner used to say "Removed from X" over the top of a tile still
+            // reading Installed, and those two together read as a bug in the tile.
+            // Only when forcing would actually get somewhere. A file the running game still has
+            // open is retained too, and against that one the answer is "close the game", not a
+            // dialog offering to delete it harder.
+            var changed = report.Lines.Any(l => l.Text.Contains(Work.ModifiedMarker, StringComparison.Ordinal));
+            if (!report.Failed && card.Installed && changed && await AskRemoveAnyway(card))
+                report = await RunUninstallAsync(card, force: true);
+
+            if (!report.Failed && card.Installed)
+                ShowResult(Level.Warn, string.Format(Text("Str.UninstallLeft"), card.Name), Text("Str.SeeDetails"));
+            else
+                ShowOutcome(report, "Str.Uninstall", card.Name);
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
         }
         finally
@@ -972,6 +1127,30 @@ public partial class MainWindow : Window
             Busy(false);
         }
     }
+
+    private async Task<Report> RunUninstallAsync(GameCard card, bool force)
+    {
+        Report report;
+        try { report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset, force)); }
+        catch (Exception ex) { report = Failure(ex); }
+        Show(report);
+        var what = force ? "uninstall (forced)" : "uninstall";
+        WriteLog(report, $"{what} {card.Entry.Preset.Label()} -> {card.Path}");
+        _lastLog = InstallLog.Write(what, card, TargetFor(card), report, Selected(), Pins(), null);
+        card.RefreshInstalled();
+        return report;
+    }
+
+    /// <summary>Asks before deleting a file this app did not write. The answer is the whole point:
+    /// the pair in a game folder is sometimes replaced by hand -- a locally built add-on, another
+    /// tool's copy -- and deleting that without asking is worse than leaving it.</summary>
+    private async Task<bool> AskRemoveAnyway(GameCard card) =>
+        await EmulatorPicker.ShowAsync(this, Text("Str.UninstallLeftTitle"),
+            string.Format(Text("Str.UninstallLeftBody"), card.Name),
+            [
+                ("force", Text("Str.UninstallForce"), Text("Str.UninstallForceBody")),
+                ("keep", Text("Str.UninstallKeep"), Text("Str.UninstallKeepBody")),
+            ]) == "force";
 
     /// <summary>Downloads whatever this route needs, then hands back the folder to install from --
     /// the same shape someone would have unzipped by hand, so the engine cannot tell the
@@ -1089,18 +1268,8 @@ public partial class MainWindow : Window
         return report;
     }
 
-    private void WriteLog(Report report, string header)
-    {
-        try
-        {
-            var path = Path.Combine(AppPaths.Logs, "amd-nr-installer.log");
-            File.AppendAllText(path, report.ToLog($"{DateTime.Now:s} {header}") + Environment.NewLine);
-        }
-        catch (IOException)
-        {
-            // The report is on screen; a log that could not be written is not worth a second error.
-        }
-    }
+    private static void WriteLog(Report report, string header) =>
+        InstallLog.Append(report.ToLog($"{DateTime.Now:s} {header}"));
 
     private void Busy(bool on, Button? pressed = null)
     {

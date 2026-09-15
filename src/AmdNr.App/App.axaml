@@ -543,6 +543,13 @@
       <Setter Property="BorderBrush" Value="#59DDA13A" />
     </Style>
 
+    <!-- The API check rides on every game rather than on a problem with one, so it keeps the
+         callout's shape and gives up its amber. Two amber boxes stacked and both read as neither. -->
+    <Style Selector="Border.callout.check">
+      <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    </Style>
+
     <!-- Report lines arrive with a short rise instead of appearing all at once. -->
     <Style Selector="Grid.line">
       <Style.Animations>

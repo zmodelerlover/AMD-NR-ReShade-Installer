@@ -8,8 +8,19 @@
   <sys:String x:Key="Str.Games">Jogos</sys:String>
   <sys:String x:Key="Str.AddGame">Adicionar um jogo…</sys:String>
   <sys:String x:Key="Str.RemoveGame">Tirar da lista</sys:String>
+  <sys:String x:Key="Str.RemoveGameHint">Tira a linha da lista. Nenhum arquivo da pasta do jogo é tocado.</sys:String>
+  <sys:String x:Key="Str.RemovedGame">{0} saiu da lista. Nada na pasta dele foi tocado.</sys:String>
+  <sys:String x:Key="Str.RemovedGameInstalled">{0} saiu da lista, mas o add-on continua instalado na pasta dele. Adicione a pasta de volta se quiser desinstalar.</sys:String>
   <sys:String x:Key="Str.NoGames">Nada aqui ainda. Adicione a pasta de onde o jogo ou o emulador roda.</sys:String>
   <sys:String x:Key="Str.PickFolder">Escolha a pasta de onde o jogo roda</sys:String>
+  <sys:String x:Key="Str.AddGameTitle">Adicionar jogos</sys:String>
+  <sys:String x:Key="Str.AddGameBody">Ou um jogo só, ou tudo que estiver numa pasta onde você guarda jogos.</sys:String>
+  <sys:String x:Key="Str.AddGameMany">Procurar numa pasta</sys:String>
+  <sys:String x:Key="Str.AddGameManyBody">Aponte a pasta onde seus jogos ficam — um HD de Games, uma biblioteca copiada de outra máquina — e todos os jogos dentro dela entram de uma vez. Só leitura: olhar não instala nem muda nada.</sys:String>
+  <sys:String x:Key="Str.AddGameOne">Adicionar um jogo</sys:String>
+  <sys:String x:Key="Str.AddGameOneBody">Aponte direto a pasta de onde aquele jogo roda.</sys:String>
+  <sys:String x:Key="Str.AddGamePickLibrary">Escolha a pasta onde você guarda os jogos</sys:String>
+  <sys:String x:Key="Str.AddGameNone">Nada com cara de jogo foi encontrado em "{0}".</sys:String>
 
   <sys:String x:Key="Str.Preset">Rota</sys:String>
   <sys:String x:Key="Str.Install">Instalar</sys:String>
@@ -51,7 +62,7 @@
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — do danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">A rede em si, e o motivo de tudo isto existir: foi ele que fez o neural rendering do DLSS 5 rodar em Radeon. A runtime e os pesos que este app baixa são trabalho dele, não nosso. Obrigado, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — o add-on</sys:String>
-  <sys:String x:Key="Str.CreditAddonBody">O que liga essa rede ao jogo pelo ReShade, e onde este instalador também mora. Licença MIT.</sys:String>
+  <sys:String x:Key="Str.CreditAddonBody">O que liga essa rede ao jogo pelo ReShade: o add-on que isto instala, e as releases entre as quais isto te deixa escolher. Licença MIT, e um repositório separado deste instalador.</sys:String>
   <sys:String x:Key="Str.CreditDiscordTitle">Discord — onde o pessoal está</sys:String>
   <sys:String x:Key="Str.CreditDiscordBody">Builds novas, o que funciona em qual jogo, e onde perguntar quando algo quebra.</sys:String>
   <sys:String x:Key="Str.CreditsSection">Créditos</sys:String>
@@ -67,6 +78,9 @@
   <sys:String x:Key="Str.WillDownload">Os arquivos são baixados e conferidos na hora de instalar.</sys:String>
   <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12 e Vulkan, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. OpenGL não tem.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">Este jogo roda em {1}. Coloque em {0} nas configurações gráficas dele -- é a rota escolhida aqui, e em outra API o add-on vê outro jogo.</sys:String>
+  <sys:String x:Key="Str.CheckApiTitle">Confira a API antes de instalar</sys:String>
+  <sys:String x:Key="Str.CheckApiBody">{0} foi lido dos arquivos deste jogo, e arquivo diz contra o que foi ligado, não em que o jogo roda. Uma pasta pode ter um executável D3D11 e um D3D12; um jogo pode abrir em D3D10 a partir de um executável que também faz D3D9. As duas respostas são verdade e só uma delas é a rota certa — e rota errada instala perfeitinho e depois não faz nada no jogo.</sys:String>
+  <sys:String x:Key="Str.CheckWiki">Procurar este jogo no PCGamingWiki</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">É um jogo Unreal: adicione -{0} nas opções de inicialização.</sys:String>
   <!-- Feedback e layout -->
   <sys:String x:Key="Str.EmptyTitle">Nenhum jogo ainda</sys:String>
@@ -80,6 +94,12 @@
   <sys:String x:Key="Str.RouteSection">Rota</sys:String>
   <sys:String x:Key="Str.VersionSection">Versão do add-on</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Baixar tudo agora</sys:String>
+  <sys:String x:Key="Str.ClearCache">Limpar o cache</sys:String>
+  <sys:String x:Key="Str.ClearCacheBody">Apaga os arquivos baixados, as capas e a lista de versões. Nada instalado em jogo é tocado; a próxima instalação baixa de novo o que precisar.</sys:String>
+  <sys:String x:Key="Str.ClearCacheYes">Pode limpar</sys:String>
+  <sys:String x:Key="Str.ClearCacheYesBody">Uns 165 MB vão ter que ser baixados de novo na próxima instalação.</sys:String>
+  <sys:String x:Key="Str.ClearCacheNoBody">Deixar o cache como está.</sys:String>
+  <sys:String x:Key="Str.CacheCleared">Cache esvaziado — {0} liberados.</sys:String>
   <sys:String x:Key="Str.PayloadsAllReady">{0} de {1} componentes prontos — {2} no cache</sys:String>
   <sys:String x:Key="Str.PayloadsMissing">{0} de {1} componentes prontos — faltam {2} para baixar</sys:String>
   <sys:String x:Key="Str.PayloadsAlreadyThere">Já estava tudo aí, e cada byte acabou de ser conferido.</sys:String>
@@ -99,6 +119,13 @@
   <sys:String x:Key="Str.InstallFail">A instalação em {0} não terminou.</sys:String>
   <sys:String x:Key="Str.UninstallOk">Removido de {0}.</sys:String>
   <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso(s) pra ler abaixo.</sys:String>
+  <sys:String x:Key="Str.UninstallLeft">{0} ainda conta como instalado: arquivos que mudaram depois da instalação foram deixados no lugar.</sys:String>
+  <sys:String x:Key="Str.UninstallLeftTitle">Alguns arquivos ficaram no lugar</sys:String>
+  <sys:String x:Key="Str.UninstallLeftBody">Arquivos em {0} não são os que este instalador escreveu — mudaram depois da instalação, então o desinstalar preferiu mantê-los a apagar o trabalho de outra pessoa. É por isso que o jogo continua aparecendo como instalado. A lista está em Detalhes.</sys:String>
+  <sys:String x:Key="Str.UninstallForce">Tirar mesmo assim</sys:String>
+  <sys:String x:Key="Str.UninstallForceBody">Apaga esses arquivos e devolve o que eles substituíram. O seu dlss5-neural.ini fica de qualquer jeito.</sys:String>
+  <sys:String x:Key="Str.UninstallKeep">Deixar como está</sys:String>
+  <sys:String x:Key="Str.UninstallKeepBody">Nada mais é tocado, e o jogo segue contando como instalado.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Não deu pra remover tudo de {0}.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problema(s) listado(s) abaixo.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>
@@ -175,6 +202,7 @@
   <sys:String x:Key="Str.SetupFilesOffline">Não deu pra ler a lista de downloads — provavelmente sem internet. Dá pra continuar: o app tenta de novo quando você instalar.</sys:String>
 
   <sys:String x:Key="Str.SetupGamesBody">Ler os launchers é só leitura: nada é instalado nem alterado por olhar. Você pode adicionar pastas à mão depois.</sys:String>
+  <sys:String x:Key="Str.SetupGamesApi">Cada jogo é lido pra descobrir qual API gráfica ele usa, e essa leitura costuma acertar, mas não sempre: uma pasta pode ter um executável D3D11 e um D3D12, e um jogo pode abrir numa API enquanto o executável também aceita uma mais antiga. Antes de instalar, vale conferir o jogo no pcgamingwiki.com — cada jogo tem um link direto pra lá.</sys:String>
   <sys:String x:Key="Str.SetupGamesNone">Nenhum jogo encontrado. Dá pra adicionar a pasta à mão na janela principal.</sys:String>
   <sys:String x:Key="Str.SetupGamesFound">{0} jogos encontrados.</sys:String>
   <sys:String x:Key="Str.SetupDoneBody">Tudo pronto. A janela principal abre com a sua biblioteca.</sys:String>

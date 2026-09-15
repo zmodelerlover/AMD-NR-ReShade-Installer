@@ -87,6 +87,12 @@ public sealed class Settings
     /// the X leaves it false, so the wizard asks again rather than silently never running.</summary>
     public bool SetupDone { get; set; }
 
+    /// <summary>True when the wizard's games step was left without a scan being run. The main
+    /// window used to scan on its own whenever the list was empty, which is exactly the state
+    /// skipping that step leaves behind -- so the one person who said no was the one person it ran
+    /// for. Scan games is still there; it just has to be asked for.</summary>
+    public bool ScanDeclined { get; set; }
+
     private static string Path => System.IO.Path.Combine(AppPaths.Root, "settings.json");
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNameCaseInsensitive = true };
 
@@ -129,6 +135,13 @@ public sealed class GameEntry
     /// <summary>True once the person picked a route by hand. Until then the route follows what the
     /// detection says, including when a newer API database changes its mind.</summary>
     public bool PresetChosen { get; set; }
+
+    /// <summary>The add-on version this game was last installed with, or last set to by hand. It
+    /// lives per game rather than per app because that is the scope it means anything in: pinning
+    /// one game to an older build is a thing people do, and the rest of the library should not
+    /// follow it. Unset until an install lands or the menu is touched, and a version that is no
+    /// longer published quietly falls back to the newest offered.</summary>
+    public string? AddonVersion { get; set; }
 
     [JsonIgnore]
     public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;

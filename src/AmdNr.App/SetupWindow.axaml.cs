@@ -36,6 +36,7 @@ public partial class SetupWindow : Window
     private int _step;
     private bool _busy;
     private bool _settingLanguage;
+    private bool _scanned;
 
     private const int StepLanguage = 0, StepMachine = 1, StepFiles = 2, StepGames = 3, StepCount = 4;
 
@@ -106,6 +107,10 @@ public partial class SetupWindow : Window
         var settings = Settings.Load();
         settings.SetupDone = true;
         settings.Language = App.CurrentLanguage;
+        // Leaving this step without having scanned -- by Skip, or by Continue on an untouched page
+        // -- is an answer, and the main window used to ignore it: it scanned anything with an empty
+        // list, which read as the wizard having done it anyway after being told not to.
+        settings.ScanDeclined = !_scanned;
         settings.Save();
         Completed = true;
         Close();
@@ -306,7 +311,18 @@ public partial class SetupWindow : Window
         ScanStatus.Text = Text("Str.Scanning");
         try
         {
-            var found = await Task.Run(GameScanner.ScanAll);
+            IReadOnlyList<ScannedGame> found;
+            // Reading someone else's launcher data is the least predictable thing this app does, and
+            // this is an async void handler: an escape here takes the wizard down, and SetupDone is
+            // not saved yet -- so the next launch opens the same wizard and it falls over again.
+            try { found = await Task.Run(GameScanner.ScanAll); }
+            catch (Exception ex)
+            {
+                InstallLog.Append($"{DateTime.Now:s} setup scan  {ex.GetType().Name}: {ex.Message}");
+                ScanStatus.Text = Text("Str.Unexpected");
+                return;
+            }
+            _scanned = true;
 
             // Merged with whatever is already listed rather than replacing it: the wizard can be run
             // again from a machine that already has games added by hand.
