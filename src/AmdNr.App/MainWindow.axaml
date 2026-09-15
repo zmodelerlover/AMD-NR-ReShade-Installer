@@ -111,7 +111,8 @@
             </StackPanel>
           </Grid>
 
-          <ScrollViewer Grid.Row="1" x:Name="GridScroll" Padding="24,6,24,24" SizeChanged="OnGridResized">
+          <ScrollViewer Grid.Row="1" x:Name="GridScroll" Padding="24,6,24,24" SizeChanged="OnGridResized"
+                        HorizontalScrollBarVisibility="Disabled">
             <ItemsControl x:Name="CardList" HorizontalAlignment="Center">
               <ItemsControl.Resources>
                 <!-- Set from the window width, so a row always fills the page edge to edge. -->
@@ -418,8 +419,11 @@
         </Grid>
 
         <!-- System -->
-        <ScrollViewer x:Name="SystemPage" IsVisible="False" Padding="32,26,32,32">
-          <StackPanel Spacing="20" MaxWidth="920" HorizontalAlignment="Left">
+        <!-- Horizontal scrolling off, or the page is measured against an endless width and the
+             widest card runs past the window edge. -->
+        <ScrollViewer x:Name="SystemPage" IsVisible="False" Padding="32,26,32,32"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="20" MaxWidth="920" HorizontalAlignment="Stretch">
             <StackPanel Spacing="4">
               <TextBlock Text="{DynamicResource Str.System}" Classes="page" />
               <TextBlock Text="{DynamicResource Str.SystemSubtitle}" Foreground="{DynamicResource Muted}" />
@@ -437,8 +441,8 @@
               </Grid>
             </Border>
 
-            <UniformGrid Columns="3">
-              <Border Classes="card" Margin="0,0,8,0">
+            <Grid ColumnDefinitions="*,*,*">
+              <Border Grid.Column="0" Classes="card" Margin="0,0,8,0">
                 <StackPanel Spacing="14">
                   <Border Classes="iconTile"><PathIcon Data="{StaticResource IconChip}" /></Border>
                   <StackPanel Spacing="4">
@@ -453,7 +457,7 @@
                   </Border>
                 </StackPanel>
               </Border>
-              <Border Classes="card" Margin="4,0,4,0">
+              <Border Grid.Column="1" Classes="card" Margin="4,0,4,0">
                 <StackPanel Spacing="14">
                   <Border Classes="iconTile"><PathIcon Data="{StaticResource IconDriver}" /></Border>
                   <StackPanel Spacing="4">
@@ -463,7 +467,7 @@
                   <TextBlock Text="{DynamicResource Str.DriverHint}" Classes="muted" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
-              <Border Classes="card" Margin="8,0,0,0">
+              <Border Grid.Column="2" Classes="card" Margin="8,0,0,0">
                 <StackPanel Spacing="14">
                   <Border Classes="iconTile"><PathIcon Data="{StaticResource IconBolt}" /></Border>
                   <StackPanel Spacing="4">
@@ -478,7 +482,7 @@
                   </Border>
                 </StackPanel>
               </Border>
-            </UniformGrid>
+            </Grid>
 
             <Border Classes="card" Padding="0">
               <StackPanel>
@@ -530,8 +534,11 @@
         </ScrollViewer>
 
         <!-- Settings -->
-        <ScrollViewer x:Name="SettingsPage" IsVisible="False" Padding="32,26,32,32">
-          <StackPanel Spacing="20" MaxWidth="760" HorizontalAlignment="Left">
+        <!-- Horizontal scrolling off, or the page is measured against an endless width and the
+             widest card runs past the window edge. -->
+        <ScrollViewer x:Name="SettingsPage" IsVisible="False" Padding="32,26,32,32"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="20" MaxWidth="760" HorizontalAlignment="Stretch">
             <StackPanel Spacing="4">
               <TextBlock Text="{DynamicResource Str.Settings}" Classes="page" />
               <TextBlock Text="{DynamicResource Str.SettingsSubtitle}" Foreground="{DynamicResource Muted}" />
