@@ -19,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The manifest that actually ships, checked against the add-on's own constants by a test. -->
+    <Content Include="..\..\payload\payload.json" Link="payload.json" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\src\AmdNr.Core\AmdNr.Core.csproj" />
   </ItemGroup>
 
