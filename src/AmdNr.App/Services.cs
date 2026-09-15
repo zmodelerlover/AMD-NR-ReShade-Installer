@@ -45,6 +45,13 @@ public sealed class AppConfig
 
     public string RuntimeUrl { get; init; } = "https://github.com/danielblnc/DLSS-NR-on-AMD";
 
+    /// <summary>Where someone can put money in if they want to. Nothing is behind either of them.
+    /// </summary>
+    public string KofiUrl { get; init; } = "https://ko-fi.com/proceduralnilo";
+
+    public string VakinhaUrl { get; init; } =
+        "https://www.vakinha.com.br/vaquinha/open-source-dlss-amd-nr";
+
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
 
     public static AppConfig Load()

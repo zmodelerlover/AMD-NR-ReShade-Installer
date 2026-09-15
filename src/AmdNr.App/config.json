@@ -9,6 +9,8 @@
   },
   "DiscordUrl": "https://discord.gg/wYhvS3JSHM",
   "RuntimeUrl": "https://github.com/danielblnc/DLSS-NR-on-AMD",
+  "KofiUrl": "https://ko-fi.com/proceduralnilo",
+  "VakinhaUrl": "https://www.vakinha.com.br/vaquinha/open-source-dlss-amd-nr",
   "Payload": {
     "ManifestUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.json",
     "ApiDbUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/api-db.json"

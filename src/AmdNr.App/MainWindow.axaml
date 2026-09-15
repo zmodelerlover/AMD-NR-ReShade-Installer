@@ -474,9 +474,9 @@
         <!-- System -->
         <!-- Horizontal scrolling off, or the page is measured against an endless width and the
              widest card runs past the window edge. -->
-        <ScrollViewer x:Name="SystemPage" IsVisible="False" Padding="32,26,32,32"
-                      HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Spacing="20" MaxWidth="920" HorizontalAlignment="Stretch">
+        <ScrollViewer x:Name="SystemPage" IsVisible="False"
+                      HorizontalScrollBarVisibility="Disabled" ScrollViewer.AllowAutoHide="False">
+          <StackPanel Spacing="20" MaxWidth="920" Margin="32,26,32,32" HorizontalAlignment="Stretch">
             <StackPanel Spacing="4">
               <TextBlock Text="{DynamicResource Str.System}" Classes="page" />
               <TextBlock Text="{DynamicResource Str.SystemSubtitle}" Foreground="{DynamicResource Muted}" />
@@ -600,9 +600,9 @@
         <!-- Settings -->
         <!-- Horizontal scrolling off, or the page is measured against an endless width and the
              widest card runs past the window edge. -->
-        <ScrollViewer x:Name="SettingsPage" IsVisible="False" Padding="32,26,32,32"
-                      HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Spacing="20" MaxWidth="760" HorizontalAlignment="Stretch">
+        <ScrollViewer x:Name="SettingsPage" IsVisible="False"
+                      HorizontalScrollBarVisibility="Disabled" ScrollViewer.AllowAutoHide="False">
+          <StackPanel Spacing="20" MaxWidth="760" Margin="32,26,32,32" HorizontalAlignment="Stretch">
             <StackPanel Spacing="4">
               <TextBlock Text="{DynamicResource Str.Settings}" Classes="page" />
               <TextBlock Text="{DynamicResource Str.SettingsSubtitle}" Foreground="{DynamicResource Muted}" />

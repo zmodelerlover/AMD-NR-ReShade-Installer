@@ -43,14 +43,20 @@
   <sys:String x:Key="Str.LogSaved">The full log was written next to this app.</sys:String>
   <sys:String x:Key="Str.Working">Working…</sys:String>
   <sys:String x:Key="Str.FreeTitle">This is free. If you paid for it, you are being scammed.</sys:String>
-  <sys:String x:Key="Str.FreeBody">Nobody sells any of this — not this installer, not the add-on, not the runtime, not the weights. Every file comes from the links below, at no cost, and it always will. If somebody charged you for it, or for a "key", or for a "pro version", ask for your money back: what they sold you is on this page for nothing.</sys:String>
-  <sys:String x:Key="Str.OpenSourceBody">It is open source and it is staying that way: read it, change it, build your own, ship it to your friends. The one thing we ask nobody does is turn it into a paid version — selling this is selling somebody else's work that everyone can already have for free.</sys:String>
+  <sys:String x:Key="Str.FreeBody">Nobody sells any of this — not the installer, not the add-on, not the runtime, not the weights. If you were charged for it, or for a "key" or a "pro version", ask for your money back: what they sold you is on this page for nothing.</sys:String>
+  <sys:String x:Key="Str.OpenSourceBody">It is open source and it is staying that way: read it, change it, build your own, hand it to your friends. The one thing we ask is that nobody turns it into a paid version.</sys:String>
+  <sys:String x:Key="Str.SupportSection">Support</sys:String>
+  <sys:String x:Key="Str.SupportNote">optional, and it buys nothing</sys:String>
+  <sys:String x:Key="Str.SupportKofiTitle">Ko-fi</sys:String>
+  <sys:String x:Key="Str.SupportKofiBody">A one-off coffee.</sys:String>
+  <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
+  <sys:String x:Key="Str.SupportVakinhaBody">The project's Brazilian fundraiser.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — by danielblnc</sys:String>
-  <sys:String x:Key="Str.CreditRuntimeBody">The network itself, and the reason any of this exists: it is the project that got DLSS 5's neural rendering running on Radeon at all. The runtime and the 141 MB of weights this app downloads are his work, not ours — take them away and there is nothing left to drive. Thank you, danielblnc.</sys:String>
+  <sys:String x:Key="Str.CreditRuntimeBody">The network itself, and the reason any of this exists: it is what got DLSS 5's neural rendering running on Radeon at all. The runtime and the weights this app downloads are his work, not ours. Thank you, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — the add-on</sys:String>
-  <sys:String x:Key="Str.CreditAddonBody">What plugs that network into a game through ReShade, and where this installer lives too: the D3D11, D3D12 and Vulkan routes, the 32-bit bridge for older games, the overlay, the hotkey, and the program you are reading this in. MIT licensed, source in the open.</sys:String>
+  <sys:String x:Key="Str.CreditAddonBody">What plugs that network into a game through ReShade, and where this installer lives too. MIT licensed.</sys:String>
   <sys:String x:Key="Str.CreditDiscordTitle">Discord — where everyone is</sys:String>
-  <sys:String x:Key="Str.CreditDiscordBody">Where the project is talked about: new builds, what works in which game, and the logs people send in when something breaks. Open it if you are stuck, or if you want to help test.</sys:String>
+  <sys:String x:Key="Str.CreditDiscordBody">New builds, what works in which game, and where to ask when something breaks.</sys:String>
   <sys:String x:Key="Str.CreditsSection">Credits</sys:String>
 
   <sys:String x:Key="Str.Scan">Scan games</sys:String>
@@ -147,7 +153,7 @@
   <!-- First run -->
   <sys:String x:Key="Str.SetupTitle">Getting started</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Welcome</sys:String>
-  <sys:String x:Key="Str.SetupWelcomeBody">This app runs the DLSS 5 Neural Rendering network on Radeon cards, through ReShade. It downloads everything itself and checks every file against a pinned hash. Four quick steps.</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">The DLSS 5 Neural Rendering network on Radeon cards, through ReShade. Four quick steps.</sys:String>
   <sys:String x:Key="Str.SetupStepLanguage">Language</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">This machine</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Files</sys:String>

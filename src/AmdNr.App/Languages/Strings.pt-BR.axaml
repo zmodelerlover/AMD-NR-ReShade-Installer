@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
@@ -40,14 +40,20 @@
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
   <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
   <sys:String x:Key="Str.FreeTitle">Isto é de graça. Se você pagou por isto, estão te enganando.</sys:String>
-  <sys:String x:Key="Str.FreeBody">Ninguém vende nada disto — nem este instalador, nem o add-on, nem a runtime, nem os pesos. Todo arquivo vem dos links abaixo, sem custo, e vai continuar assim. Se alguém te cobrou por isto, ou por uma "chave", ou por uma "versão pro", peça seu dinheiro de volta: o que te venderam está nesta página de graça.</sys:String>
-  <sys:String x:Key="Str.OpenSourceBody">É open source e vai continuar sendo: leia, modifique, compile a sua versão, passe pros amigos. A única coisa que a gente pede que ninguém faça é transformar numa versão paga — vender isto é vender trabalho dos outros que todo mundo já pode ter de graça.</sys:String>
+  <sys:String x:Key="Str.FreeBody">Ninguém vende nada disto — nem o instalador, nem o add-on, nem a runtime, nem os pesos. Se te cobraram por isto, ou por uma "chave", ou por uma "versão pro", peça seu dinheiro de volta: o que te venderam está nesta página de graça.</sys:String>
+  <sys:String x:Key="Str.OpenSourceBody">É open source e vai continuar sendo: leia, modifique, compile a sua versão, passe pros amigos. A única coisa que a gente pede é que ninguém transforme numa versão paga.</sys:String>
+  <sys:String x:Key="Str.SupportSection">Apoiar</sys:String>
+  <sys:String x:Key="Str.SupportNote">opcional, e não compra nada</sys:String>
+  <sys:String x:Key="Str.SupportKofiTitle">Ko-fi</sys:String>
+  <sys:String x:Key="Str.SupportKofiBody">Um café avulso.</sys:String>
+  <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
+  <sys:String x:Key="Str.SupportVakinhaBody">A vaquinha do projeto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — do danielblnc</sys:String>
-  <sys:String x:Key="Str.CreditRuntimeBody">A rede em si, e o motivo de tudo isto existir: foi o projeto dele que fez o neural rendering do DLSS 5 rodar em Radeon. A runtime e os 141 MB de pesos que este app baixa são trabalho dele, não nosso — tira isso e não sobra nada pra rodar. Obrigado, danielblnc.</sys:String>
+  <sys:String x:Key="Str.CreditRuntimeBody">A rede em si, e o motivo de tudo isto existir: foi ele que fez o neural rendering do DLSS 5 rodar em Radeon. A runtime e os pesos que este app baixa são trabalho dele, não nosso. Obrigado, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — o add-on</sys:String>
-  <sys:String x:Key="Str.CreditAddonBody">O que liga essa rede ao jogo através do ReShade, e onde este instalador também mora: as rotas D3D11, D3D12 e Vulkan, a ponte 32-bit pros jogos antigos, o overlay, a tecla de atalho, e o programa em que você está lendo isto. Licença MIT, código aberto.</sys:String>
+  <sys:String x:Key="Str.CreditAddonBody">O que liga essa rede ao jogo pelo ReShade, e onde este instalador também mora. Licença MIT.</sys:String>
   <sys:String x:Key="Str.CreditDiscordTitle">Discord — onde o pessoal está</sys:String>
-  <sys:String x:Key="Str.CreditDiscordBody">Onde o projeto é discutido: builds novas, o que funciona em qual jogo, e os logs que o pessoal manda quando algo quebra. Abre aí se você travou, ou se quiser ajudar a testar.</sys:String>
+  <sys:String x:Key="Str.CreditDiscordBody">Builds novas, o que funciona em qual jogo, e onde perguntar quando algo quebra.</sys:String>
   <sys:String x:Key="Str.CreditsSection">Créditos</sys:String>
 
   <sys:String x:Key="Str.Scan">Procurar jogos</sys:String>
@@ -144,7 +150,7 @@
   <!-- First run -->
   <sys:String x:Key="Str.SetupTitle">Primeiros passos</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Bem-vindo</sys:String>
-  <sys:String x:Key="Str.SetupWelcomeBody">Este app instala a rede de Neural Rendering do DLSS 5 em placas Radeon, através do ReShade. Ele baixa tudo sozinho e confere cada arquivo por hash. São quatro passos rápidos.</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">A rede de Neural Rendering do DLSS 5 em placas Radeon, através do ReShade. São quatro passos rápidos.</sys:String>
   <sys:String x:Key="Str.SetupStepLanguage">Idioma</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Esta máquina</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Arquivos</sys:String>

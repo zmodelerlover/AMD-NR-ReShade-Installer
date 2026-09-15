@@ -1,10 +1,10 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:AmdNr.App"
         x:Class="AmdNr.App.SetupWindow"
         Title="AMD-NR ReShade Installer"
         Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
-        Width="820" Height="840" MinWidth="560" MinHeight="470"
+        Width="820" Height="900" MinWidth="560" MinHeight="470"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Bg}">
 
@@ -29,11 +29,16 @@
       </Grid>
     </Border>
 
-    <ScrollViewer Grid.Row="1" Padding="28,24" HorizontalScrollBarVisibility="Disabled">
-      <Panel>
+    <!-- The page gutter is a margin on the content, not padding on the ScrollViewer: padding here
+         is subtracted when the content is arranged but not when it is measured, so anything that
+         wraps measures against the full width, overflows to the right, and reports a height short
+         of what it needs, which is what stopped the scrollbar before the end of the page. -->
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto" ScrollViewer.AllowAutoHide="False">
+      <Panel Margin="28,22">
 
         <!-- 1. Language -->
-        <StackPanel x:Name="PageLanguage" Spacing="18">
+        <StackPanel x:Name="PageLanguage" Spacing="12">
           <StackPanel Spacing="6">
             <TextBlock Text="{DynamicResource Str.SetupWelcome}" Classes="page" />
             <TextBlock Text="{DynamicResource Str.SetupWelcomeBody}" Classes="muted"
@@ -44,7 +49,6 @@
               <TextBlock Text="{DynamicResource Str.Language}" Classes="section" />
               <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch" SelectionChanged="OnLanguageChanged"
                         AutomationProperties.Name="{DynamicResource Str.Language}" />
-              <TextBlock Text="{DynamicResource Str.LanguageHint}" Classes="muted" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
 

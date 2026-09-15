@@ -18,6 +18,8 @@ public partial class CreditsPanel : UserControl
         RuntimeLink.Tag = config.RuntimeUrl;
         AddonLink.Tag = $"https://github.com/{config.Addon.Owner}/{config.Addon.Repo}";
         DiscordLink.Tag = config.DiscordUrl;
+        KofiLink.Tag = config.KofiUrl;
+        VakinhaLink.Tag = config.VakinhaUrl;
     }
 
     /// <summary>The whole row is the link, so the logo is what gets clicked.</summary>

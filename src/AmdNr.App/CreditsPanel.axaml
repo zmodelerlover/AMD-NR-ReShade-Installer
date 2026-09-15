@@ -4,7 +4,7 @@
 
   <!-- The same block on the first screen and in Settings: who made the network, where every piece
        lives, and that none of it is for sale. Each row is one target, so the logo is the link. -->
-  <StackPanel Spacing="12">
+  <StackPanel Spacing="10">
 
     <!-- Discord's own blue, because a logo in the wrong colour reads as a screenshot of a logo. -->
     <Button x:Name="DiscordLink" Classes="pick" Padding="14,13" Click="OnOpen"
@@ -38,7 +38,7 @@
       </Grid>
     </Border>
 
-    <TextBlock Text="{DynamicResource Str.CreditsSection}" Classes="section" Margin="2,6,0,0" />
+    <TextBlock Text="{DynamicResource Str.CreditsSection}" Classes="section" Margin="2,4,0,0" />
 
     <!-- The network first, because without it there is nothing here to install. -->
     <Button x:Name="RuntimeLink" Classes="pick" Padding="14,13" Click="OnOpen"
@@ -72,6 +72,42 @@
                   Foreground="{DynamicResource Faint}" VerticalAlignment="Center" Margin="12,0,0,0" />
       </Grid>
     </Button>
+
+    <StackPanel Orientation="Horizontal" Spacing="9" Margin="2,4,0,0">
+      <TextBlock Text="{DynamicResource Str.SupportSection}" Classes="section" VerticalAlignment="Center" />
+      <TextBlock Text="{DynamicResource Str.SupportNote}" Classes="muted" VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis" />
+    </StackPanel>
+
+    <!-- Side by side: two short links do not each need a line of their own. -->
+    <Grid ColumnDefinitions="*,*">
+      <Button x:Name="KofiLink" Grid.Column="0" Classes="pick" Padding="12,11" Click="OnOpen"
+              Margin="0,0,6,0" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Width="32" Height="32" CornerRadius="9" Background="#00B9FE" Margin="0,0,11,0">
+            <PathIcon Data="{StaticResource IconCoffee}" Width="17" Height="17" Foreground="White" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Text="{DynamicResource Str.SupportKofiTitle}" FontWeight="SemiBold" />
+            <TextBlock Text="{DynamicResource Str.SupportKofiBody}" Classes="muted" TextWrapping="Wrap"
+                       LineHeight="17" />
+          </StackPanel>
+        </Grid>
+      </Button>
+      <Button x:Name="VakinhaLink" Grid.Column="1" Classes="pick" Padding="12,11" Click="OnOpen"
+              Margin="6,0,0,0" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Width="32" Height="32" CornerRadius="9" Background="#12A150" Margin="0,0,11,0">
+            <PathIcon Data="{StaticResource IconHeart}" Width="17" Height="17" Foreground="White" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Text="{DynamicResource Str.SupportVakinhaTitle}" FontWeight="SemiBold" />
+            <TextBlock Text="{DynamicResource Str.SupportVakinhaBody}" Classes="muted" TextWrapping="Wrap"
+                       LineHeight="17" />
+          </StackPanel>
+        </Grid>
+      </Button>
+    </Grid>
 
   </StackPanel>
 </UserControl>
