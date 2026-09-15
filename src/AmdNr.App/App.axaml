@@ -1,0 +1,81 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AmdNr.App.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Index 0 is the language, swapped at run time by App.ChangeLanguage. Nothing else may
+             be inserted in front of it. -->
+        <ResourceInclude Source="avares://AMD-NR-ReShade-Installer/Languages/Strings.en.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <!-- The add-on's own palette: the contained red, not the one that glows on a dark terminal. -->
+      <Color x:Key="AccentColor">#A61C22</Color>
+      <SolidColorBrush x:Key="Accent" Color="#A61C22" />
+      <SolidColorBrush x:Key="AccentHover" Color="#C4242C" />
+      <SolidColorBrush x:Key="Chrome" Color="#601E1E" />
+      <SolidColorBrush x:Key="Bg" Color="#141010" />
+      <SolidColorBrush x:Key="Surface" Color="#1D1817" />
+      <SolidColorBrush x:Key="SurfaceHigh" Color="#262020" />
+      <SolidColorBrush x:Key="Border" Color="#3A2B2A" />
+      <SolidColorBrush x:Key="Text" Color="#ECE6E4" />
+      <SolidColorBrush x:Key="Muted" Color="#A3948F" />
+      <SolidColorBrush x:Key="Ok" Color="#5CB37E" />
+      <SolidColorBrush x:Key="Warn" Color="#DDA13A" />
+      <SolidColorBrush x:Key="Err" Color="#E05B4C" />
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource Bg}" />
+      <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+    </Style>
+
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <Style Selector="TextBlock.h1">
+      <Setter Property="FontSize" Value="19" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource Surface}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
+
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+      <Setter Property="Padding" Value="16,8" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHover}" />
+    </Style>
+
+    <Style Selector="Button.ghost">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+  </Application.Styles>
+</Application>

@@ -1,0 +1,42 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <sys:String x:Key="Str.AppTitle">AMD-NR ReShade Installer</sys:String>
+  <sys:String x:Key="Str.Subtitle">DLSS 5 neural rendering em Radeon, instalado pra você</sys:String>
+
+  <sys:String x:Key="Str.Games">Jogos</sys:String>
+  <sys:String x:Key="Str.AddGame">Adicionar um jogo…</sys:String>
+  <sys:String x:Key="Str.RemoveGame">Tirar da lista</sys:String>
+  <sys:String x:Key="Str.NoGames">Nada aqui ainda. Adicione a pasta de onde o jogo ou o emulador roda.</sys:String>
+  <sys:String x:Key="Str.PickFolder">Escolha a pasta de onde o jogo roda</sys:String>
+
+  <sys:String x:Key="Str.Preset">Rota</sys:String>
+  <sys:String x:Key="Str.Install">Instalar</sys:String>
+  <sys:String x:Key="Str.Uninstall">Desinstalar</sys:String>
+  <sys:String x:Key="Str.Recheck">Conferir de novo</sys:String>
+  <sys:String x:Key="Str.OpenFolder">Abrir a pasta</sys:String>
+
+  <sys:String x:Key="Str.System">Esta máquina</sys:String>
+  <sys:String x:Key="Str.Gpu">Placa de vídeo</sys:String>
+  <sys:String x:Key="Str.Driver">Driver</sys:String>
+  <sys:String x:Key="Str.Hip">Runtime HIP 7</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll não foi encontrada. Um Adrenalin atual traz ela; HIP 6 não serve.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Isto não parece uma Radeon. A rede roda só em RDNA3 e RDNA4.</sys:String>
+  <sys:String x:Key="Str.Ready">Pronto</sys:String>
+
+  <sys:String x:Key="Str.Payloads">Arquivos</sys:String>
+  <sys:String x:Key="Str.Downloading">Baixando</sys:String>
+  <sys:String x:Key="Str.Verifying">Conferindo o que já está aqui…</sys:String>
+  <sys:String x:Key="Str.PayloadsReady">Baixado e conferido.</sys:String>
+  <sys:String x:Key="Str.ManifestFailed">Não deu pra ler a lista de downloads. Confira a conexão e tente de novo.</sys:String>
+
+  <sys:String x:Key="Str.Language">Idioma</sys:String>
+  <sys:String x:Key="Str.UpdateAvailable">Saiu uma versão nova</sys:String>
+  <sys:String x:Key="Str.OpenReleases">Abrir a página de releases</sys:String>
+  <sys:String x:Key="Str.Dismiss">Agora não</sys:String>
+
+  <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
+  <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
+  <sys:String x:Key="Str.Credits">A rede é a DLSS-NR-on-AMD do danielblnc. A runtime e os pesos são trabalho dele.</sys:String>
+</ResourceDictionary>

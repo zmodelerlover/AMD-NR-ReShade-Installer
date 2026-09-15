@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <!-- The fallback language. Every other Strings.*.axaml carries the same keys; one that is missing
+       falls through to whatever this file says. -->
+
+  <sys:String x:Key="Str.AppTitle">AMD-NR ReShade Installer</sys:String>
+  <sys:String x:Key="Str.Subtitle">DLSS 5 neural rendering on Radeon, installed for you</sys:String>
+
+  <sys:String x:Key="Str.Games">Games</sys:String>
+  <sys:String x:Key="Str.AddGame">Add a game…</sys:String>
+  <sys:String x:Key="Str.RemoveGame">Remove from list</sys:String>
+  <sys:String x:Key="Str.NoGames">Nothing here yet. Add the folder a game or emulator runs from.</sys:String>
+  <sys:String x:Key="Str.PickFolder">Pick the folder the game runs from</sys:String>
+
+  <sys:String x:Key="Str.Preset">Route</sys:String>
+  <sys:String x:Key="Str.Install">Install</sys:String>
+  <sys:String x:Key="Str.Uninstall">Uninstall</sys:String>
+  <sys:String x:Key="Str.Recheck">Check again</sys:String>
+  <sys:String x:Key="Str.OpenFolder">Open folder</sys:String>
+
+  <sys:String x:Key="Str.System">This machine</sys:String>
+  <sys:String x:Key="Str.Gpu">Graphics</sys:String>
+  <sys:String x:Key="Str.Driver">Driver</sys:String>
+  <sys:String x:Key="Str.Hip">HIP 7 runtime</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll was not found. A current Adrenalin driver ships it; HIP 6 will not do.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">This does not look like a Radeon. The network runs on RDNA3 and RDNA4 only.</sys:String>
+  <sys:String x:Key="Str.Ready">Ready</sys:String>
+
+  <sys:String x:Key="Str.Payloads">Files</sys:String>
+  <sys:String x:Key="Str.Downloading">Downloading</sys:String>
+  <sys:String x:Key="Str.Verifying">Verifying what is already here…</sys:String>
+  <sys:String x:Key="Str.PayloadsReady">Downloaded and verified.</sys:String>
+  <sys:String x:Key="Str.ManifestFailed">Could not read the download list. Check the connection and try again.</sys:String>
+
+  <sys:String x:Key="Str.Language">Language</sys:String>
+  <sys:String x:Key="Str.UpdateAvailable">A newer version is out</sys:String>
+  <sys:String x:Key="Str.OpenReleases">Open the releases page</sys:String>
+  <sys:String x:Key="Str.Dismiss">Not now</sys:String>
+
+  <sys:String x:Key="Str.LogSaved">The full log was written next to this app.</sys:String>
+  <sys:String x:Key="Str.Working">Working…</sys:String>
+  <sys:String x:Key="Str.Credits">The network is DLSS-NR-on-AMD by danielblnc. Runtime and weights are its work.</sys:String>
+</ResourceDictionary>

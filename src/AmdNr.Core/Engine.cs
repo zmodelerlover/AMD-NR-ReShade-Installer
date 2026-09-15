@@ -398,7 +398,7 @@ public static class Engine
                    || candidate[r.Length] == Path.AltDirectorySeparatorChar);
     }
 
-    internal static bool SamePath(string a, string b) =>
+    public static bool SamePath(string a, string b) =>
         string.Equals(a.TrimEnd(Path.DirectorySeparatorChar), b.TrimEnd(Path.DirectorySeparatorChar),
             StringComparison.OrdinalIgnoreCase);
 
@@ -523,7 +523,7 @@ public static class Engine
         Require(ok, "Manifest commit failed");
     }
 
-    internal static void MakeParent(string p)
+    public static void MakeParent(string p)
     {
         var parent = Path.GetDirectoryName(p);
         if (string.IsNullOrEmpty(parent)) return;

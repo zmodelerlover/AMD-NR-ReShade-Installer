@@ -13,10 +13,16 @@ namespace AmdNr.Core;
 
 public static class AppPaths
 {
-    /// <summary>%AppData%\AmdNrInstaller. Created on first use.</summary>
-    public static string Root { get; } = Create(Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create),
-        "AmdNrInstaller"));
+    /// <summary>%AppData%\AmdNrInstaller, created on first use -- or wherever AMDNR_HOME says.
+    /// The override is what keeps the test suite out of the real cache, and it is also how a
+    /// portable install would keep everything beside the executable.</summary>
+    public static string Root { get; } = Create(
+        Environment.GetEnvironmentVariable("AMDNR_HOME") is { Length: > 0 } home
+            ? home
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData,
+                    Environment.SpecialFolderOption.Create),
+                "AmdNrInstaller"));
 
     public static string Cache => Create(Path.Combine(Root, "cache"));
     public static string Logs => Create(Path.Combine(Root, "logs"));

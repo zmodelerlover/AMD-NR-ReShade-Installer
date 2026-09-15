@@ -1,0 +1,145 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AmdNr.App.MainWindow"
+        Title="AMD-NR ReShade Installer"
+        Width="1040" Height="680" MinWidth="880" MinHeight="560"
+        WindowStartupLocation="CenterScreen">
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+    <!-- Header -->
+    <Border Grid.Row="0" Background="{DynamicResource Chrome}" Padding="18,12">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Classes="h1" Text="{DynamicResource Str.AppTitle}" />
+          <TextBlock Classes="muted" Text="{DynamicResource Str.Subtitle}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <TextBlock Classes="muted" VerticalAlignment="Center" Text="{DynamicResource Str.Language}" />
+          <ComboBox x:Name="LanguageBox" MinWidth="170" SelectionChanged="OnLanguageChanged" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Update banner: a notice and a link, never a self-replacing download -->
+    <Border x:Name="UpdateBanner" Grid.Row="1" IsVisible="False"
+            Background="{DynamicResource SurfaceHigh}" BorderBrush="{DynamicResource Accent}"
+            BorderThickness="0,0,0,2" Padding="18,10">
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock Grid.Column="0" x:Name="UpdateText" VerticalAlignment="Center" TextWrapping="Wrap" />
+        <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0"
+                Content="{DynamicResource Str.OpenReleases}" Click="OnOpenReleases" />
+        <Button Grid.Column="2" Classes="ghost" Margin="8,0,0,0"
+                Content="{DynamicResource Str.Dismiss}" Click="OnDismissUpdate" />
+      </Grid>
+    </Border>
+
+    <!-- Body -->
+    <Grid Grid.Row="2" ColumnDefinitions="330,*" Margin="18">
+
+      <!-- Left: the machine, then the games -->
+      <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto" Margin="0,0,14,0">
+
+        <Border Grid.Row="0" Classes="card" Margin="0,0,0,14">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{DynamicResource Str.System}" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" >
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Gpu}" Margin="0,0,10,0" />
+              <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuText" TextWrapping="Wrap" FontSize="12" />
+              <TextBlock Grid.Row="1" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Driver}" Margin="0,0,10,0" />
+              <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DriverText" FontSize="12" />
+              <TextBlock Grid.Row="2" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Hip}" Margin="0,0,10,0" />
+              <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HipText" FontSize="12" />
+            </Grid>
+            <TextBlock x:Name="SystemWarning" TextWrapping="Wrap" FontSize="12"
+                       Foreground="{DynamicResource Warn}" IsVisible="False" />
+          </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="1" Text="{DynamicResource Str.Games}" FontWeight="SemiBold" Margin="2,0,0,8" />
+
+        <Border Grid.Row="2" Classes="card" Padding="4">
+          <Grid>
+            <ListBox x:Name="GameList" Background="Transparent" BorderThickness="0"
+                     SelectionChanged="OnGameSelected">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Spacing="1" Margin="4">
+                    <TextBlock Text="{Binding Display}" FontWeight="SemiBold" />
+                    <TextBlock Classes="muted" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock x:Name="EmptyHint" Classes="muted" Margin="10" TextWrapping="Wrap"
+                       VerticalAlignment="Center" Text="{DynamicResource Str.NoGames}" />
+          </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+          <Button Classes="primary" Content="{DynamicResource Str.AddGame}" Click="OnAddGame" />
+          <Button Classes="ghost" Content="{DynamicResource Str.RemoveGame}" Click="OnRemoveGame" />
+        </StackPanel>
+      </Grid>
+
+      <!-- Right: what this folder is, and what would happen -->
+      <Border Grid.Column="1" Classes="card">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+          <StackPanel Grid.Row="0" Spacing="3">
+            <TextBlock x:Name="TargetName" Classes="h1" Text="—" />
+            <TextBlock x:Name="TargetPath" Classes="muted" TextTrimming="CharacterEllipsis" />
+            <TextBlock x:Name="DetectedLine" FontSize="12" Foreground="{DynamicResource Muted}"
+                       TextWrapping="Wrap" Margin="0,4,0,0" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
+            <TextBlock Text="{DynamicResource Str.Preset}" VerticalAlignment="Center" Classes="muted" />
+            <ComboBox x:Name="PresetBox" MinWidth="220" SelectionChanged="OnPresetChanged" />
+          </StackPanel>
+
+          <TextBlock Grid.Row="2" x:Name="PresetNote" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Muted}" Margin="0,10,0,0" />
+
+          <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                  BorderThickness="1" CornerRadius="4" Margin="0,14,0,0">
+            <ScrollViewer x:Name="ReportScroll" Padding="10">
+              <ItemsControl x:Name="ReportList">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="18,*" Margin="0,2">
+                      <TextBlock Grid.Column="0" Text="{Binding Glyph}" Foreground="{Binding Brush}"
+                                 FontWeight="Bold" />
+                      <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"
+                                 Foreground="{Binding Brush}" FontSize="12" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Border>
+
+          <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock x:Name="StatusText" Classes="muted" TextWrapping="Wrap" />
+              <ProgressBar x:Name="Progress" Height="4" IsVisible="False"
+                           Foreground="{DynamicResource Accent}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+              <Button x:Name="RecheckButton" Classes="ghost" Content="{DynamicResource Str.Recheck}" Click="OnRecheck" />
+              <Button x:Name="UninstallButton" Classes="ghost" Content="{DynamicResource Str.Uninstall}" Click="OnUninstall" />
+              <Button x:Name="InstallButton" Classes="primary" Content="{DynamicResource Str.Install}" Click="OnInstall" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Border Grid.Row="3" Background="{DynamicResource Surface}" Padding="18,8">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Credits}" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" x:Name="VersionText" Classes="muted" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
