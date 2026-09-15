@@ -217,7 +217,8 @@ public static class Transaction
     /// <summary>Undo an install using its own manifest. Files the installer did not own are left
     /// alone, files the user changed afterwards are kept with a warning, and anything displaced at
     /// install time is put back from its backup.</summary>
-    public static void Uninstall(string dir, Route route, bool removeConfigs, List<string> log)
+    public static void Uninstall(string dir, Route route, bool removeConfigs, List<string> log,
+        bool force = false)
     {
         dir = Engine.Absolute(dir);
         Engine.SafePath(dir);
@@ -257,9 +258,17 @@ public static class Transaction
                         TryDelete(backupPath);
                         continue;
                     }
-                    log.Add($"WARNING modified after install; retained with backup: {e.Name}");
-                    keep.Add(e.Clone());
-                    continue;
+                    // A file that no longer hashes to what was written is somebody else's work
+                    // now, so it is kept and the folder goes on counting as installed. Forced only
+                    // by a caller that has been told exactly that and asked again -- and never for
+                    // personal configuration, which has its own switch in removeConfigs.
+                    if (!force || e.Configuration)
+                    {
+                        log.Add($"WARNING modified after install; retained with backup: {e.Name}");
+                        keep.Add(e.Clone());
+                        continue;
+                    }
+                    log.Add($"FORCED: {e.Name}");
                 }
             }
             else if (e.Backup.Length == 0)
@@ -280,10 +289,18 @@ public static class Transaction
                 TryDelete(backupPath);
                 log.Add($"RESTORED: {e.Name}");
             }
+            else if (TryDelete(dst))
+            {
+                log.Add($"REMOVED: {e.Name}");
+            }
             else
             {
-                TryDelete(dst);
-                log.Add($"REMOVED: {e.Name}");
+                // The file is still there, so the manifest goes on owning it. Dropping the entry
+                // here was the whole bug: a DLL the running game still had open could not be
+                // deleted, the log said REMOVED anyway, the entry went, and from then on every
+                // uninstall found nothing to do while the add-on was still in the folder.
+                log.Add($"WARNING {StillOpen}: {e.Name}. Close the game and uninstall again.");
+                keep.Add(e.Clone());
             }
         }
 
@@ -300,13 +317,24 @@ public static class Transaction
         log.Add("Uninstall complete; retained files/backups are listed above.");
     }
 
-    private static void TryDelete(string path)
+    /// <summary>The words a caller can look for to tell "the game still has it open" apart from
+    /// "somebody changed it": one is waited out, the other is a decision.</summary>
+    public const string StillOpen = "still open, so it is still here";
+
+    /// <summary>True when the file is gone, which includes it never having been there. A file that
+    /// will not delete does not fail the whole uninstall -- the rest still comes out -- but it is
+    /// never reported as removed either, and the caller keeps its manifest entry so the next
+    /// uninstall can finish the job.</summary>
+    private static bool TryDelete(string path)
     {
-        try { File.Delete(path); }
-        catch
+        try
         {
-            // Matches the Rust `let _ = remove_file(..)`: a file that will not delete is reported by
-            // what is left on disk, not by failing an uninstall that otherwise succeeded.
+            File.Delete(path);
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
         }
     }
 }

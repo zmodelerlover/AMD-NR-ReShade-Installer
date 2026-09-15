@@ -195,6 +195,41 @@ public class ScanningTests
         }
     }
 
+    /// <summary>The folder somebody keeps games in, which is the other half of "add a game": one at
+    /// a time is nobody's answer for forty of them. Every shape that turns up in a real one has to
+    /// come back as the game's own folder -- not its bin\, and not the publisher folder above it.
+    /// </summary>
+    [Fact]
+    public void SearchingAFolderFindsTheGamesUnderIt()
+    {
+        var root = Fixture.Temp("library");
+
+        // Straight in its own folder.
+        Exe(root, "Alpha", "alpha.exe");
+        // Source: the executable lives in bin\, and the game is still the folder above it.
+        Exe(root, Path.Combine("Sigma", "bin"), "sigma.exe");
+        // Unreal: same again, one level deeper.
+        Exe(root, Path.Combine("Omega", "Binaries", "Win64"), "Omega-Win64-Shipping.exe");
+        // A publisher folder: the game is the one inside, not the folder holding it.
+        Exe(root, Path.Combine("Publisher", "Beta"), "beta.exe");
+        // Nothing in it at all.
+        Directory.CreateDirectory(Path.Combine(root, "Empty"));
+
+        var found = GameScanner.UnderFolder(root);
+        var paths = found.Select(g => Path.GetRelativePath(root, g.InstallPath)).OrderBy(p => p).ToList();
+
+        Assert.Equal(["Alpha", "Omega", Path.Combine("Publisher", "Beta"), "Sigma"], paths);
+        Assert.All(found, g => Assert.Equal(GamePlatform.Manual, g.Platform));
+        Assert.Equal("Beta", found.Single(g => g.InstallPath.EndsWith("Beta", StringComparison.Ordinal)).Name);
+    }
+
+    private static void Exe(string root, string folder, string name)
+    {
+        var dir = Path.Combine(root, folder);
+        Directory.CreateDirectory(dir);
+        File.WriteAllBytes(Path.Combine(dir, name), Fixture.Pe(true));
+    }
+
     [Fact]
     public void ScanningEverythingDoesNotThrowAndReturnsRealFolders()
     {

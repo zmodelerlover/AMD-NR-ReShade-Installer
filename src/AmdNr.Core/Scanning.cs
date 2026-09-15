@@ -358,6 +358,71 @@ public static partial class GameScanner
     /// ReShade.ini and dlss5-neural.ini are kept on purpose -- so a folder that has been fully
     /// uninstalled normally still has one. Reading it as "installed" is what left the badge on after
     /// Uninstall said it was done.</summary>
+    /// <summary>Every game under one folder, for somebody who keeps them in a folder rather than
+    /// in a launcher: a Games drive, an old library, a copy off another machine.
+    ///
+    /// A child folder is a game when the detection finds an executable to point at, which is the
+    /// same judgement the rest of the app installs by -- and it is the reason this cannot just look
+    /// for a .exe in the folder itself: Source keeps one in bin\, Unreal in Binaries\Win64, and
+    /// neither has anything worth finding at the top. A folder taken as a game is not descended
+    /// into, so its own bin\ never comes back as a second game.</summary>
+    public static IReadOnlyList<ScannedGame> UnderFolder(string root, int maxDepth = 3)
+    {
+        var found = new List<ScannedGame>();
+        Walk(root, 0);
+        return found
+            .GroupBy(g => Engine.WeaklyCanonical(g.InstallPath), StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        void Walk(string dir, int depth)
+        {
+            string[] children;
+            try { children = Directory.GetDirectories(dir); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // A folder that will not open costs that folder, never the search.
+                return;
+            }
+
+            foreach (var child in children)
+            {
+                if (IsExcluded(child) || !HasContent(child)) continue;
+
+                var exe = GraphicsDetector.FindExecutable(child);
+                if (exe is not null && !IsContainer(child, exe))
+                {
+                    found.Add(new ScannedGame(Path.GetFileName(child), child, GamePlatform.Manual));
+                    continue;
+                }
+                if (depth + 1 < maxDepth) Walk(child, depth + 1);
+            }
+        }
+    }
+
+    /// <summary>Whether a folder holds games rather than being one.
+    ///
+    /// The detection reaches one level down on its own -- a Source game keeps its executable in
+    /// bin\, Unreal in Binaries\Win64 -- so a publisher folder with the game inside it answers
+    /// exactly as a game folder does, and a search that trusted that answer added "Rockstar Games"
+    /// as a game and never saw the two games under it. The difference is which subfolder the
+    /// executable turned up in: one of the engine's, or a plain one that is really the game.</summary>
+    private static bool IsContainer(string folder, string exe)
+    {
+        var relative = Path.GetRelativePath(folder, exe);
+        var segments = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (segments.Length < 2) return false; // Straight in the folder: it is the game.
+        return !EngineFolders.Contains(segments[0]);
+    }
+
+    /// <summary>Where an engine puts its executable, as the first segment under the game's root.
+    /// Taken from the folders the detection itself searches.</summary>
+    private static readonly HashSet<string> EngineFolders = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "bin", "bin64", "bin_x64", "x64", "game", "binaries", "phoenix", "win64", "win32",
+    };
+
     public static bool IsInstalled(string folder) =>
         Work.InstalledMarkers.Any(name => File.Exists(Path.Combine(folder, name)));
 }

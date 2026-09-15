@@ -97,6 +97,66 @@ public class ReleasesTests
         Assert.Equal(550400ul, found[0].Bare.Assets["dlss5-neural.addon64"].Size);
     }
 
+    /// <summary>Publishing a release has to be the whole of making it the default. This is the
+    /// rule the version menu opens on, and the reason it is here rather than in the window is that
+    /// "are you sure it will come up as 0.5.1" is not a question anybody should have to answer by
+    /// reading the UI code.</summary>
+    [Fact]
+    public void ANewerReleaseBecomesTheDefaultUnlessThisGameWasPinnedToAnother()
+    {
+        // As the menu builds it: every offered version, newest first.
+        List<Version> offered = [new(0, 5, 1), new(0, 5, 0)];
+
+        // Nothing remembered, nothing chosen this session: the newest, which is the whole point.
+        Assert.Equal(0, AddonReleases.Preferred(offered, null, null));
+        Assert.Equal(new Version(0, 5, 1), offered[AddonReleases.Preferred(offered, null, null)]);
+
+        // A game installed at 0.5.0 opens at 0.5.0, however many releases land after it.
+        Assert.Equal(1, AddonReleases.Preferred(offered, "0.5.0", null));
+
+        // Nothing remembered for this game, but the app is set to one: that one.
+        Assert.Equal(1, AddonReleases.Preferred(offered, null, new Version(0, 5, 0)));
+
+        // What the game remembers beats what the app is set to.
+        Assert.Equal(1, AddonReleases.Preferred(offered, "0.5.0", new Version(0, 5, 1)));
+
+        // A remembered version that is no longer published falls through to the newest rather
+        // than leaving the sheet on nothing.
+        Assert.Equal(0, AddonReleases.Preferred(offered, "0.4.9", null));
+        Assert.Equal(0, AddonReleases.Preferred(offered, "not a version", null));
+
+        // And with nothing to offer there is no selection to make.
+        Assert.Equal(-1, AddonReleases.Preferred([], "0.5.1", null));
+    }
+
+    /// <summary>The same thing end to end, from the JSON GitHub answers with: a v0.5.1 that
+    /// publishes the four files loose plus its sums is offered to both routes and sorts first, so
+    /// it is what Preferred lands on.</summary>
+    [Fact]
+    public void AReleasePublishingEverythingLooseIsOfferedToBothRoutesAndComesFirst()
+    {
+        var found = AddonReleases.Parse(ReleasesJson);
+        Assert.Equal("v0.5.1", found[0].Bare.Tag);
+
+        var sums = new[] { Work.AddonName, Work.Addon32Name, Work.Host64Name, AddonReleases.BridgeSums }
+            .ToDictionary(f => f, _ => Hash('a'), StringComparer.OrdinalIgnoreCase);
+        var newest = new AddonRelease
+        {
+            Version = found[0].Bare.Version,
+            Tag = found[0].Bare.Tag,
+            Title = found[0].Bare.Title,
+            Published = found[0].Bare.Published,
+            PreRelease = found[0].Bare.PreRelease,
+            Assets = found[0].Bare.Assets,
+            Sums = sums,
+        };
+
+        Assert.True(newest.Covers(Route.X64), "the 64-bit route has to be offered it");
+        Assert.True(newest.Covers(Route.X86), "and so does the bridge");
+        Assert.Equal(new Version(0, 5, 1), newest.Version);
+        Assert.Equal(0, AddonReleases.Preferred([newest.Version, new Version(0, 5, 0)], null, null));
+    }
+
     [Fact]
     public void ATagThatIsNotAVersionIsNotOne()
     {

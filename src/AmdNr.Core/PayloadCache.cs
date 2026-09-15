@@ -72,6 +72,43 @@ public sealed class PayloadCache(HttpClient http)
         });
     }
 
+    /// <summary>Empties the cache and says how many bytes went with it. Everything in here comes
+    /// back: the payloads download again, the covers download again, and the release list is one
+    /// request. Nothing installed in a game is touched -- this is the download folder, not the
+    /// install.
+    ///
+    /// The staging folders are deleted but not counted: their files are hard links into the
+    /// component folders beside them, so counting both would report twice the disk that is
+    /// actually coming back.</summary>
+    public static ulong Clear()
+    {
+        var freed = 0UL;
+        // The whole listing first: deleting out of a directory that is still being walked is not
+        // something Windows promises anything about.
+        foreach (var entry in Directory.GetFileSystemEntries(AppPaths.Cache))
+        {
+            try
+            {
+                if (!Directory.Exists(entry))
+                {
+                    freed += Engine.SizeOf(entry) ?? 0;
+                    File.Delete(entry);
+                    continue;
+                }
+                if (Path.GetFileName(entry) != "staging")
+                    freed += Directory.EnumerateFiles(entry, "*", SearchOption.AllDirectories)
+                        .Aggregate(0UL, (sum, f) => sum + (Engine.SizeOf(f) ?? 0));
+                Directory.Delete(entry, recursive: true);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // Something has a file open. The rest still goes, and the caller re-reads what is
+                // left rather than believing this.
+            }
+        }
+        return freed;
+    }
+
     /// <summary>Downloads whatever is missing or wrong and returns the folder to install from.
     /// A file that is already there and already hashes correctly is not fetched again.</summary>
     public async Task<string> EnsureAsync(PayloadManifest manifest, string component,
@@ -176,12 +213,50 @@ public sealed class PayloadCache(HttpClient http)
         }
     }
 
-    /// <summary>One file, resumed if a part of it is already on disk, verified before it is allowed
-    /// to take the final name. A partial download can never be mistaken for a complete one, because
-    /// the name only changes after the hash matches.</summary>
+    /// <summary>How long a download may go without one byte arriving before the address is given
+    /// up on. A server that refuses or drops the connection says so; one that accepts and then
+    /// stops sending says nothing at all, and the client's own 30-minute timeout is then the only
+    /// thing that ever ends it. A minute of silence on a file that was arriving is already
+    /// dead.</summary>
+    private static readonly TimeSpan Stall = TimeSpan.FromMinutes(1);
+
+    /// <summary>The same call as <see cref="FetchOneAsync"/>, with every timeout turned into the
+    /// failure it actually is.
+    ///
+    /// A timeout -- the stall timer's or the client's -- arrives as a cancellation that nobody
+    /// asked for, which is a TaskCanceledException. That type is in none of the filters this
+    /// travels through: not the mirror fall-through above, and not the three EnsureAsync call
+    /// sites, which all list HttpRequestException, InstallException and IOException. So a primary
+    /// that hung rather than refused never tried the mirror, and the exception went on to escape an
+    /// async void handler. It is a download that failed, so it leaves here saying so.</summary>
     private async Task FetchAsync(Uri url, string path, PayloadFile file,
         IProgress<DownloadProgress>? progress, CancellationToken cancel)
     {
+        try
+        {
+            await FetchOneAsync(url, path, file, progress, cancel);
+        }
+        catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
+        {
+            throw new InstallException(
+                $"Could not download {file.Name}: {url.Host} accepted the connection and then stopped "
+                + "answering. Whatever arrived is kept, so trying again picks up where this left off.");
+        }
+    }
+
+    /// <summary>One file, resumed if a part of it is already on disk, verified before it is allowed
+    /// to take the final name. A partial download can never be mistaken for a complete one, because
+    /// the name only changes after the hash matches.</summary>
+    private async Task FetchOneAsync(Uri url, string path, PayloadFile file,
+        IProgress<DownloadProgress>? progress, CancellationToken cancel)
+    {
+        // Re-armed by every byte that lands, so a slow connection has all the time it needs and a
+        // silent one has a minute. The hash below is deliberately not under it: that is a second of
+        // disk and CPU with nothing arriving, which is exactly what this timer is looking for.
+        using var stall = CancellationTokenSource.CreateLinkedTokenSource(cancel);
+        stall.CancelAfter(Stall);
+        var live = stall.Token;
+
         var part = path + ".part";
         var have = Engine.SizeOf(part) ?? 0;
         if (have > file.Size) // A stale part from a different build: start over rather than splice.
@@ -193,7 +268,7 @@ public sealed class PayloadCache(HttpClient http)
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         if (have > 0) request.Headers.Range = new RangeHeaderValue((long)have, null);
 
-        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancel);
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, live);
         if (have > 0 && response.StatusCode == HttpStatusCode.OK)
         {
             // The server ignored the range and is sending the whole thing: take it from the top.
@@ -214,15 +289,16 @@ public sealed class PayloadCache(HttpClient http)
         if (response.StatusCode != HttpStatusCode.RequestedRangeNotSatisfiable)
         {
             var total = (response.Content.Headers.ContentLength ?? 0) + (long)have;
-            await using var source = await response.Content.ReadAsStreamAsync(cancel);
+            await using var source = await response.Content.ReadAsStreamAsync(live);
             await using var target = new FileStream(part, have > 0 ? FileMode.Append : FileMode.Create,
                 FileAccess.Write, FileShare.None);
 
             var buffer = new byte[128 * 1024];
             var received = (long)have;
             int read;
-            while ((read = await source.ReadAsync(buffer, cancel)) > 0)
+            while ((read = await source.ReadAsync(buffer, live)) > 0)
             {
+                stall.CancelAfter(Stall);
                 await target.WriteAsync(buffer.AsMemory(0, read), cancel);
                 received += read;
                 progress?.Report(new DownloadProgress(file.Name, received, total > 0 ? total : null));
@@ -321,8 +397,16 @@ public sealed class PayloadCache(HttpClient http)
     /// <summary>A default client with a User-Agent, because GitHub refuses requests without one.</summary>
     public static HttpClient DefaultClient(string version)
     {
-        var client = new HttpClient(new SocketsHttpHandler { AutomaticDecompression = DecompressionMethods.All })
+        var client = new HttpClient(new SocketsHttpHandler
         {
+            AutomaticDecompression = DecompressionMethods.All,
+            // An address that is down has a mirror behind it; without this the connect attempt sits
+            // there until the timeout below, which is not a fall-through, it is a hang.
+            ConnectTimeout = TimeSpan.FromSeconds(20),
+        })
+        {
+            // The whole of a 141 MB download, on a slow line. What ends a dead one is the stall
+            // timer, not this.
             Timeout = TimeSpan.FromMinutes(30),
         };
         client.DefaultRequestHeaders.UserAgent.ParseAdd($"AMD-NR-ReShade-Installer/{version}");

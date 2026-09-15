@@ -51,6 +51,28 @@ public static class AddonReleases
     /// the engine reads.</summary>
     public static readonly Version Earliest = new(0, 5, 0);
 
+    /// <summary>Which of the offered versions a game opens on, as an index into
+    /// <paramref name="offered"/>, newest first. -1 when nothing is offered.
+    ///
+    /// Three answers in order: the version this game was last installed with, then whatever the
+    /// app is currently set to, then the newest there is. The first is why installing a game at an
+    /// older build survives a restart; the last is why publishing a release is all it takes for
+    /// everyone else to land on it. A remembered version that is no longer published falls through
+    /// to the newest rather than leaving the sheet on nothing.</summary>
+    public static int Preferred(IReadOnlyList<Version> offered, string? saved, Version? session)
+    {
+        if (offered.Count == 0) return -1;
+        foreach (var wanted in new[] { Version(saved ?? ""), session })
+        {
+            if (wanted is null) continue;
+            var at = -1;
+            for (var i = 0; i < offered.Count; i++)
+                if (offered[i] == wanted) { at = i; break; }
+            if (at >= 0) return at;
+        }
+        return 0;
+    }
+
     public const string SumsAsset = "SHA256SUMS.txt";
     public const string BridgeSums = "payload.sha256";
 

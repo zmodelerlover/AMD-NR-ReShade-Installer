@@ -363,6 +363,8 @@ public static class Work
         else if (Strip(line, "RESTORED: ") is { } restored) report.Ok($"restored {restored} from its backup");
         else if (Strip(line, "REMOVED: ") is { } removed) report.Ok($"removed {removed}");
         else if (Strip(line, "WARNING ") is { } warning) report.Warn(warning);
+        else if (Strip(line, "FORCED: ") is { } forced)
+            report.Warn($"{forced} had changed since the install and was removed anyway, as asked.");
         else report.Info(line); // PRESERVED lines and anything the engine adds later read fine as they are.
 
         static string? Strip(string s, string prefix) =>
@@ -703,7 +705,7 @@ public static class Work
 
     // -- Uninstall -------------------------------------------------------------------------------
 
-    private static Report UninstallX86(string gameDir)
+    private static Report UninstallX86(string gameDir, bool force)
     {
         var report = new Report();
         var path = ResolveTarget(gameDir);
@@ -747,7 +749,7 @@ public static class Work
             var log = new List<string>();
             try
             {
-                Transaction.Uninstall(dir, Route.X86, false, log);
+                Transaction.Uninstall(dir, Route.X86, false, log, force);
                 foreach (var line in log) Narrate(line, report);
             }
             catch (InstallException e)
@@ -756,6 +758,8 @@ public static class Work
             }
         }
 
+        SweepDroppings(dir, report);
+
         // Said only when it is true: when this route installed the pinned ReShade itself, uninstall
         // took it back, and telling someone it was left alone would send them looking for nothing.
         if (new[] { "d3d9.dll", "dxgi.dll", "d3d8.dll" }.Any(n => File.Exists(Path.Combine(dir, n))))
@@ -763,9 +767,17 @@ public static class Work
         return report;
     }
 
-    public static Report Uninstall(string gameDir, Preset preset)
+    /// <summary>The words a retained-because-it-changed line carries. The window reads it to know
+    /// whether offering to remove the file anyway would achieve anything: forcing gets past a file
+    /// somebody edited, and gets nowhere against one the running game still has open.</summary>
+    public const string ModifiedMarker = "modified after install";
+
+    /// <summary><paramref name="force"/> takes back the files that changed after the install as
+    /// well. Off by default, because a file that is not the one written here belongs to whatever
+    /// changed it; on only when somebody has been shown that list and asked for it anyway.</summary>
+    public static Report Uninstall(string gameDir, Preset preset, bool force = false)
     {
-        if (preset.Route() == Route.X86) return UninstallX86(gameDir);
+        if (preset.Route() == Route.X86) return UninstallX86(gameDir, force);
 
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -792,7 +804,7 @@ public static class Work
             var log = new List<string>();
             try
             {
-                Transaction.Uninstall(dir, Route.X64, false, log);
+                Transaction.Uninstall(dir, Route.X64, false, log, force);
                 foreach (var line in log) Narrate(line, report);
                 gone++;
             }
@@ -809,9 +821,34 @@ public static class Work
             foreach (var name in names) gone += RemoveFile(dir, name, report);
         }
 
-        // Written by the add-on itself at run time, so they are never in a manifest and are swept the
-        // same way whichever branch ran above.
-        foreach (var name in new[] { "dlss5-pass1.dll", "dlss5-neural.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini" })
+        gone += SweepDroppings(dir, report);
+
+        if (gone == 0) report.Warn("Nothing of ours was in that folder.");
+        if (File.Exists(Path.Combine(dir, "dlss5-neural.ini")))
+        {
+            report.Info(
+                "dlss5-neural.ini was left in place: it is your tuning, not ours. Delete it by hand if "
+                + "you want a clean slate.");
+        }
+
+        // Only true when a ReShade proxy is still there: one this app installed came back out above.
+        if (Proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
+            report.Info("ReShade itself was left alone. Use its own installer to remove it.");
+        return report;
+    }
+
+    /// <summary>What the add-on itself writes while a game runs: the unpacked runtime, its logs,
+    /// its capture folder. They are never in a manifest, because nothing here put them there, so
+    /// they are swept by name -- and by both routes. The x86 uninstall used to skip this entirely
+    /// and left 7 MB of runtime plus a folder behind every time.</summary>
+    private static int SweepDroppings(string dir, Report report)
+    {
+        var gone = 0;
+        foreach (var name in new[]
+                 {
+                     "dlss5-pass1.dll", "dlss5-neural.log", "dlss5-neural-x86.log",
+                     "dlss5-neural-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
+                 })
             gone += RemoveFile(dir, name, report);
 
         foreach (var folder in new[] { "dlss5-runtime", "dlss5-captures" })
@@ -829,19 +866,7 @@ public static class Work
                 report.Err($"could not remove {folder}: {e.Message}");
             }
         }
-
-        if (gone == 0) report.Warn("Nothing of ours was in that folder.");
-        if (File.Exists(Path.Combine(dir, "dlss5-neural.ini")))
-        {
-            report.Info(
-                "dlss5-neural.ini was left in place: it is your tuning, not ours. Delete it by hand if "
-                + "you want a clean slate.");
-        }
-
-        // Only true when a ReShade proxy is still there: one this app installed came back out above.
-        if (Proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
-            report.Info("ReShade itself was left alone. Use its own installer to remove it.");
-        return report;
+        return gone;
     }
 
     private static int RemoveFile(string dir, string name, Report report)

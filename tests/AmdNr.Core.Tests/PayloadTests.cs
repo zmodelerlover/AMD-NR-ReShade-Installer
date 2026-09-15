@@ -217,6 +217,88 @@ public class PayloadTests
         Assert.Equal(blob.Length, seen[^1].Received);
     }
 
+    /// <summary>A host that accepts the connection and then never answers, which is the shape a
+    /// dropped-rather-than-refused address takes. Everything else is served.</summary>
+    private sealed class SilentServer(byte[] blob, string? silentHost) : HttpMessageHandler
+    {
+        public int Served { get; private set; }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancel)
+        {
+            if (silentHost is null || request.RequestUri!.Host == silentHost)
+                await Task.Delay(Timeout.Infinite, cancel);
+            Served++;
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(blob) };
+        }
+    }
+
+    private static (PayloadManifest Manifest, byte[] Blob, string Component) MirroredManifest(string tag)
+    {
+        var blob = Enumerable.Range(0, 4096).Select(i => (byte)(i % 251)).ToArray();
+        var json = $$"""
+            {
+              "schema": 1, "owner": "someone", "repo": "Extras", "tag": "{{tag}}",
+              "components": { "runtime": { "version": "{{tag}}", "files": [
+                { "name": "dlssnr_amd_pass1.dll", "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}",
+                  "url": "https://primary.example/pass1.dll",
+                  "mirrors": [ "https://mirror.example/pass1.dll" ] } ] } }
+            }
+            """;
+        return (PayloadManifest.Parse(json), blob, PayloadManifest.RuntimeComponent);
+    }
+
+    /// <summary>The whole point of having a mirror. A primary that refuses reports it as an
+    /// HttpRequestException and always fell through; one that accepts and then goes quiet ends as a
+    /// timeout, which is a TaskCanceledException -- a type the fall-through did not list, so the
+    /// mirror was never tried and the exception escaped instead.</summary>
+    [Fact]
+    public async Task APrimaryThatGoesQuietFallsThroughToTheMirror()
+    {
+        var (manifest, blob, component) = MirroredManifest($"si-{Guid.NewGuid():N}"[..12]);
+        var server = new SilentServer(blob, "primary.example");
+        var cache = new PayloadCache(new HttpClient(server) { Timeout = TimeSpan.FromMilliseconds(250) });
+
+        var dir = await cache.EnsureAsync(manifest, component);
+
+        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(dir, Work.RuntimeName)));
+        Assert.Equal(1, server.Served);
+    }
+
+    /// <summary>And when no address answers it has to arrive as an InstallException: that is the
+    /// type every caller filters on -- the three EnsureAsync call sites are all async void handlers
+    /// -- so a TaskCanceledException here is a lost window, not a message.</summary>
+    [Fact]
+    public async Task ATimeoutOnEveryAddressIsReportedAsAFailedDownload()
+    {
+        var (manifest, blob, component) = MirroredManifest($"sa-{Guid.NewGuid():N}"[..12]);
+        var cache = new PayloadCache(new HttpClient(new SilentServer(blob, null))
+        {
+            Timeout = TimeSpan.FromMilliseconds(250),
+        });
+
+        var error = await Assert.ThrowsAsync<InstallException>(() => cache.EnsureAsync(manifest, component));
+        Assert.Contains("stopped", error.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>The one call in here that deletes. It has to take the whole cache and leave the
+    /// folder itself standing, and the figure it reports is what somebody decides by -- this test
+    /// is in the same class as the downloads on purpose, because xUnit runs a class in order and
+    /// the cache is shared by every test that touches it.</summary>
+    [Fact]
+    public async Task ClearingTheCacheEmptiesItAndSaysWhatWasFreed()
+    {
+        var (manifest, blob, component) = OneFileManifest($"cl-{Guid.NewGuid():N}"[..12]);
+        await new PayloadCache(new HttpClient(new BlobServer(blob))).EnsureAsync(manifest, component);
+        Assert.True(PayloadCache.IsComplete(manifest, component));
+
+        var freed = PayloadCache.Clear();
+
+        Assert.True(freed >= (ulong)blob.Length, $"{freed} bytes freed should cover the {blob.Length} cached");
+        Assert.False(PayloadCache.IsComplete(manifest, component));
+        Assert.Empty(Directory.GetFileSystemEntries(AppPaths.Cache));
+        Assert.True(Directory.Exists(AppPaths.Cache), "the cache folder itself has to survive being emptied");
+    }
+
     [Fact]
     public void AComponentNameFromAManifestCannotEscapeTheCacheFolder()
     {
