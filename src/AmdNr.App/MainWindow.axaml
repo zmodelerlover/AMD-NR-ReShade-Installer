@@ -388,10 +388,11 @@
                       <StackPanel Spacing="10">
                         <ProgressBar x:Name="Progress" Height="4" MinHeight="4" IsVisible="False" CornerRadius="2"
                                      Foreground="{DynamicResource AccentHover}" Background="{DynamicResource SurfaceTop}" />
-                        <Grid ColumnDefinitions="*,Auto,Auto">
-                          <TextBlock Grid.Column="0" x:Name="StatusText" Classes="muted" TextTrimming="CharacterEllipsis"
-                                     VerticalAlignment="Center" Margin="0,0,16,0" />
-                          <Button Grid.Column="1" x:Name="UninstallButton" Classes="ghost danger large" Click="OnUninstall"
+                        <!-- The sentence gets the full width above the buttons: beside them it was
+                             cut mid-word as soon as the window narrowed. -->
+                        <TextBlock x:Name="StatusText" Classes="muted" TextWrapping="Wrap" />
+                        <Grid ColumnDefinitions="*,Auto">
+                          <Button Grid.Column="0" HorizontalAlignment="Right" x:Name="UninstallButton" Classes="ghost danger large" Click="OnUninstall"
                                   Margin="0,0,8,0" AutomationProperties.Name="{DynamicResource Str.Uninstall}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                               <PathIcon x:Name="UninstallIcon" Data="{StaticResource IconDelete}" />
@@ -399,7 +400,7 @@
                               <TextBlock x:Name="UninstallLabel" Text="{DynamicResource Str.Uninstall}" VerticalAlignment="Center" />
                             </StackPanel>
                           </Button>
-                          <Button Grid.Column="2" x:Name="InstallButton" Classes="primary large" Click="OnInstall" MinWidth="148"
+                          <Button Grid.Column="1" x:Name="InstallButton" Classes="primary large" Click="OnInstall" MinWidth="148"
                                   HorizontalContentAlignment="Center"
                                   AutomationProperties.Name="{DynamicResource Str.Install}">
                             <StackPanel Orientation="Horizontal" Spacing="8">

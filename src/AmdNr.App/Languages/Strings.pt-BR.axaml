@@ -106,4 +106,21 @@
   <sys:String x:Key="Str.SettingsSubtitle">Idioma, e onde este app guarda os arquivos dele.</sys:String>
   <sys:String x:Key="Str.LanguageHint">Todos os textos mudam na hora, sem reiniciar.</sys:String>
   <sys:String x:Key="Str.DataFolder">Pasta de dados</sys:String>
+  <!-- Routes: the names and notes Core carries in English, said in this language. -->
+  <sys:String x:Key="Str.Preset.Pcsx2">PCSX2</sys:String>
+  <sys:String x:Key="Str.Preset.Rpcs3">RPCS3</sys:String>
+  <sys:String x:Key="Str.Preset.Dx11">Jogo D3D11</sys:String>
+  <sys:String x:Key="Str.Preset.Dx12">Jogo D3D12</sys:String>
+  <sys:String x:Key="Str.Preset.Vulkan">Jogo Vulkan</sys:String>
+  <sys:String x:Key="Str.Preset.X86Dx11">Jogo D3D11, 32 bits</sys:String>
+  <sys:String x:Key="Str.Preset.X86Dx9">Jogo D3D9, 32 bits</sys:String>
+  <sys:String x:Key="Str.Preset.X86Dx8">Jogo D3D8, 32 bits</sys:String>
+  <sys:String x:Key="Str.PresetNote.Pcsx2">Deixe o emulador em Direct3D 11: é o único renderizador cuja profundidade chega na rede. Cuidado com a configuração por jogo, que passa por cima da global sem avisar.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Rpcs3">Experimental. No Vulkan o ReShade entra como camada global, não como DLL de proxy: rode o instalador dele no rpcs3.exe e escolha Vulkan. Sem profundidade no Vulkan, só cor e movimento estimado.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Dx11">A melhor rota: o D3D11 é a única em que a profundidade e os vetores de movimento do próprio jogo chegam na rede.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Dx12">Rota limitada. No D3D12 o add-on só enxerga o quadro pronto, então a rede recebe a cor e chuta o resto. Funciona, mas espere menos.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. No Vulkan o ReShade entra como camada global: rode o instalador dele no .exe do jogo e escolha Vulkan. O jogo precisa importar vkCreateDevice de forma estática, e não há profundidade no Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. Um jogo de 32 bits não carrega o runtime de 64 bits, então o add-on roda em dupla, dividindo os quadros na mesma placa. Instale o ReShade com suporte a add-on como dxgi.dll de 32 bits.</sys:String>
+  <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. A mesma dupla de 32 bits do D3D11, passando por um estágio D3D9/D3D11 interno. O D3D9 comum custa alguns milissegundos fixos por quadro; o D3D9Ex não. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
+  <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. O D3D8 é traduzido para D3D9 e segue a rota do D3D9 acima, com a mesma dupla de 32 bits. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
 </ResourceDictionary>

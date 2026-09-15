@@ -375,14 +375,14 @@ public partial class MainWindow : Window
         _offered.Clear();
         _offered.AddRange(Presets.Offered(detected));
         _settingPreset = true;
-        PresetBox.ItemsSource = _offered.Select(p => p.Label()).ToList();
+        PresetBox.ItemsSource = _offered.Select(PresetLabel).ToList();
         var index = _offered.IndexOf(card.Entry.Preset);
         PresetBox.SelectedIndex = index >= 0 ? index : 0;
         _settingPreset = false;
 
         card.Entry.Preset = _offered[PresetBox.SelectedIndex];
         card.RefreshRoute();
-        PresetNote.Text = card.Entry.Preset.Note();
+        PresetNote.Text = PresetNote_(card.Entry.Preset);
 
         await RefreshAsync();
     }
@@ -469,7 +469,7 @@ public partial class MainWindow : Window
         _selected.Entry.Preset = _offered[PresetBox.SelectedIndex];
         _selected.Entry.PresetChosen = true;
         _selected.RefreshRoute();
-        PresetNote.Text = _selected.Entry.Preset.Note();
+        PresetNote.Text = PresetNote_(_selected.Entry.Preset);
         Save();
         await RefreshAsync();
     }
@@ -841,11 +841,7 @@ public partial class MainWindow : Window
         UninstallButton.IsEnabled = enabled && _selected is not null;
     }
 
-    private void Status(string text)
-    {
-        StatusText.Text = text;
-        ToolTip.SetTip(StatusText, text); // It is trimmed to one line; the tip has the rest.
-    }
+    private void Status(string text) => StatusText.Text = text;
     private void Foot(string text) => FootText.Text = text;
 
     private void OnOpenReleases(object? sender, RoutedEventArgs e)
@@ -854,6 +850,18 @@ public partial class MainWindow : Window
     }
 
     private void OnDismissUpdate(object? sender, RoutedEventArgs e) => UpdateBanner.IsVisible = false;
+
+    /// <summary>A route's name and its note in the current language. The engine carries both in
+    /// English -- it has no resources -- so the translation lives here and falls back to its words
+    /// when a key is missing.</summary>
+    private string PresetLabel(Preset preset) => Translated($"Str.Preset.{preset}", preset.Label());
+
+    private string PresetNote_(Preset preset) => Translated($"Str.PresetNote.{preset}", preset.Note());
+
+    private static string Translated(string key, string fallback) =>
+        Application.Current?.TryFindResource(key, out var value) == true && value is string s && s.Length > 0
+            ? s
+            : fallback;
 
     private string Text(string key) =>
         Application.Current?.TryFindResource(key, out var value) == true && value is string s ? s : key;
