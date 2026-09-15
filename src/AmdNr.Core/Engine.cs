@@ -340,6 +340,10 @@ public static class Engine
         "d3d8.dll",
         "d3d8R.dll",
         "d3d9.dll",
+        // The way into a game that reaches its graphics API through something none of the names
+        // above can displace. The pinned ReShade exports DirectInput8Create, so it really loads
+        // under this one; without it here the proxy menu offered a name Transaction then refused.
+        "dinput8.dll",
         "dgVoodoo.conf",
         "ReShade.ini",
         "dlss5-neural.ini",
@@ -349,6 +353,10 @@ public static class Engine
         "dlssnr_amd_pass1.dll",
         "dlssnr_on_amd_weights.bin",
     };
+
+    /// <summary>The name the 32-bit route loads ReShade under when nobody has chosen one. D3D8 is
+    /// translated to D3D9 before anything else, so it is the D3D9 name there too.</summary>
+    public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
 
     public static bool IsConfig(string name) =>
         name is "ReShade.ini" or "dgVoodoo.conf" or "dlss5-neural.ini";

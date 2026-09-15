@@ -46,7 +46,7 @@ public sealed class X86Installer(string release)
     /// <summary>Everything that would be written, with nothing written. Every payload hash, the PE
     /// machine type and the chaining rule are decided here, so a refusal happens before any file
     /// moves.</summary>
-    public SortedDictionary<string, byte[]> Plan(string target, string preset)
+    public SortedDictionary<string, byte[]> Plan(string target, string preset, string? proxyName = null)
     {
         Engine.Require(preset is "D3D11" or "D3D9" or "D3D8", "Unsupported x86 preset");
         Engine.SafePath(target);
@@ -92,7 +92,11 @@ public sealed class X86Installer(string release)
             p[name] = translator;
         }
 
-        var reShadeName = preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
+        // The name asked for when the caller resolved one, and the API's own name otherwise. This
+        // route used to hardcode the second, so the "ReShade loads as" menu was drawn for a 32-bit
+        // game, accepted a choice, and then wrote the other name anyway.
+        var reShadeName = proxyName is { Length: > 0 } ? proxyName : Engine.X86ProxyName(preset);
+        Engine.Require(Engine.Allowed.Contains(reShadeName), $"Unsupported ReShade proxy name: {reShadeName}");
         byte[] reShade;
         if (File.Exists(Path.Combine(Release, "files", "dxgi.dll")))
         {
@@ -129,11 +133,11 @@ public sealed class X86Installer(string release)
         return p;
     }
 
-    public void Install(string target, string preset)
+    public void Install(string target, string preset, string? proxyName = null)
     {
         var dir = Engine.InstallDirectory(target);
         Engine.SafePath(dir);
-        var desired = Plan(Engine.Absolute(target), preset);
+        var desired = Plan(Engine.Absolute(target), preset, proxyName);
         Transaction.Apply(dir, preset, Route.X86, desired, Log);
         var how = preset == "D3D8"
             ? $"d3d8to9 {Engine.D3d8To9Version} -> native D3D9 frontend"

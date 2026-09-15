@@ -161,6 +161,66 @@ public class ReShadeTests
         Assert.False(Fixture.HasAny(d3d11, "d3d12.dll"), d3d11.ToLog("x86 d3d11"));
     }
 
+    /// <summary>Two ReShades in one process and the game does not start at all -- no window, no line
+    /// in any log. It came in as "tried it with the installer and the extras files, game refuses to
+    /// launch once these dlls are dropped": the extras ship ReShade32 under the name dxgi.dll, which
+    /// is only ever meant to be *written as* d3d9.dll, and dropping it in by hand leaves two.
+    ///
+    /// The check that should have caught it looked only at the names this route loads, so the file
+    /// that collides -- by definition the other one -- was the one it could not see.</summary>
+    [Fact]
+    public void ASecondReShadeUnderAnotherNameIsRefusedBeforeAnythingIsWritten()
+    {
+        var game = Fixture.Temp("two-reshades");
+        var (src, pins) = Fixture.Payloads("two-reshades");
+        var reShade = Fixture.Pe(true).Concat(new byte[2048]).ToArray();
+        File.WriteAllBytes(Path.Combine(src, "ReShade64.dll"), reShade);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ReShade64Sha = Engine.Sha(reShade),
+        };
+
+        // The same bytes this install is about to write, under a name this route never loads.
+        var dropped = Path.Combine(game, "d3d9.dll");
+        File.WriteAllBytes(dropped, reShade);
+
+        var pre = Work.Preflight(game, src, Preset.Dx11, pins);
+        Assert.True(Fixture.HasErr(pre, "second ReShade"), pre.ToLog("pre"));
+        Assert.True(Fixture.HasAny(pre, "d3d9.dll"), pre.ToLog("pre"));
+
+        var refused = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.True(refused.Failed, refused.ToLog("refused"));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")), "nothing may be written over a folder that cannot launch");
+
+        // And the same folder with the stray file gone installs exactly as before: the check has to
+        // stay silent about the one ReShade that is supposed to be there.
+        File.Delete(dropped);
+        var ok = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(ok.Failed, ok.ToLog("install"));
+        Assert.Equal(reShade, File.ReadAllBytes(Path.Combine(game, "dxgi.dll")));
+    }
+
+    /// <summary>The "ReShade loads as" menu, honoured. The 32-bit route ignored it and wrote the
+    /// API's own name regardless, and dinput8.dll -- offered on every route -- was not in
+    /// <see cref="Engine.Allowed"/> at all, so choosing it made the transaction refuse the install.</summary>
+    [Fact]
+    public void EveryProxyNameTheMenuOffersIsOneThatCanBeInstalled()
+    {
+        var dir = Fixture.Temp("proxy-choice");
+
+        Assert.Equal("d3d9.dll", Work.ProxyNameFor(Preset.X86Dx9, dir, null));
+        Assert.Equal("dinput8.dll", Work.ProxyNameFor(Preset.X86Dx9, dir, "dinput8.dll"));
+        Assert.Equal("dxgi.dll", Work.ProxyNameFor(Preset.X86Dx11, dir, null));
+        Assert.Equal("d3d9.dll", Work.ProxyNameFor(Preset.X86Dx8, dir, "d3d12.dll"));
+        Assert.Null(Work.ProxyNameFor(Preset.Vulkan, dir, "dxgi.dll"));
+
+        foreach (var preset in Presets.All)
+            Assert.All(Work.ProxyChoicesFor(preset), name => Assert.Contains(name, Engine.Allowed));
+    }
+
     [Fact]
     public void AReShadeThatDoesNotMatchItsPinIsRefusedAndNothingIsWritten()
     {

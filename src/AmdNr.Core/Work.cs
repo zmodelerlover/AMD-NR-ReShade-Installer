@@ -67,9 +67,10 @@ public static class Work
     ];
 
     /// <summary>A ReShade proxy, by the name it has to be loaded under. Used where the route is not
-    /// known -- uninstall, which only wants to know whether one is still there.</summary>
+    /// known -- uninstall, which only wants to know whether one is still there, and the check for a
+    /// second ReShade, which has to look at every name rather than this route's.</summary>
     private static readonly string[] Proxies =
-        ["d3d11.dll", "dxgi.dll", "d3d12.dll", "opengl32.dll", "d3d9.dll", "d3d8.dll"];
+        ["d3d11.dll", "dxgi.dll", "d3d12.dll", "opengl32.dll", "d3d9.dll", "d3d8.dll", "dinput8.dll"];
 
     /// <summary>The names ReShade can be loaded under *for this route*. A 32-bit D3D9 game loads
     /// d3d9.dll and never dxgi.dll, so checking the 64-bit names there reported "no ReShade proxy
@@ -201,6 +202,64 @@ public static class Work
         }
     }
 
+    /// <summary>The ReShade this install would write, when it carries one. Both routes ship it under
+    /// the name dxgi.dll or ReShade64.dll in the payload, whatever it is written as in the end.</summary>
+    private static string? ShippedReShade(string src, Preset preset)
+    {
+        if (src.Length == 0 || preset.IsVulkan()) return null;
+        var path = preset.Route() == Route.X86
+            ? Path.Combine(src, "files", "dxgi.dll")
+            : Path.Combine(PayloadDir(src), "ReShade64.dll");
+        return File.Exists(path) ? path : null;
+    }
+
+    /// <summary>ReShade, by its version resource -- or by being byte for byte the file this install
+    /// is about to write, which is ReShade by definition however the copy got there. The second arm
+    /// is the one that matters for the extras bundle: it ships ReShade32 under the name dxgi.dll,
+    /// which is only ever meant to be *written as* d3d9.dll, and dropping it into a D3D9 game folder
+    /// by hand is what the failure below actually looks like in the wild.</summary>
+    private static bool IsReShadeFile(string path, string? shipped)
+    {
+        var (isReShade, product, _) = Identify(path);
+        if (isReShade) return true;
+        // Size first, so this stays a stat() for every file that cannot be a copy of it.
+        return product is null && shipped is not null
+               && Engine.SizeOf(path) == Engine.SizeOf(shipped)
+               && Engine.HashFile(path) == Engine.HashFile(shipped);
+    }
+
+    /// <summary>A second ReShade in the same folder, under a name this route does not load.
+    ///
+    /// This is the one failure in this project that produces no evidence at all: the game closes
+    /// before a window appears, nothing is written to any log, and the folder looks correct. ReShade
+    /// hooks dxgi.dll, d3d11.dll and the rest itself, and the game folder comes before system32 in
+    /// the search order, so a stray dxgi.dll beside the d3d9.dll a 32-bit game loads is picked up and
+    /// initialised a second time inside the same process.
+    ///
+    /// It is checked over every proxy name rather than this route's, because the file that collides
+    /// is by definition the one this route was not looking for -- which is exactly why a check
+    /// scoped to the route's own names never saw it.</summary>
+    private static void CheckDoubleReShade(string dir, Preset preset, Report report, string? keep,
+        string? shipped)
+    {
+        keep ??= ProxiesFor(preset).FirstOrDefault(n => File.Exists(Path.Combine(dir, n)));
+        var extra = Proxies
+            .Where(n => !string.Equals(n, keep, StringComparison.OrdinalIgnoreCase)
+                        && File.Exists(Path.Combine(dir, n))
+                        && IsReShadeFile(Path.Combine(dir, n), shipped))
+            .ToList();
+        if (extra.Count == 0) return;
+
+        report.Err(
+            $"There is a second ReShade in this folder: {Joined(extra)}. "
+            + (keep is null
+                ? "Only one of them is ever loaded"
+                : $"This route loads ReShade as {keep}")
+            + ", and a process that loads two ReShades does not start at all -- the game closes before "
+            + "a window appears and writes nothing anywhere saying why. Delete "
+            + $"{string.Join(" and ", extra)} from the game folder and run this again.");
+    }
+
     /// <summary>The name ReShade is loaded under. dxgi.dll serves D3D10/11/12 and is what ReShade's
     /// own setup picks; when a ReShade is already there under another proxy name it is replaced in
     /// place rather than doubled; when dxgi.dll belongs to something else -- OptiScaler, DXVK -- the
@@ -232,6 +291,14 @@ public static class Work
     public static bool ProxyAllowed(Preset preset, string? name) =>
         name is { Length: > 0 } &&
         ProxyChoicesFor(preset).Contains(name, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The name this install will load ReShade under, whichever route it takes. Null only
+    /// on Vulkan, where ReShade is a layer and no file in the folder is it.</summary>
+    internal static string? ProxyNameFor(Preset preset, string dir, string? proxy) =>
+        preset.IsVulkan() ? null
+        : preset.Route() == Route.X86
+            ? ProxyAllowed(preset, proxy) ? proxy : Engine.X86ProxyName(preset.ManifestPreset())
+            : ReShadeProxyFor(preset, dir, proxy);
 
     internal static string? ReShadeProxyFor(Preset preset, string dir, string? wanted = null)
     {
@@ -550,15 +617,17 @@ public static class Work
 
         // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
         // "no ReShade here" is not a problem to report there -- it is the state before installing.
-        var reShadeShipped = src.Length > 0 && (preset.Route() == Route.X86
-            ? File.Exists(Path.Combine(src, "files", "dxgi.dll"))
-            : File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) && !preset.IsVulkan());
-        if (reShadeShipped)
+        var shipped = ShippedReShade(src, preset);
+        if (shipped is not null)
             report.Ok(preset.Route() == Route.X86
-                ? "The pinned 32-bit ReShade 6.8.0 is part of this install; nothing to install by hand."
+                ? $"The pinned 32-bit ReShade 6.8.0 is part of this install, as {ProxyNameFor(preset, dir, proxy)}; nothing to install by hand."
                 : $"ReShade 6.8.0 with full add-on support is part of this install, as {ReShadeProxyFor(preset, dir, proxy)}; nothing to install by hand.");
         else
             CheckReShade(dir, preset, report);
+
+        // Never inside the else: shipping ReShade is exactly when a second one is most likely, and
+        // skipping the whole check there is what let a folder with two of them install cleanly.
+        CheckDoubleReShade(dir, preset, report, ProxyNameFor(preset, dir, proxy), shipped);
 
         CheckDisabledAddons(dir, report);
 
@@ -610,7 +679,7 @@ public static class Work
         }
     }
 
-    private static Report InstallX86(string gameDir, string releaseDir, Preset preset)
+    private static Report InstallX86(string gameDir, string releaseDir, Preset preset, string? proxy)
     {
         var report = new Report();
         if (X86Target(gameDir, report) is not { } target) return report;
@@ -632,10 +701,19 @@ public static class Work
         report.Info($"target: {target}");
         report.Info($"preset: {preset.Label()}");
 
+        var installDir = Engine.InstallDirectory(target);
+        var proxyName = ProxyNameFor(preset, installDir, proxy);
+        CheckDoubleReShade(installDir, preset, report, proxyName, ShippedReShade(release, preset));
+        if (report.Failed)
+        {
+            report.Info("Nothing was written: fix the problem above and run it again.");
+            return report;
+        }
+
         var app = new X86Installer(release);
         try
         {
-            app.Install(target, preset.ManifestPreset());
+            app.Install(target, preset.ManifestPreset(), proxyName);
             foreach (var line in app.Log) Narrate(line, report);
             report.Info(preset.Note());
             report.Info(
@@ -653,7 +731,7 @@ public static class Work
     public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
         string? proxy = null)
     {
-        if (preset.Route() == Route.X86) return InstallX86(gameDir, payloadDir, preset);
+        if (preset.Route() == Route.X86) return InstallX86(gameDir, payloadDir, preset, proxy);
 
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -675,6 +753,7 @@ public static class Work
         CheckExe(dir, preset, report);
         if (src.Length == 0 || !File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) || preset.IsVulkan())
             CheckReShade(dir, preset, report);
+        CheckDoubleReShade(dir, preset, report, ReShadeProxyFor(preset, dir, proxy), ShippedReShade(src, preset));
 
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         if (src.Length == 0)

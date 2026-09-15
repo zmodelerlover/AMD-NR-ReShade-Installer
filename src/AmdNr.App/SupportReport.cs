@@ -24,7 +24,12 @@ public static class SupportReport
     /// time rather than at install time.</summary>
     private static readonly string[] RuntimeEvidence =
     [
-        "ReShade.log", "ReShade.ini", "dlss5-neural.log", "dlss5-neural.ini",
+        "ReShade.log",
+        // ReShade renames its log to .log1 when the game starts again, so the run that mattered is
+        // the one this report was missing: a game that closes at once leaves a log of a few hundred
+        // bytes, and the next launch -- the one people make before asking for help -- pushes it here.
+        "ReShade.log1",
+        "ReShade.ini", "dlss5-neural.log", "dlss5-neural.ini",
         "dlssnr_on_amd.log", "dlssnr_on_amd.ini", "dlss5-pass1.dll",
         // The 32-bit bridge does not use the name above: it writes one log per half of the pair,
         // and those two are what said which hotkey the add-on was actually running with.
