@@ -36,6 +36,13 @@ public sealed class AppConfig
     /// </summary>
     public RepoRef Addon { get; init; } = new() { Owner = "zmodelerlover", Repo = "dlss5-neural-amd" };
 
+    /// <summary>The chat everyone is actually in, and the project the network comes from. Both are
+    /// here rather than in the code because an invite can be rotated and a repository can move, and
+    /// neither should need a new build of this.</summary>
+    public string DiscordUrl { get; init; } = "https://discord.gg/wYhvS3JSHM";
+
+    public string RuntimeUrl { get; init; } = "https://github.com/danielblnc/DLSS-NR-on-AMD";
+
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
 
     public static AppConfig Load()

@@ -39,7 +39,14 @@
 
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
   <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
-  <sys:String x:Key="Str.Credits">A rede é a DLSS-NR-on-AMD do danielblnc. A runtime e os pesos são trabalho dele.</sys:String>
+  <sys:String x:Key="Str.Credits">A rede é a DLSS-NR-on-AMD do danielblnc. A runtime e os pesos são trabalho dele, e sem eles não sobra nada aqui pra rodar.</sys:String>
+  <sys:String x:Key="Str.CreditsOurs">O add-on e este instalador são o dlss5-neural-amd, licença MIT, código aberto. Nada é travado, nada é vendido, e nada aqui pede dinheiro.</sys:String>
+  <sys:String x:Key="Str.Free">Isto é de graça, e sempre foi. Se você pagou alguém por isto, te enganaram — peça seu dinheiro de volta e pegue nos links abaixo.</sys:String>
+  <sys:String x:Key="Str.LinkAddon">O add-on no GitHub</sys:String>
+  <sys:String x:Key="Str.LinkInstaller">Este instalador no GitHub</sys:String>
+  <sys:String x:Key="Str.LinkRuntime">DLSS-NR-on-AMD (danielblnc)</sys:String>
+  <sys:String x:Key="Str.LinkDiscord">Discord</sys:String>
+  <sys:String x:Key="Str.CreditsSection">Créditos</sys:String>
 
   <sys:String x:Key="Str.Scan">Procurar jogos</sys:String>
   <sys:String x:Key="Str.Scanning">Lendo Steam, Epic, GOG, EA, Ubisoft, Battle.net e Xbox…</sys:String>

@@ -3,6 +3,12 @@
     "Owner": "zmodelerlover",
     "Repo": "AMD-NR-ReShade-Installer"
   },
+  "Addon": {
+    "Owner": "zmodelerlover",
+    "Repo": "dlss5-neural-amd"
+  },
+  "DiscordUrl": "https://discord.gg/wYhvS3JSHM",
+  "RuntimeUrl": "https://github.com/danielblnc/DLSS-NR-on-AMD",
   "Payload": {
     "ManifestUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.json",
     "ApiDbUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/api-db.json"

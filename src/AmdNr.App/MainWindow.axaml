@@ -636,10 +636,32 @@
                 </Grid>
                 <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,14">
                   <Grid ColumnDefinitions="Auto,*">
+                    <PathIcon Data="{StaticResource IconWarn}" Width="15" Height="15" Foreground="{DynamicResource Warn}"
+                              VerticalAlignment="Top" Margin="0,1,12,0" />
+                    <TextBlock Grid.Column="1" Text="{DynamicResource Str.Free}" TextWrapping="Wrap"
+                               LineHeight="19" Foreground="#F2D7A6" />
+                  </Grid>
+                </Border>
+                <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,14">
+                  <Grid ColumnDefinitions="Auto,*">
                     <PathIcon Data="{StaticResource IconHeart}" Width="15" Height="15" Foreground="{DynamicResource AccentText}"
                               VerticalAlignment="Top" Margin="0,1,12,0" />
-                    <TextBlock Grid.Column="1" Text="{DynamicResource Str.Credits}" TextWrapping="Wrap"
-                               Foreground="{DynamicResource Muted}" />
+                    <StackPanel Grid.Column="1" Spacing="7">
+                      <TextBlock Text="{DynamicResource Str.Credits}" TextWrapping="Wrap" LineHeight="19"
+                                 Foreground="{DynamicResource Muted}" />
+                      <TextBlock Text="{DynamicResource Str.CreditsOurs}" TextWrapping="Wrap" LineHeight="19"
+                                 Foreground="{DynamicResource Muted}" />
+                      <WrapPanel Margin="0,3,0,0">
+                        <Button x:Name="LinkAddonButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
+                                Content="{DynamicResource Str.LinkAddon}" />
+                        <Button x:Name="LinkInstallerButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
+                                Content="{DynamicResource Str.LinkInstaller}" />
+                        <Button x:Name="LinkRuntimeButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
+                                Content="{DynamicResource Str.LinkRuntime}" />
+                        <Button x:Name="LinkDiscordButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
+                                Content="{DynamicResource Str.LinkDiscord}" />
+                      </WrapPanel>
+                    </StackPanel>
                   </Grid>
                 </Border>
                 <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"

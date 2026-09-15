@@ -73,6 +73,13 @@ public partial class MainWindow : Window
         ToolTip.SetTip(CacheFolder, AppPaths.Cache);
         CacheFolder.Text = AppPaths.Cache;
 
+        // Every link in About carries its own address, so a fork that repoints config.json sends
+        // people to its own pages and not to these.
+        LinkAddonButton.Tag = $"https://github.com/{_config.Addon.Owner}/{_config.Addon.Repo}";
+        LinkInstallerButton.Tag = $"https://github.com/{_config.App.Owner}/{_config.App.Repo}";
+        LinkRuntimeButton.Tag = _config.RuntimeUrl;
+        LinkDiscordButton.Tag = _config.DiscordUrl;
+
         LanguageBox.ItemsSource = App.Languages.Select(l => l.Name).ToList();
         LanguageBox.SelectedIndex = Math.Max(0, Array.FindIndex(App.Languages, l => l.Code == App.CurrentLanguage));
 
@@ -1239,6 +1246,12 @@ public partial class MainWindow : Window
     private void OnOpenReleases(object? sender, RoutedEventArgs e)
     {
         if (_update is not null) AppUpdate.OpenInBrowser(_update.Url);
+    }
+
+    private void OnOpenLink(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string url } && url.StartsWith("https://", StringComparison.Ordinal))
+            AppUpdate.OpenInBrowser(url);
     }
 
     private void OnDismissUpdate(object? sender, RoutedEventArgs e) => UpdateBanner.IsVisible = false;

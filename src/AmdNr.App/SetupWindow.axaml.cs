@@ -51,6 +51,11 @@ public partial class SetupWindow : Window
         FoundList.ItemsSource = _found;
 
         _settingLanguage = true;
+        LinkAddonButton.Tag = $"https://github.com/{_config.Addon.Owner}/{_config.Addon.Repo}";
+        LinkInstallerButton.Tag = $"https://github.com/{_config.App.Owner}/{_config.App.Repo}";
+        LinkRuntimeButton.Tag = _config.RuntimeUrl;
+        LinkDiscordButton.Tag = _config.DiscordUrl;
+
         LanguageBox.ItemsSource = App.Languages.Select(l => l.Name).ToList();
         LanguageBox.SelectedIndex = Math.Max(0, Array.FindIndex(App.Languages, l => l.Code == App.CurrentLanguage));
         _settingLanguage = false;
@@ -354,6 +359,12 @@ public partial class SetupWindow : Window
         >= 1_048_576 => $"{bytes / 1_048_576.0:0.0} MB",
         _ => $"{Math.Max(1, bytes / 1024)} KB",
     };
+
+    private void OnOpenLink(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string url } && url.StartsWith("https://", StringComparison.Ordinal))
+            AppUpdate.OpenInBrowser(url);
+    }
 
     private static Geometry? Vector(string key) =>
         Application.Current?.TryFindResource(key, out var value) == true ? value as Geometry : null;
