@@ -2,16 +2,13 @@
   "schema": 1,
   "components": {
     "addon": {
-      "version": "0.5.0",
+      "version": "0.5.1",
       "files": [
         {
           "name": "dlss5-neural.addon64",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon64",
-          "mirrors": [
-            "https://files.catbox.moe/qafsq1.bin"
-          ],
-          "size": 550400,
-          "sha256": "203f0278b64c5786da2bb95e8635de86bf3b18a852f098c4c0378661e8b48cf7"
+          "size": 550912,
+          "sha256": "2bcc13f5710a9c07b3696cbfa9d08b1340ea0e15ae12c36e580c5b064cd7efe8"
         }
       ]
     },
@@ -62,36 +59,27 @@
       ]
     },
     "bridge": {
-      "version": "0.5.0",
+      "version": "0.5.1",
       "files": [
         {
           "name": "dlss5-neural.addon32",
           "path": "files/dlss5-neural.addon32",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon32",
-          "mirrors": [
-            "https://files.catbox.moe/uumxf7.bin"
-          ],
-          "size": 257536,
-          "sha256": "451229b71e3547e14f085f4d0a1b81421618567c78dc3dd2f53b6575d3e4e8f9"
+          "size": 247808,
+          "sha256": "fa6606e86059a5e352b51a924f2cc12b78fa7a19d469bd93ccb0916861e4e296"
         },
         {
           "name": "dlss5-neural-host64.exe",
           "path": "files/dlss5-neural-host64.exe",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural-host64.exe",
-          "mirrors": [
-            "https://files.catbox.moe/w5vjax.bin"
-          ],
-          "size": 442368,
-          "sha256": "9548ed5b183eeb0123e72f8c7da4e76a91bd9b590a0d18f3a7653b12aa9eb131"
+          "size": 440832,
+          "sha256": "d1b5a6ed8877a461a929525ea40edd114ac5896f3a2ac1f82a937653ce9614b7"
         },
         {
           "name": "payload.sha256",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
-          "mirrors": [
-            "https://files.catbox.moe/7jlmrs.txt"
-          ],
           "size": 179,
-          "sha256": "51f63f06f4e45d2f82c9c74180d09e5c99381e254159f4228b927bfbaf487d3f"
+          "sha256": "e3c866f380da6d65869d43a6db48b82812027a16ebd18a2e2382ab8485f8b18e"
         }
       ]
     },
