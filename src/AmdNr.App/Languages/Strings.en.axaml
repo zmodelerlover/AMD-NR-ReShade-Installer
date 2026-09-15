@@ -65,8 +65,8 @@
   <sys:String x:Key="Str.InstalledBadge">Installed</sys:String>
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
-  <sys:String x:Key="Str.RouteSection">ROUTE</sys:String>
-  <sys:String x:Key="Str.WhatHappens">WHAT WILL HAPPEN</sys:String>
+  <sys:String x:Key="Str.RouteSection">Route</sys:String>
+  <sys:String x:Key="Str.WhatHappens">What will happen</sys:String>
   <sys:String x:Key="Str.Checking">Checking this folder…</sys:String>
   <sys:String x:Key="Str.StepDownload">Download</sys:String>
   <sys:String x:Key="Str.StepVerify">Verify</sys:String>
@@ -83,5 +83,30 @@
   <sys:String x:Key="Str.ResultErrors">{0} problem(s) listed below.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
   <sys:String x:Key="Str.Folder">Folder</sys:String>
-  <sys:String x:Key="Str.OnBadge">ON</sys:String>
+  <!-- Second layout pass -->
+  <sys:String x:Key="Str.GameCount">{0} games</sys:String>
+  <sys:String x:Key="Str.UnknownApi">Unknown API</sys:String>
+  <sys:String x:Key="Str.Location">Location</sys:String>
+  <sys:String x:Key="Str.Details">Details</sys:String>
+  <sys:String x:Key="Str.DetailsCount">{0} lines</sys:String>
+  <sys:String x:Key="Str.PreflightOk">Ready to install</sys:String>
+  <sys:String x:Key="Str.PreflightOkDetail">Nothing in the way. Pick a route below and press Install.</sys:String>
+  <sys:String x:Key="Str.PreflightWarn">Ready to install, with {0} note(s) to read</sys:String>
+  <sys:String x:Key="Str.PreflightErr">{0} problem(s) found in this folder</sys:String>
+  <sys:String x:Key="Str.PreflightInstalled">Installed in this game</sys:String>
+  <sys:String x:Key="Str.PreflightInstalledDetail">Start the game to use it. Install again to refresh the files, or uninstall to remove them.</sys:String>
+  <sys:String x:Key="Str.SeeDetails">Open Details below to see what was found.</sys:String>
+  <sys:String x:Key="Str.SystemSubtitle">What the add-on needs from this PC, checked when the app starts.</sys:String>
+  <sys:String x:Key="Str.SystemReady">This PC has what the add-on needs</sys:String>
+  <sys:String x:Key="Str.SystemNotReady">This PC is missing something the add-on needs</sys:String>
+  <sys:String x:Key="Str.GpuOk">Radeon detected</sys:String>
+  <sys:String x:Key="Str.GpuBad">Not a Radeon</sys:String>
+  <sys:String x:Key="Str.Missing">Missing</sys:String>
+  <sys:String x:Key="Str.DriverHint">The version Windows reports for the graphics driver.</sys:String>
+  <sys:String x:Key="Str.FilesHint">Downloaded once, checked against a pinned hash, and reused for every game.</sys:String>
+  <sys:String x:Key="Str.PayloadReadyShort">Verified</sys:String>
+  <sys:String x:Key="Str.NotDownloadedShort">Not downloaded</sys:String>
+  <sys:String x:Key="Str.SettingsSubtitle">Language, and where this app keeps its files.</sys:String>
+  <sys:String x:Key="Str.LanguageHint">Every label switches right away; no restart needed.</sys:String>
+  <sys:String x:Key="Str.DataFolder">Data folder</sys:String>
 </ResourceDictionary>

@@ -62,8 +62,8 @@
   <sys:String x:Key="Str.InstalledBadge">Instalado</sys:String>
   <sys:String x:Key="Str.Close">Fechar</sys:String>
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
-  <sys:String x:Key="Str.RouteSection">ROTA</sys:String>
-  <sys:String x:Key="Str.WhatHappens">O QUE VAI ACONTECER</sys:String>
+  <sys:String x:Key="Str.RouteSection">Rota</sys:String>
+  <sys:String x:Key="Str.WhatHappens">O que vai acontecer</sys:String>
   <sys:String x:Key="Str.Checking">Conferindo esta pasta…</sys:String>
   <sys:String x:Key="Str.StepDownload">Baixar</sys:String>
   <sys:String x:Key="Str.StepVerify">Conferir</sys:String>
@@ -80,5 +80,30 @@
   <sys:String x:Key="Str.ResultErrors">{0} problema(s) listado(s) abaixo.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>
   <sys:String x:Key="Str.Folder">Pasta</sys:String>
-  <sys:String x:Key="Str.OnBadge">ATIVO</sys:String>
+  <!-- Second layout pass -->
+  <sys:String x:Key="Str.GameCount">{0} jogos</sys:String>
+  <sys:String x:Key="Str.UnknownApi">API desconhecida</sys:String>
+  <sys:String x:Key="Str.Location">Local</sys:String>
+  <sys:String x:Key="Str.Details">Detalhes</sys:String>
+  <sys:String x:Key="Str.DetailsCount">{0} linhas</sys:String>
+  <sys:String x:Key="Str.PreflightOk">Pronto pra instalar</sys:String>
+  <sys:String x:Key="Str.PreflightOkDetail">Nada no caminho. Escolha a rota abaixo e clique em Instalar.</sys:String>
+  <sys:String x:Key="Str.PreflightWarn">Pronto pra instalar, com {0} aviso(s) pra ler</sys:String>
+  <sys:String x:Key="Str.PreflightErr">{0} problema(s) encontrado(s) nesta pasta</sys:String>
+  <sys:String x:Key="Str.PreflightInstalled">Instalado neste jogo</sys:String>
+  <sys:String x:Key="Str.PreflightInstalledDetail">Abra o jogo pra usar. Instale de novo pra atualizar os arquivos, ou desinstale pra removê-los.</sys:String>
+  <sys:String x:Key="Str.SeeDetails">Abra Detalhes abaixo pra ver o que foi encontrado.</sys:String>
+  <sys:String x:Key="Str.SystemSubtitle">O que o add-on precisa deste PC, conferido quando o app abre.</sys:String>
+  <sys:String x:Key="Str.SystemReady">Este PC tem o que o add-on precisa</sys:String>
+  <sys:String x:Key="Str.SystemNotReady">Falta algo neste PC que o add-on precisa</sys:String>
+  <sys:String x:Key="Str.GpuOk">Radeon detectada</sys:String>
+  <sys:String x:Key="Str.GpuBad">Não é uma Radeon</sys:String>
+  <sys:String x:Key="Str.Missing">Não encontrado</sys:String>
+  <sys:String x:Key="Str.DriverHint">A versão que o Windows informa para o driver de vídeo.</sys:String>
+  <sys:String x:Key="Str.FilesHint">Baixados uma vez, conferidos contra um hash fixo e reaproveitados em todos os jogos.</sys:String>
+  <sys:String x:Key="Str.PayloadReadyShort">Verificado</sys:String>
+  <sys:String x:Key="Str.NotDownloadedShort">Não baixado</sys:String>
+  <sys:String x:Key="Str.SettingsSubtitle">Idioma, e onde este app guarda os arquivos dele.</sys:String>
+  <sys:String x:Key="Str.LanguageHint">Todos os textos mudam na hora, sem reiniciar.</sys:String>
+  <sys:String x:Key="Str.DataFolder">Pasta de dados</sys:String>
 </ResourceDictionary>

@@ -14,7 +14,10 @@ namespace AmdNr.App;
 
 /// <summary>One line of a report, with the colour it reads in. The engine already decided the
 /// level; this only chooses how it looks.</summary>
-public sealed record ReportLine(string Glyph, string Text, IBrush Brush);
+public sealed record ReportLine(Geometry? Glyph, string Text, IBrush Brush);
+
+/// <summary>One downloadable component as the System page lists it.</summary>
+public sealed record PayloadRow(string Name, string Version, bool Ready);
 
 public partial class MainWindow : Window
 {
@@ -42,14 +45,21 @@ public partial class MainWindow : Window
 
         CardList.ItemsSource = _shown;
         ReportList.ItemsSource = _report;
-        _report.CollectionChanged += (_, _) => ReportEmpty.IsVisible = _report.Count == 0;
+        _report.CollectionChanged += (_, _) =>
+        {
+            ReportEmpty.IsVisible = _report.Count == 0;
+            DetailsCount.Text = _report.Count == 0 ? "" : string.Format(Text("Str.DetailsCount"), _report.Count);
+        };
         _toastTimer.Tick += (_, _) =>
         {
             _toastTimer.Stop();
             Toast.Classes.Set("show", false);
         };
         VersionText.Text = $"v{App.Version}";
-        AboutVersion.Text = $"v{App.Version} · {AppPaths.Root}";
+        AboutVersion.Text = $"v{App.Version}";
+        DataFolderText.Text = AppPaths.Root;
+        ToolTip.SetTip(DataFolderText, AppPaths.Root);
+        ToolTip.SetTip(CacheFolder, AppPaths.Cache);
         CacheFolder.Text = AppPaths.Cache;
 
         LanguageBox.ItemsSource = App.Languages.Select(l => l.Name).ToList();
@@ -112,15 +122,32 @@ public partial class MainWindow : Window
         var state = GpuService.Read();
         GpuText.Text = state.Gpu;
         DriverText.Text = state.Driver;
-        HipText.Text = state.Hip7 ? Text("Str.Ready") : "—";
-        HipText.Foreground = state.Hip7 ? Brush("Ok") : Brush("Err");
+        SetStatus(GpuStatus, GpuStatusIcon, state.LooksLikeRadeon);
+        Localize(GpuStatusText, state.LooksLikeRadeon ? "Str.GpuOk" : "Str.GpuBad");
+        SetStatus(HipStatus, HipStatusIcon, state.Hip7);
+        Localize(HipText, state.Hip7 ? "Str.Ready" : "Str.Missing");
 
-        GpuPillText.Text = state.Gpu.Length > 34 ? state.Gpu[..34] + "…" : state.Gpu;
+        GpuPillText.Text = state.Gpu;
         GpuDot.Fill = state.Ready ? Brush("Ok") : Brush("Err");
+
+        // One sentence on top that says whether anything on this page needs doing.
+        SystemVerdict.Classes.Set("ok", state.Ready);
+        SystemVerdict.Classes.Set("err", !state.Ready);
+        SystemVerdictTile.Classes.Set("ok", state.Ready);
+        SystemVerdictTile.Classes.Set("err", !state.Ready);
+        SystemVerdictIcon.Data = Icon(state.Ready ? "IconOk" : "IconErr");
+        Localize(SystemVerdictTitle, state.Ready ? "Str.SystemReady" : "Str.SystemNotReady");
 
         if (!state.Hip7) ShowWarning(Text("Str.HipMissing"));
         else if (!state.LooksLikeRadeon) ShowWarning(Text("Str.NotRadeon"));
         else SystemWarning.IsVisible = false;
+    }
+
+    private static void SetStatus(Border pill, PathIcon icon, bool ok)
+    {
+        pill.Classes.Set("ok", ok);
+        pill.Classes.Set("err", !ok);
+        icon.Data = Icon(ok ? "IconCheck" : "IconErr");
     }
 
     private void ShowWarning(string text)
@@ -131,13 +158,15 @@ public partial class MainWindow : Window
 
     private void ShowPayloadState()
     {
+        PayloadState.IsVisible = _manifest is null;
         if (_manifest is null)
         {
             PayloadState.Text = Text("Str.ManifestFailed");
+            PayloadList.ItemsSource = null;
             return;
         }
 
-        var lines = new List<string>();
+        var rows = new List<PayloadRow>();
         foreach (var (name, component) in _manifest.Components)
         {
             var complete = false;
@@ -146,9 +175,9 @@ public partial class MainWindow : Window
             {
                 // A component this build does not understand is not a reason to show nothing.
             }
-            lines.Add($"{name} {component.Version} — {(complete ? Text("Str.PayloadsReady") : Text("Str.NotDownloaded"))}");
+            rows.Add(new PayloadRow(name, component.Version, complete));
         }
-        PayloadState.Text = string.Join("\n", lines);
+        PayloadList.ItemsSource = rows;
     }
 
     // -- The library -----------------------------------------------------------------------------
@@ -167,9 +196,10 @@ public partial class MainWindow : Window
         EmptyHint.IsVisible = _all.Count == 0 || noMatch;
         EmptyActions.IsVisible = !noMatch;
         Localize(EmptyTitle, noMatch ? "Str.NoMatchTitle" : "Str.EmptyTitle");
+        EmptyIcon.Data = Icon(noMatch ? "IconSearch" : "IconGames");
         if (noMatch) EmptyBody.Text = string.Format(Text("Str.NoMatch"), needle);
         else Localize(EmptyBody, "Str.NoGames");
-        Foot(_all.Count == 0 ? "" : $"{_all.Count} {Text("Str.Games").ToLowerInvariant()}");
+        Foot(_all.Count == 0 ? "" : string.Format(Text("Str.GameCount"), _all.Count));
     }
 
     private void OnSearch(object? sender, TextChangedEventArgs e) => RefreshGrid();
@@ -365,7 +395,30 @@ public partial class MainWindow : Window
         Drawer.IsVisible = true;
         // One layout pass while visible before the class lands, or the transition has no starting
         // frame and the drawer just appears.
-        Dispatcher.UIThread.Post(() => Drawer.Classes.Set("open", true), DispatcherPriority.Render);
+        Dispatcher.UIThread.Post(() =>
+        {
+            Drawer.Classes.Set("open", true);
+            // Focus goes into the sheet, so Tab walks its controls rather than the grid behind it.
+            CloseButton.Focus();
+        }, DispatcherPriority.Render);
+    }
+
+    /// <summary>A click on the dimmed grid around the sheet closes it, as it would any dialog.</summary>
+    private void OnBackdropPressed(object? sender, PointerPressedEventArgs e) => CloseDrawer();
+
+    private void OnGpuPill(object? sender, RoutedEventArgs e) => TabSystem.IsChecked = true;
+
+    private void OnOpenCache(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Directory.CreateDirectory(AppPaths.Cache);
+            Process.Start(new ProcessStartInfo(AppPaths.Cache) { UseShellExecute = true });
+        }
+        catch (Exception e2) when (e2 is System.ComponentModel.Win32Exception or IOException or UnauthorizedAccessException)
+        {
+            // No shell association for a folder is not something to interrupt anyone over.
+        }
     }
 
     private async void CloseDrawer()
@@ -389,15 +442,23 @@ public partial class MainWindow : Window
         base.OnKeyDown(e);
     }
 
-    /// <summary>Tiles are a fixed size; the slots they sit in share the row evenly, so the leftover
-    /// width is spread between them instead of piling up at the right edge.</summary>
+    /// <summary>Tiles stretch a little to fill the row, so the grid runs edge to edge with the same
+    /// gap everywhere instead of piling leftover width between tiles. Past the widest tile another
+    /// column is added.</summary>
     private void OnGridResized(object? sender, SizeChangedEventArgs e)
     {
         if (CardList.ItemsPanelRoot is not WrapPanel panel) return;
-        const double slot = 192; // 164 tile + 12 button padding + 16 gap
+        const double gap = 18, minTile = 168, maxTile = 212;
         var width = e.NewSize.Width - GridScroll.Padding.Left - GridScroll.Padding.Right;
-        var columns = Math.Max(1, Math.Floor(width / slot));
-        panel.ItemWidth = Math.Floor(width / columns);
+        var columns = Math.Max(1, Math.Floor((width + gap) / (minTile + gap)));
+        var tile = Math.Floor(Math.Min(maxTile, (width - gap * (columns - 1)) / columns));
+        panel.ItemWidth = tile + gap;
+        // The last column's gap hangs past the right edge; a matching negative margin keeps the
+        // centred rows lined up with the top bar.
+        CardList.Width = columns * (tile + gap);
+        CardList.Margin = new Thickness(0, 0, -gap, 0);
+        CardList.Resources["TileWidth"] = tile;
+        CardList.Resources["CoverHeight"] = Math.Round(tile * 1.5);
     }
 
     private async void OnPresetChanged(object? sender, SelectionChangedEventArgs e)
@@ -416,10 +477,12 @@ public partial class MainWindow : Window
     private void OnTabChanged(object? sender, RoutedEventArgs e)
     {
         if (GamesPage is null) return; // Fires once while the window is still being built.
-        GamesPage.IsVisible = TabGames.IsChecked == true;
-        SystemPage.IsVisible = TabSystem.IsChecked == true;
-        SettingsPage.IsVisible = TabSettings.IsChecked == true;
-        if (TabSystem.IsChecked == true) ShowPayloadState();
+        // Decided by the button just checked: the one it replaces is not unchecked yet when this
+        // runs, so reading every IsChecked left two pages showing on top of each other.
+        GamesPage.IsVisible = sender == TabGames;
+        SystemPage.IsVisible = sender == TabSystem;
+        SettingsPage.IsVisible = sender == TabSettings;
+        if (sender == TabSystem) ShowPayloadState();
     }
 
     private void OnLanguageChanged(object? sender, SelectionChangedEventArgs e)
@@ -467,6 +530,7 @@ public partial class MainWindow : Window
 
         Show(report);
         card.RefreshInstalled();
+        ShowVerdict(report, card);
         SetButtons(true);
         Status(payloads is null ? Text("Str.WillDownload") : Text("Str.PayloadsReady"));
     }
@@ -652,8 +716,32 @@ public partial class MainWindow : Window
         // The pressed button says what it is doing; the other one only waits.
         InstallSpin.IsVisible = on && pressed == InstallButton;
         UninstallSpin.IsVisible = on && pressed == UninstallButton;
+        InstallIcon.IsVisible = !InstallSpin.IsVisible;
+        UninstallIcon.IsVisible = !UninstallSpin.IsVisible;
         Localize(InstallLabel, InstallSpin.IsVisible ? "Str.Installing" : "Str.Install");
         Localize(UninstallLabel, UninstallSpin.IsVisible ? "Str.Removing" : "Str.Uninstall");
+
+        // While it runs, the verdict slot says so, rather than showing the check that came before.
+        if (on && pressed is not null)
+        {
+            SetVerdict(Level.Info, Text(pressed == InstallButton ? "Str.Installing" : "Str.Removing"), "");
+            ResultSpin.IsVisible = true;
+        }
+    }
+
+    /// <summary>The pre-flight in one sentence. The report itself stays folded under Details.</summary>
+    private void ShowVerdict(Report report, GameCard card)
+    {
+        var warnings = report.Lines.Count(l => l.Level == Level.Warn);
+        var errors = report.Lines.Count(l => l.Level == Level.Err);
+        if (errors > 0)
+            SetVerdict(Level.Err, string.Format(Text("Str.PreflightErr"), errors), Text("Str.SeeDetails"));
+        else if (card.Installed)
+            SetVerdict(Level.Ok, Text("Str.PreflightInstalled"), Text("Str.PreflightInstalledDetail"));
+        else if (warnings > 0)
+            SetVerdict(Level.Warn, string.Format(Text("Str.PreflightWarn"), warnings), Text("Str.SeeDetails"));
+        else
+            SetVerdict(Level.Ok, Text("Str.PreflightOk"), Text("Str.PreflightOkDetail"));
     }
 
     /// <summary>Lights the chips: everything before <paramref name="current"/> done, the current one
@@ -688,36 +776,51 @@ public partial class MainWindow : Window
 
     private void ShowResult(Level level, string title, string detail)
     {
+        SetVerdict(level, title, detail);
+        // Anything short of a clean result wants its lines read, so they are opened for it.
+        if (level != Level.Ok) DetailsExpander.IsExpanded = true;
+        // The panel may have been closed during a long download; then the corner says it instead.
+        // With the panel open the banner above already does, and two copies of one sentence is noise.
+        if (!Drawer.Classes.Contains("open")) ShowToast(title, level);
+    }
+
+    private void SetVerdict(Level level, string title, string detail)
+    {
         foreach (var (name, l) in new[] { ("ok", Level.Ok), ("warn", Level.Warn), ("err", Level.Err) })
+        {
             ResultBanner.Classes.Set(name, l == level);
-        ResultGlyph.Text = Glyph(level);
-        ResultDot.Background = LevelBrush(level);
+            ResultDot.Classes.Set(name, l == level);
+        }
+        ResultSpin.IsVisible = false;
+        ResultGlyph.Data = level == Level.Info ? null : Glyph(level);
         ResultTitle.Text = title;
         ResultDetail.Text = detail;
         ResultDetail.IsVisible = detail.Length > 0;
         // Off and on again, so the entrance plays even when the banner was already up.
         ResultBanner.IsVisible = false;
         ResultBanner.IsVisible = true;
-        // The drawer may have been closed during a long download; the corner still says it.
-        ShowToast(title, level);
     }
 
     private void ShowToast(string text, Level level)
     {
         ToastText.Text = text;
-        ToastDot.Fill = LevelBrush(level);
+        ToastIcon.Data = Glyph(level);
+        ToastIcon.Foreground = LevelBrush(level);
         Toast.Classes.Set("show", true);
         _toastTimer.Stop();
         _toastTimer.Start();
     }
 
-    private static string Glyph(Level level) => level switch
+    private static Geometry? Glyph(Level level) => Icon(level switch
     {
-        Level.Ok => "✓",
-        Level.Warn => "!",
-        Level.Err => "✕",
-        _ => "·",
-    };
+        Level.Ok => "IconOk",
+        Level.Warn => "IconWarn",
+        Level.Err => "IconErr",
+        _ => "IconInfo",
+    });
+
+    private static Geometry? Icon(string key) =>
+        Application.Current?.TryFindResource(key, out var value) == true ? value as Geometry : null;
 
     private IBrush LevelBrush(Level level) => Brush(level switch
     {
@@ -738,7 +841,11 @@ public partial class MainWindow : Window
         UninstallButton.IsEnabled = enabled && _selected is not null;
     }
 
-    private void Status(string text) => StatusText.Text = text;
+    private void Status(string text)
+    {
+        StatusText.Text = text;
+        ToolTip.SetTip(StatusText, text); // It is trimmed to one line; the tip has the rest.
+    }
     private void Foot(string text) => FootText.Text = text;
 
     private void OnOpenReleases(object? sender, RoutedEventArgs e)

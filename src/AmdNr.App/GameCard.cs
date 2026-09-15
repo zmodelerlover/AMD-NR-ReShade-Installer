@@ -39,14 +39,24 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     private static readonly string[] words_keep = ["GTA", "NFS", "DMC"];
 
     /// <summary>A colour derived from the name, so a game keeps the same tile every time without
-    /// anything being stored.</summary>
+    /// anything being stored. A diagonal fade reads as a designed placeholder, where a flat fill
+    /// read as a cover that failed to load.</summary>
     public IBrush Tile
     {
         get
         {
             var hash = Name.Aggregate(17, (acc, c) => acc * 31 + c);
             var hue = Math.Abs(hash) % 360;
-            return new SolidColorBrush(new HslColor(1, hue, 0.32, 0.30).ToRgb());
+            return new LinearGradientBrush
+            {
+                StartPoint = new Avalonia.RelativePoint(0, 0, Avalonia.RelativeUnit.Relative),
+                EndPoint = new Avalonia.RelativePoint(1, 1, Avalonia.RelativeUnit.Relative),
+                GradientStops =
+                {
+                    new GradientStop(new HslColor(1, hue, 0.38, 0.34).ToRgb(), 0),
+                    new GradientStop(new HslColor(1, (hue + 30) % 360, 0.40, 0.13).ToRgb(), 1),
+                },
+            };
         }
     }
 
@@ -114,12 +124,29 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
             _graphics = value;
             Raise();
             Raise(nameof(RouteLabel));
+            Raise(nameof(RouteTags));
+            Raise(nameof(UnknownApi));
             Raise(nameof(NoRoute));
             RefreshInstalled();
         }
     }
 
     public string RouteLabel => _graphics?.Tag ?? "…";
+
+    /// <summary>The same label as separate chips: each API on its own, the architecture quieter, all
+    /// of them red when none has a route. Nothing yet while detection is still running.</summary>
+    public IReadOnlyList<RouteTag> RouteTags => _graphics switch
+    {
+        null => [new RouteTag("…", Quiet: true, Bad: false)],
+        { All.Count: 0 } => [],
+        var g => [
+            .. g.All.Select(a => new RouteTag(GraphicsDetection.Short(a), Quiet: false, Bad: NoRoute)),
+            .. g.Width == Route.X86 ? [new RouteTag("32-bit", Quiet: true, Bad: false)] : Array.Empty<RouteTag>(),
+        ],
+    };
+
+    /// <summary>Read, and nothing recognisable found. Shown as a word in the current language.</summary>
+    public bool UnknownApi => _graphics is { All.Count: 0 };
 
     /// <summary>Detected, and nothing it supports has a route: OpenGL, a 64-bit D3D9 game.</summary>
     public bool NoRoute => _graphics is { Preset: null } g && g.All.Count > 0;
@@ -135,5 +162,11 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
         Installed = GameScanner.IsInstalled(Entry.Path)
                     || (_graphics?.Executable is { } exe && GameScanner.IsInstalled(System.IO.Path.GetDirectoryName(exe)!));
 
-    public void RefreshRoute() => Raise(nameof(RouteLabel));
+    public void RefreshRoute()
+    {
+        Raise(nameof(RouteLabel));
+        Raise(nameof(RouteTags));
+    }
 }
+
+public sealed record RouteTag(string Text, bool Quiet, bool Bad);
