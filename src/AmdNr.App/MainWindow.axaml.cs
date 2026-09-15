@@ -496,6 +496,12 @@ public partial class MainWindow : Window
         var settings = Settings.Load();
         settings.Language = code;
         settings.Save();
+
+        // Labels bound with DynamicResource follow the swap on their own; the ones written in code
+        // -- the route name, its note, the verdict -- were written in the old language, so the open
+        // sheet is filled again.
+        RefreshGrid();
+        if (_selected is { } card) Select(card);
     }
 
     private void OnOpenFolder(object? sender, RoutedEventArgs e)
