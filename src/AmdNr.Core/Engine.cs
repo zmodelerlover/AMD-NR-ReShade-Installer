@@ -29,6 +29,10 @@ public static class Engine
     public const string RuntimeSha = "ddd82d313aa74c2e7602d17dfb7e7cd90cca9bfc0306f581684d35d75d1b350b";
     public const string WeightsSha = "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab";
     public const string ReShadeSha = "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8";
+
+    /// <summary>ReShade64.dll from the same official ReShade_Setup_6.8.0_Addon.exe whose ReShade32.dll
+    /// is <see cref="ReShadeSha"/> -- verified by extracting both from that one installer.</summary>
+    public const string ReShade64Sha = "0cee63f9c9f13f3ac909c5b4903f4dbb4b719a7ab3b4f13b0deaf83c814b94f7";
     public const string D3d8To9Version = "v1.15.1";
     public const string D3d8To9Commit = "65870f2302e9c496cd6d873d6095961d5c777668";
     public const string D3d8To9Sha = "ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5";
@@ -328,6 +332,11 @@ public static class Engine
     public static readonly IReadOnlySet<string> Allowed = new HashSet<string>(StringComparer.Ordinal)
     {
         "dxgi.dll",
+        // The 64-bit routes install ReShade too, under d3d11.dll or d3d12.dll when dxgi.dll already
+        // belongs to something else (OptiScaler, DXVK). Adding names here changes no existing
+        // manifest: decoding only refuses names that are *not* in this set.
+        "d3d11.dll",
+        "d3d12.dll",
         "d3d8.dll",
         "d3d8R.dll",
         "d3d9.dll",

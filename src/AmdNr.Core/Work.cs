@@ -21,6 +21,10 @@ public sealed class PayloadPins
     public ulong RuntimeSize { get; init; } = 7_248_384;
     public string WeightsSha { get; init; } = Engine.WeightsSha;
     public ulong WeightsSize { get; init; } = 147_689_451;
+
+    /// <summary>The ReShade64.dll a 64-bit install puts in the game folder when the payload carries
+    /// it. Checked like every other payload.</summary>
+    public string ReShade64Sha { get; init; } = Engine.ReShade64Sha;
 }
 
 /// <summary>What the target says about which route applies. A folder can hold a 32-bit launcher
@@ -165,6 +169,42 @@ public static class Work
                     + "and which one depends on the game. Keep the one that matches the renderer.");
                 break;
         }
+    }
+
+    /// <summary>The name ReShade is loaded under. dxgi.dll serves D3D10/11/12 and is what ReShade's
+    /// own setup picks; when a ReShade is already there under another proxy name it is replaced in
+    /// place rather than doubled; when dxgi.dll belongs to something else -- OptiScaler, DXVK -- the
+    /// API's own DLL is used so both keep loading. Vulkan has no proxy at all: ReShade is a layer
+    /// there, registered by its own setup, and this returns null.</summary>
+    internal static string? ReShadeProxyFor(Preset preset, string dir)
+    {
+        if (preset.IsVulkan()) return null;
+
+        string[] candidates = preset == Preset.Dx12 ? ["dxgi.dll", "d3d12.dll"] : ["dxgi.dll", "d3d11.dll"];
+        var existing = candidates.FirstOrDefault(n =>
+            File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade);
+        if (existing is not null) return existing;
+
+        return candidates.FirstOrDefault(n =>
+                   !File.Exists(Path.Combine(dir, n)) || Identify(Path.Combine(dir, n)).Product is null)
+               ?? candidates[^1];
+    }
+
+    /// <summary>ReShade.ini as it has to be for the add-on to be usable the first time the game
+    /// starts: the add-on not disabled, the tutorial that covers the screen already dismissed, and the
+    /// panel docked. Every other key someone has set is left exactly as it was.</summary>
+    internal static string ReadyReShadeIni(string ini)
+    {
+        var disabled = Engine.GetIni(ini, "ADDON", "DisabledAddons");
+        if (disabled.Contains("dlss5", StringComparison.OrdinalIgnoreCase))
+        {
+            var kept = disabled.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(a => !a.Contains("dlss5", StringComparison.OrdinalIgnoreCase));
+            ini = Engine.SetIni(ini, "ADDON", "DisabledAddons", string.Join(",", kept));
+        }
+        if (Engine.GetIni(ini, "OVERLAY", "TutorialProgress").Length == 0)
+            ini = Engine.SetIni(ini, "OVERLAY", "TutorialProgress", "4");
+        return Engine.FirstDock(ini, 1920, 1080);
     }
 
     private static void CheckExe(string dir, Preset preset, Report report)
@@ -395,10 +435,13 @@ public static class Work
 
         // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
         // "no ReShade here" is not a problem to report there -- it is the state before installing.
-        var reShadeShipped = preset.Route() == Route.X86 && src.Length > 0
-                             && File.Exists(Path.Combine(src, "files", "dxgi.dll"));
+        var reShadeShipped = src.Length > 0 && (preset.Route() == Route.X86
+            ? File.Exists(Path.Combine(src, "files", "dxgi.dll"))
+            : File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) && !preset.IsVulkan());
         if (reShadeShipped)
-            report.Ok("The pinned 32-bit ReShade 6.8.0 is part of this install; nothing to install by hand.");
+            report.Ok(preset.Route() == Route.X86
+                ? "The pinned 32-bit ReShade 6.8.0 is part of this install; nothing to install by hand."
+                : $"ReShade 6.8.0 with full add-on support is part of this install, as {ReShadeProxyFor(preset, dir)}; nothing to install by hand.");
         else
             CheckReShade(dir, preset, report);
 
@@ -514,7 +557,8 @@ public static class Work
         report.Info($"preset: {preset.Label()}");
 
         CheckExe(dir, preset, report);
-        CheckReShade(dir, preset, report);
+        if (src.Length == 0 || !File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) || preset.IsVulkan())
+            CheckReShade(dir, preset, report);
 
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         if (src.Length == 0)
@@ -537,6 +581,19 @@ public static class Work
                  })
         {
             if (VerifiedPayload(payloads, name, want, report) is { } bytes) files[name] = bytes;
+        }
+
+        // ReShade itself, when the payload carries it: the add-on does nothing without it, and asking
+        // someone to run a second installer and pick the right API is the step people get wrong.
+        if (File.Exists(Path.Combine(payloads, "ReShade64.dll")) && ReShadeProxyFor(preset, dir) is { } proxy
+            && VerifiedPayload(payloads, "ReShade64.dll", pins.ReShade64Sha, report) is { } reShade)
+        {
+            files[proxy] = reShade;
+            var iniPath = Path.Combine(dir, "ReShade.ini");
+            var before = File.Exists(iniPath) ? File.ReadAllText(iniPath) : "";
+            var after = ReadyReShadeIni(before);
+            if (after != before) files["ReShade.ini"] = System.Text.Encoding.UTF8.GetBytes(after);
+            report.Info($"ReShade 6.8.0 with full add-on support goes in as {proxy}.");
         }
 
         // A refused payload stops the whole install rather than leaving the add-on behind on its own.
@@ -694,7 +751,10 @@ public static class Work
                 "dlss5-neural.ini was left in place: it is your tuning, not ours. Delete it by hand if "
                 + "you want a clean slate.");
         }
-        report.Info("ReShade itself was left alone. Use its own installer to remove it.");
+
+        // Only true when a ReShade proxy is still there: one this app installed came back out above.
+        if (Proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
+            report.Info("ReShade itself was left alone. Use its own installer to remove it.");
         return report;
     }
 

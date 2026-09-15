@@ -33,6 +33,10 @@ public sealed class PayloadFile
     public required ulong Size { get; init; }
     public required string Sha256 { get; init; }
 
+    /// <summary>A full https address, for a file that is not published on GitHub at all -- ReShade's
+    /// own installer, fetched from reshade.me exactly as a person would download it.</summary>
+    public string? Url { get; init; }
+
     [JsonIgnore]
     public string AssetName => Asset ?? Name;
 
@@ -50,6 +54,15 @@ public sealed class PayloadComponent
     public string? Owner { get; init; }
     public string? Repo { get; init; }
     public string? Tag { get; init; }
+
+    /// <summary>Files taken out of the downloaded archive, each pinned by its own hash. The archive
+    /// is only the envelope: what gets installed is what is listed here.</summary>
+    public List<PayloadFile>? Extract { get; init; }
+
+    /// <summary>What an install reads from this component: the extracted files when there are any,
+    /// otherwise the downloaded ones.</summary>
+    [JsonIgnore]
+    public IReadOnlyList<PayloadFile> Installed => Extract is { Count: > 0 } ? Extract : Files;
 }
 
 public sealed class PayloadManifest
@@ -86,8 +99,10 @@ public sealed class PayloadManifest
         foreach (var (name, component) in m.Components)
         {
             Engine.Require(component.Files.Count > 0, $"Component {name} lists no files.");
-            foreach (var file in component.Files)
+            foreach (var file in component.Files.Concat(component.Extract ?? []))
             {
+                Engine.Require(file.Url is null || file.Url.StartsWith("https://", StringComparison.Ordinal),
+                    $"Component {name} gives {file.Name} an address that is not https.");
                 // The manifest is remote data and it names the path this writes to, so the path is
                 // checked here. Whether a file may be copied into a *game* folder is a separate
                 // question, answered by Transaction.Apply against Engine.Allowed -- the cache also
@@ -132,6 +147,7 @@ public sealed class PayloadManifest
     /// supports Range requests, so an interrupted 141 MB download resumes instead of restarting.</summary>
     public Uri DownloadUrl(string componentName, PayloadFile file)
     {
+        if (file.Url is not null) return new Uri(file.Url);
         var component = Component(componentName);
         var owner = component.Owner ?? Owner;
         var repo = component.Repo ?? Repo;

@@ -65,7 +65,7 @@ public sealed class PayloadCache(HttpClient http)
     {
         var c = manifest.Component(component);
         var dir = FolderFor(component, c.Version);
-        return c.Files.All(f =>
+        return c.Installed.All(f =>
         {
             var path = Path.Combine(dir, f.RelativePath);
             return Engine.SizeOf(path) == f.Size && Engine.HashFile(path) == f.Sha256;
@@ -88,7 +88,60 @@ public sealed class PayloadCache(HttpClient http)
             Engine.MakeParent(path);
             await FetchAsync(manifest.DownloadUrl(component, file), path, file, progress, cancel);
         }
+
+        foreach (var entry in c.Extract ?? [])
+        {
+            var target = Path.Combine(dir, entry.RelativePath);
+            if (Engine.SizeOf(target) == entry.Size && Engine.HashFile(target) == entry.Sha256) continue;
+            var archive = Path.Combine(dir, c.Files[0].RelativePath);
+            await Task.Run(() => ExtractVerified(archive, entry, target), cancel);
+        }
         return dir;
+    }
+
+    /// <summary>Takes one entry out of an archive and keeps it only if it hashes to its pin. The
+    /// archive may be a zip appended to an executable -- ReShade's installer is exactly that -- whose
+    /// offsets count from where the zip starts, not from the start of the file, which is why the
+    /// archive is re-based before it is opened.</summary>
+    internal static void ExtractVerified(string archive, PayloadFile entry, string target)
+    {
+        using var zip = OpenAppendedZip(archive);
+        var item = zip.Entries.FirstOrDefault(e =>
+            string.Equals(e.FullName.Replace('\\', '/'), entry.Name, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(e.Name, entry.Name, StringComparison.OrdinalIgnoreCase));
+        Engine.Require(item is not null, $"{entry.Name} is not inside {Path.GetFileName(archive)}.");
+
+        using var buffer = new MemoryStream();
+        using (var source = item!.Open()) source.CopyTo(buffer);
+        var bytes = buffer.ToArray();
+        var got = Engine.Sha(bytes);
+        Engine.Require(got == entry.Sha256,
+            $"{entry.Name} inside {Path.GetFileName(archive)} does not match its pinned SHA-256."
+            + $"\n      expected {entry.Sha256}\n      got      {got}");
+
+        Engine.MakeParent(target);
+        File.WriteAllBytes(target, bytes);
+    }
+
+    internal static System.IO.Compression.ZipArchive OpenAppendedZip(string path)
+    {
+        var bytes = File.ReadAllBytes(path);
+        // End of central directory: signature 50 4B 05 06, somewhere in the last 64 KB (the comment
+        // field is at most 65535 bytes). It records the directory's size and its offset from the
+        // zip's own start, and the directory itself sits right before it -- so the zip starts at
+        // (end-of-directory position) - (directory size) - (directory offset).
+        for (var at = bytes.Length - 22; at >= Math.Max(0, bytes.Length - 22 - 65535); at--)
+        {
+            if (bytes[at] != 0x50 || bytes[at + 1] != 0x4b || bytes[at + 2] != 0x05 || bytes[at + 3] != 0x06) continue;
+            var size = BitConverter.ToUInt32(bytes, at + 12);
+            var offset = BitConverter.ToUInt32(bytes, at + 16);
+            var start = (long)at - size - offset;
+            Engine.Require(start >= 0, $"{Path.GetFileName(path)} has a damaged archive directory.");
+            return new System.IO.Compression.ZipArchive(
+                new MemoryStream(bytes, (int)start, bytes.Length - (int)start, writable: false),
+                System.IO.Compression.ZipArchiveMode.Read);
+        }
+        throw new InstallException($"{Path.GetFileName(path)} carries no archive to extract from.");
     }
 
     /// <summary>One file, resumed if a part of it is already on disk, verified before it is allowed
@@ -170,7 +223,7 @@ public sealed class PayloadCache(HttpClient http)
         {
             var c = manifest.Component(component);
             var from = FolderFor(component, c.Version);
-            foreach (var file in c.Files)
+            foreach (var file in c.Installed)
             {
                 var source = Path.Combine(from, file.RelativePath);
                 var target = Path.Combine(staging, file.RelativePath);
