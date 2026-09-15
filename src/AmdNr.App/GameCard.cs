@@ -156,11 +156,12 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     private void Raise([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    /// <summary>Looked for beside the game's executable as well as at the root, because that is where
-    /// an Unreal install lands.</summary>
+    /// <summary>Looked for beside the folder the install writes into as well as at the root: an
+    /// Unreal install lands in Binaries\Win64 and a Source one in bin\, and neither is the root.</summary>
     public void RefreshInstalled() =>
         Installed = GameScanner.IsInstalled(Entry.Path)
-                    || (_graphics?.Executable is { } exe && GameScanner.IsInstalled(System.IO.Path.GetDirectoryName(exe)!));
+                    || (_graphics?.Target is { } target
+                        && GameScanner.IsInstalled(System.IO.Path.GetDirectoryName(target)!));
 
     public void RefreshRoute()
     {

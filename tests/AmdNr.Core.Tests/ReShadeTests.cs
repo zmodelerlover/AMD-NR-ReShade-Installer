@@ -131,6 +131,34 @@ public class ReShadeTests
         var removed = Work.Uninstall(game, Preset.Dx11);
         Assert.False(removed.Failed, removed.ToLog("uninstall"));
         Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")), "ReShade was ours, so it goes");
+
+        // This is the route the reported bug came in on. Installing ReShade writes ReShade.ini as an
+        // owned configuration entry, uninstall preserves it, and preserving it keeps the manifest --
+        // so the manifest is still here, and reading the state off it reported "installed" forever.
+        Assert.True(File.Exists(Path.Combine(game, Route.X64.ManifestFileName())),
+            "the manifest is kept on purpose, to hold the preserved ReShade.ini entry");
+        Assert.False(GameScanner.IsInstalled(game),
+            "and the folder must still stop reporting itself installed");
+    }
+
+    /// <summary>A 32-bit D3D9 game loads d3d9.dll and never dxgi.dll. Checking the 64-bit names
+    /// there reported "no ReShade proxy DLL found" about a folder with ReShade sitting in it -- on
+    /// every 32-bit install, including the ones this installer had just written itself.</summary>
+    [Fact]
+    public void TheReShadeCheckLooksForTheNameThisRouteActuallyLoads()
+    {
+        var game = Fixture.Temp("proxy-names");
+        var (src, pins) = Fixture.Payloads("proxy-names");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(false));
+        File.WriteAllBytes(Path.Combine(game, "d3d9.dll"), Fixture.Pe(false));
+
+        var d3d9 = Work.Preflight(game, src, Preset.X86Dx9, pins);
+        Assert.False(Fixture.HasAny(d3d9, "No ReShade proxy DLL found"), d3d9.ToLog("x86 d3d9"));
+
+        // And the same folder on a route that really does want dxgi.dll still says so.
+        var d3d11 = Work.Preflight(game, src, Preset.X86Dx11, pins);
+        Assert.True(Fixture.HasAny(d3d11, "No ReShade proxy DLL found"), d3d11.ToLog("x86 d3d11"));
+        Assert.False(Fixture.HasAny(d3d11, "d3d12.dll"), d3d11.ToLog("x86 d3d11"));
     }
 
     [Fact]

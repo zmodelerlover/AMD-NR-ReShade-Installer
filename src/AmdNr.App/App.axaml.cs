@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
@@ -42,7 +43,37 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             ChangeLanguage(PreferredLanguage());
-            desktop.MainWindow = new MainWindow();
+
+            // A first run configures itself before the library is any use: which language, whether
+            // this machine can run the add-on, whether every payload is here, and which games are
+            // installed. The wizard writes what it finds to the same files the main window reads, so
+            // it hands nothing over -- the main window just starts with them already filled in.
+            if (Settings.Load().SetupDone)
+            {
+                desktop.MainWindow = new MainWindow();
+            }
+            else
+            {
+                var setup = new SetupWindow();
+                // Shutdown follows the main window, and there is none yet: without this the process
+                // would exit the moment the wizard closes.
+                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                setup.Closed += (_, _) =>
+                {
+                    desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                    // Closed with the X rather than finished: nothing was saved as done, so there is
+                    // no half-configured state to open into.
+                    if (!setup.Completed)
+                    {
+                        desktop.Shutdown();
+                        return;
+                    }
+                    var main = new MainWindow();
+                    desktop.MainWindow = main;
+                    main.Show();
+                };
+                desktop.MainWindow = setup;
+            }
         }
         base.OnFrameworkInitializationCompleted();
     }

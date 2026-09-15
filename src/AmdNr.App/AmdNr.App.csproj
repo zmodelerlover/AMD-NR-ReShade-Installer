@@ -10,6 +10,7 @@
     <RootNamespace>AmdNr.App</RootNamespace>
     <Version>0.1.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
 
     <!-- One file to hand out, like the add-on's own installer. Trimming stays off: Avalonia's XAML
          loader resolves types by name, and the reference manager this follows disables it too. -->

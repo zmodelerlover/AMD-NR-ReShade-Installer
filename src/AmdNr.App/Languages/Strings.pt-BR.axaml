@@ -123,4 +123,84 @@
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. Um jogo de 32 bits não carrega o runtime de 64 bits, então o add-on roda em dupla, dividindo os quadros na mesma placa. Instale o ReShade com suporte a add-on como dxgi.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. A mesma dupla de 32 bits do D3D11, passando por um estágio D3D9/D3D11 interno. O D3D9 comum custa alguns milissegundos fixos por quadro; o D3D9Ex não. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. O D3D8 é traduzido para D3D9 e segue a rota do D3D9 acima, com a mesma dupla de 32 bits. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
+
+  <!-- First run -->
+  <sys:String x:Key="Str.SetupTitle">Primeiros passos</sys:String>
+  <sys:String x:Key="Str.SetupWelcome">Bem-vindo</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">Este app instala a rede de Neural Rendering do DLSS 5 em placas Radeon, através do ReShade. Ele baixa tudo sozinho e confere cada arquivo por hash. São quatro passos rápidos.</sys:String>
+  <sys:String x:Key="Str.SetupStepLanguage">Idioma</sys:String>
+  <sys:String x:Key="Str.SetupStepMachine">Esta máquina</sys:String>
+  <sys:String x:Key="Str.SetupStepFiles">Arquivos</sys:String>
+  <sys:String x:Key="Str.SetupStepGames">Seus jogos</sys:String>
+  <sys:String x:Key="Str.SetupBack">Voltar</sys:String>
+  <sys:String x:Key="Str.SetupNext">Continuar</sys:String>
+  <sys:String x:Key="Str.SetupFinish">Começar a usar</sys:String>
+  <sys:String x:Key="Str.SetupSkip">Pular por enquanto</sys:String>
+  <sys:String x:Key="Str.SetupStepOf">Passo {0} de {1}</sys:String>
+
+  <sys:String x:Key="Str.SetupMachineBody">Duas coisas fazem o add-on não rodar, e as duas dá pra ver daqui. Nenhuma delas impede de continuar — só de funcionar dentro do jogo.</sys:String>
+  <sys:String x:Key="Str.SetupMachineOk">Esta máquina tem tudo que o add-on precisa.</sys:String>
+  <sys:String x:Key="Str.SetupMachineBad">Falta algo. Dá pra continuar e resolver depois, mas dentro do jogo não vai funcionar até resolver.</sys:String>
+
+  <sys:String x:Key="Str.SetupFilesBody">São os mesmos arquivos pra todos os jogos: baixados uma vez, conferidos contra um hash fixo e reaproveitados. Cerca de 165 MB no total.</sys:String>
+  <sys:String x:Key="Str.SetupFilesCheck">Conferindo o que já está aqui…</sys:String>
+  <sys:String x:Key="Str.SetupFilesAllReady">Todos os arquivos estão aqui e conferidos.</sys:String>
+  <sys:String x:Key="Str.SetupFilesMissing">{0} de {1} componentes ainda faltam.</sys:String>
+  <sys:String x:Key="Str.SetupFilesDownload">Baixar tudo agora</sys:String>
+  <sys:String x:Key="Str.SetupFilesRetry">Tentar de novo</sys:String>
+  <sys:String x:Key="Str.SetupFilesLater">Se pular, eles são baixados na primeira instalação.</sys:String>
+  <sys:String x:Key="Str.SetupFilesOffline">Não deu pra ler a lista de downloads — provavelmente sem internet. Dá pra continuar: o app tenta de novo quando você instalar.</sys:String>
+
+  <sys:String x:Key="Str.SetupGamesBody">Ler os launchers é só leitura: nada é instalado nem alterado por olhar. Você pode adicionar pastas à mão depois.</sys:String>
+  <sys:String x:Key="Str.SetupGamesNone">Nenhum jogo encontrado. Dá pra adicionar a pasta à mão na janela principal.</sys:String>
+  <sys:String x:Key="Str.SetupGamesFound">{0} jogos encontrados.</sys:String>
+  <sys:String x:Key="Str.SetupDoneBody">Tudo pronto. A janela principal abre com a sua biblioteca.</sys:String>
+
+  <sys:String x:Key="Str.Unexpected">Algo inesperado aconteceu. O log completo foi gravado.</sys:String>
+
+
+  <!-- Play and emulators -->
+  <sys:String x:Key="Str.Play">Jogar</sys:String>
+  <sys:String x:Key="Str.Launch">Abrir</sys:String>
+  <sys:String x:Key="Str.PlayFailed">Não deu pra abrir. Use Abrir a pasta e rode o executável à mão.</sys:String>
+  <sys:String x:Key="Str.AddEmulator">Adicionar emulador</sys:String>
+  <sys:String x:Key="Str.EmulatorTitle">Adicionar um emulador</sys:String>
+  <sys:String x:Key="Str.EmulatorBody">Escolha qual, e aponte a pasta de onde ele roda — a mesma pasta do executável, não a pasta das ROMs.</sys:String>
+  <sys:String x:Key="Str.EmulatorOther">Outro emulador</sys:String>
+  <sys:String x:Key="Str.EmulatorOtherBody">Aponte a pasta e eu digo o que consigo prever dela.</sys:String>
+  <sys:String x:Key="Str.EmulatorPick">Aponte a pasta do {0}</sys:String>
+  <sys:String x:Key="Str.EmulatorPickOther">Aponte a pasta do emulador</sys:String>
+  <sys:String x:Key="Str.EmulatorFound">{0} encontrado: {1}</sys:String>
+  <sys:String x:Key="Str.EmulatorWrong">Isto não parece o {0}: não achei {1} nessa pasta. Adicionei assim mesmo — confira o caminho.</sys:String>
+  <sys:String x:Key="Str.EmulatorUnknown">Não reconheci nenhum emulador conhecido aí. Adicionei pela leitura dos arquivos: {0}</sys:String>
+  <sys:String x:Key="Str.EmulatorSetting">Dentro do emulador</sys:String>
+  <sys:String x:Key="Str.OpenLog">Ver o log desta instalação</sys:String>
+
+
+  <!-- Emulator guidance: the sentence that names the setting which actually decides the route.
+       Core carries these in English (it has no resources), so the translation lives here. -->
+  <sys:String x:Key="Str.Emulator.pcsx2">Configurações &gt; Gráficos &gt; Renderizador: Direct3D 11. Cuidado com a configuração por jogo, nas propriedades do jogo: ela passa por cima da global sem avisar, e é o jeito mais comum disto parecer quebrado sem estar.</sys:String>
+  <sys:String x:Key="Str.Emulator.rpcs3">Configurações &gt; GPU &gt; Renderizador: Vulkan. Aqui não existe Direct3D nenhum, então esta rota recebe só cor e movimento estimado — sem profundidade.</sys:String>
+  <sys:String x:Key="Str.Emulator.duckstation">Configurações &gt; Gráficos &gt; Renderizador: Direct3D 11.</sys:String>
+  <sys:String x:Key="Str.Emulator.dolphin">Gráficos &gt; Geral &gt; Backend: Direct3D 11.</sys:String>
+  <sys:String x:Key="Str.Emulator.ppsspp">Configurações &gt; Gráficos &gt; Backend: Direct3D 11.</sys:String>
+  <sys:String x:Key="Str.Emulator.flycast">Configurações &gt; Gráficos &gt; API gráfica: DirectX 11.</sys:String>
+  <sys:String x:Key="Str.Emulator.xenia">Ele roda em D3D12, que é a rota degradada: o add-on só enxerga o quadro pronto. Funciona, mas espere menos.</sys:String>
+  <sys:String x:Key="Str.Emulator.cemu">Options &gt; General settings &gt; Graphics &gt; Graphics API: Vulkan. Sem profundidade no Vulkan: só cor e movimento estimado.</sys:String>
+  <sys:String x:Key="Str.Emulator.ryujinx">Options &gt; Settings &gt; Graphics &gt; Graphics Backend: Vulkan. Sem profundidade no Vulkan.</sys:String>
+  <sys:String x:Key="Str.Emulator.vita3k">Vulkan é o backend padrão. Sem profundidade no Vulkan.</sys:String>
+  <sys:String x:Key="Str.Emulator.shadps4">Só Vulkan. Sem profundidade, e o emulador em si é recente — espere problemas.</sys:String>
+  <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. No OpenGL não existe rota nenhuma, então este tem que ser trocado.</sys:String>
+  <sys:String x:Key="Str.Emulator.xemu">O xemu renderiza em OpenGL, e este add-on não tem rota pra OpenGL. Nada aqui vai funcionar enquanto ele não ganhar outro backend.</sys:String>
+  <sys:String x:Key="Str.Emulator.melonds">O melonDS renderiza em OpenGL ou por software, e este add-on não tem rota pra nenhum dos dois.</sys:String>
+
+
+  <!-- Problem report -->
+  <sys:String x:Key="Str.ReportTitle">Não funcionou no jogo?</sys:String>
+  <sys:String x:Key="Str.ReportBody">Junta os logs, o que há na pasta do jogo e o que o ReShade escreveu num .zip. Nada é enviado: o arquivo fica no seu PC pra você mandar onde quiser.</sys:String>
+  <sys:String x:Key="Str.Report">Reportar um problema</sys:String>
+  <sys:String x:Key="Str.ReportSaved">Relatório salvo e a pasta foi aberta: {0}</sys:String>
+  <sys:String x:Key="Str.ReportFailed">Não deu pra montar o relatório. Os logs estão em {0}</sys:String>
+  <sys:String x:Key="Str.ReportWorking">Juntando…</sys:String>
+
 </ResourceDictionary>

@@ -45,6 +45,25 @@ public sealed record GraphicsDetection(
     /// game's own files.</summary>
     public string? Source { get; init; }
 
+    /// <summary>The emulator this folder holds, when it is one this app knows. An emulator links
+    /// every renderer it can offer, so its import table cannot pick a route; this can, and it also
+    /// carries the sentence naming the setting that actually decides it.</summary>
+    public EmulatorInfo? Emulator { get; init; }
+
+    /// <summary>The file whose folder the install has to write into, when that is not the folder the
+    /// executable is in. Null means they are the same, which is the ordinary case.
+    ///
+    /// Source is why this exists. hl2.exe sits in the root and imports nothing; the module that
+    /// creates the D3D9 device is bin\shaderapidx9.dll, and Source loads bin\ with
+    /// LOAD_WITH_ALTERED_SEARCH_PATH, so that module resolves its own d3d9.dll against bin\ and
+    /// never looks at the root. ReShade in the root is never loaded, and ReShade in bin\ searches
+    /// bin\ for add-ons. Everything has to go there together.</summary>
+    public string? InstallTarget { get; init; }
+
+    /// <summary>What an install is pointed at: the renderer's folder when those differ, the
+    /// executable otherwise.</summary>
+    public string? Target => InstallTarget ?? Executable;
+
     public IReadOnlyList<GraphicsApi> All =>
         Supported.Count > 0 ? Supported
         : Api == GraphicsApi.Unknown ? []
@@ -72,6 +91,12 @@ public sealed record GraphicsDetection(
     {
         get
         {
+            // A known emulator names its own route. Without this the import table decides, and an
+            // emulator links every renderer at once, so the answer was whichever this loop hit
+            // first -- which is how the PCSX2 and RPCS3 routes were being overwritten with D3D11.
+            if (Emulator is { } emulator)
+                return emulator.Route ?? RouteFor(Width, emulator.Best);
+
             foreach (var api in Preference)
                 if (All.Contains(api) && RouteFor(Width, api) is { } route) return route;
             return null;
@@ -80,7 +105,7 @@ public sealed record GraphicsDetection(
 
     /// <summary>The API that route runs on.</summary>
     public GraphicsApi Recommended =>
-        Preference.FirstOrDefault(api => All.Contains(api) && RouteFor(Width, api) is not null);
+        Emulator?.Best ?? Preference.FirstOrDefault(api => All.Contains(api) && RouteFor(Width, api) is not null);
 
     /// <summary>When the game offers more than one API and the best route is not the only one, the
     /// game has to be told which to use -- which is the difference between "it works" and "it does
@@ -122,12 +147,15 @@ public sealed record GraphicsDetection(
 
         var width = Width ?? (wiki.Has64Bit == true ? Route.X64 : wiki.Has32Bit == true ? Route.X86 : null);
         var local = Api == GraphicsApi.Unknown ? "" : $" The executable itself links {Short(Api)}.";
+        // A layout note is not something the wiki can know or replace: it says which folder the
+        // files go in, which is the difference between an install that loads and one that does not.
+        var layout = InstallTarget is null ? "" : $" {Why}";
         return this with
         {
             Width = width,
             Supported = ordered,
             Source = "PCGamingWiki",
-            Why = $"PCGamingWiki ({wiki.Page}): {string.Join(", ", ordered.Select(Short))}.{local}",
+            Why = $"PCGamingWiki ({wiki.Page}): {string.Join(", ", ordered.Select(Short))}.{local}{layout}",
         };
     }
 }
@@ -312,10 +340,86 @@ public static class GraphicsDetector
     /// <summary>Engine modules worth opening when the executable imports no renderer itself.</summary>
     private static readonly string[] EngineModules = ["UnityPlayer.dll", "GameAssembly.dll", "engine.dll", "Engine.dll", "shaderapidx9.dll"];
 
+    /// <summary>A Source game. The width and the API come from the renderer module, because the
+    /// executable in the root is a stub that imports nothing; the executable is still what gets
+    /// launched, and the renderer's folder is where the files go.</summary>
+    private static GraphicsDetection ForSource(string root, string exe, string renderer)
+    {
+        var folder = Path.GetDirectoryName(renderer)!;
+        var width = Engine.MachineOfFile(renderer) switch
+        {
+            Engine.MachineX86 => Route.X86,
+            Engine.MachineX64 => Route.X64,
+            _ => (Route?)null,
+        };
+
+        // Source ships one shaderapi per backend. The Vulkan one is DXVK, which is D3D9 underneath,
+        // so every backend this engine offers reaches the network through the same D3D9 route.
+        var vulkan = File.Exists(Path.Combine(folder, "shaderapivk.dll"));
+        var relative = Path.GetRelativePath(root, renderer);
+
+        return new GraphicsDetection(exe, width, GraphicsApi.D3D9, false,
+            $"{Path.GetFileName(exe)} is a Source launcher; {relative} is what creates the device, and it "
+            + $"imports d3d9.dll.{(vulkan ? " The Vulkan backend beside it is DXVK, which is D3D9 underneath." : "")} "
+            + $"Everything goes in {Path.GetFileName(folder)}, because that is where Source loads its "
+            + "modules from and where ReShade looks for add-ons.")
+        {
+            InstallTarget = renderer,
+        };
+    }
+
+    /// <summary>Source keeps its renderer in bin\ (or bin\x64\ on the 64-bit builds) and leaves a
+    /// stub in the root. shaderapidx9.dll is the module that creates the device, so its folder is
+    /// where ReShade and the add-on have to sit; the root is where the launcher lives and nothing
+    /// that matters ever loads from there.</summary>
+    private static string? SourceRenderer(string root)
+    {
+        foreach (var relative in new[] { @"bin\x64\shaderapidx9.dll", @"bin\shaderapidx9.dll" })
+        {
+            var path = Path.Combine(root, relative);
+            if (File.Exists(path)) return path;
+        }
+        return null;
+    }
+
+    /// <summary>A detection for a folder already known to hold <paramref name="emulator"/>. The
+    /// renderer list is the emulator's declared one rather than its import table, and the width
+    /// still comes from the executable on this disk, because only that says which build is here.</summary>
+    private static GraphicsDetection ForEmulator(string root, EmulatorInfo emulator)
+    {
+        var exe = Emulators.ExecutableIn(root, emulator);
+        var width = exe is null
+            ? Route.X64
+            : Engine.MachineOfFile(exe) switch
+            {
+                Engine.MachineX86 => Route.X86,
+                Engine.MachineX64 => Route.X64,
+                _ => Route.X64,
+            };
+
+        return new GraphicsDetection(exe, width, emulator.Best, false,
+            $"{Path.GetFileName(exe ?? emulator.PrimaryExecutable)} is {emulator.Name} "
+            + $"({emulator.System}). Which renderer it uses is a setting inside it, not something its "
+            + "files say.")
+        {
+            Supported = emulator.Renderers,
+            Emulator = emulator,
+        };
+    }
+
     public static GraphicsDetection Detect(string root, string? gameName = null)
     {
+        // 0. A known emulator, before anything else. Its executable links every renderer it can be
+        //    set to, so reading the imports here answers a different question than the one asked:
+        //    what decides the route is a setting inside the emulator, which no file reveals.
+        if (Emulators.Identify(root) is { } emulator)
+            return ForEmulator(root, emulator);
+
         var exe = FindExecutable(root, gameName);
         if (exe is null) return new GraphicsDetection(null, null, GraphicsApi.Unknown, false, "No executable found in that folder.");
+
+        // A Source game answers from its renderer module, not from the launcher stub in the root.
+        if (SourceRenderer(root) is { } renderer) return ForSource(root, exe, renderer);
 
         var width = Engine.MachineOfFile(exe) switch
         {

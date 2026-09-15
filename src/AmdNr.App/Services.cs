@@ -15,6 +15,13 @@ public sealed class RepoRef
     public string Repo { get; init; } = "";
     public string Branch { get; init; } = "main";
     public string File { get; init; } = "payload.json";
+
+    /// <summary>A full address for the payload list, when it is not published on GitHub. Set, it
+    /// wins over Owner/Repo/Branch/File; unset, that pair is used as before.</summary>
+    public string? ManifestUrl { get; init; }
+
+    /// <summary>The same, for api-db.json.</summary>
+    public string? ApiDbUrl { get; init; }
 }
 
 public sealed class AppConfig
@@ -54,6 +61,10 @@ public sealed class AppConfig
 public sealed class Settings
 {
     public string? Language { get; set; }
+
+    /// <summary>True once someone reached the end of the first-run wizard. Closing that window with
+    /// the X leaves it false, so the wizard asks again rather than silently never running.</summary>
+    public bool SetupDone { get; set; }
 
     private static string Path => System.IO.Path.Combine(AppPaths.Root, "settings.json");
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNameCaseInsensitive = true };

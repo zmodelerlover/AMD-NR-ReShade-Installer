@@ -43,6 +43,27 @@ public class WorkTests
         Assert.False(File.Exists(Path.Combine(game, Route.X64.ManifestFileName())));
     }
 
+    /// <summary>Without a payload manifest the add-on's size is unknown, and the pins carry a zero
+    /// there. Comparing a real file against that zero reported the right file as the wrong build.</summary>
+    [Fact]
+    public void AnUnknownExpectedSizeIsNotReadAsAWrongBuild()
+    {
+        var game = Fixture.Temp("unknown-size-game");
+        var (src, pins) = Fixture.Payloads("unknown-size");
+
+        var blind = new PayloadPins
+        {
+            AddonSha = new string('0', 64),
+            AddonSize = 0,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+        };
+
+        var report = Work.Preflight(game, src, Preset.Dx11, blind);
+        Assert.False(Fixture.HasAny(report, "That is a different build"), report.ToLog("blind pins"));
+        Assert.False(Fixture.HasErr(report, Work.AddonName), report.ToLog("blind pins"));
+    }
+
     [Fact]
     public void AMissingPayloadFileIsNamed()
     {
@@ -229,6 +250,29 @@ public class WorkTests
         Assert.Equal("held open by the running game", File.ReadAllText(held));
     }
 
+    /// <summary>The x64 route has always swept by name when there is no manifest. The x86 route
+    /// reported "No install manifest" as an error for the same situation -- a folder nothing was
+    /// installed into, or one an older build wrote -- which read as a failure.</summary>
+    [Fact]
+    public void TheX86RouteSweepsByNameWhenThereIsNoManifestInsteadOfFailing()
+    {
+        var clean = Fixture.Temp("x86-nothing-here");
+        var nothing = Work.Uninstall(clean, Preset.X86Dx11);
+        Assert.False(nothing.Failed, nothing.ToLog("x86 clean"));
+        Assert.True(Fixture.HasAny(nothing, "Nothing of ours"), nothing.ToLog("x86 clean"));
+
+        var legacy = Fixture.Temp("x86-legacy");
+        foreach (var name in new[] { Work.Addon32Name, Work.Host64Name, Work.RuntimeName, Work.WeightsName })
+            File.WriteAllText(Path.Combine(legacy, name), "from an older installer");
+        Assert.False(File.Exists(Path.Combine(legacy, Route.X86.ManifestFileName())));
+
+        var report = Work.Uninstall(legacy, Preset.X86Dx11);
+        Assert.False(report.Failed, report.ToLog("x86 legacy"));
+        foreach (var name in new[] { Work.Addon32Name, Work.Host64Name, Work.RuntimeName, Work.WeightsName })
+            Assert.False(File.Exists(Path.Combine(legacy, name)), $"{name} survived an x86 legacy uninstall");
+        Assert.False(GameScanner.IsInstalled(legacy));
+    }
+
     [Fact]
     public void AnInstallFromBeforeTheManifestExistedCanStillBeUninstalled()
     {
@@ -281,6 +325,11 @@ public class WorkTests
         Assert.False(File.Exists(Path.Combine(game, Work.AddonName)));
         Assert.False(Directory.Exists(Path.Combine(game, "dlss5-runtime")));
         Assert.True(File.Exists(Path.Combine(game, "dlss5-neural.ini")), "the ini is the user's, not ours");
+
+        // What the window reads to draw the badge. Removing the files was never the broken half:
+        // this is, because uninstall keeps the manifest to hold the preserved ini entries.
+        Assert.False(GameScanner.IsInstalled(game),
+            "the folder must stop reporting itself installed once uninstall has run");
     }
 
     [Fact]

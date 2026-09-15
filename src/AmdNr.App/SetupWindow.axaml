@@ -1,0 +1,228 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AmdNr.App.SetupWindow"
+        Title="AMD-NR ReShade Installer"
+        Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
+        Width="720" Height="620" CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Bg}">
+
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- Header: the mark, what this is, and where in the four steps we are. -->
+    <Border Grid.Row="0" Background="{DynamicResource Rail}" BorderBrush="{DynamicResource Border}"
+            BorderThickness="0,0,0,1" Padding="28,22">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Border Grid.Column="0" Width="40" Height="40" CornerRadius="11"
+                Background="{DynamicResource LogoFill}" BoxShadow="0 6 18 0 #59A61C22">
+          <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
+                 Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <StackPanel Grid.Column="1" Margin="14,0,0,0" Spacing="2" VerticalAlignment="Center">
+          <TextBlock Text="{DynamicResource Str.AppTitle}" Classes="subtitle" />
+          <TextBlock x:Name="StepOf" Classes="caption" />
+        </StackPanel>
+        <StackPanel Grid.Column="2" x:Name="Pips" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+          <Border Classes="pip" /><Border Classes="pip" /><Border Classes="pip" /><Border Classes="pip" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <ScrollViewer Grid.Row="1" Padding="28,24" HorizontalScrollBarVisibility="Disabled">
+      <Panel>
+
+        <!-- 1. Language -->
+        <StackPanel x:Name="PageLanguage" Spacing="18">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{DynamicResource Str.SetupWelcome}" Classes="page" />
+            <TextBlock Text="{DynamicResource Str.SetupWelcomeBody}" Classes="muted"
+                       TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
+          </StackPanel>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{DynamicResource Str.Language}" Classes="section" />
+              <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch" SelectionChanged="OnLanguageChanged"
+                        AutomationProperties.Name="{DynamicResource Str.Language}" />
+              <TextBlock Text="{DynamicResource Str.LanguageHint}" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- 2. This machine -->
+        <StackPanel x:Name="PageMachine" Spacing="18" IsVisible="False">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{DynamicResource Str.SetupStepMachine}" Classes="page" />
+            <TextBlock Text="{DynamicResource Str.SetupMachineBody}" Classes="muted"
+                       TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
+          </StackPanel>
+
+          <Border x:Name="MachineVerdict" Classes="card">
+            <Grid ColumnDefinitions="Auto,*">
+              <Border Grid.Column="0" x:Name="MachineVerdictTile" Classes="iconTile" Margin="0,0,14,0">
+                <PathIcon x:Name="MachineVerdictIcon" Width="20" Height="20" />
+              </Border>
+              <TextBlock Grid.Column="1" x:Name="MachineVerdictText" Classes="subtitle" TextWrapping="Wrap"
+                         VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Grid.Column="0" Classes="iconTile" Margin="0,0,12,0">
+                  <PathIcon Data="{StaticResource IconChip}" Width="18" Height="18" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="{DynamicResource Str.Gpu}" Classes="section" />
+                  <TextBlock x:Name="GpuText" Classes="muted" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="2" x:Name="GpuStatus" Classes="status" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon x:Name="GpuStatusIcon" />
+                    <TextBlock x:Name="GpuStatusText" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Grid.Column="0" Classes="iconTile" Margin="0,0,12,0">
+                  <PathIcon Data="{StaticResource IconBolt}" Width="18" Height="18" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="{DynamicResource Str.Hip}" Classes="section" />
+                  <TextBlock x:Name="DriverText" Classes="muted" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="2" x:Name="HipStatus" Classes="status" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon x:Name="HipStatusIcon" />
+                    <TextBlock x:Name="HipText" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="MachineWarningBox" Classes="callout" IsVisible="False">
+            <Grid ColumnDefinitions="Auto,*">
+              <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="16" Height="16"
+                        Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
+              <TextBlock Grid.Column="1" x:Name="MachineWarning" TextWrapping="Wrap" LineHeight="19"
+                         Foreground="#F2D7A6" />
+            </Grid>
+          </Border>
+        </StackPanel>
+
+        <!-- 3. Files -->
+        <StackPanel x:Name="PageFiles" Spacing="18" IsVisible="False">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{DynamicResource Str.SetupStepFiles}" Classes="page" />
+            <TextBlock Text="{DynamicResource Str.SetupFilesBody}" Classes="muted"
+                       TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
+          </StackPanel>
+
+          <Border x:Name="FilesVerdict" Classes="card">
+            <Grid ColumnDefinitions="Auto,*">
+              <Border Grid.Column="0" x:Name="FilesVerdictTile" Classes="iconTile" Margin="0,0,14,0">
+                <Panel>
+                  <PathIcon x:Name="FilesVerdictIcon" Width="20" Height="20" />
+                  <Arc x:Name="FilesSpin" Classes="spin" Width="18" Height="18"
+                       Stroke="{DynamicResource AccentText}" IsVisible="False" HorizontalAlignment="Center" />
+                </Panel>
+              </Border>
+              <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                <TextBlock x:Name="FilesVerdictText" Classes="subtitle" TextWrapping="Wrap" />
+                <TextBlock x:Name="FilesDetail" Classes="muted" TextWrapping="Wrap" />
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <ItemsControl x:Name="PayloadList">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Classes="line" ColumnDefinitions="*,Auto,Auto" Margin="0,5">
+                      <StackPanel Grid.Column="0" Spacing="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" />
+                        <TextBlock Text="{Binding Version}" Classes="caption" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding Size}" Classes="muted" FontSize="12"
+                                 VerticalAlignment="Center" Margin="0,0,12,0" />
+                      <Border Grid.Column="2" Classes="status" Classes.ok="{Binding Ready}"
+                              Classes.err="{Binding NotReady}" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding State}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <ProgressBar x:Name="Progress" Height="4" MinHeight="4" IsVisible="False" CornerRadius="2"
+                           Foreground="{DynamicResource AccentHover}" Background="{DynamicResource SurfaceTop}" />
+              <TextBlock x:Name="FilesStatus" Classes="muted" TextWrapping="Wrap" />
+              <Button x:Name="DownloadButton" Classes="primary large" Click="OnDownload"
+                      HorizontalAlignment="Left" IsVisible="False">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon x:Name="DownloadIcon" Data="{StaticResource IconDownload}" />
+                  <Arc x:Name="DownloadSpin" Classes="spin" Stroke="White" IsVisible="False" />
+                  <TextBlock x:Name="DownloadLabel" Text="{DynamicResource Str.SetupFilesDownload}"
+                             VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- 4. Games -->
+        <StackPanel x:Name="PageGames" Spacing="18" IsVisible="False">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{DynamicResource Str.SetupStepGames}" Classes="page" />
+            <TextBlock Text="{DynamicResource Str.SetupGamesBody}" Classes="muted"
+                       TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
+          </StackPanel>
+
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <Button x:Name="ScanButton" Classes="primary large" Click="OnScan" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon x:Name="ScanIcon" Data="{StaticResource IconRefresh}" />
+                  <Arc x:Name="ScanSpin" Classes="spin" Stroke="White" IsVisible="False" />
+                  <TextBlock x:Name="ScanLabel" Text="{DynamicResource Str.Scan}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <TextBlock x:Name="ScanStatus" Classes="muted" TextWrapping="Wrap" />
+              <ItemsControl x:Name="FoundList">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Classes="line" ColumnDefinitions="*,Auto" Margin="0,4">
+                      <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13"
+                                 TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <Border Grid.Column="1" Classes="badge">
+                        <TextBlock Text="{Binding Platform}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+      </Panel>
+    </ScrollViewer>
+
+    <!-- Footer -->
+    <Border Grid.Row="2" Background="{DynamicResource Rail}" BorderBrush="{DynamicResource Border}"
+            BorderThickness="0,1,0,0" Padding="28,16">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Button Grid.Column="0" x:Name="BackButton" Classes="ghost" Click="OnBack"
+                Content="{DynamicResource Str.SetupBack}" />
+        <Button Grid.Column="1" x:Name="SkipButton" Classes="ghost" Click="OnNext" HorizontalAlignment="Right"
+                Margin="0,0,10,0" Content="{DynamicResource Str.SetupSkip}" IsVisible="False" />
+        <Button Grid.Column="2" x:Name="NextButton" Classes="primary large" Click="OnNext" MinWidth="150"
+                HorizontalContentAlignment="Center">
+          <TextBlock x:Name="NextLabel" Text="{DynamicResource Str.SetupNext}" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

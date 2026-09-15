@@ -86,12 +86,8 @@ public static class Presets
     /// <summary>An executable whose presence says the folder is the right one. Absent means "warn",
     /// never "refuse": there is no whitelist anywhere in this project and there is not going to be
     /// one here either.</summary>
-    public static string? ExpectedExe(this Preset p) => p switch
-    {
-        Preset.Pcsx2 => "pcsx2-qt.exe",
-        Preset.Rpcs3 => "rpcs3.exe",
-        _ => null,
-    };
+    public static string? ExpectedExe(this Preset p) =>
+        Emulators.Known.FirstOrDefault(e => e.Route == p)?.PrimaryExecutable;
 
     public static string Note(this Preset p) => p switch
     {

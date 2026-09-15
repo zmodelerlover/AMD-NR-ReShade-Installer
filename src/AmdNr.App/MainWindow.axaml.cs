@@ -87,7 +87,8 @@ public partial class MainWindow : Window
         try
         {
             _manifest = await cache.FetchManifestAsync(
-                _config.Payload.Owner, _config.Payload.Repo, _config.Payload.Branch, _config.Payload.File);
+                _config.Payload.Owner, _config.Payload.Repo, _config.Payload.Branch, _config.Payload.File,
+                _config.Payload.ManifestUrl);
         }
         catch (Exception e) when (e is HttpRequestException or InstallException or TaskCanceledException)
         {
@@ -135,7 +136,7 @@ public partial class MainWindow : Window
         SystemVerdict.Classes.Set("err", !state.Ready);
         SystemVerdictTile.Classes.Set("ok", state.Ready);
         SystemVerdictTile.Classes.Set("err", !state.Ready);
-        SystemVerdictIcon.Data = Icon(state.Ready ? "IconOk" : "IconErr");
+        SystemVerdictIcon.Data = Vector(state.Ready ? "IconOk" : "IconErr");
         Localize(SystemVerdictTitle, state.Ready ? "Str.SystemReady" : "Str.SystemNotReady");
 
         if (!state.Hip7) ShowWarning(Text("Str.HipMissing"));
@@ -147,7 +148,7 @@ public partial class MainWindow : Window
     {
         pill.Classes.Set("ok", ok);
         pill.Classes.Set("err", !ok);
-        icon.Data = Icon(ok ? "IconCheck" : "IconErr");
+        icon.Data = Vector(ok ? "IconCheck" : "IconErr");
     }
 
     private void ShowWarning(string text)
@@ -167,10 +168,10 @@ public partial class MainWindow : Window
         }
 
         var rows = new List<PayloadRow>();
-        foreach (var (name, component) in _manifest.Components)
+        foreach (var (name, component) in manifest.Components)
         {
             var complete = false;
-            try { complete = PayloadCache.IsComplete(_manifest, name); }
+            try { complete = PayloadCache.IsComplete(manifest, name); }
             catch (InstallException)
             {
                 // A component this build does not understand is not a reason to show nothing.
@@ -196,7 +197,7 @@ public partial class MainWindow : Window
         EmptyHint.IsVisible = _all.Count == 0 || noMatch;
         EmptyActions.IsVisible = !noMatch;
         Localize(EmptyTitle, noMatch ? "Str.NoMatchTitle" : "Str.EmptyTitle");
-        EmptyIcon.Data = Icon(noMatch ? "IconSearch" : "IconGames");
+        EmptyIcon.Data = Vector(noMatch ? "IconSearch" : "IconGames");
         if (noMatch) EmptyBody.Text = string.Format(Text("Str.NoMatch"), needle);
         else Localize(EmptyBody, "Str.NoGames");
         Foot(_all.Count == 0 ? "" : string.Format(Text("Str.GameCount"), _all.Count));
@@ -216,7 +217,17 @@ public partial class MainWindow : Window
         Localize(ScanLabel, "Str.ScanningShort");
         try
         {
-            var found = await Task.Run(GameScanner.ScanAll);
+            IReadOnlyList<ScannedGame> found;
+            try { found = await Task.Run(GameScanner.ScanAll); }
+            catch (Exception ex)
+            {
+                // Reading someone else's launcher data is the least predictable thing this app does,
+                // and this is an async void handler: an escape here is a dead window, not an error.
+                WriteLog(Failure(ex), "scan");
+                ShowToast(Text("Str.Unexpected"), Level.Err);
+                return;
+            }
+
             var added = 0;
             foreach (var game in found)
             {
@@ -322,6 +333,144 @@ public partial class MainWindow : Window
         Select(card);
     }
 
+    /// <summary>Adding an emulator, which is the one case where the folder someone picks is usually
+    /// the wrong one: the files go beside the emulator, not beside the ROMs. So the flow names the
+    /// emulator first and then asks for that emulator's folder, rather than asking for "a folder"
+    /// and working out what it was afterwards.</summary>
+    private async void OnAddEmulator(object? sender, RoutedEventArgs e)
+    {
+        var choice = await AskWhichEmulator();
+        if (choice is null) return;
+        var wanted = choice == "other" ? null : Emulators.ById(choice);
+
+        var picked = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = wanted is null
+                ? Text("Str.EmulatorPickOther")
+                : string.Format(Text("Str.EmulatorPick"), wanted.Name),
+            AllowMultiple = false,
+        });
+        if (picked.Count == 0) return;
+
+        var path = picked[0].TryGetLocalPath();
+        if (string.IsNullOrWhiteSpace(path)) return;
+
+        var existing = _all.FirstOrDefault(c => Engine.SamePath(c.Path, path));
+        if (existing is not null)
+        {
+            Select(existing);
+            return;
+        }
+
+        // What is actually in there decides, not what was picked from the list: someone who chose
+        // PCSX2 and pointed at RPCS3 should get RPCS3, not a wrong route and a silent failure.
+        var found = Emulators.Identify(path);
+        var detection = GraphicsDetector.Detect(path);
+
+        var card = new GameCard(new GameEntry
+        {
+            Path = path,
+            Name = found?.Name ?? Path.GetFileName(path.TrimEnd('\\', '/')),
+            Preset = GameScanner.GuessPreset(path),
+        })
+        {
+            Graphics = detection,
+        };
+        if (detection.Preset is { } route) card.Entry.Preset = route;
+
+        _all.Add(card);
+        _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        card.RefreshInstalled();
+        Save();
+        RefreshGrid();
+        Select(card);
+
+        // Say what was actually found, including when it disagrees with what was asked for.
+        if (found is not null && (wanted is null || found.Id == wanted.Id))
+            ShowToast(string.Format(Text("Str.EmulatorFound"), found.Name, found.System), Level.Ok);
+        else if (wanted is not null)
+            ShowToast(string.Format(Text("Str.EmulatorWrong"), wanted.Name,
+                string.Join(", ", wanted.Executables.Take(2))), Level.Warn);
+        else
+            ShowToast(string.Format(Text("Str.EmulatorUnknown"), detection.Tag), Level.Info);
+    }
+
+    /// <summary>The two with a route of their own, then everything else. Returns an emulator id,
+    /// "other", or null when it was dismissed.</summary>
+    private async Task<string?> AskWhichEmulator()
+    {
+        var named = new[] { "pcsx2", "rpcs3" }
+            .Select(Emulators.ById)
+            .Where(e => e is not null)
+            .Select(e => e!)
+            .ToList();
+
+        var options = new List<(string Id, string Title, string Detail)>();
+        foreach (var emulator in named)
+            options.Add((emulator.Id, emulator.Name, emulator.System));
+        // Everything else this app recognises, so "other" is a real list and not a shrug.
+        var rest = Emulators.Known.Where(e => named.All(n => n.Id != e.Id)).ToList();
+        options.Add(("other", Text("Str.EmulatorOther"),
+            $"{Text("Str.EmulatorOtherBody")} ({string.Join(", ", rest.Take(6).Select(e => e.Name))}…)"));
+
+        return await EmulatorPicker.ShowAsync(this, Text("Str.EmulatorTitle"), Text("Str.EmulatorBody"), options);
+    }
+
+    /// <summary>Starts the game. Through Steam when it has an app id, because that is the path the
+    /// game expects -- its own launcher, its DRM, its overlay -- and running the executable straight
+    /// is what breaks that. Otherwise the executable the detection already found.</summary>
+    private void OnPlay(object? sender, RoutedEventArgs e)
+    {
+        if (_selected is not { } card) return;
+
+        var what = card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 } id
+            ? $"steam://rungameid/{id}"
+            : card.Graphics?.Executable;
+
+        if (what is null || (!what.StartsWith("steam://", StringComparison.Ordinal) && !File.Exists(what)))
+        {
+            ShowToast(Text("Str.PlayFailed"), Level.Warn);
+            return;
+        }
+
+        try { Process.Start(new ProcessStartInfo(what) { UseShellExecute = true, WorkingDirectory = card.Path }); }
+        catch (Exception e2) when (e2 is System.ComponentModel.Win32Exception or FileNotFoundException
+                                       or System.ComponentModel.InvalidEnumArgumentException)
+        {
+            ShowToast(Text("Str.PlayFailed"), Level.Warn);
+        }
+    }
+
+    /// <summary>Everything someone would otherwise be asked for, three messages at a time, in one
+    /// zip. Nothing is sent: the file is saved and Explorer opens with it selected, so what leaves
+    /// the machine is whatever the person chooses to hand over.</summary>
+    private async void OnReport(object? sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        ReportButton.IsEnabled = false;
+        Status(Text("Str.ReportWorking"));
+        try
+        {
+            var card = _selected;
+            var target = card is null ? null : TargetFor(card);
+            // Reading a whole game folder and a ReShade log is disk work, not UI work.
+            var path = await Task.Run(() => SupportReport.Save(card, target));
+
+            if (path is null)
+            {
+                Status(string.Format(Text("Str.ReportFailed"), AppPaths.Logs));
+                ShowToast(string.Format(Text("Str.ReportFailed"), AppPaths.Logs), Level.Err);
+                return;
+            }
+            Status(string.Format(Text("Str.ReportSaved"), path));
+            ShowToast(string.Format(Text("Str.ReportSaved"), Path.GetFileName(path)), Level.Ok);
+        }
+        finally
+        {
+            ReportButton.IsEnabled = true;
+        }
+    }
+
     private void Save() => GameStore.Save(_all.Select(c => c.Entry));
 
     // -- The drawer ------------------------------------------------------------------------------
@@ -362,7 +511,18 @@ public partial class MainWindow : Window
                     : ""),
             _ => "",
         };
+        // An emulator's renderer is a setting inside it, and that sentence is the whole difference
+        // between working and not, so it replaces the generic "switch the renderer" hint.
+        if (graphics.Emulator is { } emulator)
+            ApiHint.Text = $"{Text("Str.EmulatorSetting")}: "
+                           + Translated($"Str.Emulator.{emulator.Id}", emulator.Setting);
         ApiHintBox.IsVisible = ApiHint.Text.Length > 0;
+
+        // Steam can always start it; anything else needs an executable we actually found.
+        var canPlay = (card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 })
+                      || (graphics.Executable is { } exe2 && File.Exists(exe2));
+        PlayButton.IsEnabled = canPlay;
+        Localize(PlayLabel, graphics.Emulator is not null ? "Str.Launch" : "Str.Play");
 
         // The width comes from the executable the detection picked, so a folder holding a 32-bit
         // launcher beside a 64-bit game is decided by the game and not by the launcher.
@@ -623,14 +783,14 @@ public partial class MainWindow : Window
         {
             var components = ComponentsFor(preset);
             foreach (var component in components)
-                await cache.EnsureAsync(_manifest, component, progress);
+                await cache.EnsureAsync(manifest, component, progress);
 
             Progress.IsVisible = false;
             ShowStep(StepVerify);
             Status(Text("Str.Verifying"));
             // One folder for the install to read, hard-linked out of the cache: the 141 MB of
             // weights are not copied a second time on the way there.
-            return cache.Stage(_manifest, components);
+            return cache.Stage(manifest, components);
         }
         catch (Exception e) when (e is InstallException or HttpRequestException or IOException)
         {
@@ -646,7 +806,7 @@ public partial class MainWindow : Window
     /// the root holds only a launcher stub that loads neither. For a 32-bit game it is also what
     /// settles a folder holding the game beside a benchmark or a launcher.</summary>
     private static string TargetFor(GameCard card) =>
-        card.Graphics?.Executable is { } exe && File.Exists(exe) ? exe : card.Path;
+        card.Graphics?.Target is { } target && File.Exists(target) ? target : card.Path;
 
     /// <summary>What a route needs. Every route needs the add-on and the runtime; the bridge routes
     /// also need their own 32-bit pair and the pinned ReShade beside it.</summary>
@@ -695,6 +855,16 @@ public partial class MainWindow : Window
             _report.Add(new ReportLine(Glyph(level), text, LevelBrush(level)));
         }
         ReportScroll.ScrollToHome();
+    }
+
+    /// <summary>An unforeseen exception as a report, so every caller can carry on treating the
+    /// result as one. The type name is in it because this is the line that gets pasted into a
+    /// support thread.</summary>
+    private static Report Failure(Exception e)
+    {
+        var report = new Report();
+        report.Err($"{e.GetType().Name}: {e.Message}");
+        return report;
     }
 
     private void WriteLog(Report report, string header)
@@ -817,7 +987,7 @@ public partial class MainWindow : Window
         _toastTimer.Start();
     }
 
-    private static Geometry? Glyph(Level level) => Icon(level switch
+    private static Geometry? Glyph(Level level) => Vector(level switch
     {
         Level.Ok => "IconOk",
         Level.Warn => "IconWarn",
@@ -825,7 +995,7 @@ public partial class MainWindow : Window
         _ => "IconInfo",
     });
 
-    private static Geometry? Icon(string key) =>
+    private static Geometry? Vector(string key) =>
         Application.Current?.TryFindResource(key, out var value) == true ? value as Geometry : null;
 
     private IBrush LevelBrush(Level level) => Brush(level switch

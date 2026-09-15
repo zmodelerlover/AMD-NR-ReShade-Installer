@@ -46,13 +46,36 @@ public static class Work
     public const string AddonName = "dlss5-neural.addon64";
     public const string RuntimeName = "dlssnr_amd_pass1.dll";
     public const string WeightsName = "dlssnr_on_amd_weights.bin";
+    public const string Addon32Name = "dlss5-neural.addon32";
+    public const string Host64Name = "dlss5-neural-host64.exe";
+
+    /// <summary>The files whose presence means "this folder has an install of ours", and exactly the
+    /// ones uninstall takes back. Deliberately no manifest and no ini: uninstall keeps the manifest
+    /// whenever it preserves a configuration entry, so "a manifest is here" is true long after
+    /// everything has been removed.</summary>
+    public static readonly string[] InstalledMarkers =
+        [AddonName, Addon32Name, Host64Name, RuntimeName, WeightsName];
 
     /// <summary>Known-bad: the runtime this release replaced. Recognised by its first bytes so the
     /// message can be "you have the old one" instead of "this file is wrong".</summary>
     private const string RuntimeSha0214Prefix = "e145ff963b1ef614";
 
-    /// <summary>A ReShade proxy, by the name it has to be loaded under.</summary>
-    private static readonly string[] Proxies = ["d3d11.dll", "dxgi.dll", "d3d12.dll", "opengl32.dll"];
+    /// <summary>A ReShade proxy, by the name it has to be loaded under. Used where the route is not
+    /// known -- uninstall, which only wants to know whether one is still there.</summary>
+    private static readonly string[] Proxies =
+        ["d3d11.dll", "dxgi.dll", "d3d12.dll", "opengl32.dll", "d3d9.dll", "d3d8.dll"];
+
+    /// <summary>The names ReShade can be loaded under *for this route*. A 32-bit D3D9 game loads
+    /// d3d9.dll and never dxgi.dll, so checking the 64-bit names there reported "no ReShade proxy
+    /// DLL found" about a folder with ReShade sitting in it -- on every 32-bit install this route
+    /// performs, including the ones it had just written itself.</summary>
+    private static string[] ProxiesFor(Preset preset) => preset switch
+    {
+        Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "d3d8.dll"],
+        Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll"],
+        Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "d3d11.dll"],
+        _ => ["dxgi.dll", "d3d11.dll", "d3d12.dll"],
+    };
 
     /// <summary>Files an older layout left behind: one copy of the runtime per pass, which did not
     /// fit in VRAM and has not been used for several releases.</summary>
@@ -113,7 +136,8 @@ public static class Work
 
     private static void CheckReShade(string dir, Preset preset, Report report)
     {
-        var present = Proxies.Where(n => File.Exists(Path.Combine(dir, n))).ToList();
+        var names = ProxiesFor(preset);
+        var present = names.Where(n => File.Exists(Path.Combine(dir, n))).ToList();
 
         // Anything identified as something else is named, and not counted as ReShade. A proxy with no
         // version resource at all is kept as possibly-ReShade: every ReShade build carries one, but
@@ -156,9 +180,9 @@ public static class Work
         {
             case 0:
                 report.Warn(
-                    "No ReShade proxy DLL found here (d3d11.dll, dxgi.dll, d3d12.dll). The add-on cannot "
+                    $"No ReShade proxy DLL found here ({string.Join(", ", names)}). The add-on cannot "
                     + "load without ReShade, and it has to be the build with full add-on support. Files "
-                    + "were still copied, so installing ReShade afterwards is enough.");
+                    + "are still copied, so installing ReShade afterwards is enough.");
                 break;
             case 1:
                 report.Ok($"ReShade found: {found[0]}");
@@ -207,15 +231,23 @@ public static class Work
         return Engine.FirstDock(ini, 1920, 1080);
     }
 
+    /// <summary>For an emulator route, whether the emulator is actually in this folder. Any of its
+    /// known executable names counts: PCSX2 alone ships as five, and warning about the absence of
+    /// pcsx2-qt.exe next to a perfectly good pcsx2x64-avx2.exe is noise that teaches people to
+    /// ignore warnings.</summary>
     private static void CheckExe(string dir, Preset preset, Report report)
     {
-        if (preset.ExpectedExe() is not { } exe) return;
-        if (File.Exists(Path.Combine(dir, exe)))
-            report.Ok($"{exe} is here, so this is the right folder.");
+        var emulator = Emulators.Known.FirstOrDefault(e => e.Route == preset);
+        if (emulator is null) return;
+
+        var found = emulator.Executables.FirstOrDefault(n => File.Exists(Path.Combine(dir, n)));
+        if (found is not null)
+            report.Ok($"{found} is here, so this is the right folder.");
         else
             report.Warn(
-                $"{exe} is not in this folder. That is only a warning -- nothing checks which program "
-                + "it is -- but it is usually a sign the path is wrong.");
+                $"No {emulator.Name} executable in this folder (looked for {string.Join(", ", emulator.Executables)}). "
+                + "That is only a warning -- nothing checks which program it is -- but it is usually a "
+                + "sign the path is wrong.");
     }
 
     /// <summary>ReShade writes DisabledAddons= into its own ini the first time anyone unticks an
@@ -246,6 +278,41 @@ public static class Work
                 report.Info($"ReShade.ini disables other add-ons: {list}");
             }
         }
+    }
+
+    /// <summary>Whether the renderer this route needs is one the files here actually link.
+    ///
+    /// Half-Life is why this exists. The database says D3D9 and OpenGL, which was true of the build
+    /// it was written about; the copy on disk renders through hw.dll, which imports opengl32.dll and
+    /// nothing else. The D3D9 route installed perfectly and the game never loaded a byte of it,
+    /// because there is no Direct3D renderer in that build to load it with.
+    ///
+    /// This does not refuse -- a renderer can be picked in a launcher, a config file or a launch
+    /// option, and none of that is visible here. It says what the files show, which is the piece of
+    /// evidence nobody has when an install that "worked" does nothing.</summary>
+    private static void CheckRouteIsReachable(string dir, Preset preset, Report report)
+    {
+        var wanted = preset switch
+        {
+            Preset.Dx11 or Preset.X86Dx11 => GraphicsApi.D3D11,
+            Preset.Dx12 => GraphicsApi.D3D12,
+            Preset.X86Dx9 => GraphicsApi.D3D9,
+            Preset.X86Dx8 => GraphicsApi.D3D8,
+            _ => GraphicsApi.Unknown,   // Vulkan loads as a layer, and the emulator routes are settings.
+        };
+        if (wanted == GraphicsApi.Unknown) return;
+
+        // Only the game's own files, never the database: the question is what this copy links.
+        var local = GraphicsDetector.Detect(dir);
+        if (local.Api == GraphicsApi.Unknown || local.All.Count == 0) return;
+        if (local.All.Contains(wanted)) return;
+
+        var found = string.Join(", ", local.All.Select(GraphicsDetection.Short));
+        report.Warn(
+            $"This route needs {GraphicsDetection.Short(wanted)}, and the files here link {found} instead. "
+            + $"{local.Why} If this build has no {GraphicsDetection.Short(wanted)} renderer, everything will "
+            + "install correctly and nothing will ever load it -- switch the game to "
+            + $"{GraphicsDetection.Short(wanted)} first, or pick a route that matches what it runs.");
     }
 
     /// <summary>Verify a payload in the folder given and hand back its bytes. Whether it then gets
@@ -372,7 +439,11 @@ public static class Work
                         report.Err($"{name} is not in that folder.");
                         allThere = false;
                         break;
-                    case { } got when got != want:
+                    // want == 0 means the size is not known, not that the file should be empty: the
+                    // add-on's own size only comes from the payload manifest, and without one the
+                    // pins fall back to a zero there. Judging a real file against it said "that is a
+                    // different build" about the right file.
+                    case { } got when want > 0 && got != want:
                         report.Err(
                             $"{name} is {got} bytes, and this release expects {want}. That is a different "
                             + "build, and the add-on refuses anything but the one it was compiled against.");
@@ -432,6 +503,7 @@ public static class Work
         }
 
         CheckExe(dir, preset, report);
+        CheckRouteIsReachable(dir, preset, report);
 
         // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
         // "no ReShade here" is not a problem to report there -- it is the state before installing.
@@ -659,15 +731,29 @@ public static class Work
         }
         report.Info($"target: {dir}");
 
-        var log = new List<string>();
-        try
+        // No manifest is not a failure, it is the ordinary state of a folder nothing was installed
+        // into -- and of one installed by a build from before the manifest existed. The x64 route
+        // has always said so and swept by name; saying "No install manifest" in red here, for the
+        // same situation, read as something having gone wrong.
+        if (!File.Exists(Path.Combine(dir, Route.X86.ManifestFileName())))
         {
-            Transaction.Uninstall(dir, Route.X86, false, log);
-            foreach (var line in log) Narrate(line, report);
+            var gone = 0;
+            foreach (var name in new[] { Addon32Name, Host64Name, RuntimeName, WeightsName })
+                gone += RemoveFile(dir, name, report);
+            if (gone == 0) report.Warn("Nothing of ours was in that folder.");
         }
-        catch (InstallException e)
+        else
         {
-            report.Err(e.Message);
+            var log = new List<string>();
+            try
+            {
+                Transaction.Uninstall(dir, Route.X86, false, log);
+                foreach (var line in log) Narrate(line, report);
+            }
+            catch (InstallException e)
+            {
+                report.Err(e.Message);
+            }
         }
 
         // Said only when it is true: when this route installed the pinned ReShade itself, uninstall

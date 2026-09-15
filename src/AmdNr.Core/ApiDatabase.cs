@@ -1,4 +1,4 @@
-// api-db.json: which graphics APIs each game supports, read ahead of time so the app never has to
+﻿// api-db.json: which graphics APIs each game supports, read ahead of time so the app never has to
 // ask anyone at run time.
 //
 // Keyed by Steam app id where there is one, because that is exact, and indexed by normalised title
@@ -99,12 +99,14 @@ public sealed class ApiDatabase
     /// otherwise the last one fetched, otherwise the one shipped beside the executable. An app that
     /// cannot reach anything still detects every game from its own files.</summary>
     public static async Task<ApiDatabase?> LoadAsync(HttpClient http, string owner, string repo, string branch = "main",
-        CancellationToken cancel = default)
+        string? url = null, CancellationToken cancel = default)
     {
         try
         {
-            var url = $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/api-db.json";
-            using var response = await http.GetAsync(url, cancel);
+            var address = string.IsNullOrWhiteSpace(url)
+                ? $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/api-db.json"
+                : url;
+            using var response = await http.GetAsync(address, cancel);
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync(cancel);

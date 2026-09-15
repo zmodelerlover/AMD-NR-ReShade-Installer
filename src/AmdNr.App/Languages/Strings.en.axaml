@@ -126,4 +126,66 @@
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. The same 32-bit pair as D3D11, through a private D3D9/D3D11 stage. Plain D3D9 costs a fixed few milliseconds per frame; D3D9Ex does not. Install ReShade as the 32-bit d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 is translated to D3D9 and then takes the D3D9 route above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>
+
+  <!-- First run -->
+  <sys:String x:Key="Str.SetupTitle">Getting started</sys:String>
+  <sys:String x:Key="Str.SetupWelcome">Welcome</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">This app runs the DLSS 5 Neural Rendering network on Radeon cards, through ReShade. It downloads everything itself and checks every file against a pinned hash. Four quick steps.</sys:String>
+  <sys:String x:Key="Str.SetupStepLanguage">Language</sys:String>
+  <sys:String x:Key="Str.SetupStepMachine">This machine</sys:String>
+  <sys:String x:Key="Str.SetupStepFiles">Files</sys:String>
+  <sys:String x:Key="Str.SetupStepGames">Your games</sys:String>
+  <sys:String x:Key="Str.SetupBack">Back</sys:String>
+  <sys:String x:Key="Str.SetupNext">Continue</sys:String>
+  <sys:String x:Key="Str.SetupFinish">Start using it</sys:String>
+  <sys:String x:Key="Str.SetupSkip">Skip for now</sys:String>
+  <sys:String x:Key="Str.SetupStepOf">Step {0} of {1}</sys:String>
+
+  <sys:String x:Key="Str.SetupMachineBody">Two things stop the add-on from running, and both are visible from here. Neither one blocks you from continuing — only from it working inside the game.</sys:String>
+  <sys:String x:Key="Str.SetupMachineOk">This machine has everything the add-on needs.</sys:String>
+  <sys:String x:Key="Str.SetupMachineBad">Something is missing. You can continue and fix it later, but it will not work in game until you do.</sys:String>
+
+  <sys:String x:Key="Str.SetupFilesBody">The same files serve every game: downloaded once, checked against a pinned hash, and reused. About 165 MB in total.</sys:String>
+  <sys:String x:Key="Str.SetupFilesCheck">Checking what is already here…</sys:String>
+  <sys:String x:Key="Str.SetupFilesAllReady">Every file is here and verified.</sys:String>
+  <sys:String x:Key="Str.SetupFilesMissing">{0} of {1} components are still missing.</sys:String>
+  <sys:String x:Key="Str.SetupFilesDownload">Download everything now</sys:String>
+  <sys:String x:Key="Str.SetupFilesRetry">Try again</sys:String>
+  <sys:String x:Key="Str.SetupFilesLater">Skip this and they are downloaded on the first install.</sys:String>
+  <sys:String x:Key="Str.SetupFilesOffline">Could not read the download list — most likely no connection. You can continue: the app tries again when you install.</sys:String>
+
+  <sys:String x:Key="Str.SetupGamesBody">Reading the launchers is read-only: nothing is installed or changed by looking. You can add folders by hand afterwards.</sys:String>
+  <sys:String x:Key="Str.SetupGamesNone">No games found. You can add a folder by hand in the main window.</sys:String>
+  <sys:String x:Key="Str.SetupGamesFound">{0} games found.</sys:String>
+  <sys:String x:Key="Str.SetupDoneBody">All set. The main window opens with your library.</sys:String>
+
+  <sys:String x:Key="Str.Unexpected">Something unexpected happened. The full log was written.</sys:String>
+
+
+  <!-- Play and emulators -->
+  <sys:String x:Key="Str.Play">Play</sys:String>
+  <sys:String x:Key="Str.Launch">Open</sys:String>
+  <sys:String x:Key="Str.PlayFailed">Could not start it. Use Open the folder and run the executable by hand.</sys:String>
+  <sys:String x:Key="Str.AddEmulator">Add Emulator</sys:String>
+  <sys:String x:Key="Str.EmulatorTitle">Add an emulator</sys:String>
+  <sys:String x:Key="Str.EmulatorBody">Pick which one, then point at the folder it runs from — the folder with the executable, not the one with the ROMs.</sys:String>
+  <sys:String x:Key="Str.EmulatorOther">Another emulator</sys:String>
+  <sys:String x:Key="Str.EmulatorOtherBody">Point at the folder and I will say what I can work out from it.</sys:String>
+  <sys:String x:Key="Str.EmulatorPick">Point at the {0} folder</sys:String>
+  <sys:String x:Key="Str.EmulatorPickOther">Point at the emulator's folder</sys:String>
+  <sys:String x:Key="Str.EmulatorFound">{0} found: {1}</sys:String>
+  <sys:String x:Key="Str.EmulatorWrong">That does not look like {0}: no {1} in that folder. Added anyway — check the path.</sys:String>
+  <sys:String x:Key="Str.EmulatorUnknown">No emulator I know is in there. Added from what the files say: {0}</sys:String>
+  <sys:String x:Key="Str.EmulatorSetting">Inside the emulator</sys:String>
+  <sys:String x:Key="Str.OpenLog">Open this install's log</sys:String>
+
+
+  <!-- Problem report -->
+  <sys:String x:Key="Str.ReportTitle">Not working in game?</sys:String>
+  <sys:String x:Key="Str.ReportBody">Collects the logs, what is in the game folder, and what ReShade wrote, into one .zip. Nothing is sent: the file stays on your PC for you to share where you like.</sys:String>
+  <sys:String x:Key="Str.Report">Report a problem</sys:String>
+  <sys:String x:Key="Str.ReportSaved">Report saved and the folder opened: {0}</sys:String>
+  <sys:String x:Key="Str.ReportFailed">The report could not be built. The logs are in {0}</sys:String>
+  <sys:String x:Key="Str.ReportWorking">Collecting…</sys:String>
+
 </ResourceDictionary>

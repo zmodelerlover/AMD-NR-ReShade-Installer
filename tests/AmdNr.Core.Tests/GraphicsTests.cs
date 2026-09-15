@@ -1,4 +1,4 @@
-using AmdNr.Core;
+﻿using AmdNr.Core;
 
 namespace AmdNr.Core.Tests;
 
@@ -250,4 +250,54 @@ public class GraphicsTests
     [Fact]
     public void ADatabaseFromTheFutureIsRefused() =>
         Assert.Throws<InstallException>(() => ApiDatabase.Parse("{\"schema\":2,\"games\":{}}"));
+
+    /// <summary>Source keeps a launcher stub in the root and its renderer in bin\. Source loads that
+    /// folder's modules with LOAD_WITH_ALTERED_SEARCH_PATH, so shaderapidx9.dll resolves its own
+    /// d3d9.dll against bin\ and never looks at the root -- a ReShade installed in the root is never
+    /// loaded at all, and one in bin\ searches bin\ for add-ons. Proven on Half-Life 2: ReShade.log
+    /// appeared only once ReShade was in bin\, and it logged
+    /// "Searching for add-ons ... in '...\Half-Life 2\bin'".</summary>
+    [Fact]
+    public void ASourceGameIsInstalledIntoTheFolderItsRendererLoadsFrom()
+    {
+        var root = Fixture.Temp("source-game");
+        File.WriteAllBytes(Path.Combine(root, "hl2.exe"), Fixture.Pe(false));
+        var bin = Directory.CreateDirectory(Path.Combine(root, "bin")).FullName;
+        File.WriteAllBytes(Path.Combine(bin, "shaderapidx9.dll"), Fixture.PeWithImports(false, ["d3d9.dll"]));
+
+        var d = GraphicsDetector.Detect(root, "Half-Life 2");
+        Assert.Equal(Path.Combine(root, "hl2.exe"), d.Executable);
+        Assert.Equal(Path.Combine(bin, "shaderapidx9.dll"), d.Target);
+        Assert.Equal(Route.X86, d.Width);
+        Assert.Equal(Preset.X86Dx9, d.Preset);
+        Assert.Contains("bin", d.Why, StringComparison.Ordinal);
+
+        // The 64-bit layout wins over the 32-bit one when both are there.
+        var bin64 = Directory.CreateDirectory(Path.Combine(bin, "x64")).FullName;
+        File.WriteAllBytes(Path.Combine(bin64, "shaderapidx9.dll"), Fixture.PeWithImports(true, ["d3d9.dll"]));
+        var wide = GraphicsDetector.Detect(root, "Half-Life 2");
+        Assert.Equal(Path.Combine(bin64, "shaderapidx9.dll"), wide.Target);
+        Assert.Equal(Route.X64, wide.Width);
+
+        // The database can say which APIs exist; it cannot know the layout, so the sentence that
+        // says which folder the files go in has to survive being merged with it.
+        var wiki = d.With(new PcgwApi("Half-Life 2", [GraphicsApi.Vulkan, GraphicsApi.D3D9, GraphicsApi.OpenGL], true, false));
+        Assert.Equal(Path.Combine(bin, "shaderapidx9.dll"), wiki.Target);
+        Assert.Contains("bin", wiki.Why, StringComparison.Ordinal);
+        Assert.Contains("PCGamingWiki", wiki.Why, StringComparison.Ordinal);
+    }
+
+    /// <summary>A game whose renderer is in its own folder keeps pointing at its executable, so the
+    /// Source rule cannot move an ordinary install somewhere else.</summary>
+    [Fact]
+    public void AnOrdinaryGameStillInstallsBesideItsExecutable()
+    {
+        var root = Fixture.Temp("plain-target");
+        File.WriteAllBytes(Path.Combine(root, "Game.exe"), Fixture.PeWithImports(true, ["d3d11.dll"]));
+
+        var d = GraphicsDetector.Detect(root, "Game");
+        Assert.Equal(Path.Combine(root, "Game.exe"), d.Executable);
+        Assert.Equal(d.Executable, d.Target);
+        Assert.Null(d.InstallTarget);
+    }
 }

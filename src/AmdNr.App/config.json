@@ -4,9 +4,7 @@
     "Repo": "AMD-NR-ReShade-Installer"
   },
   "Payload": {
-    "Owner": "zmodelerlover",
-    "Repo": "AMD-NR-Extras",
-    "Branch": "main",
-    "File": "payload.json"
+    "ManifestUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.json",
+    "ApiDbUrl": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/api-db.json"
   }
 }

@@ -63,6 +63,9 @@
       <StreamGeometry x:Key="IconDriver">M20 6h-8l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-8 11-4-4h3V9h2v4h3l-4 4z</StreamGeometry>
       <StreamGeometry x:Key="IconBolt">M7 2v11h3v9l7-12h-4l4-8z</StreamGeometry>
       <StreamGeometry x:Key="IconGlobe">M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14A8.2 8.2 0 0 1 4 12c0-.69.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 0 1 5.08 16zm2.95-8H5.08a7.99 7.99 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z</StreamGeometry>
+      <StreamGeometry x:Key="IconReport">M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z</StreamGeometry>
+      <StreamGeometry x:Key="IconPlay">M8 5v14l11-7z</StreamGeometry>
+      <StreamGeometry x:Key="IconEmulator">M21 6H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zM8.5 13.5h-1.5v1.5h-1.5v-1.5h-1.5v-1.5h1.5v-1.5h1.5v1.5h1.5v1.5zm5 1a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm2.5-2.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm2.5 2.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z</StreamGeometry>
       <StreamGeometry x:Key="IconHeart">M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z</StreamGeometry>
 
       <!-- The shade under anything laid over cover art, so a badge reads on any cover. -->
@@ -77,10 +80,9 @@
         <GradientStop Offset="0" Color="#661A1514" />
         <GradientStop Offset="1" Color="#FF1A1514" />
       </LinearGradientBrush>
-      <LinearGradientBrush x:Key="LogoFill" StartPoint="0%,0%" EndPoint="100%,100%">
-        <GradientStop Offset="0" Color="#D72C33" />
-        <GradientStop Offset="1" Color="#7A1418" />
-      </LinearGradientBrush>
+      <!-- The mark is a red logo with transparency, so the tile behind it is white: red on red
+           would not read at 40px. -->
+      <SolidColorBrush x:Key="LogoFill" Color="#FFFFFF" />
     </ResourceDictionary>
   </Application.Resources>
 
@@ -133,6 +135,26 @@
       <Setter Property="Padding" Value="20" />
     </Style>
 
+    <!-- The first-run step indicator: a dot per step, the one you are on drawn as a bar. -->
+    <Style Selector="Border.pip">
+      <Setter Property="Height" Value="6" />
+      <Setter Property="Width" Value="6" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.22" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.pip.done">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Border.pip.here">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Background" Value="{DynamicResource AccentHover}" />
+    </Style>
+
     <!-- A tinted square behind an icon: the tint says whether the row is fine or needs something. -->
     <Style Selector="Border.iconTile">
       <Setter Property="Width" Value="40" />
@@ -147,12 +169,14 @@
       <Setter Property="Height" Value="20" />
       <Setter Property="Foreground" Value="{DynamicResource AccentText}" />
     </Style>
+    <!-- Descendant, not direct child: the tiles that can also show a spinner wrap their icon in a
+         Panel, and a child selector left those icons the default colour on a tinted tile. -->
     <Style Selector="Border.iconTile.ok"><Setter Property="Background" Value="{DynamicResource OkSoft}" /></Style>
-    <Style Selector="Border.iconTile.ok > PathIcon"><Setter Property="Foreground" Value="{DynamicResource Ok}" /></Style>
+    <Style Selector="Border.iconTile.ok PathIcon"><Setter Property="Foreground" Value="{DynamicResource Ok}" /></Style>
     <Style Selector="Border.iconTile.warn"><Setter Property="Background" Value="{DynamicResource WarnSoft}" /></Style>
-    <Style Selector="Border.iconTile.warn > PathIcon"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+    <Style Selector="Border.iconTile.warn PathIcon"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
     <Style Selector="Border.iconTile.err"><Setter Property="Background" Value="{DynamicResource ErrSoft}" /></Style>
-    <Style Selector="Border.iconTile.err > PathIcon"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
+    <Style Selector="Border.iconTile.err PathIcon"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
 
     <!-- Status pill: an icon and a word. -->
     <Style Selector="Border.status">
@@ -268,6 +292,25 @@
       <Setter Property="BorderBrush" Value="#99E05B4C" />
       <Setter Property="Foreground" Value="{DynamicResource Err}" />
     </Style>
+    <!-- A choice in a picker: the ghost look without its fixed 36px height, because these carry a
+         title over a wrapped sentence and that height clipped the sentence away entirely. -->
+    <Style Selector="Button.pick">
+      <Setter Property="Background" Value="{DynamicResource Surface}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.pick:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+    </Style>
+    <Style Selector="Button.pick:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+    </Style>
+
     <Style Selector="Button.icon">
       <Setter Property="Width" Value="36" />
       <Setter Property="Padding" Value="0" />

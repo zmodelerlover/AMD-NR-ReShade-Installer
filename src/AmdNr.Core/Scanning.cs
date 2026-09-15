@@ -1,4 +1,4 @@
-// Finding the games that are already installed.
+﻿// Finding the games that are already installed.
 //
 // Same sources and same filters as the manager this follows -- Steam, Epic, GOG, EA, Ubisoft,
 // Battle.net and Xbox -- written here rather than taken from it, because that project is GPL-3.0
@@ -55,8 +55,11 @@ public static partial class GameScanner
         Parallel.ForEach(sources, source =>
         {
             List<ScannedGame> games;
+            // Anything at all: one launcher's registry key, manifest or library file being in a
+            // shape this does not expect must cost that launcher's games, never the whole scan --
+            // and never the window, because the only caller is an async void click handler.
             try { games = source().ToList(); }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+            catch (Exception)
             {
                 return;
             }
@@ -64,7 +67,7 @@ public static partial class GameScanner
         });
 
         return found
-            .Where(g => !IsExcluded(g.InstallPath) && Directory.Exists(g.InstallPath))
+            .Where(g => !IsExcluded(g.InstallPath) && HasContent(g.InstallPath))
             .GroupBy(g => Engine.WeaklyCanonical(g.InstallPath), StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
@@ -319,22 +322,42 @@ public static partial class GameScanner
         return games;
     }
 
+    /// <summary>A folder that exists and has something in it. A launcher keeps the folder of a game
+    /// it knows about but has not downloaded, and listing one of those put a card on screen whose
+    /// tags read "no route" in red -- which is a statement about the game, when the truth was only
+    /// that nothing had been installed yet.</summary>
+    private static bool HasContent(string folder)
+    {
+        try
+        {
+            return Directory.Exists(folder) && Directory.EnumerateFileSystemEntries(folder).Any();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
     // -- What the folder turns out to be ----------------------------------------------------------
 
     /// <summary>A first guess at the route, from what is in the folder. Always overridable, and the
     /// install still reads the PE header itself -- this only decides which row is preselected.</summary>
     public static Preset GuessPreset(string folder)
     {
-        if (File.Exists(Path.Combine(folder, "pcsx2-qt.exe")) || File.Exists(Path.Combine(folder, "pcsx2.exe")))
-            return Preset.Pcsx2;
-        if (File.Exists(Path.Combine(folder, "rpcs3.exe"))) return Preset.Rpcs3;
-        return Work.Detect(folder).Route == Route.X86 ? Preset.X86Dx11 : Preset.Dx11;
+        // One table, shared with the detection, so the two cannot disagree about what a folder is.
+        var width = Work.Detect(folder).Route;
+        if (Emulators.Identify(folder) is { } emulator)
+            return emulator.Route ?? GraphicsDetection.RouteFor(width ?? Route.X64, emulator.Best) ?? Preset.Dx11;
+        return width == Route.X86 ? Preset.X86Dx11 : Preset.Dx11;
     }
 
-    /// <summary>Whether this folder already has an install of ours, by the manifest either route
-    /// writes. Cheap enough to ask for every card on every refresh.</summary>
+    /// <summary>Whether this folder still has an install of ours, judged by the payload files being
+    /// there. Cheap enough to ask for every card on every refresh.
+    ///
+    /// Not by the manifest: uninstall keeps that file whenever it preserves a configuration entry --
+    /// ReShade.ini and dlss5-neural.ini are kept on purpose -- so a folder that has been fully
+    /// uninstalled normally still has one. Reading it as "installed" is what left the badge on after
+    /// Uninstall said it was done.</summary>
     public static bool IsInstalled(string folder) =>
-        File.Exists(Path.Combine(folder, Route.X64.ManifestFileName()))
-        || File.Exists(Path.Combine(folder, Route.X86.ManifestFileName()))
-        || File.Exists(Path.Combine(folder, Work.AddonName));
+        Work.InstalledMarkers.Any(name => File.Exists(Path.Combine(folder, name)));
 }

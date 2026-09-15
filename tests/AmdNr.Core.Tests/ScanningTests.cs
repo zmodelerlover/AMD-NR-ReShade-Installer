@@ -134,13 +134,49 @@ public class ScanningTests
     }
 
     [Fact]
-    public void AFolderIsCalledInstalledOnceTheAddOnOrAManifestIsInIt()
+    public void AFolderIsCalledInstalledOnceAPayloadIsInIt()
     {
         var folder = Fixture.Temp("installed-state");
         Assert.False(GameScanner.IsInstalled(folder));
 
         File.WriteAllText(Path.Combine(folder, Work.AddonName), "x");
         Assert.True(GameScanner.IsInstalled(folder));
+    }
+
+    /// <summary>The bug this guards: uninstall keeps the manifest whenever it preserves a
+    /// configuration entry, and the state used to be read off that file -- so a folder that had been
+    /// fully uninstalled still reported itself installed, and the badge never went away.</summary>
+    [Fact]
+    public void AManifestLeftBehindByUninstallIsNotAnInstall()
+    {
+        var folder = Fixture.Temp("installed-after-uninstall");
+
+        // Exactly what Transaction.Uninstall leaves: the manifest, holding only the configuration
+        // entries it preserved on purpose, and those configuration files themselves.
+        File.WriteAllText(Path.Combine(folder, Route.X64.ManifestFileName()), "{}");
+        File.WriteAllText(Path.Combine(folder, "ReShade.ini"), "[GENERAL]\r\n");
+        File.WriteAllText(Path.Combine(folder, "dlss5-neural.ini"), "[dlss5]\r\n");
+
+        Assert.False(GameScanner.IsInstalled(folder),
+            "a preserved manifest and the user's own ini files are not an install");
+    }
+
+    /// <summary>Steam keeps the folder of a game it knows about but has not downloaded. Listing one
+    /// put a card on screen whose tags read "no route" in red, which says something false about the
+    /// game when the truth was only that nothing had been installed into it yet.</summary>
+    [Fact]
+    public void AFolderWithNothingInItIsNotAnInstalledGame()
+    {
+        var empty = Fixture.Temp("scan-empty");
+        Assert.Empty(Directory.EnumerateFileSystemEntries(empty));
+
+        var real = Fixture.Temp("scan-real");
+        File.WriteAllBytes(Path.Combine(real, "game.exe"), Fixture.Pe(true));
+
+        // ScanAll reads this machine's launchers, so the filter is exercised through its own rule.
+        Assert.False(GameScanner.IsInstalled(empty));
+        Assert.True(Directory.Exists(empty), "the folder is there; it is just empty");
+        Assert.NotEmpty(Directory.EnumerateFileSystemEntries(real));
     }
 
     /// <summary>The registry sources have to answer on a machine where none of those launchers are

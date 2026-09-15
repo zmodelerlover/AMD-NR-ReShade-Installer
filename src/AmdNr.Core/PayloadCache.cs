@@ -86,7 +86,7 @@ public sealed class PayloadCache(HttpClient http)
             var path = Path.Combine(dir, file.RelativePath);
             if (Engine.SizeOf(path) == file.Size && Engine.HashFile(path) == file.Sha256) continue;
             Engine.MakeParent(path);
-            await FetchAsync(manifest.DownloadUrl(component, file), path, file, progress, cancel);
+            await FetchAnyAsync(manifest.DownloadUrls(component, file), path, file, progress, cancel);
         }
 
         foreach (var entry in c.Extract ?? [])
@@ -142,6 +142,38 @@ public sealed class PayloadCache(HttpClient http)
                 System.IO.Compression.ZipArchiveMode.Read);
         }
         throw new InstallException($"{Path.GetFileName(path)} carries no archive to extract from.");
+    }
+
+    /// <summary>The same file from whichever address answers. Every one of them is checked against
+    /// the same SHA-256, so falling through to a mirror weakens nothing -- a mirror that serves the
+    /// wrong bytes fails exactly as the first address would have.
+    ///
+    /// The last failure is the one reported: by then every address has been tried, and the first
+    /// one's message is no more useful than the last one's.</summary>
+    private async Task FetchAnyAsync(IReadOnlyList<Uri> urls, string path, PayloadFile file,
+        IProgress<DownloadProgress>? progress, CancellationToken cancel)
+    {
+        for (var i = 0; i < urls.Count; i++)
+        {
+            try
+            {
+                await FetchAsync(urls[i], path, file, progress, cancel);
+                return;
+            }
+            catch (Exception e) when (e is HttpRequestException or InstallException or IOException
+                                          && i + 1 < urls.Count)
+            {
+                // Another address has the same bytes, but whatever this one left behind is not
+                // resumable against it: a half-written .part plus a Range request to a different
+                // server splices two answers together. The hash would catch that, having spent the
+                // whole download to do it, so the partial goes instead.
+                try { File.Delete(path + ".part"); }
+                catch (IOException)
+                {
+                    // Held open somehow: the size and hash checks still refuse to install it.
+                }
+            }
+        }
     }
 
     /// <summary>One file, resumed if a part of it is already on disk, verified before it is allowed
@@ -247,13 +279,16 @@ public sealed class PayloadCache(HttpClient http)
         catch (EntryPointNotFoundException) { return false; }
     }
 
-    /// <summary>The manifest itself, from raw.githubusercontent.com -- no REST API, so no rate
-    /// limit to share with everyone else on the same address.</summary>
+    /// <summary>The manifest itself. From <paramref name="url"/> when config.json names one, so the
+    /// list can live anywhere; otherwise from raw.githubusercontent.com, which unlike the REST API
+    /// has no rate limit to share with everyone else on the same address.</summary>
     public async Task<PayloadManifest> FetchManifestAsync(string owner, string repo, string branch = "main",
-        string file = "payload.json", CancellationToken cancel = default)
+        string file = "payload.json", string? url = null, CancellationToken cancel = default)
     {
-        var url = $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file}";
-        using var response = await http.GetAsync(url, cancel);
+        var address = string.IsNullOrWhiteSpace(url)
+            ? $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file}"
+            : url;
+        using var response = await http.GetAsync(address, cancel);
         Engine.Require(response.IsSuccessStatusCode,
             $"Could not read the payload list: the server answered {(int)response.StatusCode} {response.ReasonPhrase}.");
         return PayloadManifest.Parse(await response.Content.ReadAsStringAsync(cancel));

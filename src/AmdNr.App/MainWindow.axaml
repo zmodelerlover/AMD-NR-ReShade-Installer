@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="AmdNr.App.MainWindow"
         Title="AMD-NR ReShade Installer"
+        Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
         Width="1240" Height="800" MinWidth="980" MinHeight="620"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Bg}">
@@ -16,8 +17,8 @@
         <Border Grid.Row="0" Width="40" Height="40" Margin="0,18,0,22" CornerRadius="11"
                 Background="{DynamicResource LogoFill}" BoxShadow="0 6 18 0 #59A61C22"
                 ToolTip.Tip="{DynamicResource Str.AppTitle}">
-          <TextBlock Text="NR" Foreground="White" FontWeight="Bold" FontSize="14" LetterSpacing="0.4"
-                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
+                 Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
 
         <StackPanel Grid.Row="1" Spacing="4">
@@ -89,6 +90,12 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <PathIcon Data="{StaticResource IconAdd}" />
                   <TextBlock Text="{DynamicResource Str.AddGame}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Classes="ghost" Click="OnAddEmulator" AutomationProperties.Name="{DynamicResource Str.AddEmulator}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconEmulator}" />
+                  <TextBlock Text="{DynamicResource Str.AddEmulator}" VerticalAlignment="Center" />
                 </StackPanel>
               </Button>
               <Button x:Name="ScanButton" Classes="primary" Click="OnScan"
@@ -218,6 +225,12 @@
                   <TextBlock Text="{DynamicResource Str.AddGame}" VerticalAlignment="Center" />
                 </StackPanel>
               </Button>
+              <Button Classes="ghost" Click="OnAddEmulator" AutomationProperties.Name="{DynamicResource Str.AddEmulator}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconEmulator}" />
+                  <TextBlock Text="{DynamicResource Str.AddEmulator}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
             </StackPanel>
           </StackPanel>
 
@@ -253,6 +266,14 @@
                       <TextBlock Text="{Binding Path}" Classes="muted" TextTrimming="PathSegmentEllipsis"
                                  ToolTip.Tip="{Binding Path}" />
                     </StackPanel>
+                    <Button x:Name="PlayButton" Classes="primary" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" Click="OnPlay"
+                            AutomationProperties.Name="{DynamicResource Str.Play}">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconPlay}" />
+                        <TextBlock x:Name="PlayLabel" Text="{DynamicResource Str.Play}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
                     <Button x:Name="FolderButton" Classes="ghost" HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Center" Click="OnOpenFolder"
                             AutomationProperties.Name="{DynamicResource Str.OpenFolder}">
@@ -379,6 +400,27 @@
                             </ItemsControl>
                           </StackPanel>
                         </Expander>
+                        <!-- The install can say "done" and the game still show nothing: that is the
+                             most common failure this project has, and it is the one a clean result
+                             banner hides. So the offer to report stands whatever the result was. -->
+                        <Border Classes="callout" Background="Transparent"
+                                BorderBrush="{DynamicResource Border}">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                              <TextBlock Text="{DynamicResource Str.ReportTitle}" FontWeight="SemiBold" FontSize="13" />
+                              <TextBlock Text="{DynamicResource Str.ReportBody}" Classes="muted"
+                                         TextWrapping="Wrap" FontSize="12" />
+                            </StackPanel>
+                            <Button Grid.Column="1" x:Name="ReportButton" Classes="ghost" Margin="12,0,0,0"
+                                    VerticalAlignment="Center" Click="OnReport"
+                                    AutomationProperties.Name="{DynamicResource Str.Report}">
+                              <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconReport}" />
+                                <TextBlock Text="{DynamicResource Str.Report}" VerticalAlignment="Center" />
+                              </StackPanel>
+                            </Button>
+                          </Grid>
+                        </Border>
                       </StackPanel>
                     </ScrollViewer>
 
@@ -561,8 +603,8 @@
               <StackPanel>
                 <Grid ColumnDefinitions="Auto,*" Margin="20,18">
                   <Border Width="40" Height="40" CornerRadius="11" Margin="0,0,14,0" Background="{DynamicResource LogoFill}">
-                    <TextBlock Text="NR" Foreground="White" FontWeight="Bold" FontSize="14"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
+                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                   </Border>
                   <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="10">

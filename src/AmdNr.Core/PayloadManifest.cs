@@ -37,6 +37,12 @@ public sealed class PayloadFile
     /// own installer, fetched from reshade.me exactly as a person would download it.</summary>
     public string? Url { get; init; }
 
+    /// <summary>Further addresses for the same bytes, tried in order when the first one cannot be
+    /// reached. Every one of them is checked against the same SHA-256, so a mirror can be anywhere
+    /// and is never trusted further than the hash -- which is what makes it safe to host these on a
+    /// free service and add a second one later without shipping a new build.</summary>
+    public List<string>? Mirrors { get; init; }
+
     [JsonIgnore]
     public string AssetName => Asset ?? Name;
 
@@ -103,6 +109,9 @@ public sealed class PayloadManifest
             {
                 Engine.Require(file.Url is null || file.Url.StartsWith("https://", StringComparison.Ordinal),
                     $"Component {name} gives {file.Name} an address that is not https.");
+                foreach (var mirror in file.Mirrors ?? [])
+                    Engine.Require(mirror.StartsWith("https://", StringComparison.Ordinal),
+                        $"Component {name} gives {file.Name} a mirror that is not https.");
                 // The manifest is remote data and it names the path this writes to, so the path is
                 // checked here. Whether a file may be copied into a *game* folder is a separate
                 // question, answered by Transaction.Apply against Engine.Allowed -- the cache also
@@ -143,20 +152,28 @@ public sealed class PayloadManifest
         return Components[name];
     }
 
-    /// <summary>Where one file is published. A release asset URL, which is served by a CDN and
-    /// supports Range requests, so an interrupted 141 MB download resumes instead of restarting.</summary>
-    public Uri DownloadUrl(string componentName, PayloadFile file)
+    /// <summary>Every address one file can be fetched from, best first: its own, then its mirrors,
+    /// then the release asset it would be published as. All of them are checked against the same
+    /// SHA-256, so trying the next one costs nothing but time.</summary>
+    public IReadOnlyList<Uri> DownloadUrls(string componentName, PayloadFile file)
     {
-        if (file.Url is not null) return new Uri(file.Url);
+        var urls = new List<Uri>();
+        if (file.Url is not null) urls.Add(new Uri(file.Url));
+        foreach (var mirror in file.Mirrors ?? []) urls.Add(new Uri(mirror));
+
         var component = Component(componentName);
         var owner = component.Owner ?? Owner;
         var repo = component.Repo ?? Repo;
         var tag = component.Tag ?? Tag;
-        Engine.Require(!string.IsNullOrWhiteSpace(owner) && !string.IsNullOrWhiteSpace(repo)
-                       && !string.IsNullOrWhiteSpace(tag),
-            $"The payload manifest does not say where '{componentName}' is published.");
-        return new Uri($"https://github.com/{owner}/{repo}/releases/download/{tag}/{file.AssetName}");
+        if (!string.IsNullOrWhiteSpace(owner) && !string.IsNullOrWhiteSpace(repo) && !string.IsNullOrWhiteSpace(tag))
+            urls.Add(new Uri($"https://github.com/{owner}/{repo}/releases/download/{tag}/{file.AssetName}"));
+
+        Engine.Require(urls.Count > 0, $"The payload manifest does not say where '{componentName}' is published.");
+        return urls;
     }
+
+    /// <summary>Where one file is published, best address first.</summary>
+    public Uri DownloadUrl(string componentName, PayloadFile file) => DownloadUrls(componentName, file)[0];
 
     /// <summary>The hashes and sizes an install checks against, taken from the manifest rather than
     /// from constants.</summary>

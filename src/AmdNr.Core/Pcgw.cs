@@ -1,4 +1,4 @@
-// Reading what PCGamingWiki says a game supports.
+﻿// Reading what PCGamingWiki says a game supports.
 //
 // A game's import table says what its executable links against, which is not always what it
 // renders with: Frostbite imports d3d12.dll in games that only ever run D3D11, and Unity loads D3D
