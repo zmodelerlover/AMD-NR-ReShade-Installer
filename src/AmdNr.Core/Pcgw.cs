@@ -76,7 +76,12 @@ public static partial class PcgwParser
 
     // A closed list of qualifiers, not "any few words before Edition": that version stripped the
     // "Skyrim" out of "Skyrim Special Edition".
-    [GeneratedRegex(@"\s*(?:[:\-–]\s*)?(?:the\s+)?(?:(?:special|complete|definitive|enhanced|anniversary|goty|game\s+of\s+the\s+year|deluxe|digital\s+deluxe|ultimate|gold|premium|legendary|royal|director'?s\s+cut)\s+)?(?:edition|remastered|remaster)\s*$",
+    //
+    // "Remastered" is deliberately not on it. An edition is the same game sold again; a remaster is
+    // usually a different one -- The Elder Scrolls IV: Oblivion is D3D9 and 32-bit, its 2025
+    // remaster is D3D12 and 64-bit -- and stripping the word made the two titles identical, so a
+    // copy of the original with no Steam app id was told it was D3D12.
+    [GeneratedRegex(@"\s*(?:[:\-–]\s*)?(?:the\s+)?(?:(?:special|complete|definitive|enhanced|anniversary|goty|game\s+of\s+the\s+year|deluxe|digital\s+deluxe|ultimate|gold|premium|legendary|royal|director'?s\s+cut)\s+)?edition\s*$",
         RegexOptions.IgnoreCase, 2000)]
     private static partial Regex Edition();
 

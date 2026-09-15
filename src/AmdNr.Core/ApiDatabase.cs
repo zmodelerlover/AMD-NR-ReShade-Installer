@@ -79,11 +79,23 @@ public sealed class ApiDatabase
         var wanted = PcgwParser.NormaliseTitle(name);
         if (wanted.Length < 2) return null;
 
+        // Records that normalise to one title but do not agree are a title that means more than
+        // one game, and the honest answer for it is none: the files on the disk then decide, exactly
+        // as they do for a game the wiki has never heard of. Keeping whichever one the index reached
+        // first is how a 32-bit D3D9 game was reported as 64-bit D3D12.
         _byTitle ??= Games.Values
             .GroupBy(r => PcgwParser.NormaliseTitle(r.Title))
+            .Where(g => g.Select(Fingerprint).Distinct().Count() == 1)
             .ToDictionary(g => g.Key, g => g.First());
         return _byTitle.TryGetValue(wanted, out var byTitle) ? byTitle.ToApi() : null;
     }
+
+    /// <summary>Two records are the same answer when they name the same APIs and the same builds.
+    /// Duplicates of one game are common -- the wiki is reached through several app ids -- and they
+    /// are not an ambiguity.</summary>
+    private static string Fingerprint(ApiRecord record) =>
+        string.Join(",", record.Apis.Select(a => a.ToUpperInvariant()).OrderBy(a => a, StringComparer.Ordinal))
+        + $"|{record.Has32Bit}|{record.Has64Bit}";
 
     public void Put(string key, ApiRecord record)
     {

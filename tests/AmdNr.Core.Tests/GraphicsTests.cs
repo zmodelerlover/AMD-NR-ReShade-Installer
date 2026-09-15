@@ -210,6 +210,13 @@ public class GraphicsTests
     public void ANearMissTitleIsNotAMatch() =>
         Assert.Null(PcgwParser.BestTitle("Fortnite", ["Fortnite Battle Royale", "Fortnite Save the World"]));
 
+    /// <summary>A remaster is a different game: same name, different engine, different API, often a
+    /// different width. Treating it as an edition made one record answer for both.</summary>
+    [Fact]
+    public void ARemasterIsNotAnEditionOfTheGameItRemade() =>
+        Assert.NotEqual(PcgwParser.NormaliseTitle("The Elder Scrolls IV: Oblivion"),
+                        PcgwParser.NormaliseTitle("The Elder Scrolls IV: Oblivion Remastered"));
+
     // -- The shipped database -----------------------------------------------------------------------
 
     private static ApiDatabase SampleDb()
@@ -229,6 +236,34 @@ public class GraphicsTests
         // The same game bought somewhere with no Steam app id finds the record by title.
         Assert.Equal([GraphicsApi.D3D9, GraphicsApi.D3D11], db.Lookup(null, "Metro 2033")!.Supported);
         Assert.Null(db.Lookup(null, "Metro Exodus"));
+    }
+
+    /// <summary>The same game reached through two app ids is one answer, and is still answered.</summary>
+    [Fact]
+    public void ATitleThatTwoRecordsAgreeOnIsStillAnswered()
+    {
+        var db = new ApiDatabase();
+        db.Put(ApiDatabase.SteamKey("22330"),
+            new ApiRecord { Title = "The Elder Scrolls IV: Oblivion", Apis = ["D3D9"], Has32Bit = true });
+        db.Put(ApiDatabase.SteamKey("900883"),
+            new ApiRecord { Title = "The Elder Scrolls IV: Oblivion", Apis = ["D3D9"], Has32Bit = true });
+
+        Assert.Equal([GraphicsApi.D3D9], db.Lookup(null, "The Elder Scrolls IV: Oblivion")!.Supported);
+    }
+
+    /// <summary>Two different games under one normalised title answer nothing, so the detection
+    /// falls back to the executable instead of reporting the other game's API with confidence.
+    /// </summary>
+    [Fact]
+    public void ATitleTwoGamesDisagreeOnAnswersNothing()
+    {
+        var db = new ApiDatabase();
+        db.Put(ApiDatabase.SteamKey("1"), new ApiRecord { Title = "Some Game", Apis = ["D3D12"], Has64Bit = true });
+        db.Put(ApiDatabase.SteamKey("2"), new ApiRecord { Title = "Some Game", Apis = ["D3D9"], Has32Bit = true });
+
+        Assert.Null(db.Lookup(null, "Some Game"));
+        // By app id it is still exact, and still answered.
+        Assert.Equal([GraphicsApi.D3D9], db.Lookup("2", "Some Game")!.Supported);
     }
 
     /// <summary>The Frostbite case: the executable links d3d12.dll, the game renders D3D11. What the
