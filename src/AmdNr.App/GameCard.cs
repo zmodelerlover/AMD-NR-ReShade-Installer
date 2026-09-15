@@ -75,14 +75,39 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     }
 
     public string StateLabel => _installed ? "ON" : "—";
-    public string RouteLabel => Entry.Preset.Label();
+
+    private GraphicsDetection? _graphics;
+
+    /// <summary>What the game renders with, once it has been read. Null until then, which the tile
+    /// shows as "…" rather than a guess.</summary>
+    public GraphicsDetection? Graphics
+    {
+        get => _graphics;
+        set
+        {
+            _graphics = value;
+            Raise();
+            Raise(nameof(RouteLabel));
+            Raise(nameof(NoRoute));
+            RefreshInstalled();
+        }
+    }
+
+    public string RouteLabel => _graphics?.Tag ?? "…";
+
+    /// <summary>Detected, and nothing it supports has a route: OpenGL, a 64-bit D3D9 game.</summary>
+    public bool NoRoute => _graphics is { Preset: null } g && g.All.Count > 0;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void Raise([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    public void RefreshInstalled() => Installed = GameScanner.IsInstalled(Entry.Path);
+    /// <summary>Looked for beside the game's executable as well as at the root, because that is where
+    /// an Unreal install lands.</summary>
+    public void RefreshInstalled() =>
+        Installed = GameScanner.IsInstalled(Entry.Path)
+                    || (_graphics?.Executable is { } exe && GameScanner.IsInstalled(System.IO.Path.GetDirectoryName(exe)!));
 
     public void RefreshRoute() => Raise(nameof(RouteLabel));
 }

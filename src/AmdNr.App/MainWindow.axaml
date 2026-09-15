@@ -109,9 +109,15 @@
                       </Panel>
                       <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
                                  TextTrimming="CharacterEllipsis" MaxWidth="164" />
-                      <Border Classes="tag" HorizontalAlignment="Left">
-                        <TextBlock Text="{Binding RouteLabel}" FontSize="10" />
-                      </Border>
+                      <StackPanel Orientation="Horizontal" Spacing="5">
+                        <Border Classes="tag" HorizontalAlignment="Left">
+                          <TextBlock Text="{Binding RouteLabel}" FontSize="10" />
+                        </Border>
+                        <Border Classes="tag" Background="#33E05B4C" BorderBrush="{DynamicResource Err}"
+                                IsVisible="{Binding NoRoute}">
+                          <TextBlock Text="✕" FontSize="10" Foreground="{DynamicResource Err}" />
+                        </Border>
+                      </StackPanel>
                     </StackPanel>
                   </Button>
                 </DataTemplate>
@@ -190,8 +196,16 @@
                       VerticalAlignment="Top" />
             </Grid>
 
-            <TextBlock Grid.Row="1" x:Name="DetectedLine" FontSize="12" Classes="muted"
-                       TextWrapping="Wrap" Margin="0,10,0,0" />
+            <StackPanel Grid.Row="1" Spacing="6" Margin="0,12,0,0">
+              <Border Classes="tag" HorizontalAlignment="Left">
+                <TextBlock x:Name="ApiTag" FontSize="12" FontWeight="SemiBold" />
+              </Border>
+              <TextBlock x:Name="DetectedLine" FontSize="11" Classes="muted" TextWrapping="Wrap" />
+              <Border x:Name="ApiHintBox" IsVisible="False" Background="#22DDA13A" BorderBrush="{DynamicResource Warn}"
+                      BorderThickness="1" CornerRadius="4" Padding="8,6">
+                <TextBlock x:Name="ApiHint" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource Warn}" />
+              </Border>
+            </StackPanel>
 
             <StackPanel Grid.Row="2" Spacing="8" Margin="0,14,0,0">
               <StackPanel Orientation="Horizontal" Spacing="10">

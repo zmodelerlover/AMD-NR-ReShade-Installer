@@ -94,6 +94,10 @@ public sealed class GameEntry
     /// <summary>Steam's app id, when it has one. It is what the cover art is keyed by.</summary>
     public string? AppId { get; set; }
 
+    /// <summary>True once the person picked a route by hand. Until then the route follows what the
+    /// detection says, including when a newer API database changes its mind.</summary>
+    public bool PresetChosen { get; set; }
+
     [JsonIgnore]
     public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
 

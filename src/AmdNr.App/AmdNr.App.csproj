@@ -40,6 +40,8 @@
     <!-- The same manifest the content repository publishes, shipped so the app works offline and
          before that repository exists. The remote copy wins when it can be reached. -->
     <None Include="..\..\payload\payload.json" Link="payload.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Which API each game supports, so detection is right offline and on a first run. -->
+    <None Include="..\..\payload\api-db.json" Link="api-db.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\payload\api-db.json')" />
   </ItemGroup>
 
   <ItemGroup>

@@ -53,4 +53,7 @@
   <sys:String x:Key="Str.Settings">Settings</sys:String>
   <sys:String x:Key="Str.NotDownloaded">not downloaded yet</sys:String>
   <sys:String x:Key="Str.WillDownload">The files are downloaded and verified when you install.</sys:String>
+  <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12 and Vulkan, and on D3D8, D3D9 and D3D11 for 32-bit games. OpenGL has none.</sys:String>
+  <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings -- that is the route picked here, and on another API the add-on sees a different game.</sys:String>
+  <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
 </ResourceDictionary>

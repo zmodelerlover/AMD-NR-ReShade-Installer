@@ -270,14 +270,27 @@ public static class Work
         {
             var allThere = true;
             var payloads = PayloadDir(src);
-            foreach (var (name, want) in new[]
-                     {
-                         (AddonName, pins.AddonSize),
-                         (RuntimeName, pins.RuntimeSize),
-                         (WeightsName, pins.WeightsSize),
-                     })
+
+            // The 32-bit route installs its own pair, pinned by payload.sha256, and never the 64-bit
+            // add-on -- asking for that file there is asking for something that is not supposed to exist.
+            if (preset.Route() == Route.X86)
             {
-                switch (Engine.SizeOf(Path.Combine(payloads, name)))
+                foreach (var name in new[] { "payload.sha256", @"files\dlss5-neural.addon32", @"files\dlss5-neural-host64.exe" })
+                {
+                    if (File.Exists(Path.Combine(src, name))) continue;
+                    report.Err($"{Path.GetFileName(name)} is not in the payload folder; the 32-bit bridge cannot be installed without it.");
+                    allThere = false;
+                }
+            }
+
+            var expected = preset.Route() == Route.X86
+                ? new[] { (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize) }
+                : [(AddonName, pins.AddonSize), (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize)];
+
+            foreach (var (name, want) in expected)
+            {
+                var nested = Path.Combine(src, "files", name);
+                switch (Engine.SizeOf(File.Exists(nested) ? nested : Path.Combine(payloads, name)))
                 {
                     case null:
                         report.Err($"{name} is not in that folder.");
@@ -343,7 +356,16 @@ public static class Work
         }
 
         CheckExe(dir, preset, report);
-        CheckReShade(dir, preset, report);
+
+        // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
+        // "no ReShade here" is not a problem to report there -- it is the state before installing.
+        var reShadeShipped = preset.Route() == Route.X86 && src.Length > 0
+                             && File.Exists(Path.Combine(src, "files", "dxgi.dll"));
+        if (reShadeShipped)
+            report.Ok("The pinned 32-bit ReShade 6.8.0 is part of this install; nothing to install by hand.");
+        else
+            CheckReShade(dir, preset, report);
+
         CheckDisabledAddons(dir, report);
 
         var dead = DeadFiles().Where(n => File.Exists(Path.Combine(dir, n))).ToList();
@@ -554,7 +576,11 @@ public static class Work
         {
             report.Err(e.Message);
         }
-        report.Info("ReShade itself was left alone. Use its own installer to remove it.");
+
+        // Said only when it is true: when this route installed the pinned ReShade itself, uninstall
+        // took it back, and telling someone it was left alone would send them looking for nothing.
+        if (new[] { "d3d9.dll", "dxgi.dll", "d3d8.dll" }.Any(n => File.Exists(Path.Combine(dir, n))))
+            report.Info("ReShade itself was left alone. Use its own installer to remove it.");
         return report;
     }
 

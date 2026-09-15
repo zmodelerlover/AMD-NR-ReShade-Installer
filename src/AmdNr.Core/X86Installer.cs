@@ -17,9 +17,13 @@ public sealed class X86Installer(string release)
 
     public void Note(string s) => Log.Add(s);
 
+    /// <summary>The release zip keeps every payload under files\; a staged folder built out of the
+    /// cache keeps the runtime and weights at its root, beside payload.sha256. Both are the same
+    /// bytes checked against the same hash, so both shapes are read.</summary>
     private byte[] Payload(string name, string expected)
     {
-        var bytes = Engine.Read(Path.Combine(Release, "files", name));
+        var nested = Path.Combine(Release, "files", name);
+        var bytes = Engine.Read(File.Exists(nested) ? nested : Path.Combine(Release, name));
         Engine.HashIs(bytes, expected, name);
         return bytes;
     }

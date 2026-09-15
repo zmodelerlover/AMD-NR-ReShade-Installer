@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     private readonly List<Preset> _offered = [];
 
     private PayloadManifest? _manifest;
+    private ApiDatabase? _apiDb;
     private AppRelease? _update;
     private GameCard? _selected;
     private bool _busy;
@@ -75,6 +76,12 @@ public partial class MainWindow : Window
         }
 
         ShowPayloadState();
+
+        // Which API each game supports: the database the content repository publishes, then the
+        // last copy fetched, then the one shipped beside the exe. Detection runs either way; the
+        // database only corrects what a game's own files get wrong.
+        _apiDb = await ApiDatabase.LoadAsync(_http, _config.Payload.Owner, _config.Payload.Repo, _config.Payload.Branch);
+        await DetectAllAsync();
         await LoadCoversAsync();
 
         _update = await AppUpdate.CheckAsync(_http, _config.App, App.Version);
@@ -172,6 +179,7 @@ public partial class MainWindow : Window
             RefreshGrid();
             foreach (var card in _all) card.RefreshInstalled();
             Foot($"{found.Count} {Text("Str.Found")} · {added} {Text("Str.Added")}");
+            await DetectAllAsync();
             await LoadCoversAsync();
         }
         finally
@@ -179,6 +187,24 @@ public partial class MainWindow : Window
             ScanSpinner.IsVisible = false;
             ScanButton.IsEnabled = true;
         }
+    }
+
+    /// <summary>Reads every game's graphics API off the UI thread. It only opens files -- headers and
+    /// import tables -- so a library of a few hundred games takes seconds, not minutes, and it works
+    /// offline.</summary>
+    private async Task DetectAllAsync()
+    {
+        var pending = _all.Where(c => c.Graphics is null).ToList();
+        foreach (var card in pending)
+        {
+            var db = _apiDb;
+            var detection = await Task.Run(() =>
+                GraphicsDetector.Detect(card.Path, card.Entry.Name).With(db?.Lookup(card.Entry.AppId, card.Entry.Name)));
+            card.Graphics = detection;
+            if (!card.Entry.PresetChosen && detection.Preset is { } preset) card.Entry.Preset = preset;
+        }
+        if (pending.Count > 0) Save();
+        if (_selected is not null && pending.Contains(_selected)) Select(_selected);
     }
 
     /// <summary>Cover art, a few at a time, and only for what has none yet. Steam publishes it on
@@ -228,6 +254,8 @@ public partial class MainWindow : Window
             Name = Path.GetFileName(path.TrimEnd('\\', '/')),
             Preset = GameScanner.GuessPreset(path),
         });
+        card.Graphics = GraphicsDetector.Detect(path, card.Entry.Name).With(_apiDb?.Lookup(null, card.Entry.Name));
+        if (card.Graphics.Preset is { } detected) card.Entry.Preset = detected;
         _all.Add(card);
         _all.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
         card.RefreshInstalled();
@@ -252,12 +280,33 @@ public partial class MainWindow : Window
 
         TargetName.Text = card.Name;
         TargetPath.Text = card.Path;
-        DetectedLine.Text = Work.Detect(card.Path).Line ?? "";
+
+        var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name);
+        ApiTag.Text = graphics.Tag;
+        DetectedLine.Text = graphics.Why;
+        ApiHint.Text = graphics switch
+        {
+            { Preset: null, All.Count: > 0 } => Text("Str.NoRoute"),
+            { NeedsRendererSwitch: true } => string.Format(Text("Str.SwitchRenderer"),
+                    GraphicsDetection.Short(graphics.Recommended),
+                    string.Join(", ", graphics.All.Select(GraphicsDetection.Short)))
+                + (graphics.Executable?.EndsWith("-Shipping.exe", StringComparison.OrdinalIgnoreCase) == true
+                    ? " " + string.Format(Text("Str.SwitchRendererUnreal"), GraphicsDetection.Short(graphics.Recommended).ToLowerInvariant())
+                    : ""),
+            _ => "",
+        };
+        ApiHintBox.IsVisible = ApiHint.Text.Length > 0;
+
+        // The width comes from the executable the detection picked, so a folder holding a 32-bit
+        // launcher beside a 64-bit game is decided by the game and not by the launcher.
+        var detected = graphics.Width is { } width
+            ? Detected.On(width, Path.GetFileName(graphics.Executable ?? card.Path))
+            : Work.Detect(card.Path);
 
         // Five of the ten API-by-architecture combinations do not exist; the detected width rules
         // out the rest, so a route that cannot work is never on the list.
         _offered.Clear();
-        _offered.AddRange(Presets.Offered(Work.Detect(card.Path)));
+        _offered.AddRange(Presets.Offered(detected));
         _settingPreset = true;
         PresetBox.ItemsSource = _offered.Select(p => p.Label()).ToList();
         var index = _offered.IndexOf(card.Entry.Preset);
@@ -283,6 +332,7 @@ public partial class MainWindow : Window
         if (PresetBox.SelectedIndex < 0 || PresetBox.SelectedIndex >= _offered.Count) return;
 
         _selected.Entry.Preset = _offered[PresetBox.SelectedIndex];
+        _selected.Entry.PresetChosen = true;
         _selected.RefreshRoute();
         PresetNote.Text = _selected.Entry.Preset.Note();
         Save();
@@ -333,7 +383,7 @@ public partial class MainWindow : Window
         var (report, payloads) = await Task.Run(() =>
         {
             var staged = CachedPayloadFolder(card.Entry.Preset);
-            return (Work.Preflight(card.Path, staged ?? "", card.Entry.Preset, pins), staged);
+            return (Work.Preflight(TargetFor(card), staged ?? "", card.Entry.Preset, pins), staged);
         });
 
         Show(report);
@@ -353,7 +403,7 @@ public partial class MainWindow : Window
 
             Status(Text("Str.Working"));
             var pins = Pins();
-            var report = await Task.Run(() => Work.Install(card.Path, folder, card.Entry.Preset, pins));
+            var report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins));
             Show(report);
             WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
             card.RefreshInstalled();
@@ -371,7 +421,7 @@ public partial class MainWindow : Window
         Busy(true);
         try
         {
-            var report = await Task.Run(() => Work.Uninstall(card.Path, card.Entry.Preset));
+            var report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset));
             Show(report);
             WriteLog(report, $"uninstall {card.Entry.Preset.Label()} -> {card.Path}");
             card.RefreshInstalled();
@@ -422,6 +472,13 @@ public partial class MainWindow : Window
             return null;
         }
     }
+
+    /// <summary>What the engine is pointed at: the executable the detection found, not the library
+    /// folder. For an Unreal game that is Binaries\Win64, where ReShade and the add-on have to sit --
+    /// the root holds only a launcher stub that loads neither. For a 32-bit game it is also what
+    /// settles a folder holding the game beside a benchmark or a launcher.</summary>
+    private static string TargetFor(GameCard card) =>
+        card.Graphics?.Executable is { } exe && File.Exists(exe) ? exe : card.Path;
 
     /// <summary>What a route needs. Every route needs the add-on and the runtime; the bridge routes
     /// also need their own 32-bit pair and the pinned ReShade beside it.</summary>

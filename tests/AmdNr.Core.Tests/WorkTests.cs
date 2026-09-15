@@ -387,6 +387,33 @@ public class WorkTests
         Assert.False(Fixture.HasErr(after, "still running"), "closing it should clear the line");
     }
 
+    /// <summary>The 32-bit route never installs the 64-bit add-on, so a payload folder without it is
+    /// the correct shape there -- and the pinned ReShade it carries means "no ReShade in the game
+    /// folder" is the state before installing, not a problem.</summary>
+    [Fact]
+    public void PreflightOnTheBridgeRouteAsksForTheBridgeFilesNotTheX64AddOn()
+    {
+        var game = Fixture.Temp("preflight-x86-game");
+        File.WriteAllBytes(Path.Combine(game, "old.exe"), Fixture.Pe(false));
+
+        var (src, pins) = Fixture.Payloads("preflight-x86");
+        File.Delete(Path.Combine(src, Work.AddonName));
+        Directory.CreateDirectory(Path.Combine(src, "files"));
+        File.WriteAllText(Path.Combine(src, "payload.sha256"), "");
+        File.WriteAllBytes(Path.Combine(src, "files", "dlss5-neural.addon32"), Fixture.Pe(false));
+        File.WriteAllBytes(Path.Combine(src, "files", "dlss5-neural-host64.exe"), Fixture.Pe(true));
+        File.WriteAllBytes(Path.Combine(src, "files", "dxgi.dll"), Fixture.Pe(false));
+
+        var report = Work.Preflight(Path.Combine(game, "old.exe"), src, Preset.X86Dx9, pins);
+        Assert.False(report.Failed, report.ToLog("x86 preflight"));
+        Assert.False(Fixture.HasAny(report, Work.AddonName), report.ToLog("x86 preflight"));
+        Assert.True(Fixture.HasAny(report, "pinned 32-bit ReShade"), report.ToLog("x86 preflight"));
+
+        File.Delete(Path.Combine(src, "files", "dlss5-neural-host64.exe"));
+        var missing = Work.Preflight(Path.Combine(game, "old.exe"), src, Preset.X86Dx9, pins);
+        Assert.True(Fixture.HasErr(missing, "dlss5-neural-host64.exe"), missing.ToLog("x86 missing"));
+    }
+
     [Fact]
     public void PreflightIsQuietWhenThereIsGenuinelyNothingWrong()
     {

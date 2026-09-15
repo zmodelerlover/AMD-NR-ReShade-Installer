@@ -50,4 +50,7 @@
   <sys:String x:Key="Str.Settings">Configurações</sys:String>
   <sys:String x:Key="Str.NotDownloaded">ainda não baixado</sys:String>
   <sys:String x:Key="Str.WillDownload">Os arquivos são baixados e conferidos na hora de instalar.</sys:String>
+  <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12 e Vulkan, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. OpenGL não tem.</sys:String>
+  <sys:String x:Key="Str.SwitchRenderer">Este jogo roda em {1}. Coloque em {0} nas configurações gráficas dele -- é a rota escolhida aqui, e em outra API o add-on vê outro jogo.</sys:String>
+  <sys:String x:Key="Str.SwitchRendererUnreal">É um jogo Unreal: adicione -{0} nas opções de inicialização.</sys:String>
 </ResourceDictionary>
