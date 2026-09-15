@@ -722,6 +722,13 @@ public class WorkTests
         Assert.False(AppUpdater.Verify(bytes, sums, "not-listed.exe"));
         Assert.False(AppUpdater.Verify(bytes, "", "AMD-NR-ReShade-Installer.exe"));
 
+        // The exact shape the release publishes: two spaces, no asterisk, CRLF, more than one file
+        // listed. A sums file this cannot parse is not an error anywhere -- CanSelfUpdate goes false
+        // and the app quietly opens the browser instead, which is what v0.1.0 did for want of one.
+        Assert.True(AppUpdater.Verify(bytes,
+            $"{sha}  AMD-NR-ReShade-Installer.exe\r\n{new string('0', 64)}  AMD-NR-ReShade-Installer-v0.1.1.zip\r\n",
+            "AMD-NR-ReShade-Installer.exe"));
+
         var current = Path.Combine(dir, "app.exe");
         var staged = Path.Combine(dir, "staged.exe");
         File.WriteAllBytes(current, "the old build"u8.ToArray());
