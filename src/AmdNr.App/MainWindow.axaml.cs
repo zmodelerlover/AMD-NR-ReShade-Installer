@@ -19,6 +19,10 @@ public sealed record ReportLine(Geometry? Glyph, string Text, IBrush Brush);
 /// <summary>One downloadable component as the System page lists it.</summary>
 public sealed record PayloadRow(string Name, string Version, bool Ready);
 
+/// <summary>One installable version of the add-on, as the sheet offers it. A null release means
+/// the version the payload manifest pins, which is the one this build was published with.</summary>
+public sealed record VersionChoice(Version Version, string Label, AddonRelease? Release);
+
 public partial class MainWindow : Window
 {
     private readonly AppConfig _config = AppConfig.Load();
@@ -29,11 +33,18 @@ public partial class MainWindow : Window
     private readonly List<Preset> _offered = [];
 
     private PayloadManifest? _manifest;
+    private IReadOnlyList<AddonRelease> _releases = [];
+    private readonly List<VersionChoice> _versions = [];
+    private VersionChoice? _version;
+    private bool _settingVersion;
     private ApiDatabase? _apiDb;
     private AppRelease? _update;
     private GameCard? _selected;
     private bool _busy;
     private bool _settingPreset;
+
+    /// <summary>The per-action log the last install or uninstall wrote, so the sheet can offer it.</summary>
+    private string? _lastLog;
     private readonly DispatcherTimer _toastTimer = new() { Interval = TimeSpan.FromSeconds(4) };
 
     // The install steps, in the order the chips sit in the drawer.
@@ -99,10 +110,15 @@ public partial class MainWindow : Window
 
         ShowPayloadState();
 
+        // Which versions of the add-on can be installed. One call to GitHub, kept in the cache,
+        // and the sheet falls back to the version the manifest pins when it comes back empty.
+        _releases = await AddonReleases.ListAsync(_http, _config.Addon.Owner, _config.Addon.Repo);
+
         // Which API each game supports: the database the content repository publishes, then the
         // last copy fetched, then the one shipped beside the exe. Detection runs either way; the
         // database only corrects what a game's own files get wrong.
-        _apiDb = await ApiDatabase.LoadAsync(_http, _config.Payload.Owner, _config.Payload.Repo, _config.Payload.Branch);
+        _apiDb = await ApiDatabase.LoadAsync(_http, _config.Payload.Owner, _config.Payload.Repo,
+            _config.Payload.Branch, _config.Payload.ApiDbUrl);
         await DetectAllAsync();
         await LoadCoversAsync();
 
@@ -543,6 +559,7 @@ public partial class MainWindow : Window
         card.Entry.Preset = _offered[PresetBox.SelectedIndex];
         card.RefreshRoute();
         PresetNote.Text = PresetNote_(card.Entry.Preset);
+        ShowVersions(card.Entry.Preset);
 
         await RefreshAsync();
     }
@@ -630,6 +647,7 @@ public partial class MainWindow : Window
         _selected.Entry.PresetChosen = true;
         _selected.RefreshRoute();
         PresetNote.Text = PresetNote_(_selected.Entry.Preset);
+        ShowVersions(_selected.Entry.Preset);
         Save();
         await RefreshAsync();
     }
@@ -701,6 +719,68 @@ public partial class MainWindow : Window
         Status(payloads is null ? Text("Str.WillDownload") : Text("Str.PayloadsReady"));
     }
 
+    /// <summary>The versions this route can be installed at: every GitHub release that publishes
+    /// what the route needs, plus the one the payload manifest pins. That last one is not
+    /// decoration -- v0.5.0 published its 32-bit pair inside the archive rather than beside it,
+    /// so for a bridge route the manifest is the only place those two files can be pinned from.
+    /// </summary>
+    private void ShowVersions(Preset preset)
+    {
+        var route = preset.Route();
+        _versions.Clear();
+        foreach (var release in _releases.Where(r => r.Covers(route)))
+            _versions.Add(new VersionChoice(release.Version, release.Label, release));
+
+        if (_manifest is not null)
+        {
+            var component = route == Route.X86
+                ? PayloadManifest.BridgeComponent
+                : PayloadManifest.AddonComponent;
+            try
+            {
+                if (AddonReleases.Version(_manifest.Component(component).Version) is { } pinned &&
+                    _versions.All(v => v.Version != pinned))
+                    _versions.Add(new VersionChoice(pinned, $"v{pinned} - {Text("Str.VersionShipped")}", null));
+            }
+            catch (InstallException)
+            {
+                // A manifest without that component adds nothing; the releases still stand.
+            }
+        }
+
+        _versions.Sort((a, b) => b.Version.CompareTo(a.Version));
+
+        // The choice is kept across routes and games while the app is open, so retrying an
+        // install somewhere else does not quietly change which version is going in.
+        var index = _version is null ? 0 : _versions.FindIndex(v => v.Version == _version.Version);
+        _settingVersion = true;
+        AddonVersionBox.ItemsSource = _versions.Select(v => v.Label).ToList();
+        AddonVersionBox.SelectedIndex = _versions.Count == 0 ? -1 : Math.Max(0, index);
+        _settingVersion = false;
+
+        _version = AddonVersionBox.SelectedIndex >= 0 ? _versions[AddonVersionBox.SelectedIndex] : null;
+        VersionSection.IsVisible = _versions.Count > 0;
+        VersionNote.Text = VersionNoteText();
+    }
+
+    private string VersionNoteText() => _version is null
+        ? string.Empty
+        : _version.Release is null
+            ? Text("Str.VersionNoteShipped")
+            : string.Format(Text("Str.VersionNoteRelease"), _version.Version);
+
+    private async void OnAddonVersionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_settingVersion || _selected is null) return;
+        if (AddonVersionBox.SelectedIndex < 0 || AddonVersionBox.SelectedIndex >= _versions.Count) return;
+
+        _version = _versions[AddonVersionBox.SelectedIndex];
+        VersionNote.Text = VersionNoteText();
+        // A different version is a different pair of hashes, so the pre-flight has to be redone:
+        // "already installed" is only true of the version that is actually in the folder.
+        await RefreshAsync();
+    }
+
     private async void OnInstall(object? sender, RoutedEventArgs e)
     {
         if (_selected is not { } card || _busy) return;
@@ -723,9 +803,18 @@ public partial class MainWindow : Window
             ShowStep(StepInstall);
             Status(Text("Str.Working"));
             var pins = Pins();
-            var report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins));
+            Report report;
+            try { report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins)); }
+            catch (Exception ex)
+            {
+                // The engine turns everything it expects into a report line, and rolls back before
+                // it throws. Anything left is unforeseen -- and losing the window mid-install is a
+                // worse answer than a line saying so.
+                report = Failure(ex);
+            }
             Show(report);
             WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
+            _lastLog = InstallLog.Write("install", card, TargetFor(card), report, Selected(), pins, folder);
             card.RefreshInstalled();
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
             ShowOutcome(report, "Str.Install", card.Name);
@@ -746,9 +835,12 @@ public partial class MainWindow : Window
         ResultBanner.IsVisible = false;
         try
         {
-            var report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset));
+            Report report;
+            try { report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset)); }
+            catch (Exception ex) { report = Failure(ex); }
             Show(report);
             WriteLog(report, $"uninstall {card.Entry.Preset.Label()} -> {card.Path}");
+            _lastLog = InstallLog.Write("uninstall", card, TargetFor(card), report, Selected(), Pins(), null);
             card.RefreshInstalled();
             ShowOutcome(report, "Str.Uninstall", card.Name);
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
@@ -764,7 +856,8 @@ public partial class MainWindow : Window
     /// difference.</summary>
     private async Task<string?> EnsurePayloadsAsync(Preset preset)
     {
-        if (_manifest is null)
+        var manifest = Selected();
+        if (manifest is null)
         {
             Status(Text("Str.ManifestFailed"));
             return null;
@@ -821,12 +914,13 @@ public partial class MainWindow : Window
     /// <summary>The folder a route would install from, when it is already complete in the cache.</summary>
     private string? CachedPayloadFolder(Preset preset)
     {
-        if (_manifest is null) return null;
+        var manifest = Selected();
+        if (manifest is null) return null;
         try
         {
             var components = ComponentsFor(preset);
-            if (!components.All(c => PayloadCache.IsComplete(_manifest, c))) return null;
-            return new PayloadCache(_http).Stage(_manifest, components);
+            if (!components.All(c => PayloadCache.IsComplete(manifest, c))) return null;
+            return new PayloadCache(_http).Stage(manifest, components);
         }
         catch (Exception e) when (e is InstallException or IOException)
         {
@@ -834,9 +928,15 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>The manifest this sheet installs from: the published one, with the chosen
+    /// release's add-on swapped in when that is not the version the manifest already pins.</summary>
+    private PayloadManifest? Selected() => _manifest is null || _version?.Release is null
+        ? _manifest
+        : AddonReleases.With(_manifest, _version.Release);
+
     private PayloadPins Pins()
     {
-        try { return _manifest?.Pins() ?? Fallback(); }
+        try { return Selected()?.Pins() ?? Fallback(); }
         catch (InstallException) { return Fallback(); }
 
         // Without a manifest the runtime and weights are still the pinned pair the add-on refuses

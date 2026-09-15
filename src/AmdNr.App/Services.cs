@@ -31,6 +31,11 @@ public sealed class AppConfig
     public RepoRef App { get; init; } = new() { Owner = "zmodelerlover", Repo = "AMD-NR-ReShade-Installer" };
     public RepoRef Payload { get; init; } = new() { Owner = "zmodelerlover", Repo = "AMD-NR-Extras" };
 
+    /// <summary>The add-on's own repository. Only its releases are read, to know which versions
+    /// exist and what each one publishes; the files still come from release asset addresses.
+    /// </summary>
+    public RepoRef Addon { get; init; } = new() { Owner = "zmodelerlover", Repo = "dlss5-neural-amd" };
+
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
 
     public static AppConfig Load()

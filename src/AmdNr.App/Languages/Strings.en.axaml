@@ -66,6 +66,11 @@
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
+  <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
+  <sys:String x:Key="Str.PrefetchAll">Download all now</sys:String>
+  <sys:String x:Key="Str.VersionShipped">bundled</sys:String>
+  <sys:String x:Key="Str.VersionNoteShipped">The version this installer was published with.</sys:String>
+  <sys:String x:Key="Str.VersionNoteRelease">Taken from the v{0} release on GitHub, and checked against the hashes that release publishes.</sys:String>
   <sys:String x:Key="Str.WhatHappens">What will happen</sys:String>
   <sys:String x:Key="Str.Checking">Checking this folder…</sys:String>
   <sys:String x:Key="Str.StepDownload">Download</sys:String>

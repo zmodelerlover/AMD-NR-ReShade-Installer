@@ -375,6 +375,15 @@
                           <TextBlock x:Name="PresetNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                         </StackPanel>
 
+                        <!-- Which release of the add-on goes in -->
+                        <StackPanel x:Name="VersionSection" Spacing="8" IsVisible="False">
+                          <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
+                          <ComboBox x:Name="AddonVersionBox" HorizontalAlignment="Stretch"
+                                    SelectionChanged="OnAddonVersionChanged"
+                                    AutomationProperties.Name="{DynamicResource Str.VersionSection}" />
+                          <TextBlock x:Name="VersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
+
                         <!-- The raw pre-flight, for whoever wants to see why. -->
                         <Expander x:Name="DetailsExpander" Classes="details">
                           <Expander.Header>
