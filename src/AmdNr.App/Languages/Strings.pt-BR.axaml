@@ -65,6 +65,9 @@
   <sys:String x:Key="Str.RouteSection">Rota</sys:String>
   <sys:String x:Key="Str.VersionSection">Versão do add-on</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Baixar tudo agora</sys:String>
+  <sys:String x:Key="Str.PayloadsAllReady">{0} de {1} componentes prontos — {2} no cache</sys:String>
+  <sys:String x:Key="Str.PayloadsMissing">{0} de {1} componentes prontos — faltam {2} para baixar</sys:String>
+  <sys:String x:Key="Str.PayloadsAlreadyThere">Já estava tudo aí, e cada byte acabou de ser conferido.</sys:String>
   <sys:String x:Key="Str.VersionShipped">que acompanha o instalador</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">A versão com que este instalador foi publicado.</sys:String>
   <sys:String x:Key="Str.VersionNoteRelease">Vem do release v{0} no GitHub, conferida contra os hashes que aquele release publica.</sys:String>

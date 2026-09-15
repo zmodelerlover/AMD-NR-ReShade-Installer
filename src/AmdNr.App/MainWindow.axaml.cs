@@ -17,7 +17,7 @@ namespace AmdNr.App;
 public sealed record ReportLine(Geometry? Glyph, string Text, IBrush Brush);
 
 /// <summary>One downloadable component as the System page lists it.</summary>
-public sealed record PayloadRow(string Name, string Version, bool Ready);
+public sealed record PayloadRow(string Name, string Version, string Size, bool Ready);
 
 /// <summary>One installable version of the add-on, as the sheet offers it. A null release means
 /// the version the payload manifest pins, which is the one this build was published with.</summary>
@@ -108,7 +108,7 @@ public partial class MainWindow : Window
             _manifest = PayloadCache.LoadLocalManifest();
         }
 
-        ShowPayloadState();
+        await ShowPayloadStateAsync();
 
         // Which versions of the add-on can be installed. One call to GitHub, kept in the cache,
         // and the sheet falls back to the version the manifest pins when it comes back empty.
@@ -173,7 +173,10 @@ public partial class MainWindow : Window
         SystemWarning.IsVisible = true;
     }
 
-    private void ShowPayloadState()
+    /// <summary>What is in the cache, and what it would still cost to fill it. Deciding that means
+    /// hashing 141 MB of weights, which is about a second, so it runs off the UI thread -- on the
+    /// thread it used to run on, switching to this page froze the window for that second.</summary>
+    private async Task ShowPayloadStateAsync()
     {
         var manifest = Selected();
         PayloadState.IsVisible = manifest is null;
@@ -181,23 +184,49 @@ public partial class MainWindow : Window
         if (manifest is null)
         {
             PayloadState.Text = Text("Str.ManifestFailed");
+            PayloadSummary.IsVisible = false;
             PayloadList.ItemsSource = null;
             return;
         }
 
-        var rows = new List<PayloadRow>();
-        foreach (var (name, component) in manifest.Components)
+        var rows = await Task.Run(() => manifest.Components.Select(pair =>
         {
             var complete = false;
-            try { complete = PayloadCache.IsComplete(manifest, name); }
-            catch (InstallException)
+            try { complete = PayloadCache.IsComplete(manifest, pair.Key); }
+            catch (Exception e) when (e is InstallException or IOException)
             {
                 // A component this build does not understand is not a reason to show nothing.
             }
-            rows.Add(new PayloadRow(name, component.Version, complete));
-        }
+            return new PayloadRow(pair.Key, pair.Value.Version, Megabytes(Bytes(pair.Value)), complete);
+        }).ToList());
+
         PayloadList.ItemsSource = rows;
+
+        var ready = rows.Count(r => r.Ready);
+        var cached = manifest.Components
+            .Where(pair => rows.Any(r => r.Name == pair.Key && r.Ready))
+            .Aggregate(0UL, (sum, pair) => sum + Bytes(pair.Value));
+        var missing = manifest.Components
+            .Where(pair => rows.Any(r => r.Name == pair.Key && !r.Ready))
+            .Aggregate(0UL, (sum, pair) => sum + Bytes(pair.Value));
+
+        PayloadSummary.Text = ready == rows.Count
+            ? string.Format(Text("Str.PayloadsAllReady"), ready, rows.Count, Megabytes(cached))
+            : string.Format(Text("Str.PayloadsMissing"), ready, rows.Count, Megabytes(missing));
+        PayloadSummary.IsVisible = rows.Count > 0;
     }
+
+    private static ulong Bytes(PayloadComponent component) =>
+        component.Files.Aggregate(0UL, (sum, file) => sum + file.Size);
+
+    /// <summary>A size someone can compare against their connection. Whole megabytes truncate every
+    /// component but the weights to "0 MB", which reads as "nothing to download".</summary>
+    private static string Megabytes(ulong bytes) => bytes switch
+    {
+        >= 10 * 1_048_576 => $"{bytes / 1_048_576} MB",
+        >= 1_048_576 => $"{bytes / 1_048_576.0:0.0} MB",
+        _ => $"{Math.Max(1, bytes / 1024)} KB",
+    };
 
     /// <summary>Fetch every component now rather than at the first install that needs one. The cache
     /// is keyed by component and version and shared by every game, so this is paid once: the 141 MB
@@ -211,32 +240,76 @@ public partial class MainWindow : Window
 
         Busy(true);
         PrefetchButton.IsEnabled = false;
-        var progress = new Progress<DownloadProgress>(p => Dispatcher.UIThread.Post(() =>
-        {
-            Progress.IsVisible = true;
-            Progress.IsIndeterminate = p.Fraction is null;
-            if (p.Fraction is { } fraction) Progress.Value = fraction * 100;
-            Status($"{Text("Str.Downloading")} {p.File} — {p.Received / 1_048_576} MB");
-        }));
+        PayloadProgressBox.IsVisible = true;
+        PayloadProgress.IsIndeterminate = true;
+        PayloadProgressText.Text = Text("Str.Verifying");
 
         var cache = new PayloadCache(_http);
         try
         {
-            foreach (var component in manifest.Components.Keys.ToList())
+            // What is actually missing, hashed off the UI thread. Clicking with a full cache is a
+            // re-check of every byte, and it says so rather than looking like it did nothing.
+            var pending = await Task.Run(() => manifest.Components.Keys
+                .Where(name =>
+                {
+                    try { return !PayloadCache.IsComplete(manifest, name); }
+                    catch (Exception e2) when (e2 is InstallException or IOException) { return false; }
+                })
+                .ToList());
+
+            if (pending.Count == 0)
+            {
+                ShowToast(Text("Str.PayloadsAlreadyThere"), Level.Ok);
+                Status(Text("Str.PayloadsReady"));
+                return;
+            }
+
+            // One bar for the whole set, not one per file: six files of wildly different sizes each
+            // running 0 to 100 tells nobody how much of the download is left.
+            var sizes = pending.SelectMany(name => manifest.Component(name).Files)
+                .GroupBy(file => file.Name)
+                .ToDictionary(group => group.Key, group => group.First().Size);
+            var total = sizes.Values.Aggregate(0UL, (sum, size) => sum + size);
+            var finished = 0UL;
+            var current = "";
+
+            PayloadProgress.IsIndeterminate = false;
+            var progress = new Progress<DownloadProgress>(p => Dispatcher.UIThread.Post(() =>
+            {
+                if (p.File != current)
+                {
+                    // A file only stops being reported when it is done, or when a mirror restarts
+                    // it under the same name -- which leaves this untouched, as it should.
+                    if (current.Length > 0 && sizes.TryGetValue(current, out var done)) finished += done;
+                    current = p.File;
+                }
+                var received = finished + (ulong)Math.Max(0, p.Received);
+                PayloadProgress.Value = total == 0 ? 0 : Math.Min(100, 100.0 * received / total);
+                PayloadProgressText.Text =
+                    $"{p.File} — {Megabytes(received)} / {Megabytes(total)}";
+                Status($"{Text("Str.Downloading")} {p.File}");
+            }));
+
+            foreach (var component in pending)
                 await cache.EnsureAsync(manifest, component, progress);
+
+            PayloadProgress.Value = 100;
+            ShowToast(Text("Str.PayloadsReady"), Level.Ok);
             Status(Text("Str.PayloadsReady"));
         }
         catch (Exception ex) when (ex is InstallException or HttpRequestException or IOException)
         {
             // The rows below say which ones did land, so the message is the reason and not a list.
+            PayloadProgressText.Text = ex.Message;
+            ShowToast(Text("Str.DownloadFailed"), Level.Err);
             Status(ex.Message);
         }
         finally
         {
-            Progress.IsVisible = false;
+            PayloadProgressBox.IsVisible = false;
             Busy(false);
             // Re-read rather than assume: a component that failed has to keep saying so.
-            ShowPayloadState();
+            await ShowPayloadStateAsync();
         }
     }
 
@@ -703,7 +776,7 @@ public partial class MainWindow : Window
         GamesPage.IsVisible = sender == TabGames;
         SystemPage.IsVisible = sender == TabSystem;
         SettingsPage.IsVisible = sender == TabSettings;
-        if (sender == TabSystem) ShowPayloadState();
+        if (sender == TabSystem) _ = ShowPayloadStateAsync();
     }
 
     private void OnLanguageChanged(object? sender, SelectionChangedEventArgs e)

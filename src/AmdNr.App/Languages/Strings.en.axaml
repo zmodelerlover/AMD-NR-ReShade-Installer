@@ -68,6 +68,9 @@
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Download all now</sys:String>
+  <sys:String x:Key="Str.PayloadsAllReady">{0} of {1} components ready — {2} in the cache</sys:String>
+  <sys:String x:Key="Str.PayloadsMissing">{0} of {1} components ready — {2} left to download</sys:String>
+  <sys:String x:Key="Str.PayloadsAlreadyThere">Everything was already there, and every byte just checked out.</sys:String>
   <sys:String x:Key="Str.VersionShipped">bundled</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">The version this installer was published with.</sys:String>
   <sys:String x:Key="Str.VersionNoteRelease">Taken from the v{0} release on GitHub, and checked against the hashes that release publishes.</sys:String>

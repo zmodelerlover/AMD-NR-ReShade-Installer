@@ -547,6 +547,8 @@
                 </Grid>
                 <TextBlock x:Name="PayloadState" Margin="20,0,20,14" Foreground="{DynamicResource Warn}"
                            TextWrapping="Wrap" IsVisible="False" />
+                <TextBlock x:Name="PayloadSummary" Margin="20,0,20,14" Classes="muted"
+                           TextWrapping="Wrap" IsVisible="False" />
                 <ItemsControl x:Name="PayloadList">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -555,6 +557,7 @@
                           <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                             <TextBlock Text="{Binding Version}" Classes="caption" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Size}" Classes="caption" VerticalAlignment="Center" />
                           </StackPanel>
                           <Border Grid.Column="1" Classes="status" Classes.ok="{Binding Ready}">
                             <StackPanel Orientation="Horizontal" Spacing="5">
@@ -571,6 +574,12 @@
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <StackPanel x:Name="PayloadProgressBox" IsVisible="False" Margin="20,14,20,2" Spacing="7">
+                  <ProgressBar x:Name="PayloadProgress" Height="4" MinHeight="4" CornerRadius="2"
+                               Foreground="{DynamicResource AccentHover}"
+                               Background="{DynamicResource SurfaceTop}" />
+                  <TextBlock x:Name="PayloadProgressText" Classes="caption" TextWrapping="Wrap" />
+                </StackPanel>
                 <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"
                         Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
                   <Grid ColumnDefinitions="Auto,*,Auto,Auto">
