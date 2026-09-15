@@ -1,7 +1,12 @@
+using System.Net;
 using AmdNr.Core;
 
 namespace AmdNr.Core.Tests;
 
+/// <summary>Shares one AppPaths.Cache with every other test in this collection, so it
+/// runs alone: the cache-clearing test wipes the folder these read their caches out of.
+/// </summary>
+[Collection("AppCache")]
 public class ReleasesTests
 {
     /// <summary>The shape GitHub actually answers with, cut down to the fields that are read. The
@@ -209,8 +214,8 @@ public class ReleasesTests
             "bridge":  { "version": "0.5.0", "files": [
               { "name": "{{Work.Addon32Name}}", "path": "files/{{Work.Addon32Name}}", "size": 257536,
                 "sha256": "{{Hash('1')}}", "url": "https://example.invalid/addon32" } ] },
-            "runtime": { "version": "0.2.17", "files": [
-              { "name": "{{Work.RuntimeName}}", "size": 7248384, "sha256": "{{Hash('2')}}",
+            "runtime": { "version": "0.3.0", "files": [
+              { "name": "{{Work.RuntimeName}}", "size": 7290880, "sha256": "{{Hash('2')}}",
                 "url": "https://example.invalid/runtime" },
               { "name": "{{Work.WeightsName}}", "size": 147689451, "sha256": "{{Hash('3')}}",
                 "url": "https://example.invalid/weights" } ] }
@@ -235,7 +240,7 @@ public class ReleasesTests
 
         // The runtime and the weights are not versioned with the add-on and are left exactly alone.
         var runtime = chosen.Component(PayloadManifest.RuntimeComponent);
-        Assert.Equal("0.2.17", runtime.Version);
+        Assert.Equal("0.3.0", runtime.Version);
         Assert.Equal(Hash('2'), runtime.Files[0].Sha256);
 
         // And the pre-flight now judges the folder against the version that was chosen.
@@ -247,5 +252,44 @@ public class ReleasesTests
         var addonOnly = AddonReleases.With(manifest, Release("0.5.2", Work.AddonName));
         Assert.Equal("0.5.0", addonOnly.Component(PayloadManifest.BridgeComponent).Version);
         Assert.Equal("0.5.2", addonOnly.Component(PayloadManifest.AddonComponent).Version);
+    }
+
+    /// <summary>Caching the releases JSON was not enough to survive a relaunch offline. A release
+    /// with no sums is unpinnable and is dropped, and the sums were fetched live every time -- so
+    /// the second launch read its cached list, threw every entry in it away, and offered only the
+    /// bundled version, which is the thing the cache exists to prevent.</summary>
+    [Fact]
+    public async Task ReleasesReadOnlineAreStillOfferedOnTheNextLaunchOffline()
+    {
+        var server = new ReleaseServer(ReleasesJson);
+        List<string> online;
+        using (var http = new HttpClient(server, disposeHandler: false))
+            online = (await AddonReleases.ListAsync(http, "o", "r")).Select(r => r.Tag).ToList();
+        Assert.NotEmpty(online);
+
+        server.Offline = true;
+        using (var http = new HttpClient(server, disposeHandler: false))
+        {
+            var offline = await AddonReleases.ListAsync(http, "o", "r");
+            Assert.Equal(online, offline.Select(r => r.Tag));
+            Assert.All(offline, r => Assert.NotEmpty(r.Sums));
+        }
+    }
+
+    /// <summary>The releases list and every sums file, or nothing at all when <see cref="Offline"/>
+    /// -- which is what an unplugged cable looks like to <c>HttpClient</c>.</summary>
+    private sealed class ReleaseServer(string releasesJson) : HttpMessageHandler
+    {
+        public bool Offline { get; set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancel)
+        {
+            if (Offline) throw new HttpRequestException("offline");
+            var url = request.RequestUri!.ToString();
+            var body = url.Contains("api.github.com", StringComparison.Ordinal)
+                ? releasesJson
+                : $"{Hash('2')}  {Work.AddonName}\n";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body) });
+        }
     }
 }

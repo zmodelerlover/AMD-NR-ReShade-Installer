@@ -78,6 +78,14 @@ public static class AddonReleases
 
     private static string CachePath => Path.Combine(AppPaths.Cache, "releases.json");
 
+    /// <summary>The sums files, keyed by the address each came from. Caching the releases JSON on
+    /// its own was not enough to survive a relaunch offline: a release with no sums is unpinnable
+    /// and is dropped, so every release fell out of a list that had been read successfully an hour
+    /// earlier, and the sheet offered only the bundled version -- exactly as if GitHub had never
+    /// been reached. One file rather than one per release, because it is read and written whole.
+    /// </summary>
+    private static string SumsCachePath => Path.Combine(AppPaths.Cache, "release-sums.json");
+
     /// <summary>Every installable release, newest first. An empty list is not an error: it means
     /// the list could not be read and has never been read, and the caller falls back to the one
     /// version the payload manifest pins.</summary>
@@ -91,10 +99,18 @@ public static class AddonReleases
         try { found = Parse(json); }
         catch (JsonException) { return []; }
 
+        var cached = await ReadSumsCacheAsync(cancel);
+        var fresh = new Dictionary<string, string>(StringComparer.Ordinal);
+
         var releases = new List<AddonRelease>();
         foreach (var (bare, sumsUrl) in found)
         {
-            var sums = await SumsAsync(http, sumsUrl, cancel);
+            var text = await SumsTextAsync(http, sumsUrl, cancel);
+            // Offline, the live read gives nothing and the last good copy stands in. A read that
+            // did work replaces it, so a re-cut release cannot be pinned to stale sums.
+            if (text is not null) fresh[sumsUrl] = text;
+            else cached.TryGetValue(sumsUrl, out text);
+            var sums = text is null ? new Dictionary<string, string>() : ParseSums(text);
             if (sums.Count == 0) continue; // Unpinnable: not offered.
             releases.Add(new AddonRelease
             {
@@ -107,7 +123,41 @@ public static class AddonReleases
                 Sums = sums,
             });
         }
+
+        // Only the releases this list still names, so the cache is pruned by the same read that
+        // fills it and a tag that was deleted upstream does not live here for ever.
+        var keep = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (_, sumsUrl) in found)
+            if (fresh.TryGetValue(sumsUrl, out var text) || cached.TryGetValue(sumsUrl, out text))
+                keep[sumsUrl] = text;
+        await WriteSumsCacheAsync(keep, cancel);
+
         return releases;
+    }
+
+    private static async Task<Dictionary<string, string>> ReadSumsCacheAsync(CancellationToken cancel)
+    {
+        try
+        {
+            if (!File.Exists(SumsCachePath)) return new Dictionary<string, string>(StringComparer.Ordinal);
+            var json = await File.ReadAllTextAsync(SumsCachePath, cancel);
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                   ?? new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
+        {
+            // A cache that cannot be read is a cache that is not there.
+            return new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+    }
+
+    private static async Task WriteSumsCacheAsync(Dictionary<string, string> sums, CancellationToken cancel)
+    {
+        try { await File.WriteAllTextAsync(SumsCachePath, JsonSerializer.Serialize(sums), cancel); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // The list still works for this run; only the next offline one is poorer for it.
+        }
     }
 
     /// <summary>The releases JSON, from GitHub when it answers and from the last copy when it does
@@ -199,18 +249,20 @@ public static class AddonReleases
         return System.Version.TryParse(t, out var version) ? version : null;
     }
 
-    private static async Task<IReadOnlyDictionary<string, string>> SumsAsync(HttpClient http, string url,
-        CancellationToken cancel)
+    /// <summary>The sums file as published, or null when it could not be read at all. Null and
+    /// "read, but empty" are different answers here: the first is what the cache stands in for,
+    /// the second is a release that really does not pin anything.</summary>
+    private static async Task<string?> SumsTextAsync(HttpClient http, string url, CancellationToken cancel)
     {
         try
         {
             using var response = await http.GetAsync(url, cancel);
-            if (!response.IsSuccessStatusCode) return new Dictionary<string, string>();
-            return ParseSums(await response.Content.ReadAsStringAsync(cancel));
+            if (!response.IsSuccessStatusCode) return null;
+            return await response.Content.ReadAsStringAsync(cancel);
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
         {
-            return new Dictionary<string, string>();
+            return null;
         }
     }
 

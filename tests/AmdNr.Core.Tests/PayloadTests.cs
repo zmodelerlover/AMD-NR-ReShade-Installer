@@ -4,6 +4,10 @@ using AmdNr.Core;
 
 namespace AmdNr.Core.Tests;
 
+/// <summary>Shares one AppPaths.Cache with every other test in this collection, so it
+/// runs alone: the cache-clearing test wipes the folder these read their caches out of.
+/// </summary>
+[Collection("AppCache")]
 public class PayloadTests
 {
     private const string Minimal = """
@@ -13,8 +17,8 @@ public class PayloadTests
           "components": {
             "addon":   { "version": "0.5.0", "files": [
               { "name": "dlss5-neural.addon64", "size": 550400, "sha256": "203f0278b64c5786da2bb95e8635de86bf3b18a852f098c4c0378661e8b48cf7" } ] },
-            "runtime": { "version": "0.2.17", "files": [
-              { "name": "dlssnr_amd_pass1.dll", "size": 7248384, "sha256": "ddd82d313aa74c2e7602d17dfb7e7cd90cca9bfc0306f581684d35d75d1b350b" },
+            "runtime": { "version": "0.3.0", "files": [
+              { "name": "dlssnr_amd_pass1.dll", "size": 7290880, "sha256": "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6" },
               { "name": "dlssnr_on_amd_weights.bin", "size": 147689451, "sha256": "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab" } ] }
           }
         }
@@ -304,7 +308,7 @@ public class PayloadTests
     {
         Assert.Throws<InstallException>(() => PayloadCache.FolderFor("..", "1"));
         Assert.Throws<InstallException>(() => PayloadCache.FolderFor("runtime", "../../windows"));
-        Assert.StartsWith(AppPaths.Cache, PayloadCache.FolderFor("runtime", "0.2.17"), StringComparison.Ordinal);
+        Assert.StartsWith(AppPaths.Cache, PayloadCache.FolderFor("runtime", "0.3.0"), StringComparison.Ordinal);
     }
 
     // -- Staging ----------------------------------------------------------------------------------
