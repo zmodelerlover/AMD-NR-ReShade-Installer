@@ -18,7 +18,7 @@ public sealed class PayloadPins
     public required string AddonSha { get; init; }
     public required ulong AddonSize { get; init; }
     public string RuntimeSha { get; init; } = Engine.RuntimeSha;
-    public ulong RuntimeSize { get; init; } = 7_248_384;
+    public ulong RuntimeSize { get; init; } = 7_290_880;
     public string WeightsSha { get; init; } = Engine.WeightsSha;
     public ulong WeightsSize { get; init; } = 147_689_451;
 
@@ -56,9 +56,15 @@ public static class Work
     public static readonly string[] InstalledMarkers =
         [AddonName, Addon32Name, Host64Name, RuntimeName, WeightsName];
 
-    /// <summary>Known-bad: the runtime this release replaced. Recognised by its first bytes so the
-    /// message can be "you have the old one" instead of "this file is wrong".</summary>
-    private const string RuntimeSha0214Prefix = "e145ff963b1ef614";
+    /// <summary>Known-bad: the runtimes earlier releases pinned. Recognised by their first bytes so
+    /// the message can be "you have the old one" instead of "this file is wrong". Each was once the
+    /// correct file, so a folder left over from an earlier install lands here rather than in the
+    /// generic hash-mismatch branch, which reads like a corrupt download.</summary>
+    private static readonly (string Prefix, string Version)[] OldRuntimes =
+    [
+        ("e145ff963b1ef614", "v0.2.14"),
+        ("ddd82d313aa74c2e", "v0.2.17"),
+    ];
 
     /// <summary>A ReShade proxy, by the name it has to be loaded under. Used where the route is not
     /// known -- uninstall, which only wants to know whether one is still there.</summary>
@@ -338,11 +344,12 @@ public static class Work
         var got = Engine.Sha(bytes);
         if (got == wantSha) return bytes;
 
-        if (name == RuntimeName && got.StartsWith(RuntimeSha0214Prefix, StringComparison.Ordinal))
+        var old = Array.Find(OldRuntimes, r => got.StartsWith(r.Prefix, StringComparison.Ordinal));
+        if (name == RuntimeName && old.Version is not null)
         {
             report.Err(
-                $"{name} is the old v0.2.14 runtime. This release requires v0.2.17 and the add-on "
-                + "refuses anything else. Let the app download the current one.");
+                $"{name} is the old {old.Version} runtime. This release requires v0.3.0 and the "
+                + "add-on refuses anything else. Let the app download the current one.");
         }
         else
         {

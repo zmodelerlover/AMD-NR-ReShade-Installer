@@ -8,21 +8,18 @@
           "name": "dlss5-neural.addon64",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon64",
           "size": 550912,
-          "sha256": "2bcc13f5710a9c07b3696cbfa9d08b1340ea0e15ae12c36e580c5b064cd7efe8"
+          "sha256": "f2283b5cc1c8e5d79c48b3055981d694e2f88c44932ab403a427695392404a3f"
         }
       ]
     },
     "runtime": {
-      "version": "0.2.17",
+      "version": "0.3.0",
       "files": [
         {
           "name": "dlssnr_amd_pass1.dll",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_amd_pass1.dll",
-          "mirrors": [
-            "https://files.catbox.moe/vlur2x.dll"
-          ],
-          "size": 7248384,
-          "sha256": "ddd82d313aa74c2e7602d17dfb7e7cd90cca9bfc0306f581684d35d75d1b350b"
+          "size": 7290880,
+          "sha256": "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6"
         },
         {
           "name": "dlssnr_on_amd_weights.bin",
@@ -66,20 +63,20 @@
           "path": "files/dlss5-neural.addon32",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon32",
           "size": 247808,
-          "sha256": "fa6606e86059a5e352b51a924f2cc12b78fa7a19d469bd93ccb0916861e4e296"
+          "sha256": "ea02558429eb2a64497e2f5d72df7007bf7b6e57815be4c56480a90c4c56d64d"
         },
         {
           "name": "dlss5-neural-host64.exe",
           "path": "files/dlss5-neural-host64.exe",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural-host64.exe",
           "size": 440832,
-          "sha256": "d1b5a6ed8877a461a929525ea40edd114ac5896f3a2ac1f82a937653ce9614b7"
+          "sha256": "4efb32cf4482d7751450274539d47aa4988a9dd052b6953fb293ff76b10d54a8"
         },
         {
           "name": "payload.sha256",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
           "size": 179,
-          "sha256": "e3c866f380da6d65869d43a6db48b82812027a16ebd18a2e2382ab8485f8b18e"
+          "sha256": "8568122b4f19289ceb2dcff62587707c66d6f842449dfd5a4642542efa8c3154"
         }
       ]
     },

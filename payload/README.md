@@ -50,7 +50,11 @@ it automatically; `-SetVersion runtime=0.2.18` overrides it.
 `mirrors` is an array of further addresses per file, tried in order when the first cannot be
 reached. Every one of them is checked against the same SHA-256, so a mirror can be anywhere and is
 never trusted further than its hash. The previous catbox.moe addresses are kept there as a free
-fallback.
+fallback — but only for files whose bytes have not changed since they were uploaded there. A
+mirror serving an older build fails the hash and the person is told *"the published file changed"*,
+which is the wrong sentence and sends them looking for the wrong problem. So a file that is
+re-cut loses its mirror line until a matching copy is uploaded: that is why `dlssnr_amd_pass1.dll`
+has none as of the v0.3.0 runtime, while the weights, which did not change, keep theirs.
 
 `owner`/`repo`/`tag` are still understood and are tried last, after `url` and every mirror, so a
 GitHub release asset remains a valid place to put one of these without any code change.
