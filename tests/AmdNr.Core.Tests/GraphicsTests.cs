@@ -251,6 +251,26 @@ public class GraphicsTests
         Assert.Equal([GraphicsApi.D3D9], db.Lookup(null, "The Elder Scrolls IV: Oblivion")!.Supported);
     }
 
+    /// <summary>Even with a record in hand, one that describes a build this copy is not never
+    /// replaces what the executable says. This is the Oblivion case from the other side: whatever
+    /// the database answers, a 32-bit game is never told to install the 64-bit D3D12 route.</summary>
+    [Fact]
+    public void ARecordForABuildThisCopyIsNotLeavesTheExecutableAlone()
+    {
+        var root = Game("oblivion", "Oblivion.exe", Fixture.PeWithImports(false, ["d3d9.dll"]));
+        var local = GraphicsDetector.Detect(root, "The Elder Scrolls IV: Oblivion");
+        Assert.Equal(Preset.X86Dx9, local.Preset);
+
+        var remaster = new PcgwApi("The Elder Scrolls IV: Oblivion Remastered",
+            [GraphicsApi.D3D12], Has32Bit: false, Has64Bit: true);
+        var merged = local.With(remaster);
+
+        Assert.Equal(Preset.X86Dx9, merged.Preset);
+        Assert.Equal(Route.X86, merged.Width);
+        Assert.Null(merged.Source);
+        Assert.Contains("describes a build this is not", merged.Why);
+    }
+
     /// <summary>Two different games under one normalised title answer nothing, so the detection
     /// falls back to the executable instead of reporting the other game's API with confidence.
     /// </summary>

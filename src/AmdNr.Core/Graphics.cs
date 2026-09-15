@@ -141,6 +141,19 @@ public sealed record GraphicsDetection(
     {
         if (wiki is null || wiki.Supported.Count == 0) return this;
 
+        // A record that says this build does not exist is not a record of this copy. The wiki page
+        // for a remaster carries the same title as the original, and one of them being 64-bit D3D12
+        // while the other is 32-bit D3D9 is exactly how a 32-bit game was told to install the D3D12
+        // route. Where the record and the executable contradict each other, the executable is the
+        // one that was measured on this disk, so it stands and the record is left out.
+        if ((Width == Route.X86 && wiki.Has32Bit == false) ||
+            (Width == Route.X64 && wiki.Has64Bit == false))
+            return this with
+            {
+                Why = $"{Why} PCGamingWiki ({wiki.Page}) describes a build this is not, so what the "
+                      + "files say stands.",
+            };
+
         var ordered = wiki.Supported
             .OrderBy(a => Array.IndexOf(Preference, a) is var i && i < 0 ? 99 : i)
             .ToList();
