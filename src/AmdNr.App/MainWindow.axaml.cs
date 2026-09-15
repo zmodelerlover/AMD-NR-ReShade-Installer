@@ -43,8 +43,6 @@ public partial class MainWindow : Window
     private bool _busy;
     private bool _settingPreset;
 
-    /// <summary>The per-action log the last install or uninstall wrote, so the sheet can offer it.</summary>
-    private string? _lastLog;
     private readonly DispatcherTimer _toastTimer = new() { Interval = TimeSpan.FromSeconds(4) };
 
     // The install steps, in the order the chips sit in the drawer.
@@ -543,6 +541,7 @@ public partial class MainWindow : Window
     /// and working out what it was afterwards.</summary>
     private async void OnAddEmulator(object? sender, RoutedEventArgs e)
     {
+        if (_busy) return;
         var choice = await AskWhichEmulator();
         if (choice is null) return;
         var wanted = choice == "other" ? null : Emulators.ById(choice);
@@ -1079,7 +1078,7 @@ public partial class MainWindow : Window
             }
             Show(report);
             WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
-            _lastLog = InstallLog.Write("install", card, TargetFor(card), report, Selected(), pins, folder);
+            InstallLog.Write("install", card, TargetFor(card), report, Selected(), pins, folder);
             card.RefreshInstalled();
             // Recorded from the install and not only from the menu, so the version is remembered
             // for somebody who never opened that menu -- which is nearly everybody.
@@ -1141,7 +1140,7 @@ public partial class MainWindow : Window
         Show(report);
         var what = force ? "uninstall (forced)" : "uninstall";
         WriteLog(report, $"{what} {card.Entry.Preset.Label()} -> {card.Path}");
-        _lastLog = InstallLog.Write(what, card, TargetFor(card), report, Selected(), Pins(), null);
+        InstallLog.Write(what, card, TargetFor(card), report, Selected(), Pins(), null);
         card.RefreshInstalled();
         return report;
     }

@@ -84,21 +84,36 @@ public sealed class PayloadCache(HttpClient http)
     {
         var freed = 0UL;
         // The whole listing first: deleting out of a directory that is still being walked is not
-        // something Windows promises anything about.
-        foreach (var entry in Directory.GetFileSystemEntries(AppPaths.Cache))
+        // something Windows promises anything about. The listing itself is inside the try because
+        // it can fail on its own -- an ACL changed after startup, antivirus holding the cache root,
+        // a cache on a drive that went away -- and this is called through an async void handler, so
+        // an exception escaping here is the window closing rather than a toast.
+        string[] entries;
+        try { entries = Directory.GetFileSystemEntries(AppPaths.Cache); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return 0;
+        }
+
+        foreach (var entry in entries)
         {
             try
             {
                 if (!Directory.Exists(entry))
                 {
-                    freed += Engine.SizeOf(entry) ?? 0;
+                    // Measured before, added after: a file something else has open throws out of
+                    // Delete, and counting it first reported disk space that never came back.
+                    var size = Engine.SizeOf(entry) ?? 0;
                     File.Delete(entry);
+                    freed += size;
                     continue;
                 }
-                if (Path.GetFileName(entry) != "staging")
-                    freed += Directory.EnumerateFiles(entry, "*", SearchOption.AllDirectories)
+                var inside = Path.GetFileName(entry) == "staging"
+                    ? 0UL
+                    : Directory.EnumerateFiles(entry, "*", SearchOption.AllDirectories)
                         .Aggregate(0UL, (sum, f) => sum + (Engine.SizeOf(f) ?? 0));
                 Directory.Delete(entry, recursive: true);
+                freed += inside;
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {

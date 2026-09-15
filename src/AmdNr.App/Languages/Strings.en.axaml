@@ -228,7 +228,6 @@
   <sys:String x:Key="Str.EmulatorWrong">That does not look like {0}: no {1} in that folder. Added anyway — check the path.</sys:String>
   <sys:String x:Key="Str.EmulatorUnknown">No emulator I know is in there. Added from what the files say: {0}</sys:String>
   <sys:String x:Key="Str.EmulatorSetting">Inside the emulator</sys:String>
-  <sys:String x:Key="Str.OpenLog">Open this install's log</sys:String>
 
 
   <!-- Problem report -->

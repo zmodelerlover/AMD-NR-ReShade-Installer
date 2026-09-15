@@ -92,11 +92,16 @@ public class ReleasesTests
         var found = AddonReleases.Parse(ReleasesJson);
 
         // Newest first, and by version rather than by the order GitHub listed them in.
-        Assert.Equal(["v0.5.1", "v0.5.0"], found.Select(f => f.Bare.Tag));
+        Assert.Equal(["v0.5.1"], found.Select(f => f.Bare.Tag));
 
-        // v0.6.0 is a draft, v0.4.2 is older than the first installable release, v0.5.2 publishes
-        // no SHA256SUMS.txt so nothing pins it, and media-v1 is not a version at all.
-        Assert.DoesNotContain(found, f => f.Bare.Tag is "v0.6.0" or "v0.4.2" or "v0.5.2" or "media-v1");
+        // v0.6.0 is a draft, v0.5.2 publishes no SHA256SUMS.txt so nothing pins it, and media-v1
+        // is not a version at all. v0.4.2 and v0.5.0 are both under Earliest -- and v0.5.0 is the
+        // one to look at when this list changes again: the runtime is not versioned with the
+        // add-on, so choosing v0.5.0 would install that add-on against the v0.3.0 runtime this
+        // build pins, and it refuses any runtime but its own. It would install cleanly and then
+        // switch itself off, which is worse than not being offered.
+        Assert.DoesNotContain(found,
+            f => f.Bare.Tag is "v0.6.0" or "v0.4.2" or "v0.5.0" or "v0.5.2" or "media-v1");
 
         Assert.EndsWith("/v0.5.1/SHA256SUMS.txt", found[0].SumsUrl);
         Assert.Equal(550400ul, found[0].Bare.Assets["dlss5-neural.addon64"].Size);

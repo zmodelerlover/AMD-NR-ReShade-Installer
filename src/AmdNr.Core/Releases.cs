@@ -46,10 +46,18 @@ public sealed class AddonRelease
 
 public static class AddonReleases
 {
-    /// <summary>The first release this installer knows how to install. Everything before it
+    /// <summary>The first release this installer knows how to install. Everything before v0.5.0
     /// predates the 32-bit bridge and the one-download packaging, and its assets are not the shape
-    /// the engine reads.</summary>
-    public static readonly Version Earliest = new(0, 5, 0);
+    /// the engine reads.
+    ///
+    /// v0.5.0 itself is out for a different reason, and it is the one to remember when this moves
+    /// again: the runtime is not versioned with the add-on. Choosing an older add-on swaps the
+    /// addon and bridge components and leaves the runtime component exactly as the manifest pins
+    /// it, so picking v0.5.0 today would install the v0.5.0 add-on against the v0.3.0 runtime --
+    /// and the add-on refuses any runtime but the one its offsets were read out of. The install
+    /// would complete and the add-on would then turn itself off with a hash mismatch in the log.
+    /// **Every runtime bump moves this to the first add-on release built against it.**</summary>
+    public static readonly Version Earliest = new(0, 5, 1);
 
     /// <summary>Which of the offered versions a game opens on, as an index into
     /// <paramref name="offered"/>, newest first. -1 when nothing is offered.
@@ -102,10 +110,16 @@ public static class AddonReleases
         var cached = await ReadSumsCacheAsync(cancel);
         var fresh = new Dictionary<string, string>(StringComparer.Ordinal);
 
+        // All of them at once. GitHub is asked for up to thirty releases, and this used to wait for
+        // each sums file before starting the next -- thirty round trips end to end, with the window
+        // showing no versions until the last one landed.
+        var texts = await Task.WhenAll(found.Select(f => SumsTextAsync(http, f.SumsUrl, cancel)));
+
         var releases = new List<AddonRelease>();
-        foreach (var (bare, sumsUrl) in found)
+        for (var i = 0; i < found.Count; i++)
         {
-            var text = await SumsTextAsync(http, sumsUrl, cancel);
+            var (bare, sumsUrl) = found[i];
+            var text = texts[i];
             // Offline, the live read gives nothing and the last good copy stands in. A read that
             // did work replaces it, so a re-cut release cannot be pinned to stale sums.
             if (text is not null) fresh[sumsUrl] = text;

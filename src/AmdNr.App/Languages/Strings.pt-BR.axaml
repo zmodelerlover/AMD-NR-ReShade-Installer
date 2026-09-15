@@ -225,7 +225,6 @@
   <sys:String x:Key="Str.EmulatorWrong">Isto não parece o {0}: não achei {1} nessa pasta. Adicionei assim mesmo — confira o caminho.</sys:String>
   <sys:String x:Key="Str.EmulatorUnknown">Não reconheci nenhum emulador conhecido aí. Adicionei pela leitura dos arquivos: {0}</sys:String>
   <sys:String x:Key="Str.EmulatorSetting">Dentro do emulador</sys:String>
-  <sys:String x:Key="Str.OpenLog">Ver o log desta instalação</sys:String>
 
 
   <!-- Emulator guidance: the sentence that names the setting which actually decides the route.
