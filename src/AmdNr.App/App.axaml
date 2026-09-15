@@ -15,11 +15,13 @@
       <Color x:Key="AccentColor">#A61C22</Color>
       <SolidColorBrush x:Key="Accent" Color="#A61C22" />
       <SolidColorBrush x:Key="AccentHover" Color="#C4242C" />
+      <SolidColorBrush x:Key="AccentPressed" Color="#8A171C" />
       <SolidColorBrush x:Key="Chrome" Color="#601E1E" />
       <SolidColorBrush x:Key="Bg" Color="#141010" />
       <SolidColorBrush x:Key="Surface" Color="#1D1817" />
       <SolidColorBrush x:Key="SurfaceHigh" Color="#262020" />
       <SolidColorBrush x:Key="Border" Color="#3A2B2A" />
+      <SolidColorBrush x:Key="BorderStrong" Color="#5A4341" />
       <SolidColorBrush x:Key="Text" Color="#ECE6E4" />
       <SolidColorBrush x:Key="Muted" Color="#A3948F" />
       <SolidColorBrush x:Key="Ok" Color="#5CB37E" />
@@ -50,23 +52,64 @@
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
+    <!-- Small caps-like label over each group in the drawer and the pages. -->
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="0.6" />
+      <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+    </Style>
+
     <Style Selector="Border.card">
       <Setter Property="Background" Value="{DynamicResource Surface}" />
       <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Padding" Value="12" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <!-- Every button eases between states instead of snapping, and gives a little on press, so a
+         click is felt even when the work behind it takes a moment to show. -->
+    <Style Selector="Button">
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.12" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.97)" />
     </Style>
 
     <Style Selector="Button.primary">
       <Setter Property="Background" Value="{DynamicResource Accent}" />
       <Setter Property="Foreground" Value="#FFFFFF" />
       <Setter Property="Padding" Value="16,8" />
-      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="CornerRadius" Value="6" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentHover}" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentPressed}" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <!-- A busy primary button keeps its colour, dimmed: grey reads as "not allowed" rather than
+         "working on it". -->
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+      <Setter Property="Opacity" Value="0.65" />
     </Style>
 
     <Style Selector="Button.ghost">
@@ -75,19 +118,62 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Foreground" Value="{DynamicResource Text}" />
       <Setter Property="Padding" Value="14,8" />
-      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+    <Style Selector="Button.ghost:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Border}" />
+    </Style>
+    <Style Selector="Button.ghost:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <!-- The spinner only turns while it is shown, so a hidden one costs no frames. -->
+    <Style Selector="Arc.spin">
+      <Setter Property="Width" Value="13" />
+      <Setter Property="Height" Value="13" />
+      <Setter Property="StartAngle" Value="0" />
+      <Setter Property="SweepAngle" Value="270" />
+      <Setter Property="StrokeThickness" Value="2" />
+      <Setter Property="StrokeLineCap" Value="Round" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Arc.spin[IsVisible=True]">
+      <Style.Animations>
+        <Animation Duration="0:0:0.8" IterationCount="Infinite">
+          <KeyFrame Cue="0%"><Setter Property="RotateTransform.Angle" Value="0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="RotateTransform.Angle" Value="360" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
     </Style>
 
     <!-- The rail: one glyph per page, checked state marked by the accent bar behind it. -->
     <Style Selector="RadioButton.rail">
-      <Setter Property="Width" Value="46" />
-      <Setter Property="Height" Value="42" />
+      <Setter Property="Width" Value="44" />
+      <Setter Property="Height" Value="40" />
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="FontSize" Value="17" />
       <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
       <Setter Property="Template">
         <ControlTemplate>
-          <Border Name="bg" Background="Transparent" CornerRadius="8" Padding="0">
+          <Border Name="bg" Background="Transparent" CornerRadius="8" Padding="0"
+                  BorderBrush="Transparent" BorderThickness="1">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                               Content="{TemplateBinding Content}"
                               Foreground="{TemplateBinding Foreground}"
@@ -99,23 +185,73 @@
     <Style Selector="RadioButton.rail:pointerover /template/ Border#bg">
       <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
     </Style>
+    <Style Selector="RadioButton.rail:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+    <Style Selector="RadioButton.rail:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.92)" />
+    </Style>
     <Style Selector="RadioButton.rail:checked /template/ Border#bg">
       <Setter Property="Background" Value="{DynamicResource Chrome}" />
     </Style>
     <Style Selector="RadioButton.rail:checked">
       <Setter Property="Foreground" Value="{DynamicResource Text}" />
     </Style>
+    <Style Selector="RadioButton.rail:focus-visible /template/ Border#bg">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+    </Style>
 
-    <!-- A game tile: the picture is the button, so the whole thing is one target. -->
+    <!-- A game tile: the picture is the button, so the whole thing is one target. It lifts on hover
+         and the cover gains a shadow, which is what says "this opens something". -->
     <Style Selector="Button.card">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="6" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.16" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.card:pointerover">
+      <Setter Property="RenderTransform" Value="translateY(-3px)" />
+    </Style>
+    <Style Selector="Button.card:pressed">
+      <Setter Property="RenderTransform" Value="translateY(-1px) scale(0.98)" />
     </Style>
     <Style Selector="Button.card:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    </Style>
+    <Style Selector="Button.card Border.cover">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.16" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.card:pointerover Border.cover">
+      <Setter Property="BoxShadow" Value="0 8 22 0 #99000000" />
+    </Style>
+    <Style Selector="Button.card.selected Border.cover">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+    </Style>
+    <!-- Keyboard focus lifts the tile like a hover and outlines it, so tabbing through the grid is
+         as easy to follow as pointing at it. Selected still wins the accent outline. -->
+    <Style Selector="Button.card:focus-visible">
+      <Setter Property="RenderTransform" Value="translateY(-3px)" />
+    </Style>
+    <Style Selector="Button.card:focus-visible Border.cover">
+      <Setter Property="BorderBrush" Value="{DynamicResource Text}" />
+      <Setter Property="BoxShadow" Value="0 8 22 0 #99000000" />
+    </Style>
+    <Style Selector="Button.card.selected:focus-visible Border.cover">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
     </Style>
 
     <Style Selector="Border.pill">
@@ -123,7 +259,7 @@
       <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="14" />
-      <Setter Property="Padding" Value="11,6" />
+      <Setter Property="Padding" Value="12,6" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
@@ -139,6 +275,26 @@
       <Setter Property="Padding" Value="6,2" />
     </Style>
 
+    <!-- Once, right after an install lands, so the tile that changed is the one the eye goes to. -->
+    <Style Selector="Border.state.pulse">
+      <Style.Animations>
+        <Animation Duration="0:0:0.7" Easing="CubicEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="ScaleTransform.ScaleX" Value="0.6" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.6" />
+          </KeyFrame>
+          <KeyFrame Cue="45%">
+            <Setter Property="ScaleTransform.ScaleX" Value="1.4" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1.4" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="ScaleTransform.ScaleX" Value="1" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
     <Style Selector="Border.tag">
       <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
       <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
@@ -147,8 +303,140 @@
       <Setter Property="Padding" Value="6,2" />
     </Style>
 
+    <!-- Report lines arrive with a short rise instead of appearing all at once. -->
+    <Style Selector="Grid.line">
+      <Style.Animations>
+        <Animation Duration="0:0:0.22" Easing="CubicEaseOut" FillMode="Backward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="6" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- The drawer slides in from the right; closing plays it backwards before it is hidden. -->
+    <Style Selector="Border#Drawer">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateX(28px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#Drawer.open">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+
+    <!-- Install steps: pending, the one running, the ones done, the one that failed. -->
+    <Style Selector="Border.step">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="9,3" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.step TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+    </Style>
+    <Style Selector="Border.step.active">
+      <Setter Property="Background" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="Border.step.active TextBlock">
+      <Setter Property="Foreground" Value="#FFFFFF" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.step.done">
+      <Setter Property="Background" Value="#265CB37E" />
+    </Style>
+    <Style Selector="Border.step.done TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource Ok}" />
+    </Style>
+    <Style Selector="Border.step.failed">
+      <Setter Property="Background" Value="#33E05B4C" />
+    </Style>
+    <Style Selector="Border.step.failed TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource Err}" />
+    </Style>
+
+    <!-- The result of an action, in one sentence, where it cannot be missed. -->
+    <Style Selector="Border.result">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="12,10" />
+    </Style>
+    <Style Selector="Border.result[IsVisible=True]">
+      <Style.Animations>
+        <Animation Duration="0:0:0.22" Easing="CubicEaseOut" FillMode="Backward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-6" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Border.result.ok">
+      <Setter Property="Background" Value="#1F5CB37E" />
+      <Setter Property="BorderBrush" Value="#805CB37E" />
+    </Style>
+    <Style Selector="Border.result.warn">
+      <Setter Property="Background" Value="#1FDDA13A" />
+      <Setter Property="BorderBrush" Value="#80DDA13A" />
+    </Style>
+    <Style Selector="Border.result.err">
+      <Setter Property="Background" Value="#26E05B4C" />
+      <Setter Property="BorderBrush" Value="#99E05B4C" />
+    </Style>
+
+    <Style Selector="Border.toast">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="14,10" />
+      <Setter Property="BoxShadow" Value="0 10 30 0 #AA000000" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(10px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.toast.show">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+
+    <Style Selector="ProgressBar">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Value" Duration="0:0:0.25" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+
     <Style Selector="TextBox">
       <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
     </Style>
   </Application.Styles>
 </Application>

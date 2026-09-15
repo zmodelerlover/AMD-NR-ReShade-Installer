@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -30,6 +31,10 @@ public partial class MainWindow : Window
     private GameCard? _selected;
     private bool _busy;
     private bool _settingPreset;
+    private readonly DispatcherTimer _toastTimer = new() { Interval = TimeSpan.FromSeconds(4) };
+
+    // The install steps, in the order the chips sit in the drawer.
+    private const int StepDownload = 0, StepVerify = 1, StepInstall = 2, StepDone = 3;
 
     public MainWindow()
     {
@@ -37,6 +42,12 @@ public partial class MainWindow : Window
 
         CardList.ItemsSource = _shown;
         ReportList.ItemsSource = _report;
+        _report.CollectionChanged += (_, _) => ReportEmpty.IsVisible = _report.Count == 0;
+        _toastTimer.Tick += (_, _) =>
+        {
+            _toastTimer.Stop();
+            Toast.Classes.Set("show", false);
+        };
         VersionText.Text = $"v{App.Version}";
         AboutVersion.Text = $"v{App.Version} · {AppPaths.Root}";
         CacheFolder.Text = AppPaths.Cache;
@@ -150,7 +161,14 @@ public partial class MainWindow : Window
                                              || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)))
             _shown.Add(card);
 
-        EmptyHint.IsVisible = _all.Count == 0;
+        // Two different empties: nothing scanned yet wants the actions, a search that matched
+        // nothing only wants to be told so.
+        var noMatch = _all.Count > 0 && _shown.Count == 0;
+        EmptyHint.IsVisible = _all.Count == 0 || noMatch;
+        EmptyActions.IsVisible = !noMatch;
+        Localize(EmptyTitle, noMatch ? "Str.NoMatchTitle" : "Str.EmptyTitle");
+        if (noMatch) EmptyBody.Text = string.Format(Text("Str.NoMatch"), needle);
+        else Localize(EmptyBody, "Str.NoGames");
         Foot(_all.Count == 0 ? "" : $"{_all.Count} {Text("Str.Games").ToLowerInvariant()}");
     }
 
@@ -162,6 +180,10 @@ public partial class MainWindow : Window
         ScanSpinner.IsVisible = true;
         Foot(Text("Str.Scanning"));
         ScanButton.IsEnabled = false;
+        EmptyActions.IsEnabled = false;
+        ScanGlyph.IsVisible = false;
+        ScanSpin.IsVisible = true;
+        Localize(ScanLabel, "Str.ScanningShort");
         try
         {
             var found = await Task.Run(GameScanner.ScanAll);
@@ -181,11 +203,17 @@ public partial class MainWindow : Window
             Foot($"{found.Count} {Text("Str.Found")} · {added} {Text("Str.Added")}");
             await DetectAllAsync();
             await LoadCoversAsync();
+            // Said once the button stops spinning, so the toast and the button agree it is over.
+            ShowToast(string.Format(Text("Str.ScanDone"), found.Count, added), Level.Ok);
         }
         finally
         {
             ScanSpinner.IsVisible = false;
-            ScanButton.IsEnabled = true;
+            ScanButton.IsEnabled = !_busy;
+            EmptyActions.IsEnabled = true;
+            ScanGlyph.IsVisible = true;
+            ScanSpin.IsVisible = false;
+            Localize(ScanLabel, "Str.Scan");
         }
     }
 
@@ -275,11 +303,11 @@ public partial class MainWindow : Window
 
     private async void Select(GameCard card)
     {
+        if (_selected is not null && _selected != card) _selected.IsSelected = false;
         _selected = card;
-        Drawer.IsVisible = true;
-
-        TargetName.Text = card.Name;
-        TargetPath.Text = card.Path;
+        card.IsSelected = true;
+        DrawerHeader.DataContext = card;
+        OpenDrawer();
 
         var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name);
         ApiTag.Text = graphics.Tag;
@@ -320,10 +348,47 @@ public partial class MainWindow : Window
         await RefreshAsync();
     }
 
-    private void OnCloseDrawer(object? sender, RoutedEventArgs e)
+    private void OnCloseDrawer(object? sender, RoutedEventArgs e) => CloseDrawer();
+
+    private void OpenDrawer()
     {
-        Drawer.IsVisible = false;
+        if (Drawer.Classes.Contains("open")) return;
+        Drawer.IsVisible = true;
+        // One layout pass while visible before the class lands, or the transition has no starting
+        // frame and the drawer just appears.
+        Dispatcher.UIThread.Post(() => Drawer.Classes.Set("open", true), DispatcherPriority.Render);
+    }
+
+    private async void CloseDrawer()
+    {
+        if (_selected is not null) _selected.IsSelected = false;
         _selected = null;
+        Drawer.Classes.Set("open", false);
+        await Task.Delay(220);
+        // Reopened while it was sliding out: leave it be.
+        if (!Drawer.Classes.Contains("open")) Drawer.IsVisible = false;
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && Drawer.Classes.Contains("open"))
+        {
+            CloseDrawer();
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
+    }
+
+    /// <summary>Tiles are a fixed size; the slots they sit in share the row evenly, so the leftover
+    /// width is spread between them instead of piling up at the right edge.</summary>
+    private void OnGridResized(object? sender, SizeChangedEventArgs e)
+    {
+        if (CardList.ItemsPanelRoot is not WrapPanel panel) return;
+        const double slot = 192; // 164 tile + 12 button padding + 16 gap
+        var width = e.NewSize.Width - GridScroll.Padding.Left - GridScroll.Padding.Right;
+        var columns = Math.Max(1, Math.Floor(width / slot));
+        panel.ItemWidth = Math.Floor(width / columns);
     }
 
     private async void OnPresetChanged(object? sender, SelectionChangedEventArgs e)
@@ -378,6 +443,11 @@ public partial class MainWindow : Window
         if (_selected is not { } card || _busy) return;
         var pins = Pins();
 
+        // A result belongs to the action that produced it; a new check replaces it.
+        Steps.IsVisible = false;
+        ResultBanner.IsVisible = false;
+        _report.Clear();
+
         // Off the UI thread: deciding whether the cache is complete means hashing 141 MB of
         // weights, which is about a second and would be a second of frozen window.
         var (report, payloads) = await Task.Run(() =>
@@ -395,18 +465,32 @@ public partial class MainWindow : Window
     private async void OnInstall(object? sender, RoutedEventArgs e)
     {
         if (_selected is not { } card || _busy) return;
-        Busy(true);
+        Busy(true, InstallButton);
+        ResultBanner.IsVisible = false;
+        ShowStep(StepDownload);
         try
         {
             var folder = await EnsurePayloadsAsync(card.Entry.Preset);
-            if (folder is null) return;
+            if (folder is null)
+            {
+                ShowStep(StepDownload, failed: true);
+                // The reason is the report line the download left behind; without a manifest there is none.
+                ShowResult(Level.Err, Text("Str.DownloadFailed"), _report.Count > 0
+                    ? string.Format(Text("Str.ResultErrors"), _report.Count)
+                    : Text("Str.ManifestFailed"));
+                return;
+            }
 
+            ShowStep(StepInstall);
             Status(Text("Str.Working"));
             var pins = Pins();
             var report = await Task.Run(() => Work.Install(TargetFor(card), folder, card.Entry.Preset, pins));
             Show(report);
             WriteLog(report, $"install {card.Entry.Preset.Label()} -> {card.Path}");
             card.RefreshInstalled();
+            ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
+            ShowOutcome(report, "Str.Install", card.Name);
+            if (!report.Failed && card.Installed) card.Pulse();
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
         }
         finally
@@ -418,13 +502,16 @@ public partial class MainWindow : Window
     private async void OnUninstall(object? sender, RoutedEventArgs e)
     {
         if (_selected is not { } card || _busy) return;
-        Busy(true);
+        Busy(true, UninstallButton);
+        Steps.IsVisible = false;
+        ResultBanner.IsVisible = false;
         try
         {
             var report = await Task.Run(() => Work.Uninstall(TargetFor(card), card.Entry.Preset));
             Show(report);
             WriteLog(report, $"uninstall {card.Entry.Preset.Label()} -> {card.Path}");
             card.RefreshInstalled();
+            ShowOutcome(report, "Str.Uninstall", card.Name);
             Status(report.Failed ? Text("Str.LogSaved") : Text("Str.Ready"));
         }
         finally
@@ -460,6 +547,8 @@ public partial class MainWindow : Window
                 await cache.EnsureAsync(_manifest, component, progress);
 
             Progress.IsVisible = false;
+            ShowStep(StepVerify);
+            Status(Text("Str.Verifying"));
             // One folder for the install to read, hard-linked out of the cache: the 141 MB of
             // weights are not copied a second time on the way there.
             return cache.Stage(_manifest, components);
@@ -467,8 +556,8 @@ public partial class MainWindow : Window
         catch (Exception e) when (e is InstallException or HttpRequestException or IOException)
         {
             Progress.IsVisible = false;
-            _report.Add(new ReportLine("!", e.Message, Brush("Err")));
-            Status(Text("Str.LogSaved"));
+            _report.Add(new ReportLine(Glyph(Level.Err), e.Message, Brush("Err")));
+            Status(Text("Str.DownloadFailed"));
             return null;
         }
     }
@@ -524,14 +613,7 @@ public partial class MainWindow : Window
         _report.Clear();
         foreach (var (level, text) in report.Lines)
         {
-            var (glyph, brush) = level switch
-            {
-                Level.Ok => ("✓", Brush("Ok")),
-                Level.Warn => ("!", Brush("Warn")),
-                Level.Err => ("✕", Brush("Err")),
-                _ => ("·", Brush("Muted")),
-            };
-            _report.Add(new ReportLine(glyph, text, brush));
+            _report.Add(new ReportLine(Glyph(level), text, LevelBrush(level)));
         }
         ReportScroll.ScrollToHome();
     }
@@ -549,13 +631,97 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Busy(bool on)
+    private void Busy(bool on, Button? pressed = null)
     {
         _busy = on;
         SetButtons(!on);
         ScanButton.IsEnabled = !on;
+        // Changing the route mid-install would change what the running install is told it did.
+        PresetBox.IsEnabled = !on;
         if (!on) Progress.IsVisible = false;
+
+        // The pressed button says what it is doing; the other one only waits.
+        InstallSpin.IsVisible = on && pressed == InstallButton;
+        UninstallSpin.IsVisible = on && pressed == UninstallButton;
+        Localize(InstallLabel, InstallSpin.IsVisible ? "Str.Installing" : "Str.Install");
+        Localize(UninstallLabel, UninstallSpin.IsVisible ? "Str.Removing" : "Str.Uninstall");
     }
+
+    /// <summary>Lights the chips: everything before <paramref name="current"/> done, the current one
+    /// running or failed. Reaching the last step marks it done too.</summary>
+    private void ShowStep(int current, bool failed = false)
+    {
+        Steps.IsVisible = true;
+        for (var i = 0; i < Steps.Children.Count; i++)
+        {
+            var classes = Steps.Children[i].Classes;
+            var here = i == current;
+            classes.Set("done", i < current || (here && current == StepDone));
+            classes.Set("active", here && !failed && current != StepDone);
+            classes.Set("failed", here && failed);
+        }
+    }
+
+    /// <summary>One sentence for what an action did, picked from the report's worst line.
+    /// <paramref name="action"/> is the key prefix: Str.Install or Str.Uninstall.</summary>
+    private void ShowOutcome(Report report, string action, string game)
+    {
+        var warnings = report.Lines.Count(l => l.Level == Level.Warn);
+        var errors = report.Lines.Count(l => l.Level == Level.Err);
+        var level = report.Failed ? Level.Err : warnings > 0 ? Level.Warn : Level.Ok;
+        var suffix = level switch { Level.Err => "Fail", Level.Warn => "Warn", _ => "Ok" };
+        var title = string.Format(Text(action + suffix), game, warnings);
+        var detail = report.Failed
+            ? $"{string.Format(Text("Str.ResultErrors"), Math.Max(1, errors))} {Text("Str.LogSaved")}"
+            : "";
+        ShowResult(level, title, detail);
+    }
+
+    private void ShowResult(Level level, string title, string detail)
+    {
+        foreach (var (name, l) in new[] { ("ok", Level.Ok), ("warn", Level.Warn), ("err", Level.Err) })
+            ResultBanner.Classes.Set(name, l == level);
+        ResultGlyph.Text = Glyph(level);
+        ResultDot.Background = LevelBrush(level);
+        ResultTitle.Text = title;
+        ResultDetail.Text = detail;
+        ResultDetail.IsVisible = detail.Length > 0;
+        // Off and on again, so the entrance plays even when the banner was already up.
+        ResultBanner.IsVisible = false;
+        ResultBanner.IsVisible = true;
+        // The drawer may have been closed during a long download; the corner still says it.
+        ShowToast(title, level);
+    }
+
+    private void ShowToast(string text, Level level)
+    {
+        ToastText.Text = text;
+        ToastDot.Fill = LevelBrush(level);
+        Toast.Classes.Set("show", true);
+        _toastTimer.Stop();
+        _toastTimer.Start();
+    }
+
+    private static string Glyph(Level level) => level switch
+    {
+        Level.Ok => "✓",
+        Level.Warn => "!",
+        Level.Err => "✕",
+        _ => "·",
+    };
+
+    private IBrush LevelBrush(Level level) => Brush(level switch
+    {
+        Level.Ok => "Ok",
+        Level.Warn => "Warn",
+        Level.Err => "Err",
+        _ => "Muted",
+    });
+
+    /// <summary>Binds a text to a string resource rather than copying it, so a label changed in code
+    /// still follows a language switch.</summary>
+    private static void Localize(TextBlock block, string key) =>
+        block[!TextBlock.TextProperty] = block.GetResourceObservable(key).ToBinding();
 
     private void SetButtons(bool enabled)
     {

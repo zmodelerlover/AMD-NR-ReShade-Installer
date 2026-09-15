@@ -53,4 +53,32 @@
   <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12 e Vulkan, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. OpenGL não tem.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">Este jogo roda em {1}. Coloque em {0} nas configurações gráficas dele -- é a rota escolhida aqui, e em outra API o add-on vê outro jogo.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">É um jogo Unreal: adicione -{0} nas opções de inicialização.</sys:String>
+  <!-- Feedback e layout -->
+  <sys:String x:Key="Str.EmptyTitle">Nenhum jogo ainda</sys:String>
+  <sys:String x:Key="Str.NoMatchTitle">Nada encontrado</sys:String>
+  <sys:String x:Key="Str.NoMatch">Nenhum jogo da lista bate com "{0}".</sys:String>
+  <sys:String x:Key="Str.ScanningShort">Procurando…</sys:String>
+  <sys:String x:Key="Str.ScanDone">Busca concluída: {0} jogos encontrados, {1} novos.</sys:String>
+  <sys:String x:Key="Str.InstalledBadge">Instalado</sys:String>
+  <sys:String x:Key="Str.Close">Fechar</sys:String>
+  <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
+  <sys:String x:Key="Str.RouteSection">ROTA</sys:String>
+  <sys:String x:Key="Str.WhatHappens">O QUE VAI ACONTECER</sys:String>
+  <sys:String x:Key="Str.Checking">Conferindo esta pasta…</sys:String>
+  <sys:String x:Key="Str.StepDownload">Baixar</sys:String>
+  <sys:String x:Key="Str.StepVerify">Conferir</sys:String>
+  <sys:String x:Key="Str.StepInstall">Instalar</sys:String>
+  <sys:String x:Key="Str.StepDone">Pronto</sys:String>
+  <sys:String x:Key="Str.Installing">Instalando…</sys:String>
+  <sys:String x:Key="Str.Removing">Removendo…</sys:String>
+  <sys:String x:Key="Str.InstallOk">{0} está pronto. É só abrir o jogo.</sys:String>
+  <sys:String x:Key="Str.InstallWarn">Instalado em {0}, com {1} aviso(s) pra ler abaixo.</sys:String>
+  <sys:String x:Key="Str.InstallFail">A instalação em {0} não terminou.</sys:String>
+  <sys:String x:Key="Str.UninstallOk">Removido de {0}.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso(s) pra ler abaixo.</sys:String>
+  <sys:String x:Key="Str.UninstallFail">Não deu pra remover tudo de {0}.</sys:String>
+  <sys:String x:Key="Str.ResultErrors">{0} problema(s) listado(s) abaixo.</sys:String>
+  <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>
+  <sys:String x:Key="Str.Folder">Pasta</sys:String>
+  <sys:String x:Key="Str.OnBadge">ATIVO</sys:String>
 </ResourceDictionary>

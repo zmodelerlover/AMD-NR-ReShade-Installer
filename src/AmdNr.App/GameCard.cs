@@ -15,7 +15,11 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
 
     public string Name => Entry.Display;
     public string Path => Entry.Path;
-    public string Platform => Entry.Platform == GamePlatform.Manual ? "Folder" : Entry.Platform.ToString();
+    public string Platform => Entry.Platform.ToString();
+
+    /// <summary>Added by hand. The tile says "folder" in the current language instead of the enum name.</summary>
+    public bool IsManual => Entry.Platform == GamePlatform.Manual;
+    public bool IsLauncher => !IsManual;
 
     /// <summary>Two letters for the tile that stands in for a cover. Words like "The" carry no
     /// information, so the first two that do are used.</summary>
@@ -70,11 +74,33 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
         {
             _installed = value;
             Raise();
-            Raise(nameof(StateLabel));
         }
     }
 
-    public string StateLabel => _installed ? "ON" : "—";
+    private bool _selected;
+
+    /// <summary>The tile whose drawer is open, outlined so the grid and the drawer read as one.</summary>
+    public bool IsSelected
+    {
+        get => _selected;
+        set { _selected = value; Raise(); }
+    }
+
+    private bool _pulsing;
+    public bool Pulsing
+    {
+        get => _pulsing;
+        private set { _pulsing = value; Raise(); }
+    }
+
+    /// <summary>Plays the badge's pulse once. The class is dropped again afterwards so the next
+    /// install can play it a second time.</summary>
+    public async void Pulse()
+    {
+        Pulsing = true;
+        await Task.Delay(800);
+        Pulsing = false;
+    }
 
     private GraphicsDetection? _graphics;
 

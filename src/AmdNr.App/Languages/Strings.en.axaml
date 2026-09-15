@@ -56,4 +56,32 @@
   <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12 and Vulkan, and on D3D8, D3D9 and D3D11 for 32-bit games. OpenGL has none.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings -- that is the route picked here, and on another API the add-on sees a different game.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
+  <!-- Feedback and layout -->
+  <sys:String x:Key="Str.EmptyTitle">No games yet</sys:String>
+  <sys:String x:Key="Str.NoMatchTitle">No matches</sys:String>
+  <sys:String x:Key="Str.NoMatch">No game in the list matches "{0}".</sys:String>
+  <sys:String x:Key="Str.ScanningShort">Scanning…</sys:String>
+  <sys:String x:Key="Str.ScanDone">Scan finished: {0} games found, {1} new.</sys:String>
+  <sys:String x:Key="Str.InstalledBadge">Installed</sys:String>
+  <sys:String x:Key="Str.Close">Close</sys:String>
+  <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
+  <sys:String x:Key="Str.RouteSection">ROUTE</sys:String>
+  <sys:String x:Key="Str.WhatHappens">WHAT WILL HAPPEN</sys:String>
+  <sys:String x:Key="Str.Checking">Checking this folder…</sys:String>
+  <sys:String x:Key="Str.StepDownload">Download</sys:String>
+  <sys:String x:Key="Str.StepVerify">Verify</sys:String>
+  <sys:String x:Key="Str.StepInstall">Install</sys:String>
+  <sys:String x:Key="Str.StepDone">Done</sys:String>
+  <sys:String x:Key="Str.Installing">Installing…</sys:String>
+  <sys:String x:Key="Str.Removing">Removing…</sys:String>
+  <sys:String x:Key="Str.InstallOk">{0} is set up. Start the game to use it.</sys:String>
+  <sys:String x:Key="Str.InstallWarn">Installed on {0}, with {1} warning(s) to read below.</sys:String>
+  <sys:String x:Key="Str.InstallFail">The install on {0} did not finish.</sys:String>
+  <sys:String x:Key="Str.UninstallOk">Removed from {0}.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning(s) to read below.</sys:String>
+  <sys:String x:Key="Str.UninstallFail">Could not remove everything from {0}.</sys:String>
+  <sys:String x:Key="Str.ResultErrors">{0} problem(s) listed below.</sys:String>
+  <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
+  <sys:String x:Key="Str.Folder">Folder</sys:String>
+  <sys:String x:Key="Str.OnBadge">ON</sys:String>
 </ResourceDictionary>

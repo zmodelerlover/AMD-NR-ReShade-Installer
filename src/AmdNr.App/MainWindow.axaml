@@ -6,28 +6,32 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Bg}">
 
+  <!-- Spacing scale: 4 / 8 / 12 / 16 / 24. -->
   <Grid ColumnDefinitions="64,*">
 
     <!-- Rail -->
     <Border Grid.Column="0" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
             BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,*,Auto">
-        <Border Grid.Row="0" Width="34" Height="34" Margin="0,16,0,18" CornerRadius="8"
-                Background="{DynamicResource Accent}">
+        <Border Grid.Row="0" Width="36" Height="36" Margin="0,16,0,24" CornerRadius="8"
+                Background="{DynamicResource Accent}" BoxShadow="0 4 14 0 #66A61C22">
           <TextBlock Text="NR" Foreground="White" FontWeight="Bold" FontSize="13"
                      HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
 
-        <StackPanel Grid.Row="1" Spacing="6">
+        <StackPanel Grid.Row="1" Spacing="8">
           <RadioButton x:Name="TabGames" Classes="rail" GroupName="nav" IsChecked="True"
-                       Content="▦" ToolTip.Tip="{DynamicResource Str.Games}" Checked="OnTabChanged" />
+                       Content="▦" ToolTip.Tip="{DynamicResource Str.Games}"
+                       AutomationProperties.Name="{DynamicResource Str.Games}" Checked="OnTabChanged" />
           <RadioButton x:Name="TabSystem" Classes="rail" GroupName="nav"
-                       Content="◈" ToolTip.Tip="{DynamicResource Str.System}" Checked="OnTabChanged" />
+                       Content="◈" ToolTip.Tip="{DynamicResource Str.System}"
+                       AutomationProperties.Name="{DynamicResource Str.System}" Checked="OnTabChanged" />
           <RadioButton x:Name="TabSettings" Classes="rail" GroupName="nav"
-                       Content="⚙" ToolTip.Tip="{DynamicResource Str.Settings}" Checked="OnTabChanged" />
+                       Content="⚙" ToolTip.Tip="{DynamicResource Str.Settings}"
+                       AutomationProperties.Name="{DynamicResource Str.Settings}" Checked="OnTabChanged" />
         </StackPanel>
 
-        <TextBlock Grid.Row="2" x:Name="VersionText" Classes="muted" FontSize="10" Margin="0,0,0,10"
+        <TextBlock Grid.Row="2" x:Name="VersionText" Classes="muted" FontSize="10" Margin="0,0,0,12"
                    HorizontalAlignment="Center" />
       </Grid>
     </Border>
@@ -35,24 +39,26 @@
     <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto">
 
       <!-- Top bar -->
-      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="18,14,18,10">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="16,12,16,12">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-          <Button x:Name="ScanButton" Classes="primary" Click="OnScan">
-            <StackPanel Orientation="Horizontal" Spacing="7">
-              <TextBlock Text="⟳" />
-              <TextBlock Text="{DynamicResource Str.Scan}" />
+          <Button x:Name="ScanButton" Classes="primary" Click="OnScan"
+                  AutomationProperties.Name="{DynamicResource Str.Scan}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock x:Name="ScanGlyph" Text="⟳" VerticalAlignment="Center" />
+              <Arc x:Name="ScanSpin" Classes="spin" Stroke="White" IsVisible="False" />
+              <TextBlock x:Name="ScanLabel" Text="{DynamicResource Str.Scan}" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
           <Button Classes="ghost" Content="{DynamicResource Str.AddGame}" Click="OnAddGame" />
         </StackPanel>
 
-        <TextBox Grid.Column="1" x:Name="SearchBox" Margin="14,0" MaxWidth="420"
+        <TextBox Grid.Column="1" x:Name="SearchBox" Margin="16,0" MaxWidth="420"
                  Watermark="{DynamicResource Str.Search}" TextChanged="OnSearch"
                  Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
-                 CornerRadius="6" Padding="10,7" />
+                 CornerRadius="6" Padding="12,7" VerticalContentAlignment="Center" />
 
         <Border Grid.Column="2" Classes="pill" x:Name="GpuPill">
-          <StackPanel Orientation="Horizontal" Spacing="7">
+          <StackPanel Orientation="Horizontal" Spacing="8">
             <Ellipse x:Name="GpuDot" Width="8" Height="8" Fill="{DynamicResource Ok}" VerticalAlignment="Center" />
             <TextBlock x:Name="GpuPillText" FontSize="12" VerticalAlignment="Center" />
           </StackPanel>
@@ -60,9 +66,9 @@
       </Grid>
 
       <!-- Update banner -->
-      <Border x:Name="UpdateBanner" Grid.Row="1" IsVisible="False" Margin="18,0,18,8"
+      <Border x:Name="UpdateBanner" Grid.Row="1" IsVisible="False" Margin="16,0,16,12"
               Background="{DynamicResource SurfaceHigh}" BorderBrush="{DynamicResource Accent}"
-              BorderThickness="1" CornerRadius="6" Padding="14,9">
+              BorderThickness="1" CornerRadius="8" Padding="16,8">
         <Grid ColumnDefinitions="*,Auto,Auto">
           <TextBlock Grid.Column="0" x:Name="UpdateText" VerticalAlignment="Center" TextWrapping="Wrap" />
           <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0"
@@ -77,7 +83,7 @@
 
         <!-- Games -->
         <Grid Grid.Column="0" x:Name="GamesPage">
-          <ScrollViewer Padding="18,0,18,18">
+          <ScrollViewer x:Name="GridScroll" Padding="16,4,16,16" SizeChanged="OnGridResized">
             <ItemsControl x:Name="CardList">
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -86,30 +92,35 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Button Classes="card" Click="OnCardClick" Tag="{Binding}" Margin="0,0,14,16"
+                  <Button Classes="card" Classes.selected="{Binding IsSelected}" Click="OnCardClick"
+                          Tag="{Binding}" Margin="0,0,0,16" HorizontalAlignment="Center"
                           AutomationProperties.Name="{Binding Name}" ToolTip.Tip="{Binding Path}">
                     <StackPanel Width="164" Spacing="8">
                       <Panel Height="232">
-                        <Border CornerRadius="8" Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                        <Border Classes="cover" Background="{Binding Tile}" IsVisible="{Binding NoCover}">
                           <TextBlock Text="{Binding Initials}" FontSize="52" FontWeight="Bold"
                                      Foreground="#40FFFFFF" HorizontalAlignment="Center"
                                      VerticalAlignment="Center" />
                         </Border>
-                        <Border CornerRadius="8" ClipToBounds="True" IsVisible="{Binding HasCover}">
+                        <Border Classes="cover" ClipToBounds="True" IsVisible="{Binding HasCover}">
                           <Image Source="{Binding Cover}" Stretch="UniformToFill" />
                         </Border>
-                        <Border Classes="badge" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="7">
-                          <TextBlock Text="{Binding Platform}" FontSize="10" />
+                        <Border Classes="badge" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                          <Panel>
+                            <TextBlock Text="{Binding Platform}" FontSize="10" IsVisible="{Binding IsLauncher}" />
+                            <TextBlock Text="{DynamicResource Str.Folder}" FontSize="10" IsVisible="{Binding IsManual}" />
+                          </Panel>
                         </Border>
-                        <Border Classes="state" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7"
+                        <Border Classes="state" Classes.pulse="{Binding Pulsing}"
+                                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
                                 IsVisible="{Binding Installed}">
-                          <TextBlock Text="{Binding StateLabel}" FontSize="10" FontWeight="Bold"
+                          <TextBlock Text="{DynamicResource Str.OnBadge}" FontSize="10" FontWeight="Bold"
                                      Foreground="White" />
                         </Border>
                       </Panel>
                       <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
-                                 TextTrimming="CharacterEllipsis" MaxWidth="164" />
-                      <StackPanel Orientation="Horizontal" Spacing="5">
+                                 TextTrimming="CharacterEllipsis" MaxWidth="164" Margin="2,0" />
+                      <StackPanel Orientation="Horizontal" Spacing="4" Margin="2,0">
                         <Border Classes="tag" HorizontalAlignment="Left">
                           <TextBlock Text="{Binding RouteLabel}" FontSize="10" />
                         </Border>
@@ -125,25 +136,36 @@
             </ItemsControl>
           </ScrollViewer>
 
+          <!-- Empty library, or a search that matched nothing. -->
           <StackPanel x:Name="EmptyHint" VerticalAlignment="Center" HorizontalAlignment="Center"
-                      Spacing="10" MaxWidth="380" IsVisible="False">
-            <TextBlock Text="{DynamicResource Str.NoGames}" TextWrapping="Wrap" Classes="muted"
+                      Spacing="12" MaxWidth="400" IsVisible="False">
+            <Border Width="64" Height="64" CornerRadius="16" HorizontalAlignment="Center"
+                    Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+              <TextBlock x:Name="EmptyGlyph" Text="▦" FontSize="26" Foreground="{DynamicResource Muted}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock x:Name="EmptyTitle" Classes="h1" HorizontalAlignment="Center" TextAlignment="Center"
+                       TextWrapping="Wrap" />
+            <TextBlock x:Name="EmptyBody" TextWrapping="Wrap" Classes="muted"
                        HorizontalAlignment="Center" TextAlignment="Center" />
-            <Button Classes="primary" HorizontalAlignment="Center" Content="{DynamicResource Str.Scan}"
-                    Click="OnScan" />
+            <StackPanel x:Name="EmptyActions" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center"
+                        Margin="0,4,0,0">
+              <Button Classes="primary" Content="{DynamicResource Str.Scan}" Click="OnScan" />
+              <Button Classes="ghost" Content="{DynamicResource Str.AddGame}" Click="OnAddGame" />
+            </StackPanel>
           </StackPanel>
         </Grid>
 
         <!-- System -->
-        <ScrollViewer Grid.Column="0" x:Name="SystemPage" IsVisible="False" Padding="18,0,18,18">
-          <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+        <ScrollViewer Grid.Column="0" x:Name="SystemPage" IsVisible="False" Padding="16,4,16,16">
+          <StackPanel Spacing="16" MaxWidth="620" HorizontalAlignment="Left">
             <Border Classes="card">
-              <StackPanel Spacing="10">
+              <StackPanel Spacing="12">
                 <TextBlock Text="{DynamicResource Str.System}" Classes="h1" />
                 <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto" >
-                  <TextBlock Grid.Row="0" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Gpu}" />
+                  <TextBlock Grid.Row="0" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Gpu}" Margin="0,0,0,8" />
                   <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuText" TextWrapping="Wrap" />
-                  <TextBlock Grid.Row="1" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Driver}" />
+                  <TextBlock Grid.Row="1" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Driver}" Margin="0,0,0,8" />
                   <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DriverText" />
                   <TextBlock Grid.Row="2" Grid.Column="0" Classes="muted" Text="{DynamicResource Str.Hip}" />
                   <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HipText" />
@@ -164,16 +186,16 @@
         </ScrollViewer>
 
         <!-- Settings -->
-        <ScrollViewer Grid.Column="0" x:Name="SettingsPage" IsVisible="False" Padding="18,0,18,18">
-          <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+        <ScrollViewer Grid.Column="0" x:Name="SettingsPage" IsVisible="False" Padding="16,4,16,16">
+          <StackPanel Spacing="16" MaxWidth="620" HorizontalAlignment="Left">
             <Border Classes="card">
-              <StackPanel Spacing="10">
+              <StackPanel Spacing="12">
                 <TextBlock Text="{DynamicResource Str.Language}" FontWeight="SemiBold" />
                 <ComboBox x:Name="LanguageBox" MinWidth="230" SelectionChanged="OnLanguageChanged" />
               </StackPanel>
             </Border>
             <Border Classes="card">
-              <StackPanel Spacing="6">
+              <StackPanel Spacing="8">
                 <TextBlock Text="{DynamicResource Str.Credits}" TextWrapping="Wrap" Classes="muted" />
                 <TextBlock x:Name="AboutVersion" Classes="muted" FontSize="11" />
               </StackPanel>
@@ -182,84 +204,160 @@
         </ScrollViewer>
 
         <!-- Details drawer -->
-        <Border Grid.Column="1" x:Name="Drawer" IsVisible="False" Width="450"
+        <Border Grid.Column="1" x:Name="Drawer" IsVisible="False" Width="440"
                 Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
-                BorderThickness="1,0,0,0" Padding="18">
-          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+                BorderThickness="1,0,0,0">
+          <Grid RowDefinitions="Auto,Auto,*,Auto">
 
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-              <StackPanel Grid.Column="0" Spacing="2">
-                <TextBlock x:Name="TargetName" Classes="h1" TextWrapping="Wrap" />
-                <TextBlock x:Name="TargetPath" Classes="muted" FontSize="11" TextWrapping="Wrap" />
-              </StackPanel>
-              <Button Grid.Column="1" Classes="ghost" Content="✕" Padding="10,4" Click="OnCloseDrawer"
-                      VerticalAlignment="Top" />
-            </Grid>
+            <!-- Header: the game, as the grid shows it. -->
+            <StackPanel Grid.Row="0" x:Name="DrawerHeader" Spacing="12" Margin="16,16,16,0">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Panel Grid.Column="0" Width="56" Height="80" Margin="0,0,12,0" VerticalAlignment="Top">
+                  <Border CornerRadius="6" Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                    <TextBlock Text="{Binding Initials}" FontSize="18" FontWeight="Bold" Foreground="#40FFFFFF"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <Border CornerRadius="6" ClipToBounds="True" IsVisible="{Binding HasCover}">
+                    <Image Source="{Binding Cover}" Stretch="UniformToFill" />
+                  </Border>
+                </Panel>
+                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Name}" Classes="h1" TextWrapping="Wrap" MaxLines="2"
+                             TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Path}" Classes="muted" FontSize="11" TextTrimming="PathSegmentEllipsis"
+                             ToolTip.Tip="{Binding Path}" />
+                  <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                    <Border Classes="tag">
+                      <TextBlock x:Name="ApiTag" FontSize="11" FontWeight="SemiBold" />
+                    </Border>
+                    <Border Classes="state" Classes.pulse="{Binding Pulsing}" IsVisible="{Binding Installed}">
+                      <TextBlock Text="{DynamicResource Str.InstalledBadge}" FontSize="11" FontWeight="SemiBold"
+                                 Foreground="White" />
+                    </Border>
+                  </StackPanel>
+                </StackPanel>
+                <Button Grid.Column="2" Classes="ghost" Content="✕" Padding="10,4" Click="OnCloseDrawer"
+                        VerticalAlignment="Top" Margin="8,0,0,0"
+                        AutomationProperties.Name="{DynamicResource Str.Close}"
+                        ToolTip.Tip="{DynamicResource Str.CloseHint}" />
+              </Grid>
 
-            <StackPanel Grid.Row="1" Spacing="6" Margin="0,12,0,0">
-              <Border Classes="tag" HorizontalAlignment="Left">
-                <TextBlock x:Name="ApiTag" FontSize="12" FontWeight="SemiBold" />
-              </Border>
               <TextBlock x:Name="DetectedLine" FontSize="11" Classes="muted" TextWrapping="Wrap" />
               <Border x:Name="ApiHintBox" IsVisible="False" Background="#22DDA13A" BorderBrush="{DynamicResource Warn}"
-                      BorderThickness="1" CornerRadius="4" Padding="8,6">
+                      BorderThickness="1" CornerRadius="6" Padding="12,8">
                 <TextBlock x:Name="ApiHint" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource Warn}" />
               </Border>
             </StackPanel>
 
-            <StackPanel Grid.Row="2" Spacing="8" Margin="0,14,0,0">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="{DynamicResource Str.Preset}" VerticalAlignment="Center" Classes="muted" />
-                <ComboBox x:Name="PresetBox" MinWidth="230" SelectionChanged="OnPresetChanged" />
-              </StackPanel>
+            <!-- Route -->
+            <StackPanel Grid.Row="1" Spacing="8" Margin="16,24,16,0">
+              <TextBlock Text="{DynamicResource Str.RouteSection}" Classes="section" />
+              <ComboBox x:Name="PresetBox" HorizontalAlignment="Stretch" SelectionChanged="OnPresetChanged" />
               <TextBlock x:Name="PresetNote" FontSize="11" TextWrapping="Wrap" Classes="muted" />
             </StackPanel>
 
-            <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
-                    BorderThickness="1" CornerRadius="6" Margin="0,14,0,0">
-              <ScrollViewer x:Name="ReportScroll" Padding="10">
-                <ItemsControl x:Name="ReportList">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <Grid ColumnDefinitions="16,*" Margin="0,2">
-                        <TextBlock Grid.Column="0" Text="{Binding Glyph}" Foreground="{Binding Brush}"
-                                   FontWeight="Bold" FontSize="11" />
-                        <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"
-                                   Foreground="{Binding Brush}" FontSize="11" />
-                      </Grid>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </ScrollViewer>
-            </Border>
+            <!-- What will happen, and what did -->
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto,*" Margin="16,24,16,16">
+              <TextBlock Grid.Row="0" Text="{DynamicResource Str.WhatHappens}" Classes="section" />
 
-            <StackPanel Grid.Row="4" Spacing="10" Margin="0,14,0,0">
-              <ProgressBar x:Name="Progress" Height="4" IsVisible="False"
-                           Foreground="{DynamicResource Accent}" />
-              <TextBlock x:Name="StatusText" Classes="muted" FontSize="11" TextWrapping="Wrap" />
-              <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button x:Name="FolderButton" Classes="ghost" Content="{DynamicResource Str.OpenFolder}"
-                        Click="OnOpenFolder" />
-                <Button x:Name="UninstallButton" Classes="ghost" Content="{DynamicResource Str.Uninstall}"
-                        Click="OnUninstall" />
-                <Button x:Name="InstallButton" Classes="primary" Content="{DynamicResource Str.Install}"
-                        Click="OnInstall" />
+              <WrapPanel Grid.Row="1" x:Name="Steps" IsVisible="False" Margin="0,8,0,0">
+                <Border Classes="step" Margin="0,0,4,4"><TextBlock Text="{DynamicResource Str.StepDownload}" /></Border>
+                <Border Classes="step" Margin="0,0,4,4"><TextBlock Text="{DynamicResource Str.StepVerify}" /></Border>
+                <Border Classes="step" Margin="0,0,4,4"><TextBlock Text="{DynamicResource Str.StepInstall}" /></Border>
+                <Border Classes="step" Margin="0,0,4,4"><TextBlock Text="{DynamicResource Str.StepDone}" /></Border>
+              </WrapPanel>
+
+              <Border Grid.Row="2" x:Name="ResultBanner" Classes="result" IsVisible="False" Margin="0,8,0,0">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Grid.Column="0" x:Name="ResultDot" Width="24" Height="24" CornerRadius="12"
+                          VerticalAlignment="Top" Margin="0,0,12,0">
+                    <TextBlock x:Name="ResultGlyph" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource Bg}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock x:Name="ResultTitle" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock x:Name="ResultDetail" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                      BorderThickness="1" CornerRadius="8" Margin="0,8,0,0">
+                <Panel>
+                  <ScrollViewer x:Name="ReportScroll">
+                    <ItemsControl x:Name="ReportList" Margin="12,8">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Grid Classes="line" ColumnDefinitions="18,*" Margin="0,4">
+                            <TextBlock Grid.Column="0" Text="{Binding Glyph}" Foreground="{Binding Brush}"
+                                       FontWeight="Bold" FontSize="11" />
+                            <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"
+                                       Foreground="{Binding Brush}" FontSize="11" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                  <StackPanel x:Name="ReportEmpty" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                              Margin="24">
+                    <Arc Classes="spin" Stroke="{DynamicResource Muted}" HorizontalAlignment="Center" />
+                    <TextBlock Text="{DynamicResource Str.Checking}" Classes="muted" FontSize="11"
+                               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Panel>
+              </Border>
+            </Grid>
+
+            <!-- Action bar, pinned -->
+            <Border Grid.Row="3" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                    BorderThickness="0,1,0,0" Padding="16,12,16,16">
+              <StackPanel Spacing="8">
+                <ProgressBar x:Name="Progress" Height="4" MinHeight="4" IsVisible="False" CornerRadius="2"
+                             Foreground="{DynamicResource Accent}" Background="{DynamicResource SurfaceHigh}" />
+                <TextBlock x:Name="StatusText" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,4,0,0">
+                  <Button Grid.Column="0" x:Name="FolderButton" Classes="ghost" Content="{DynamicResource Str.OpenFolder}"
+                          Click="OnOpenFolder" />
+                  <Button Grid.Column="2" x:Name="UninstallButton" Classes="ghost" Click="OnUninstall" Margin="0,0,8,0"
+                          AutomationProperties.Name="{DynamicResource Str.Uninstall}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <Arc x:Name="UninstallSpin" Classes="spin" Stroke="{DynamicResource Text}" IsVisible="False" />
+                      <TextBlock x:Name="UninstallLabel" Text="{DynamicResource Str.Uninstall}" />
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Column="3" x:Name="InstallButton" Classes="primary" Click="OnInstall" MinWidth="112"
+                          AutomationProperties.Name="{DynamicResource Str.Install}">
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                      <Arc x:Name="InstallSpin" Classes="spin" Stroke="White" IsVisible="False" />
+                      <TextBlock x:Name="InstallLabel" Text="{DynamicResource Str.Install}" />
+                    </StackPanel>
+                  </Button>
+                </Grid>
               </StackPanel>
-            </StackPanel>
+            </Border>
           </Grid>
         </Border>
       </Grid>
 
       <!-- Status bar -->
       <Border Grid.Row="3" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
-              BorderThickness="0,1,0,0" Padding="18,7">
+              BorderThickness="0,1,0,0" Padding="16,8">
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Grid.Column="0" x:Name="FootText" Classes="muted" FontSize="11"
-                     TextTrimming="CharacterEllipsis" />
-          <ProgressBar Grid.Column="1" x:Name="ScanSpinner" Width="120" Height="3" IsIndeterminate="True"
-                       IsVisible="False" Foreground="{DynamicResource Accent}" />
+                     TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          <ProgressBar Grid.Column="1" x:Name="ScanSpinner" Width="120" Height="3" MinHeight="3" IsIndeterminate="True"
+                       IsVisible="False" Foreground="{DynamicResource Accent}" VerticalAlignment="Center" />
         </Grid>
       </Border>
     </Grid>
+
+    <!-- Toast: a one-line summary in the corner, for results that happen away from the drawer. -->
+    <Border Grid.Column="0" Grid.ColumnSpan="2" x:Name="Toast" Classes="toast" IsHitTestVisible="False"
+            HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="88,0,0,48" MaxWidth="380">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Ellipse x:Name="ToastDot" Width="8" Height="8" VerticalAlignment="Center" />
+        <TextBlock x:Name="ToastText" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" MaxWidth="330" />
+      </StackPanel>
+    </Border>
   </Grid>
 </Window>
