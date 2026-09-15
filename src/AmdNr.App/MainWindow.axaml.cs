@@ -175,8 +175,10 @@ public partial class MainWindow : Window
 
     private void ShowPayloadState()
     {
-        PayloadState.IsVisible = _manifest is null;
-        if (_manifest is null)
+        var manifest = Selected();
+        PayloadState.IsVisible = manifest is null;
+        PrefetchButton.IsEnabled = manifest is not null && !_busy;
+        if (manifest is null)
         {
             PayloadState.Text = Text("Str.ManifestFailed");
             PayloadList.ItemsSource = null;
@@ -195,6 +197,47 @@ public partial class MainWindow : Window
             rows.Add(new PayloadRow(name, component.Version, complete));
         }
         PayloadList.ItemsSource = rows;
+    }
+
+    /// <summary>Fetch every component now rather than at the first install that needs one. The cache
+    /// is keyed by component and version and shared by every game, so this is paid once: the 141 MB
+    /// of weights is the same file for all of them, and an install afterwards only verifies and
+    /// copies. Anything already there and already hashing correctly is not fetched again, so this is
+    /// also how a half-finished download is finished.</summary>
+    private async void OnPrefetch(object? sender, RoutedEventArgs e)
+    {
+        var manifest = Selected();
+        if (_busy || manifest is null) return;
+
+        Busy(true);
+        PrefetchButton.IsEnabled = false;
+        var progress = new Progress<DownloadProgress>(p => Dispatcher.UIThread.Post(() =>
+        {
+            Progress.IsVisible = true;
+            Progress.IsIndeterminate = p.Fraction is null;
+            if (p.Fraction is { } fraction) Progress.Value = fraction * 100;
+            Status($"{Text("Str.Downloading")} {p.File} — {p.Received / 1_048_576} MB");
+        }));
+
+        var cache = new PayloadCache(_http);
+        try
+        {
+            foreach (var component in manifest.Components.Keys.ToList())
+                await cache.EnsureAsync(manifest, component, progress);
+            Status(Text("Str.PayloadsReady"));
+        }
+        catch (Exception ex) when (ex is InstallException or HttpRequestException or IOException)
+        {
+            // The rows below say which ones did land, so the message is the reason and not a list.
+            Status(ex.Message);
+        }
+        finally
+        {
+            Progress.IsVisible = false;
+            Busy(false);
+            // Re-read rather than assume: a component that failed has to keep saying so.
+            ShowPayloadState();
+        }
     }
 
     // -- The library -----------------------------------------------------------------------------

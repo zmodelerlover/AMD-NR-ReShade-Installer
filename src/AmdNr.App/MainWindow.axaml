@@ -573,11 +573,13 @@
                 </ItemsControl>
                 <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"
                         Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
-                  <Grid ColumnDefinitions="Auto,*,Auto">
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                     <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" Foreground="{DynamicResource Faint}" />
                     <TextBlock Grid.Column="1" x:Name="CacheFolder" Classes="muted" Margin="10,0,16,0"
                                VerticalAlignment="Center" TextTrimming="PathSegmentEllipsis" />
-                    <Button Grid.Column="2" Classes="ghost" Content="{DynamicResource Str.OpenFolder}" Click="OnOpenCache" />
+                    <Button Grid.Column="2" x:Name="PrefetchButton" Classes="ghost" Margin="0,0,8,0"
+                            Click="OnPrefetch" Content="{DynamicResource Str.PrefetchAll}" />
+                    <Button Grid.Column="3" Classes="ghost" Content="{DynamicResource Str.OpenFolder}" Click="OnOpenCache" />
                   </Grid>
                 </Border>
               </StackPanel>
