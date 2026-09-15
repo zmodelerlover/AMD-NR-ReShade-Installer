@@ -39,13 +39,16 @@
 
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
   <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
-  <sys:String x:Key="Str.Credits">A rede é a DLSS-NR-on-AMD do danielblnc. A runtime e os pesos são trabalho dele, e sem eles não sobra nada aqui pra rodar.</sys:String>
-  <sys:String x:Key="Str.CreditsOurs">O add-on e este instalador são o dlss5-neural-amd, licença MIT, código aberto. Nada é travado, nada é vendido, e nada aqui pede dinheiro.</sys:String>
-  <sys:String x:Key="Str.Free">Isto é de graça, e sempre foi. Se você pagou alguém por isto, te enganaram — peça seu dinheiro de volta e pegue nos links abaixo.</sys:String>
-  <sys:String x:Key="Str.LinkAddon">O add-on no GitHub</sys:String>
-  <sys:String x:Key="Str.LinkInstaller">Este instalador no GitHub</sys:String>
-  <sys:String x:Key="Str.LinkRuntime">DLSS-NR-on-AMD (danielblnc)</sys:String>
-  <sys:String x:Key="Str.LinkDiscord">Discord</sys:String>
+  <sys:String x:Key="Str.FreeTitle">Isto é de graça. Se você pagou por isto, estão te enganando.</sys:String>
+  <sys:String x:Key="Str.FreeBody">Ninguém vende nada disto — nem este instalador, nem o add-on, nem a runtime, nem os pesos. Todo arquivo vem dos links abaixo, sem custo, e vai continuar assim. Se alguém te cobrou por isto, ou por uma "chave", ou por uma "versão pro", peça seu dinheiro de volta: o que te venderam está nesta página de graça.</sys:String>
+  <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — do danielblnc</sys:String>
+  <sys:String x:Key="Str.CreditRuntimeBody">A rede em si, e o motivo de tudo isto existir: foi o projeto dele que fez o neural rendering do DLSS 5 rodar em Radeon. A runtime e os 141 MB de pesos que este app baixa são trabalho dele, não nosso — tira isso e não sobra nada pra rodar. Obrigado, danielblnc.</sys:String>
+  <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — o add-on</sys:String>
+  <sys:String x:Key="Str.CreditAddonBody">O que liga essa rede ao jogo através do ReShade: as rotas D3D11, D3D12 e Vulkan, a ponte 32-bit pros jogos antigos, o overlay e a tecla de atalho. Licença MIT, código aberto.</sys:String>
+  <sys:String x:Key="Str.CreditInstallerTitle">AMD-NR ReShade Installer — este programa</sys:String>
+  <sys:String x:Key="Str.CreditInstallerBody">Acha seus jogos, descobre qual API gráfica cada um usa, baixa cada arquivo e confere contra um hash fixo antes de escrever qualquer coisa. Desinstalar devolve a pasta como estava. Licença MIT, código aberto.</sys:String>
+  <sys:String x:Key="Str.CreditDiscordTitle">Discord — onde o pessoal está</sys:String>
+  <sys:String x:Key="Str.CreditDiscordBody">Onde o projeto é discutido: builds novas, o que funciona em qual jogo, e os logs que o pessoal manda quando algo quebra. Abre aí se você travou, ou se quiser ajudar a testar.</sys:String>
   <sys:String x:Key="Str.CreditsSection">Créditos</sys:String>
 
   <sys:String x:Key="Str.Scan">Procurar jogos</sys:String>

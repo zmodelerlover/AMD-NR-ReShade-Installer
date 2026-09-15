@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AmdNr.App"
         x:Class="AmdNr.App.SetupWindow"
         Title="AMD-NR ReShade Installer"
         Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
@@ -47,36 +48,9 @@
             </StackPanel>
           </Border>
 
-          <!-- Said here because this is the screen everyone sees first, and by the time someone has
-               been charged for this they have already been had. -->
-          <Border Classes="callout">
-            <Grid ColumnDefinitions="Auto,*">
-              <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="16" Height="16"
-                        Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
-              <TextBlock Grid.Column="1" Text="{DynamicResource Str.Free}" TextWrapping="Wrap"
-                         LineHeight="19" Foreground="#F2D7A6" />
-            </Grid>
-          </Border>
-
-          <Border Classes="card">
-            <StackPanel Spacing="8">
-              <TextBlock Text="{DynamicResource Str.CreditsSection}" Classes="section" />
-              <TextBlock Text="{DynamicResource Str.Credits}" Classes="muted" TextWrapping="Wrap"
-                         LineHeight="19" />
-              <TextBlock Text="{DynamicResource Str.CreditsOurs}" Classes="muted" TextWrapping="Wrap"
-                         LineHeight="19" />
-              <WrapPanel Margin="0,3,0,0">
-                <Button x:Name="LinkAddonButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
-                        Content="{DynamicResource Str.LinkAddon}" />
-                <Button x:Name="LinkInstallerButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
-                        Content="{DynamicResource Str.LinkInstaller}" />
-                <Button x:Name="LinkRuntimeButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
-                        Content="{DynamicResource Str.LinkRuntime}" />
-                <Button x:Name="LinkDiscordButton" Classes="ghost" Click="OnOpenLink" Margin="0,0,8,8"
-                        Content="{DynamicResource Str.LinkDiscord}" />
-              </WrapPanel>
-            </StackPanel>
-          </Border>
+          <!-- Here because this is the screen everyone sees first, and by the time someone has been
+               charged for this they have already been had. -->
+          <local:CreditsPanel />
         </StackPanel>
 
         <!-- 2. This machine -->
