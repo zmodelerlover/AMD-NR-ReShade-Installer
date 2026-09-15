@@ -48,6 +48,7 @@
 
   <sys:String x:Key="Str.Language">Language</sys:String>
   <sys:String x:Key="Str.UpdateAvailable">A newer version is out</sys:String>
+  <sys:String x:Key="Str.UpdateWorking">Updating...</sys:String>
   <sys:String x:Key="Str.OpenReleases">Open the releases page</sys:String>
   <sys:String x:Key="Str.Dismiss">Not now</sys:String>
 

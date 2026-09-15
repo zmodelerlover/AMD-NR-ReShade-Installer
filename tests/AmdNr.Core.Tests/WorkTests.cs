@@ -662,4 +662,45 @@ public class WorkTests
         Assert.True(Work.ProxyAllowed(Preset.Dx12, "D3D12.DLL"));
         Assert.False(Work.ProxyAllowed(Preset.Dx12, null));
     }
+
+    /// <summary>The update is checked against the hash its own release publishes before anything is
+    /// written, because this is the one path that writes a file the app then runs as itself. And the
+    /// swap never leaves the app without an executable: Windows will not let a running image be
+    /// overwritten but will let it be renamed, so the outgoing one is moved aside and put back if
+    /// the replacement cannot land.</summary>
+    [Fact]
+    public void AnUpdateIsVerifiedBeforeItReplacesAnything()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "upd-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        var bytes = "a new build"u8.ToArray();
+        var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
+        var sums = string.Join('\n', $"{sha} *AMD-NR-ReShade-Installer.exe", "0000 not-a-pin", "");
+
+        Assert.True(AppUpdater.Verify(bytes, sums, "AMD-NR-ReShade-Installer.exe"));
+        Assert.False(AppUpdater.Verify("something else"u8.ToArray(), sums, "AMD-NR-ReShade-Installer.exe"));
+        Assert.False(AppUpdater.Verify(bytes, sums, "not-listed.exe"));
+        Assert.False(AppUpdater.Verify(bytes, "", "AMD-NR-ReShade-Installer.exe"));
+
+        var current = Path.Combine(dir, "app.exe");
+        var staged = Path.Combine(dir, "staged.exe");
+        File.WriteAllBytes(current, "the old build"u8.ToArray());
+        File.WriteAllBytes(staged, bytes);
+
+        var parked = AppUpdater.Swap(current, staged);
+        Assert.Equal(bytes, File.ReadAllBytes(current));
+        Assert.Equal("the old build"u8.ToArray(), File.ReadAllBytes(parked));
+        Assert.False(File.Exists(staged));
+
+        // And the sweep takes the parked one, which is what the next start does.
+        AppUpdater.SweepOld(dir);
+        Assert.False(File.Exists(parked));
+        Assert.True(File.Exists(current));
+
+        // A staged file that is not there is refused before the running one is moved anywhere.
+        Assert.Throws<InstallException>(() => AppUpdater.Swap(current, Path.Combine(dir, "gone.exe")));
+        Assert.Equal(bytes, File.ReadAllBytes(current));
+
+        Directory.Delete(dir, recursive: true);
+    }
 }

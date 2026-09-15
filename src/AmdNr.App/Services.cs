@@ -253,7 +253,15 @@ public static class GpuService
     }
 }
 
-public sealed record AppRelease(string Version, string Notes, string Url);
+public sealed record AppRelease(string Version, string Notes, string Url,
+    IReadOnlyDictionary<string, string> Assets)
+{
+    /// <summary>Whether this release publishes both the executable and the sums that pin it.
+    /// Without the pin there is nothing to check the download against, and an update that runs
+    /// unverified bytes is worse than one the person fetches by hand.</summary>
+    public bool CanSelfUpdate =>
+        Assets.ContainsKey(AppUpdate.ExeAsset) && Assets.ContainsKey(AppUpdate.SumsAsset);
+}
 
 /// <summary>Checks whether a newer release is published. It does not download or replace anything:
 /// a single-file exe is locked by Windows while the old process is still shutting down, and
@@ -323,12 +331,78 @@ public static class AppUpdate
             return plus >= 0 ? t[..plus] : t;
         }
 
-        AppRelease Build(JsonDocument doc, string version) => new(
-            version,
-            doc.RootElement.TryGetProperty("body", out var body) ? body.GetString() ?? "" : "",
-            doc.RootElement.TryGetProperty("html_url", out var link)
-                ? link.GetString() ?? $"https://github.com/{repo.Owner}/{repo.Repo}/releases"
-                : $"https://github.com/{repo.Owner}/{repo.Repo}/releases");
+        AppRelease Build(JsonDocument doc, string version)
+        {
+            var assets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (doc.RootElement.TryGetProperty("assets", out var list) &&
+                list.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in list.EnumerateArray())
+                    if (item.TryGetProperty("name", out var n) &&
+                        item.TryGetProperty("browser_download_url", out var u) &&
+                        n.GetString() is { Length: > 0 } name && u.GetString() is { Length: > 0 } url)
+                        assets[name] = url;
+            }
+            return new AppRelease(
+                version,
+                doc.RootElement.TryGetProperty("body", out var body) ? body.GetString() ?? "" : "",
+                doc.RootElement.TryGetProperty("html_url", out var link)
+                    ? link.GetString() ?? $"https://github.com/{repo.Owner}/{repo.Repo}/releases"
+                    : $"https://github.com/{repo.Owner}/{repo.Repo}/releases",
+                assets);
+        }
+    }
+
+    public const string ExeAsset = "AMD-NR-ReShade-Installer.exe";
+    public const string SumsAsset = "SHA256SUMS.txt";
+
+    /// <summary>Fetches the new executable and checks it against the sums the same release
+    /// publishes, then puts it beside the running one. Returns where it landed.
+    ///
+    /// The verification is not optional: this writes a file the app is about to run as itself, so
+    /// an unverified update is a remote code execution with extra steps. A release that does not
+    /// publish its sums is refused rather than trusted -- that is what CanSelfUpdate is for.</summary>
+    public static async Task<string> FetchAsync(HttpClient http, AppRelease release,
+        IProgress<double>? progress = null, CancellationToken cancel = default)
+    {
+        Engine.Require(release.CanSelfUpdate,
+            "That release does not publish the file and the hashes this would need. Use the link instead.");
+
+        var sums = await http.GetStringAsync(release.Assets[SumsAsset], cancel);
+
+        using var response = await http.GetAsync(release.Assets[ExeAsset],
+            HttpCompletionOption.ResponseHeadersRead, cancel);
+        response.EnsureSuccessStatusCode();
+        var total = response.Content.Headers.ContentLength;
+        await using var body = await response.Content.ReadAsStreamAsync(cancel);
+        using var buffer = new MemoryStream();
+        var chunk = new byte[81920];
+        int read;
+        while ((read = await body.ReadAsync(chunk, cancel)) > 0)
+        {
+            buffer.Write(chunk, 0, read);
+            if (total is > 0) progress?.Report((double)buffer.Length / total.Value);
+        }
+        var bytes = buffer.ToArray();
+
+        Engine.Require(AppUpdater.Verify(bytes, sums, ExeAsset),
+            "The update downloaded, but it does not match the SHA-256 the release publishes. "
+            + "Nothing was replaced.");
+
+        var staged = Path.Combine(AppPaths.Root, $"update-{release.Version}.exe");
+        await File.WriteAllBytesAsync(staged, bytes, cancel);
+        return staged;
+    }
+
+    /// <summary>Swaps the staged executable in and starts it. The caller closes the window straight
+    /// after: two copies of this app in one folder is the state the swap exists to pass through
+    /// quickly, and the outgoing one is swept on the next start.</summary>
+    public static void ApplyAndRestart(string staged)
+    {
+        var current = Environment.ProcessPath
+                      ?? throw new InstallException("Cannot tell which file this app is running from.");
+        AppUpdater.Swap(current, staged);
+        Process.Start(new ProcessStartInfo(current) { UseShellExecute = true });
     }
 
     public static void OpenInBrowser(string url)

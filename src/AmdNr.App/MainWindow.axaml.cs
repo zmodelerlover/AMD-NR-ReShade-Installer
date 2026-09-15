@@ -87,6 +87,10 @@ public partial class MainWindow : Window
         RefreshGrid();
         ShowSystem();
 
+        // The previous executable, parked by an update. The process that held it has exited by now.
+        if (Environment.ProcessPath is { } self && Path.GetDirectoryName(self) is { } home)
+            AppUpdater.SweepOld(home);
+
         _ = StartBackgroundWorkAsync();
     }
 
@@ -1452,9 +1456,38 @@ public partial class MainWindow : Window
     private void Status(string text) => StatusText.Text = text;
     private void Foot(string text) => FootText.Text = text;
 
-    private void OnOpenReleases(object? sender, RoutedEventArgs e)
+    /// <summary>Updates the app in place when the release publishes what that needs, and falls back
+    /// to the browser when it does not. The fallback is not a formality: a release without its sums
+    /// cannot be verified, and this would rather hand the person a link than run unchecked bytes.
+    /// </summary>
+    private async void OnOpenReleases(object? sender, RoutedEventArgs e)
     {
-        if (_update is not null) AppUpdate.OpenInBrowser(_update.Url);
+        if (_update is null) return;
+        if (!_update.CanSelfUpdate)
+        {
+            AppUpdate.OpenInBrowser(_update.Url);
+            return;
+        }
+
+        UpdateButton.IsEnabled = false;
+        try
+        {
+            var progress = new Progress<double>(f =>
+                UpdateText.Text = $"{Text("Str.UpdateWorking")} {f * 100:0}%");
+            var staged = await AppUpdate.FetchAsync(_http, _update, progress);
+            AppUpdate.ApplyAndRestart(staged);
+            // The replacement is already starting; this one gets out of its way.
+            Close();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or InstallException or IOException
+                                      or TaskCanceledException or UnauthorizedAccessException)
+        {
+            // Nothing was replaced -- Swap puts the old one back if the move fails, and a refused
+            // hash never gets that far. The link still works.
+            UpdateText.Text = $"{Text("Str.UpdateAvailable")} - v{_update.Version}";
+            UpdateButton.IsEnabled = true;
+            ShowToast(ex.Message, Level.Warn);
+        }
     }
 
     private void OnDismissUpdate(object? sender, RoutedEventArgs e) => UpdateBanner.IsVisible = false;
