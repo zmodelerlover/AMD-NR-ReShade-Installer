@@ -656,6 +656,11 @@ public partial class MainWindow : Window
     /// is what breaks that. Otherwise the executable the detection already found.</summary>
     private void OnPlay(object? sender, RoutedEventArgs e)
     {
+        // Not just consistency with every other handler: the game opens the very DLLs an install
+        // is in the middle of writing, Windows locks them, and the transaction fails halfway. The
+        // button stays lit because what it can do depends on the card, not on this, so the guard
+        // is here rather than in SetButtons.
+        if (_busy) return;
         if (_selected is not { } card) return;
 
         var what = card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 } id
