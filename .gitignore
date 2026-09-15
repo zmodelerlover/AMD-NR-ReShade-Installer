@@ -10,3 +10,4 @@ TestResults/
 *.addon64
 dlssnr_amd_pass1.dll
 dlssnr_on_amd_weights.bin
+dist/

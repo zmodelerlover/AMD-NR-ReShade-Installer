@@ -9,6 +9,7 @@
     <!-- The engine is Windows-only on purpose: reparse points, MoveFileEx write-through and the
          PE machine check are the whole point of it. Tests run on Windows too. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

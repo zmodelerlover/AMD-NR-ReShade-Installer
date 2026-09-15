@@ -61,7 +61,10 @@ public partial class MainWindow : Window
         }
         catch (Exception e) when (e is HttpRequestException or InstallException or TaskCanceledException)
         {
-            Status(Text("Str.ManifestFailed"));
+            // Offline, or the content repository is not up yet: the copy beside the executable
+            // pins the same hashes, so everything still works against whatever is already cached.
+            _manifest = PayloadCache.LoadLocalManifest();
+            Status(_manifest is null ? Text("Str.ManifestFailed") : Text("Str.ManifestLocal"));
         }
 
         _update = await AppUpdate.CheckAsync(_http, _config.App, App.Version);
@@ -209,9 +212,15 @@ public partial class MainWindow : Window
     {
         if (GameList.SelectedItem is not GameEntry entry || _busy) return;
         var pins = Pins();
-        var payloads = CachedPayloadFolder();
 
-        var report = await Task.Run(() => Work.Preflight(entry.Path, payloads ?? "", entry.Preset, pins));
+        // Off the UI thread: deciding whether the cache is complete means hashing 141 MB of
+        // weights, which is about a second and would be a second of frozen window.
+        var (report, payloads) = await Task.Run(() =>
+        {
+            var staged = CachedPayloadFolder(entry.Preset);
+            return (Work.Preflight(entry.Path, staged ?? "", entry.Preset, pins), staged);
+        });
+
         Show(report);
         SetButtons(true);
         Status(payloads is null ? Text("Str.Verifying") : Text("Str.PayloadsReady"));
@@ -280,24 +289,14 @@ public partial class MainWindow : Window
 
         try
         {
-            // Every route needs the add-on and the runtime; the bridge routes also need their own
-            // pair and the pinned ReShade beside it.
-            var components = preset.Route() == Route.X86
-                ? new[] { PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent, PayloadManifest.RuntimeComponent }
-                : [PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent];
-
-            string? first = null;
+            var components = ComponentsFor(preset);
             foreach (var component in components)
-            {
-                var folder = await cache.EnsureAsync(_manifest, component, progress);
-                first ??= folder;
-                // The x64 route reads everything out of one folder, so the add-on and the runtime
-                // are merged into the first of them.
-                if (preset.Route() == Route.X64 && folder != first) MergeInto(folder, first!);
-                if (preset.Route() == Route.X86 && component != PayloadManifest.BridgeComponent) MergeInto(folder, first!);
-            }
+                await cache.EnsureAsync(_manifest, component, progress);
+
             Progress.IsVisible = false;
-            return first;
+            // One folder for the install to read, hard-linked out of the cache: the 141 MB of
+            // weights are not copied a second time on the way there.
+            return cache.Stage(_manifest, components);
         }
         catch (Exception e) when (e is InstallException or HttpRequestException or IOException)
         {
@@ -308,32 +307,27 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>Hard-links where the filesystem allows it and copies where it does not, so the
-    /// weights are not written twice on the way to one install folder.</summary>
-    private static void MergeInto(string from, string to)
-    {
-        foreach (var source in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
-        {
-            var relative = Path.GetRelativePath(from, source);
-            var target = Path.Combine(to, relative);
-            if (File.Exists(target) && new FileInfo(target).Length == new FileInfo(source).Length) continue;
-            Engine.MakeParent(target);
-            File.Copy(source, target, overwrite: true);
-        }
-    }
+    /// <summary>What a route needs. Every route needs the add-on and the runtime; the bridge routes
+    /// also need their own 32-bit pair and the pinned ReShade beside it.</summary>
+    private static string[] ComponentsFor(Preset preset) => preset.Route() == Route.X86
+        ?
+        [
+            PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,
+            PayloadManifest.RuntimeComponent,
+        ]
+        : [PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent];
 
     /// <summary>The folder a route would install from, when it is already complete in the cache.</summary>
-    private string? CachedPayloadFolder()
+    private string? CachedPayloadFolder(Preset preset)
     {
         if (_manifest is null) return null;
         try
         {
-            if (!PayloadCache.IsComplete(_manifest, PayloadManifest.RuntimeComponent)) return null;
-            if (!PayloadCache.IsComplete(_manifest, PayloadManifest.AddonComponent)) return null;
-            var runtime = _manifest.Component(PayloadManifest.RuntimeComponent);
-            return PayloadCache.FolderFor(PayloadManifest.RuntimeComponent, runtime.Version);
+            var components = ComponentsFor(preset);
+            if (!components.All(c => PayloadCache.IsComplete(_manifest, c))) return null;
+            return new PayloadCache(_http).Stage(_manifest, components);
         }
-        catch (InstallException)
+        catch (Exception e) when (e is InstallException or IOException)
         {
             return null;
         }

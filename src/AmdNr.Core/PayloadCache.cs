@@ -157,6 +157,43 @@ public sealed class PayloadCache(HttpClient http)
         File.Move(part, path, overwrite: true);
     }
 
+    /// <summary>One folder holding every file the given components need, which is what an install
+    /// reads from. The files are hard-linked out of the cache where the filesystem allows it, so
+    /// staging 141 MB of weights costs no disk and no copy; a volume that refuses gets a copy.</summary>
+    public string Stage(PayloadManifest manifest, params string[] components)
+    {
+        var key = string.Join("-", components.Select(c => $"{Sanitise(c)}.{Sanitise(manifest.Component(c).Version)}"));
+        var staging = Path.Combine(AppPaths.Cache, "staging", key.Length <= 120 ? key : key[..120]);
+        Directory.CreateDirectory(staging);
+
+        foreach (var component in components)
+        {
+            var c = manifest.Component(component);
+            var from = FolderFor(component, c.Version);
+            foreach (var file in c.Files)
+            {
+                var source = Path.Combine(from, file.RelativePath);
+                var target = Path.Combine(staging, file.RelativePath);
+                if (Engine.SizeOf(target) == file.Size) continue;
+                Engine.MakeParent(target);
+                if (File.Exists(target)) File.Delete(target);
+                if (!TryHardLink(source, target)) File.Copy(source, target, overwrite: true);
+            }
+        }
+        return staging;
+    }
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW",
+        CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool CreateHardLinkW(string link, string existing, IntPtr attributes);
+
+    private static bool TryHardLink(string source, string target)
+    {
+        try { return CreateHardLinkW(target, source, IntPtr.Zero); }
+        catch (EntryPointNotFoundException) { return false; }
+    }
+
     /// <summary>The manifest itself, from raw.githubusercontent.com -- no REST API, so no rate
     /// limit to share with everyone else on the same address.</summary>
     public async Task<PayloadManifest> FetchManifestAsync(string owner, string repo, string branch = "main",
@@ -167,6 +204,30 @@ public sealed class PayloadCache(HttpClient http)
         Engine.Require(response.IsSuccessStatusCode,
             $"Could not read the payload list: the server answered {(int)response.StatusCode} {response.ReasonPhrase}.");
         return PayloadManifest.Parse(await response.Content.ReadAsStringAsync(cancel));
+    }
+
+    /// <summary>The copy that ships beside the executable, or one the user dropped in the app's own
+    /// folder. This is what makes the app work offline, on a first run behind a captive portal, and
+    /// before the content repository exists at all -- the hashes are the same either way, so a local
+    /// manifest weakens nothing.</summary>
+    public static PayloadManifest? LoadLocalManifest(string fileName = "payload.json")
+    {
+        foreach (var path in new[]
+                 {
+                     Path.Combine(AppPaths.Root, fileName),
+                     Path.Combine(AppContext.BaseDirectory, fileName),
+                 })
+        {
+            try
+            {
+                if (File.Exists(path)) return PayloadManifest.Parse(File.ReadAllText(path));
+            }
+            catch (Exception e) when (e is IOException or InstallException)
+            {
+                // Try the next one; a broken local copy must not stop the app from starting.
+            }
+        }
+        return null;
     }
 
     /// <summary>A default client with a User-Agent, because GitHub refuses requests without one.</summary>

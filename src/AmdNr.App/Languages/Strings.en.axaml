@@ -32,6 +32,7 @@
   <sys:String x:Key="Str.Downloading">Downloading</sys:String>
   <sys:String x:Key="Str.Verifying">Verifying what is already here…</sys:String>
   <sys:String x:Key="Str.PayloadsReady">Downloaded and verified.</sys:String>
+  <sys:String x:Key="Str.ManifestLocal">Using the list that ships with this app: the site could not be reached.</sys:String>
   <sys:String x:Key="Str.ManifestFailed">Could not read the download list. Check the connection and try again.</sys:String>
 
   <sys:String x:Key="Str.Language">Language</sys:String>

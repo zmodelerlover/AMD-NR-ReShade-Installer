@@ -29,6 +29,7 @@
   <sys:String x:Key="Str.Downloading">Baixando</sys:String>
   <sys:String x:Key="Str.Verifying">Conferindo o que já está aqui…</sys:String>
   <sys:String x:Key="Str.PayloadsReady">Baixado e conferido.</sys:String>
+  <sys:String x:Key="Str.ManifestLocal">Usando a lista que vem junto com o app: o site não respondeu.</sys:String>
   <sys:String x:Key="Str.ManifestFailed">Não deu pra ler a lista de downloads. Confira a conexão e tente de novo.</sys:String>
 
   <sys:String x:Key="Str.Language">Idioma</sys:String>

@@ -17,6 +17,9 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- Skia and the GL loader are native, and without this they sit beside the exe instead of
+         inside it. One file is the point: people drop this next to a game. -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
     <DebugType>none</DebugType>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -34,6 +37,9 @@
     <None Update="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- The same manifest the content repository publishes, shipped so the app works offline and
+         before that repository exists. The remote copy wins when it can be reached. -->
+    <None Include="..\..\payload\payload.json" Link="payload.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

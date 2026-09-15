@@ -224,4 +224,43 @@ public class PayloadTests
         Assert.Throws<InstallException>(() => PayloadCache.FolderFor("runtime", "../../windows"));
         Assert.StartsWith(AppPaths.Cache, PayloadCache.FolderFor("runtime", "0.2.17"), StringComparison.Ordinal);
     }
+
+    // -- Staging ----------------------------------------------------------------------------------
+
+    /// <summary>What an install actually reads from: one folder holding several components, built
+    /// by hard-linking out of the cache. The 141 MB of weights must not be copied a second time on
+    /// the way there, and the bridge's files\ layout has to survive the trip.</summary>
+    [Fact]
+    public async Task StagingBuildsOneFolderOutOfSeveralComponents()
+    {
+        var blob = Enumerable.Range(0, 2048).Select(i => (byte)(i % 97)).ToArray();
+        var tag = $"st-{Guid.NewGuid():N}"[..12];
+        var json = $$"""
+            {
+              "schema": 1, "owner": "someone", "repo": "Extras", "tag": "{{tag}}",
+              "components": {
+                "runtime": { "version": "{{tag}}", "files": [
+                  { "name": "dlssnr_amd_pass1.dll", "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}" } ] },
+                "bridge":  { "version": "{{tag}}", "files": [
+                  { "name": "dlss5-neural.addon32", "path": "files/dlss5-neural.addon32",
+                    "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}" } ] }
+              }
+            }
+            """;
+
+        var manifest = PayloadManifest.Parse(json);
+        var cache = new PayloadCache(new HttpClient(new BlobServer(blob)));
+        await cache.EnsureAsync(manifest, "runtime");
+        await cache.EnsureAsync(manifest, "bridge");
+
+        var staged = cache.Stage(manifest, "runtime", "bridge");
+        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(staged, Work.RuntimeName)));
+        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(staged, "files", "dlss5-neural.addon32")));
+
+        // Staging again is free and changes nothing.
+        Assert.Equal(staged, cache.Stage(manifest, "runtime", "bridge"));
+
+        // And it is the shape Work reads: payloads found without a files\ hop for the x64 route.
+        Assert.Equal(staged, Work.PayloadDir(staged));
+    }
 }

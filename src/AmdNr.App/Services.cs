@@ -19,8 +19,10 @@ public sealed class RepoRef
 
 public sealed class AppConfig
 {
-    public RepoRef App { get; init; } = new();
-    public RepoRef Payload { get; init; } = new();
+    // The defaults are the real repositories, so config.json is an override and not a requirement:
+    // a copy of the exe on its own still knows where to look.
+    public RepoRef App { get; init; } = new() { Owner = "zmodelerlover", Repo = "AMD-NR-ReShade-Installer" };
+    public RepoRef Payload { get; init; } = new() { Owner = "zmodelerlover", Repo = "AMD-NR-Extras" };
 
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
 
