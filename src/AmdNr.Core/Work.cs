@@ -81,6 +81,10 @@ public static class Work
         Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "d3d8.dll"],
         Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll"],
         Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "d3d11.dll"],
+        // An OpenGL game never loads dxgi.dll, so looking for the D3D names there would report
+        // "no ReShade proxy found" about a folder with ReShade sitting in it -- the same mistake
+        // the 32-bit line above was added to fix.
+        Preset.OpenGL => ["opengl32.dll", "dinput8.dll"],
         _ => ["dxgi.dll", "d3d11.dll", "d3d12.dll"],
     };
 
@@ -282,6 +286,12 @@ public static class Work
         Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "dinput8.dll"],
         Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
         Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "dinput8.dll"],
+        // Read out of the pinned ReShade64.dll the same way the rest of this list was: it exports
+        // the twenty-four wgl* entry points and the GL 1.1 set, so opengl32.dll is a name it can
+        // really be loaded under. dinput8.dll is kept as the way in for a host that loads OpenGL
+        // through something a proxy beside the executable cannot displace -- ReShade hooks the
+        // system opengl32 once it is in the process, whichever name carried it there.
+        Preset.OpenGL => ["opengl32.dll", "dinput8.dll"],
         _ => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
     };
 
@@ -310,7 +320,10 @@ public static class Work
         if (ProxyAllowed(preset, wanted))
             return ProxyChoicesFor(preset).First(n => string.Equals(n, wanted, StringComparison.OrdinalIgnoreCase));
 
-        string[] candidates = preset == Preset.Dx12 ? ["dxgi.dll", "d3d12.dll"] : ["dxgi.dll", "d3d11.dll"];
+        string[] candidates =
+            preset == Preset.OpenGL ? ["opengl32.dll"]
+            : preset == Preset.Dx12 ? ["dxgi.dll", "d3d12.dll"]
+            : ["dxgi.dll", "d3d11.dll"];
         var existing = candidates.FirstOrDefault(n =>
             File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade);
         if (existing is not null) return existing;

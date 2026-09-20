@@ -13,6 +13,7 @@ public enum Preset
     Dx11,
     Dx12,
     Vulkan,
+    OpenGL,
     X86Dx11,
     X86Dx9,
     X86Dx8,
@@ -22,12 +23,12 @@ public static class Presets
 {
     public static readonly Preset[] All =
     [
-        Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan,
+        Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL,
         Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8,
     ];
 
     private static readonly Preset[] X64 =
-        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan];
+        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
 
     private static readonly Preset[] X86 = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
 
@@ -69,6 +70,7 @@ public static class Presets
         Preset.Dx11 => "D3D11",
         Preset.Dx12 => "D3D12",
         Preset.Vulkan => "Vulkan",
+        Preset.OpenGL => "OpenGL",
         Preset.X86Dx11 => "D3D11",
         Preset.X86Dx9 => "D3D9",
         Preset.X86Dx8 => "D3D8",
@@ -82,6 +84,7 @@ public static class Presets
         Preset.Dx11 => "D3D11 game",
         Preset.Dx12 => "D3D12 game",
         Preset.Vulkan => "Vulkan game",
+        Preset.OpenGL => "OpenGL game",
         Preset.X86Dx11 => "D3D11 game, 32-bit",
         Preset.X86Dx9 => "D3D9 game, 32-bit",
         Preset.X86Dx8 => "D3D8 game, 32-bit",
@@ -125,6 +128,12 @@ public static class Presets
             + "import vkCreateDevice statically -- one that resolves Vulkan through "
             + "vkGetInstanceProcAddr cannot be hooked, and the add-on stands down rather than guess. "
             + "No depth on Vulkan either way: colour and estimated motion.",
+        Preset.OpenGL =>
+            "EXPERIMENTAL. Unlike Vulkan this one is an ordinary proxy DLL: ReShade goes in as "
+            + "opengl32.dll beside the game, no separate installer run. The network gets colour "
+            + "and estimated motion; the game's own depth is reachable on this API but is not "
+            + "wired up yet. A 32-bit OpenGL game has no route at all -- the 32-bit pair covers "
+            + "D3D8, D3D9 and D3D11 only.",
         Preset.X86Dx11 =>
             "EXPERIMENTAL. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair: "
             + "a 32-bit frontend inside the game and a 64-bit helper beside it, sharing frames on the "

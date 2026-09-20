@@ -97,13 +97,43 @@ public class GraphicsTests
         Assert.Contains("Unity", d.Why, StringComparison.Ordinal);
     }
 
+    /// <summary>OpenGL has a route now, and it is 64-bit only: the 32-bit pair has a D3D8, D3D9
+    /// and D3D11 frontend and nothing for OpenGL. Half-Life is the shape of the game this is
+    /// about -- 32-bit, OpenGL, and still nothing this add-on can do for it.</summary>
     [Fact]
-    public void AGenuineOpenGLGameHasNoRouteAndSaysSo()
+    public void A32BitOpenGLGameStillHasNoRouteAndSaysSo()
     {
-        var root = Game("opengl", "hl.exe", Fixture.PeWithImports(false, ["opengl32.dll"]));
+        var root = Game("opengl32bit", "hl.exe", Fixture.PeWithImports(false, ["opengl32.dll"]));
         var d = GraphicsDetector.Detect(root);
         Assert.Equal(GraphicsApi.OpenGL, d.Api);
         Assert.Null(d.Preset);
+    }
+
+    [Fact]
+    public void A64BitOpenGLGameTakesTheOpenGLRoute()
+    {
+        var root = Game("opengl64bit", "game.exe", Fixture.PeWithImports(true, ["opengl32.dll"]));
+        var d = GraphicsDetector.Detect(root);
+        Assert.Equal(GraphicsApi.OpenGL, d.Api);
+        Assert.Equal(Preset.OpenGL, d.Preset);
+        Assert.Equal(GraphicsApi.OpenGL, d.Recommended);
+        // One API, one route: there is nothing for the player to switch to.
+        Assert.False(d.NeedsRendererSwitch);
+    }
+
+    /// <summary>A game recorded as offering both still gets Vulkan, which is the route with the
+    /// miles on it, and is told the renderer has to be set -- picking OpenGL in the game and
+    /// Vulkan in the installer is the way this looks broken while both routes work. Two APIs is
+    /// something only the wiki record can say here: an import table names one.</summary>
+    [Fact]
+    public void AGameOfferingVulkanAndOpenGLIsRoutedToVulkanAndSaysToSwitch()
+    {
+        var root = Game("both", "game.exe", Fixture.PeWithImports(true, ["vulkan-1.dll"]));
+        var d = GraphicsDetector.Detect(root)
+            .With(new PcgwApi("Both", [GraphicsApi.Vulkan, GraphicsApi.OpenGL], false, true));
+        Assert.Equal(Preset.Vulkan, d.Preset);
+        Assert.Equal(GraphicsApi.Vulkan, d.Recommended);
+        Assert.True(d.NeedsRendererSwitch);
     }
 
     [Fact]

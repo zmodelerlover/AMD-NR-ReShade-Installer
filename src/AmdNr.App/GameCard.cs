@@ -148,7 +148,8 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     /// <summary>Read, and nothing recognisable found. Shown as a word in the current language.</summary>
     public bool UnknownApi => _graphics is { All.Count: 0 };
 
-    /// <summary>Detected, and nothing it supports has a route: OpenGL, a 64-bit D3D9 game.</summary>
+    /// <summary>Detected, and nothing it supports has a route: a 64-bit D3D9 game, a 32-bit
+    /// OpenGL or D3D12 one.</summary>
     public bool NoRoute => _graphics is { Preset: null } g && g.All.Count > 0;
 
     public event PropertyChangedEventHandler? PropertyChanged;

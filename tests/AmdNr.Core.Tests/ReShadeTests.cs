@@ -85,6 +85,20 @@ public class ReShadeTests
     public void VulkanHasNoProxyToInstall() =>
         Assert.Null(Work.ReShadeProxyFor(Preset.Vulkan, Fixture.Temp("vulkan")));
 
+    /// <summary>An OpenGL game loads opengl32.dll and never dxgi.dll, so the automatic pick has to
+    /// be that name and nothing else -- writing dxgi.dll into an OpenGL game produces a file the
+    /// game never opens, and the install would look like it worked.</summary>
+    [Fact]
+    public void OpenGLTakesTheNameAnOpenGLGameActuallyLoads()
+    {
+        var game = Fixture.Temp("opengl-proxy");
+        Assert.Equal("opengl32.dll", Work.ReShadeProxyFor(Preset.OpenGL, game));
+        Assert.Equal("opengl32.dll", Work.ProxyNameFor(Preset.OpenGL, game, null));
+        // A name from another route is ignored rather than honoured.
+        Assert.Equal("opengl32.dll", Work.ProxyNameFor(Preset.OpenGL, game, "dxgi.dll"));
+        Assert.Equal("dinput8.dll", Work.ProxyNameFor(Preset.OpenGL, game, "dinput8.dll"));
+    }
+
     // -- ReShade.ini ---------------------------------------------------------------------------------
 
     [Fact]
@@ -139,6 +153,41 @@ public class ReShadeTests
             "the manifest is kept on purpose, to hold the preserved ReShade.ini entry");
         Assert.False(GameScanner.IsInstalled(game),
             "and the folder must still stop reporting itself installed");
+    }
+
+    /// <summary>The whole OpenGL install, end to end: ReShade lands under the name an OpenGL game
+    /// loads, the manifest records the route by a name that has to keep meaning this one, and
+    /// uninstall takes back what it put in. This is the route the add-on's gl_route.inc drives.</summary>
+    [Fact]
+    public void AnOpenGLInstallPutsReShadeInAsOpenGL32AndTakesItBackOut()
+    {
+        var game = Fixture.Temp("opengl-install");
+        var (src, pins) = Fixture.Payloads("opengl-install");
+        var reShade = Fixture.Pe(true).Concat(new byte[2048]).ToArray();
+        File.WriteAllBytes(Path.Combine(src, "ReShade64.dll"), reShade);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ReShade64Sha = Engine.Sha(reShade),
+        };
+
+        var report = Work.Install(game, src, Preset.OpenGL, pins);
+        Assert.False(report.Failed, report.ToLog("install"));
+        Assert.Equal(reShade, File.ReadAllBytes(Path.Combine(game, "opengl32.dll")));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")), "an OpenGL game never loads dxgi.dll");
+        foreach (var name in new[] { Work.AddonName, Work.RuntimeName, Work.WeightsName })
+            Assert.True(File.Exists(Path.Combine(game, name)), $"{name} was not installed");
+
+        var m = Manifest.Decode(File.ReadAllText(Path.Combine(game, Route.X64.ManifestFileName())));
+        Assert.Equal("OpenGL", m.Preset);
+        Assert.Equal(Route.X64, m.Route);
+
+        var removed = Work.Uninstall(game, Preset.OpenGL);
+        Assert.False(removed.Failed, removed.ToLog("uninstall"));
+        Assert.False(File.Exists(Path.Combine(game, "opengl32.dll")), "ReShade was ours, so it goes");
+        Assert.False(GameScanner.IsInstalled(game));
     }
 
     /// <summary>A 32-bit D3D9 game loads d3d9.dll and never dxgi.dll. Checking the 64-bit names

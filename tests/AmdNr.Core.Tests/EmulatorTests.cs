@@ -82,8 +82,9 @@ public class EmulatorTests
         Assert.Equal(Preset.Dx12, GraphicsDetector.Detect(Folder("xenia", "xenia.exe")).Preset);
         Assert.Equal(Preset.Vulkan, GraphicsDetector.Detect(Folder("cemu", "Cemu.exe")).Preset);
 
-        // OpenGL has no route anywhere, and saying so is the honest answer.
-        Assert.Null(GraphicsDetector.Detect(Folder("xemu", "xemu.exe")).Preset);
+        // xemu renders with OpenGL and nothing else, which used to be a dead end and is now the
+        // OpenGL route.
+        Assert.Equal(Preset.OpenGL, GraphicsDetector.Detect(Folder("xemu", "xemu.exe")).Preset);
     }
 
     /// <summary>PCSX2 alone ships under five names. Warning that pcsx2-qt.exe is missing next to a

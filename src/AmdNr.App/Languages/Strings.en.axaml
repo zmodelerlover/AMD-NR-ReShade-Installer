@@ -80,7 +80,7 @@
   <sys:String x:Key="Str.Settings">Settings</sys:String>
   <sys:String x:Key="Str.NotDownloaded">not downloaded yet</sys:String>
   <sys:String x:Key="Str.WillDownload">The files are downloaded and verified when you install.</sys:String>
-  <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12 and Vulkan, and on D3D8, D3D9 and D3D11 for 32-bit games. OpenGL has none.</sys:String>
+  <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12, Vulkan and OpenGL, and on D3D8, D3D9 and D3D11 for 32-bit games. A 32-bit OpenGL game, a 64-bit D3D9 one and a software renderer have none.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings -- that is the route picked here, and on another API the add-on sees a different game.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
   <sys:String x:Key="Str.CheckApiTitle">Check the API before you install</sys:String>
@@ -178,6 +178,7 @@
   <sys:String x:Key="Str.Preset.Dx11">D3D11 game</sys:String>
   <sys:String x:Key="Str.Preset.Dx12">D3D12 game</sys:String>
   <sys:String x:Key="Str.Preset.Vulkan">Vulkan game</sys:String>
+  <sys:String x:Key="Str.Preset.OpenGL">OpenGL game</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx11">D3D11 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx9">D3D9 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx8">D3D8 game, 32-bit</sys:String>
@@ -186,6 +187,7 @@
   <sys:String x:Key="Str.PresetNote.Dx11">The best route: D3D11 is the only one where the game’s own depth and motion vectors reach the network.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Degraded. On D3D12 the add-on only sees the finished frame, so the network gets colour and guesses the rest. It works; expect less from it.</sys:String>
   <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan is a global layer: run its installer against the game’s .exe and pick Vulkan. The game must import vkCreateDevice statically, and there is no depth on Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this is an ordinary proxy DLL: ReShade goes in as opengl32.dll beside the game, with no separate installer run. Colour and estimated motion only; the game’s own depth is reachable on this API but is not wired up yet. A 32-bit OpenGL game has no route.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. The same 32-bit pair as D3D11, through a private D3D9/D3D11 stage. Plain D3D9 costs a fixed few milliseconds per frame; D3D9Ex does not. Install ReShade as the 32-bit d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 is translated to D3D9 and then takes the D3D9 route above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>

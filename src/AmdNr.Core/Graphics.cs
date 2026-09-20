@@ -70,15 +70,24 @@ public sealed record GraphicsDetection(
         : AlsoD3D11 ? [Api, GraphicsApi.D3D11] : [Api];
 
     /// <summary>The order this add-on would rather run on. D3D11 first because it is the only route
-    /// where the game's own depth and motion reach the network; D3D12 and Vulkan get colour only.</summary>
+    /// where the game's own depth and motion reach the network; D3D12, Vulkan and OpenGL get colour
+    /// only. OpenGL sits behind Vulkan because it is the newest of the three and has been proved on
+    /// fewer hosts, not because it is worse per frame -- where a game offers both, Vulkan is the
+    /// one with the miles on it.</summary>
     private static readonly GraphicsApi[] Preference =
-        [GraphicsApi.D3D11, GraphicsApi.D3D12, GraphicsApi.Vulkan, GraphicsApi.D3D9, GraphicsApi.D3D8];
+    [
+        GraphicsApi.D3D11, GraphicsApi.D3D12, GraphicsApi.Vulkan, GraphicsApi.OpenGL,
+        GraphicsApi.D3D9, GraphicsApi.D3D8,
+    ];
 
     public static Preset? RouteFor(Route? width, GraphicsApi api) => (width, api) switch
     {
         (Route.X64, GraphicsApi.D3D11) => Core.Preset.Dx11,
         (Route.X64, GraphicsApi.D3D12) => Core.Preset.Dx12,
         (Route.X64, GraphicsApi.Vulkan) => Core.Preset.Vulkan,
+        // 64-bit only: the 32-bit pair has a D3D8, D3D9 and D3D11 frontend and no OpenGL one, so a
+        // 32-bit OpenGL game falls through to null and is told so.
+        (Route.X64, GraphicsApi.OpenGL) => Core.Preset.OpenGL,
         (Route.X86, GraphicsApi.D3D11) => Core.Preset.X86Dx11,
         (Route.X86, GraphicsApi.D3D9) => Core.Preset.X86Dx9,
         (Route.X86, GraphicsApi.D3D8) => Core.Preset.X86Dx8,
@@ -86,7 +95,7 @@ public sealed record GraphicsDetection(
     };
 
     /// <summary>The best route among everything the game supports, or null when none of it has one
-    /// -- OpenGL, a 64-bit D3D9 game, a 32-bit D3D12 one.</summary>
+    /// -- a 64-bit D3D9 game, a 32-bit D3D12 or OpenGL one, a software renderer.</summary>
     public Preset? Preset
     {
         get
@@ -111,7 +120,7 @@ public sealed record GraphicsDetection(
     /// game has to be told which to use -- which is the difference between "it works" and "it does
     /// nothing because the game started on D3D12".</summary>
     public bool NeedsRendererSwitch =>
-        Preset is not null && All.Count(a => RouteFor(Width, a) is not null || a == GraphicsApi.OpenGL) > 1;
+        Preset is not null && All.Count(a => RouteFor(Width, a) is not null) > 1;
 
     /// <summary>A short label for a tile: "DX11 · DX12", "DX9 · 32-bit", "Vulkan".</summary>
     public string Tag

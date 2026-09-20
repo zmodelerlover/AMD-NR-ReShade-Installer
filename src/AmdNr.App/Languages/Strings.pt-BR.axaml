@@ -77,7 +77,7 @@
   <sys:String x:Key="Str.Settings">Configurações</sys:String>
   <sys:String x:Key="Str.NotDownloaded">ainda não baixado</sys:String>
   <sys:String x:Key="Str.WillDownload">Os arquivos são baixados e conferidos na hora de instalar.</sys:String>
-  <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12 e Vulkan, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. OpenGL não tem.</sys:String>
+  <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12, Vulkan e OpenGL, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. Jogo OpenGL 32-bit, D3D9 64-bit e renderizador por software não têm.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">Este jogo roda em {1}. Coloque em {0} nas configurações gráficas dele -- é a rota escolhida aqui, e em outra API o add-on vê outro jogo.</sys:String>
   <sys:String x:Key="Str.CheckApiTitle">Confira a API antes de instalar</sys:String>
   <sys:String x:Key="Str.CheckApiBody">{0} foi lido dos arquivos deste jogo, e arquivo diz contra o que foi ligado, não em que o jogo roda. Uma pasta pode ter um executável D3D11 e um D3D12; um jogo pode abrir em D3D10 a partir de um executável que também faz D3D9. As duas respostas são verdade e só uma delas é a rota certa — e rota errada instala perfeitinho e depois não faz nada no jogo.</sys:String>
@@ -175,6 +175,7 @@
   <sys:String x:Key="Str.Preset.Dx11">Jogo D3D11</sys:String>
   <sys:String x:Key="Str.Preset.Dx12">Jogo D3D12</sys:String>
   <sys:String x:Key="Str.Preset.Vulkan">Jogo Vulkan</sys:String>
+  <sys:String x:Key="Str.Preset.OpenGL">Jogo OpenGL</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx11">Jogo D3D11, 32 bits</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx9">Jogo D3D9, 32 bits</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx8">Jogo D3D8, 32 bits</sys:String>
@@ -183,6 +184,7 @@
   <sys:String x:Key="Str.PresetNote.Dx11">A melhor rota: o D3D11 é a única em que a profundidade e os vetores de movimento do próprio jogo chegam na rede.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Rota limitada. No D3D12 o add-on só enxerga o quadro pronto, então a rede recebe a cor e chuta o resto. Funciona, mas espere menos.</sys:String>
   <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. No Vulkan o ReShade entra como camada global: rode o instalador dele no .exe do jogo e escolha Vulkan. O jogo precisa importar vkCreateDevice de forma estática, e não há profundidade no Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Diferente do Vulkan, esta é uma DLL proxy comum: o ReShade entra como opengl32.dll ao lado do jogo, sem rodar instalador separado. Só cor e movimento estimado; a profundidade do próprio jogo é alcançável nesta API, mas ainda não está ligada. Jogo OpenGL de 32 bits não tem rota.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. Um jogo de 32 bits não carrega o runtime de 64 bits, então o add-on roda em dupla, dividindo os quadros na mesma placa. Instale o ReShade com suporte a add-on como dxgi.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. A mesma dupla de 32 bits do D3D11, passando por um estágio D3D9/D3D11 interno. O D3D9 comum custa alguns milissegundos fixos por quadro; o D3D9Ex não. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. O D3D8 é traduzido para D3D9 e segue a rota do D3D9 acima, com a mesma dupla de 32 bits. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
@@ -253,9 +255,9 @@
   <sys:String x:Key="Str.Emulator.ryujinx">Options &gt; Settings &gt; Graphics &gt; Graphics Backend: Vulkan. Sem profundidade no Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan é o backend padrão. Sem profundidade no Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Só Vulkan. Sem profundidade, e o emulador em si é recente — espere problemas.</sys:String>
-  <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. No OpenGL não existe rota nenhuma, então este tem que ser trocado.</sys:String>
-  <sys:String x:Key="Str.Emulator.xemu">O xemu renderiza em OpenGL, e este add-on não tem rota pra OpenGL. Nada aqui vai funcionar enquanto ele não ganhar outro backend.</sys:String>
-  <sys:String x:Key="Str.Emulator.melonds">O melonDS renderiza em OpenGL ou por software, e este add-on não tem rota pra nenhum dos dois.</sys:String>
+  <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. OpenGL também tem rota agora, mas a do Vulkan é a rodada.</sys:String>
+  <sys:String x:Key="Str.Emulator.xemu">O xemu renderiza só em OpenGL, então a rota de OpenGL é a única que existe aqui. É a mais nova das rotas e é experimental: cor e movimento estimado, sem profundidade.</sys:String>
+  <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. O renderizador por software desenha na CPU e não há o que um add-on alcance ali, então tem que ser o OpenGL — e essa rota é experimental: cor e movimento estimado, sem profundidade.</sys:String>
 
 
   <!-- Problem report -->

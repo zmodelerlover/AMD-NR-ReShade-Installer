@@ -117,21 +117,24 @@ public static class Emulators
             ["azahar.exe", "citra-qt.exe", "citra.exe"],
             [GraphicsApi.OpenGL, GraphicsApi.Vulkan],
             GraphicsApi.Vulkan,
-            "Emulation > Configure > Graphics > Graphics API: Vulkan. On OpenGL there is no route at "
-            + "all, so this one has to be changed."),
+            "Emulation > Configure > Graphics > Graphics API: Vulkan. OpenGL now has a route too, "
+            + "but Vulkan is the one with the miles on it here."),
 
         new("xemu", "xemu", "Xbox",
             ["xemu.exe"],
             [GraphicsApi.OpenGL],
             GraphicsApi.OpenGL,
-            "xemu renders with OpenGL, which this add-on has no route for. Nothing here will work "
-            + "until it gains another backend."),
+            "xemu renders with OpenGL and nothing else, so the OpenGL route is the only one there "
+            + "is here. It is the newest of the routes and it is experimental: colour and "
+            + "estimated motion, no depth."),
 
         new("melonds", "melonDS", "Nintendo DS",
             ["melonDS.exe"],
             [GraphicsApi.OpenGL],
             GraphicsApi.OpenGL,
-            "melonDS renders with OpenGL or software, and this add-on has a route for neither."),
+            "Emu settings > Video > 3D renderer: OpenGL. The software renderer draws on the CPU "
+            + "and there is nothing for an add-on to reach there, so it has to be the OpenGL one "
+            + "-- and that route is experimental: colour and estimated motion, no depth."),
     ];
 
     /// <summary>The emulator a folder holds, by the executable in it. Case-insensitive, because the
