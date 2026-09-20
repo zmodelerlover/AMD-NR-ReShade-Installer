@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Publishes a payload set to a Hugging Face dataset repository and rewrites payload.json to match.
 
@@ -47,11 +47,29 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# hf writes progress and notes like "Removing 1 file(s) from commit that have not changed" to
+# stderr, and under ErrorActionPreference = Stop a redirected stderr line becomes a terminating
+# error in Windows PowerShell. That killed a publish between uploading the manifest and verifying
+# it, which is the worst place to stop: everything was live and nothing had been checked. Every
+# call goes through Hf below, which relaxes the preference for the call and leaves the verdict
+# where it belongs -- the exit code, which every caller already tests.
 $root = Split-Path -Parent $PSScriptRoot
 $manifestPath = Join-Path $root 'payload\payload.json'
 $apiDbPath    = Join-Path $root 'payload\api-db.json'
 $configPath   = Join-Path $root 'src\AmdNr.App\config.json'
 $base         = "https://huggingface.co/datasets/$Repo/resolve/main"
+
+# Runs hf and reports its output through Note, without a line on stderr being mistaken for a
+# failure. $LASTEXITCODE survives the function, so callers test it exactly as before.
+# Named for the verb, not for the tool: a function called Hf shadows the hf executable itself --
+# PowerShell does not care about the case -- and the call inside it then re-enters the function.
+function Invoke-Hf {
+    param([Parameter(ValueFromRemainingArguments = $true)] [object[]] $Arguments)
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { & hf.exe @Arguments 2>&1 | ForEach-Object { Note "$_" } }
+    finally { $ErrorActionPreference = $previous }
+}
 
 function Fail($m) { Write-Host "FAIL  $m" -ForegroundColor Red; exit 1 }
 function Note($m) { Write-Host "      $m" -ForegroundColor DarkGray }
@@ -100,14 +118,17 @@ if ($Verify) {
 
 # --- Preconditions ----------------------------------------------------------------------------
 Step "Checking the Hugging Face login"
-$who = (hf auth whoami 2>&1 | Out-String).Trim()
+$previousPreference = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+$who = (& hf.exe auth whoami 2>&1 | Out-String).Trim()
+$ErrorActionPreference = $previousPreference
 if ($LASTEXITCODE -ne 0 -or $who -match 'Not logged in') {
     Fail "not logged in. Run:  hf auth login    (a write token from huggingface.co/settings/tokens)"
 }
 Note "as $($who -split "`n" | Select-Object -First 1)"
 
 # --public so the app reads it with no token at all; --exist-ok so re-running is not an error.
-hf repos create $Repo --repo-type dataset --public --exist-ok 2>&1 | ForEach-Object { Note $_ }
+Invoke-Hf repos create $Repo --repo-type dataset --public --exist-ok
 if ($LASTEXITCODE -ne 0) { Fail "could not create or reach the dataset repo $Repo" }
 Note "dataset repo: https://huggingface.co/datasets/$Repo"
 
@@ -150,8 +171,7 @@ foreach ($componentName in $manifest.components.PSObject.Properties.Name) {
         if ($sha -ne $f.sha256) { $changed = $true }
 
         Step "Uploading $($f.name)  ($([math]::Round($size/1MB,2)) MB)"
-        hf upload $Repo $local $f.name --repo-type dataset --commit-message "payload: $($f.name)" 2>&1 |
-            ForEach-Object { Note $_ }
+        Invoke-Hf upload $Repo $local $f.name --repo-type dataset --commit-message "payload: $($f.name)"
         if ($LASTEXITCODE -ne 0) { Fail "upload of $($f.name) failed" }
 
         # Keep the immutable copy as a mirror: it costs nothing and it is a second address that
@@ -185,12 +205,10 @@ Set-Content -LiteralPath $manifestPath -Value $json -Encoding utf8 -NoNewline
 Good "$manifestPath"
 
 Step "Uploading payload.json and api-db.json"
-hf upload $Repo $manifestPath 'payload.json' --repo-type dataset --commit-message 'payload manifest' 2>&1 |
-    ForEach-Object { Note $_ }
+Invoke-Hf upload $Repo $manifestPath 'payload.json' --repo-type dataset --commit-message 'payload manifest'
 if ($LASTEXITCODE -ne 0) { Fail 'upload of payload.json failed' }
 if (Test-Path $apiDbPath) {
-    hf upload $Repo $apiDbPath 'api-db.json' --repo-type dataset --commit-message 'graphics API database' 2>&1 |
-        ForEach-Object { Note $_ }
+    Invoke-Hf upload $Repo $apiDbPath 'api-db.json' --repo-type dataset --commit-message 'graphics API database'
     if ($LASTEXITCODE -ne 0) { Fail 'upload of api-db.json failed' }
 }
 
