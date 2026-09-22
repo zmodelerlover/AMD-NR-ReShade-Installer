@@ -146,6 +146,12 @@ public sealed class PayloadManifest
             $"Component {component} has an unusable name: '{name}'");
     }
 
+    /// <summary>Whether this manifest carries a component at all. Component() throws, which is
+    /// right for one an install cannot do without, and wrong for one added later: a manifest
+    /// published before the companion effect has no 'shader' entry, and asking for it by name
+    /// failed the whole install rather than skipping a file the add-on works without.</summary>
+    public bool Has(string name) => Components.ContainsKey(name);
+
     public PayloadComponent Component(string name)
     {
         Engine.Require(Components.TryGetValue(name, out var component),

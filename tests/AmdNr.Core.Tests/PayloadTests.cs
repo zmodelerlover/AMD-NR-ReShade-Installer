@@ -446,6 +446,26 @@ public class PayloadTests
         Assert.True(asks >= 2, $"ComponentsFor names ShaderComponent {asks} time(s); both routes need it");
     }
 
+    [Fact]
+    public void AManifestWithoutTheShaderComponentIsSkippedNotFatal()
+    {
+        // Naming ShaderComponent in the download list made it mandatory: a manifest published
+        // before the companion effect existed answered 'The payload manifest has no shader
+        // component' and the whole install stopped, three times over, for a file the add-on works
+        // without. Has() is what the caller filters with so the component stays optional.
+        var m = PayloadManifest.Parse(Minimal);
+        Assert.False(m.Has(PayloadManifest.ShaderComponent));
+        Assert.True(m.Has(PayloadManifest.AddonComponent));
+        Assert.Throws<InstallException>(() => m.Component(PayloadManifest.ShaderComponent));
+
+        var wanted = new[] { PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent,
+                             PayloadManifest.ShaderComponent };
+        Assert.Equal(2, wanted.Where(m.Has).Count());
+
+        // And the pins still come out, with the effect simply absent.
+        Assert.Equal(string.Empty, m.Pins().ShaderSha);
+    }
+
     /// <summary>Walks up from the test binary to the repository root, because the working
     /// directory under `dotnet test` is bin/, not the checkout.</summary>
     private static string FindUp(string relative)

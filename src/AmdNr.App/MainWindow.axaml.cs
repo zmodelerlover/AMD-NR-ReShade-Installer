@@ -1301,7 +1301,9 @@ public partial class MainWindow : Window
 
         try
         {
-            var components = ComponentsFor(preset);
+            // Filtered against the manifest: ComponentsFor names everything a route can use,
+            // and a manifest that predates one of them must skip it rather than fail.
+            var components = ComponentsFor(preset).Where(manifest.Has).ToArray();
             foreach (var component in components)
                 await cache.EnsureAsync(manifest, component, progress);
 
@@ -1348,7 +1350,9 @@ public partial class MainWindow : Window
         if (manifest is null) return null;
         try
         {
-            var components = ComponentsFor(preset);
+            // Filtered against the manifest: ComponentsFor names everything a route can use,
+            // and a manifest that predates one of them must skip it rather than fail.
+            var components = ComponentsFor(preset).Where(manifest.Has).ToArray();
             if (!components.All(c => PayloadCache.IsComplete(manifest, c))) return null;
             return new PayloadCache(_http).Stage(manifest, components);
         }
