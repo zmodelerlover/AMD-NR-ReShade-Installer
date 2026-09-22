@@ -7,7 +7,7 @@
         {
           "name": "amd-nr.addon64",
           "size": 588288,
-          "sha256": "1c47643f547cb81a3c28e7ed1b31608804d70452550acc8de1dcc3e02211495d",
+          "sha256": "16b3012dce86638c1b68d15cdcd8205a955e97a1840583f40e85ed1a0bfdfaff",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon64"
         }
       ]
