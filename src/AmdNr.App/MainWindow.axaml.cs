@@ -1334,7 +1334,7 @@ public partial class MainWindow : Window
         ?
         [
             PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,
-            PayloadManifest.RuntimeComponent,
+            PayloadManifest.RuntimeComponent, PayloadManifest.ShaderComponent,
         ]
         : [
             PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent,

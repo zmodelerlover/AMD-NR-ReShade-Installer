@@ -261,7 +261,10 @@ public static class Engine
     }
 
     public static string FreshIni() =>
-        "[amd-nr]\r\n; x86 fresh-install overrides. All other values follow upstream defaults.\r\nScale=1.0\r\nColourStrength=0.25\r\nStructure=1\r\nSkin=1\r\nPasses=1\r\n";
+    // Skin=-1 is the engine's own "automatic": derive skin structure from local structure.
+    // Writing 1 switched that off before the panel was ever opened, which is the bug the
+    // add-on shipped and fixed in v0.6.5; a fresh 32-bit install was putting it back.
+        "[amd-nr]\r\n; x86 fresh-install overrides. All other values follow upstream defaults.\r\nScale=1.0\r\nColourStrength=0.25\r\nStructure=1\r\nSkin=-1\r\nPasses=1\r\n";
 
     private static string? DockIdIn(string chunk)
     {

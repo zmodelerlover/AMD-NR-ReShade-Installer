@@ -1022,7 +1022,7 @@ public static class Work
                  })
             gone += RemoveFile(dir, name, report);
 
-        foreach (var folder in new[] { "dlss5-runtime", "dlss5-captures" })
+        foreach (var folder in new[] { "amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures" })
         {
             var p = Path.Combine(dir, folder);
             if (!Directory.Exists(p)) continue;

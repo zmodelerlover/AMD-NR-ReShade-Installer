@@ -408,6 +408,30 @@ public class PayloadTests
         Assert.NotEqual(new Version(1, 0, 0), declared);
     }
 
+    [Fact]
+    public void BothRoutesInstallTheCompanionEffect()
+    {
+        // It was wired into the 64-bit install only, so every 32-bit game -- D3D8, D3D9, D3D11 --
+        // quietly went without the one file that gives the network real motion vectors. The
+        // install succeeded, the log said every file was copied and verified, and the effect was
+        // simply never in the list. A user's report is what found it.
+        //
+        // A source check rather than a behavioural one: the 32-bit path plans its files against a
+        // release folder and a real fixture for it is most of an install. This still fails the
+        // moment a route stops naming the effect.
+        foreach (var rel in new[] { "src/AmdNr.Core/Work.cs", "src/AmdNr.Core/X86Installer.cs" })
+        {
+            var text = File.ReadAllText(FindUp(rel));
+            Assert.True(text.Contains("ShaderPath", StringComparison.Ordinal),
+                $"{rel} does not install {Work.ShaderName}");
+        }
+
+        // And both routes have to ask for the component, or there is nothing on disk to install.
+        var ui = File.ReadAllText(FindUp("src/AmdNr.App/MainWindow.axaml.cs"));
+        var asks = ui.Split("ShaderComponent").Length - 1;
+        Assert.True(asks >= 2, $"ComponentsFor names ShaderComponent {asks} time(s); both routes need it");
+    }
+
     /// <summary>Walks up from the test binary to the repository root, because the working
     /// directory under `dotnet test` is bin/, not the checkout.</summary>
     private static string FindUp(string relative)
