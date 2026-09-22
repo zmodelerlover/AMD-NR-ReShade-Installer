@@ -409,24 +409,38 @@ public class PayloadTests
     }
 
     [Fact]
-    public void BothRoutesInstallTheCompanionEffect()
+    public void BothRoutesInstallTheCompanionEffectFromOneImplementation()
     {
-        // It was wired into the 64-bit install only, so every 32-bit game -- D3D8, D3D9, D3D11 --
-        // quietly went without the one file that gives the network real motion vectors. The
-        // install succeeded, the log said every file was copied and verified, and the effect was
-        // simply never in the list. A user's report is what found it.
+        // v0.3.0 shipped the effect on the 64-bit route only, because that was the only place
+        // the lines existed: a 32-bit install succeeded, said every file was copied and verified,
+        // and simply never had it. A user's report is what found it.
         //
-        // A source check rather than a behavioural one: the 32-bit path plans its files against a
-        // release folder and a real fixture for it is most of an install. This still fails the
-        // moment a route stops naming the effect.
-        foreach (var rel in new[] { "src/AmdNr.Core/Work.cs", "src/AmdNr.Core/X86Installer.cs" })
+        // Both routes now call AddCompanionEffect, so this exercises the real thing rather than
+        // reading the source. A full 32-bit install cannot be faked in a test -- it verifies
+        // ReShade against a pinned hash, on purpose -- but the file planning can.
+        foreach (var layout in new[] { "files", "" })
         {
-            var text = File.ReadAllText(FindUp(rel));
-            Assert.True(text.Contains("ShaderPath", StringComparison.Ordinal),
-                $"{rel} does not install {Work.ShaderName}");
+            var dir = Fixture.Temp($"effect-{(layout.Length == 0 ? "flat" : layout)}");
+            var into = Path.Combine(dir, layout);
+            Directory.CreateDirectory(into);
+            var bytes = System.Text.Encoding.UTF8.GetBytes("// AMD_Neural_Feed");
+            File.WriteAllBytes(Path.Combine(into, Work.ShaderName), bytes);
+
+            var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
+            Work.AddCompanionEffect(files, dir);
+            Assert.True(files.ContainsKey(Work.ShaderPath), $"not planned from the {layout} layout");
+            Assert.Equal(bytes, files[Work.ShaderPath]);
+            Assert.True(Engine.Allowed.Contains(Work.ShaderPath),
+                "the path has to be allowed or the transaction refuses it");
         }
 
-        // And both routes have to ask for the component, or there is nothing on disk to install.
+        // A payload without one is skipped, not an error: manifests published before the effect
+        // was installable have no shader component.
+        var empty = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
+        Work.AddCompanionEffect(empty, Fixture.Temp("effect-none"));
+        Assert.Empty(empty);
+
+        // And both routes have to ask for the component, or there is nothing on disk to plan.
         var ui = File.ReadAllText(FindUp("src/AmdNr.App/MainWindow.axaml.cs"));
         var asks = ui.Split("ShaderComponent").Length - 1;
         Assert.True(asks >= 2, $"ComponentsFor names ShaderComponent {asks} time(s); both routes need it");

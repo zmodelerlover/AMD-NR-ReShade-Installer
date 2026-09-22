@@ -124,13 +124,8 @@ public sealed class X86Installer(string release)
         Engine.SafePath(tuning);
         if (!File.Exists(tuning)) p["amd-nr.ini"] = Encoding.UTF8.GetBytes(Engine.FreshIni());
 
-        // The companion effect, on this route too. It was wired into the 64-bit install only,
-        // so every 32-bit game -- D3D8, D3D9, D3D11 -- silently went without the one thing that
-        // gives the network real motion vectors, and nothing said so. Skipped when the payload
-        // predates it rather than failing, same as on the other route.
-        var effect = Path.Combine(Release, "files", Work.ShaderName);
-        if (!File.Exists(effect)) effect = Path.Combine(Release, Work.ShaderName);
-        if (File.Exists(effect)) p[Work.ShaderPath] = Engine.Read(effect);
+        // The companion effect, the same way the other route does it.
+        Work.AddCompanionEffect(p, Release);
 
         var ini = Path.Combine(dir, "ReShade.ini");
         Engine.SafePath(ini);

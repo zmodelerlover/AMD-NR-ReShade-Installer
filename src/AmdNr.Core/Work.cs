@@ -102,6 +102,20 @@ public static class Work
 
     /// <summary>Files an older layout left behind: one copy of the runtime per pass, which did not
     /// fit in VRAM and has not been used for several releases.</summary>
+    /// <summary>Adds the companion effect to whatever a route is about to write, from whichever
+    /// layout the payload came in. Both routes call this and neither has its own copy: v0.3.0
+    /// shipped the effect on the 64-bit route only, because that was the only place the lines
+    /// existed, and a 32-bit install went without it in silence. One implementation is the only
+    /// version of that invariant a future change cannot forget half of.</summary>
+    public static void AddCompanionEffect(IDictionary<string, byte[]> files, string payloadDir)
+    {
+        var nested = Path.Combine(payloadDir, "files", ShaderName);
+        var flat = Path.Combine(payloadDir, ShaderName);
+        var from = File.Exists(nested) ? nested : flat;
+        // Absent is not an error: a payload manifest published before the effect was installable
+        // has no shader component, and the add-on works without it.
+        if (File.Exists(from)) files[ShaderPath] = Engine.Read(from);
+    }
     private static IEnumerable<string> DeadFiles() =>
         Enumerable.Range(2, 9).Select(n => $"dlssnr_amd_pass{n}.dll").Concat(Engine.Legacy);
 
@@ -810,17 +824,16 @@ public static class Work
             if (VerifiedPayload(payloads, name, want, report) is { } bytes) files[name] = bytes;
         }
 
-        // The companion effect, when the manifest carries one and the download brought it.
-        // Skipped in silence otherwise: an older manifest has no shader component, and the
-        // add-on works without it -- it falls back to its own motion estimator.
-        if (pins.ShaderSha.Length > 0 && File.Exists(Path.Combine(payloads, ShaderName))
-            && VerifiedPayload(payloads, ShaderName, pins.ShaderSha, report) is { } shader)
+        // The companion effect. Shared with the 32-bit route; see AddCompanionEffect.
+        if (pins.ShaderSha.Length > 0)
         {
-            files[ShaderPath] = shader;
-            report.Info(
-                $"{ShaderName} goes in reshade-shaders\\Shaders. Enable it in ReShade, under a "
-                + "motion-vector shader such as iMMERSE Launchpad, and the add-on gets real "
-                + "motion vectors in a game that has none of its own.");
+            var before = files.Count;
+            AddCompanionEffect(files, payloads);
+            if (files.Count > before)
+                report.Info(
+                    $"{ShaderName} goes in reshade-shaders\\Shaders. Enable it in ReShade, under a "
+                    + "motion-vector shader such as iMMERSE Launchpad, and the add-on gets real "
+                    + "motion vectors in a game that has none of its own.");
         }
 
         // ReShade itself, when the payload carries it: the add-on does nothing without it, and asking
