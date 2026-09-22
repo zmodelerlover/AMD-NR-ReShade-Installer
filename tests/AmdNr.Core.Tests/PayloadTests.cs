@@ -388,4 +388,37 @@ public class PayloadTests
         // And it is the shape Work reads: payloads found without a files\ hop for the x64 route.
         Assert.Equal(staged, Work.PayloadDir(staged));
     }
+
+    [Fact]
+    public void TheAppDeclaresAVersionTheAutoUpdaterCanSettleOn()
+    {
+        // v0.3.0 shipped with <Version>0.2.0</Version> still in the csproj. The updater compares
+        // the newest GitHub release tag against the running assembly's own version, so an exe that
+        // under-reports itself is offered the same update forever: download, replace, restart,
+        // still older than the tag, offer again.
+        //
+        // What a unit test can catch is a missing or default version here. The tag is not known
+        // at build time, so the other half of the invariant lives in tools/check-release.ps1,
+        // which compares this number against the release actually published.
+        var csproj = FindUp("src/AmdNr.App/AmdNr.App.csproj");
+        var text = File.ReadAllText(csproj);
+        var m = System.Text.RegularExpressions.Regex.Match(text, @"<Version>([^<]+)</Version>");
+        Assert.True(m.Success, "AmdNr.App must declare a <Version>, or the exe reports 1.0.0");
+        Assert.True(Version.TryParse(m.Groups[1].Value, out var declared), m.Groups[1].Value);
+        Assert.NotEqual(new Version(1, 0, 0), declared);
+    }
+
+    /// <summary>Walks up from the test binary to the repository root, because the working
+    /// directory under `dotnet test` is bin/, not the checkout.</summary>
+    private static string FindUp(string relative)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null)
+        {
+            var candidate = Path.Combine(dir.FullName, relative.Replace('/', Path.DirectorySeparatorChar));
+            if (File.Exists(candidate)) return candidate;
+            dir = dir.Parent;
+        }
+        throw new FileNotFoundException(relative);
+    }
 }
