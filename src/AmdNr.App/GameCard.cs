@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -87,6 +87,25 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
         }
     }
 
+    /// <summary>The payload manifest the window fetched, or null while it is still on its way.
+    /// Static because there is one manifest and one window, and every tile asks it the same
+    /// question.</summary>
+    public static PayloadManifest? Payload { get; set; }
+
+    /// <summary>An install older than what the payload pins now. It is not an error and nothing
+    /// is broken -- it is the tile saying that pressing Install again would bring something new,
+    /// which is the only way somebody who installed last week finds out.</summary>
+    private bool _outdated;
+    public bool Outdated
+    {
+        get => _outdated;
+        set
+        {
+            _outdated = value;
+            Raise();
+        }
+    }
+
     private bool _selected;
 
     /// <summary>The tile whose drawer is open, outlined so the grid and the drawer read as one.</summary>
@@ -159,10 +178,18 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
 
     /// <summary>Looked for beside the folder the install writes into as well as at the root: an
     /// Unreal install lands in Binaries\Win64 and a Source one in bin\, and neither is the root.</summary>
-    public void RefreshInstalled() =>
-        Installed = GameScanner.IsInstalled(Entry.Path)
-                    || (_graphics?.Target is { } target
-                        && GameScanner.IsInstalled(System.IO.Path.GetDirectoryName(target)!));
+    public void RefreshInstalled()
+    {
+        List<string> folders = [Entry.Path];
+        if (_graphics?.Target is { } target)
+            folders.Add(System.IO.Path.GetDirectoryName(target)!);
+        Installed = folders.Any(GameScanner.IsInstalled);
+        // Only an install can be out of date, and only against a manifest that has arrived. Before
+        // it does, the tile says nothing rather than guessing -- a badge that appears offline and
+        // disappears online is worse than no badge.
+        Outdated = Installed && Payload is { } payload
+                             && folders.Any(folder => Work.PayloadMovedOn(folder, payload));
+    }
 
     public void RefreshRoute()
     {

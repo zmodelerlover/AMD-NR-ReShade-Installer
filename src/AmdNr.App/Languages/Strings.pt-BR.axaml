@@ -90,6 +90,7 @@
   <sys:String x:Key="Str.ScanningShort">Procurando…</sys:String>
   <sys:String x:Key="Str.ScanDone">Busca concluída: {0} jogos encontrados, {1} novos.</sys:String>
   <sys:String x:Key="Str.InstalledBadge">Instalado</sys:String>
+  <sys:String x:Key="Str.UpdateBadge">Tem atualização</sys:String>
   <sys:String x:Key="Str.Close">Fechar</sys:String>
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">O executável do jogo</sys:String>

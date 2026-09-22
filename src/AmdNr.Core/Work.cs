@@ -1,4 +1,4 @@
-// What the installer actually does to a folder. No UI -- so the whole of it can be reasoned about,
+﻿// What the installer actually does to a folder. No UI -- so the whole of it can be reasoned about,
 // and tested, without a window in the way. Ported from installer/src/work.rs.
 //
 // One deliberate difference from the Rust original: the add-on is not compiled into this assembly.
@@ -67,6 +67,42 @@ public static class Work
     /// everything has been removed.</summary>
     public static readonly string[] InstalledMarkers =
         [AddonName, Addon32Name, Host64Name, RuntimeName, WeightsName];
+
+    /// <summary>Whether what is installed in this folder is still what the payload pins. An install
+    /// records the SHA-256 of every file it wrote, so a recorded hash that is not the one the
+    /// manifest now carries for that name is an install the payload has moved past -- which is how
+    /// somebody who installed last week finds out the bridge was rebuilt, rather than by reading it
+    /// somewhere. Nothing is changed here; this only answers the question.
+    ///
+    /// Only the files the payload names are asked about. ReShade is installed under the API's own
+    /// name rather than the payload's, and the configuration files belong to the user. A folder
+    /// with no manifest of its own, or one this build cannot decode, answers false: "installed by
+    /// something else" is not "out of date", and a guess here would nag for ever.</summary>
+    public static bool PayloadMovedOn(string folder, PayloadManifest payload)
+    {
+        var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var component in payload.Components.Values)
+            foreach (var file in component.Installed)
+                pinned[Path.GetFileName(file.Name)] = Engine.Lower(file.Sha256);
+
+        foreach (var name in new[] { Engine.ManifestName, Engine.ManifestNameX64 })
+        {
+            var path = Path.Combine(folder, name);
+            if (!File.Exists(path)) continue;
+            Manifest manifest;
+            try { manifest = Manifest.Decode(Encoding.UTF8.GetString(Engine.Read(path))); }
+            catch (InstallException) { continue; }
+            if (manifest.State != "installed") continue;
+            foreach (var entry in manifest.Entries)
+            {
+                if (!entry.Owned || entry.Configuration) continue;
+                if (pinned.TryGetValue(Path.GetFileName(entry.Name), out var want)
+                    && Engine.Lower(entry.Hash) != want)
+                    return true;
+            }
+        }
+        return false;
+    }
 
     /// <summary>Known-bad: the runtimes earlier releases pinned. Recognised by their first bytes so
     /// the message can be "you have the old one" instead of "this file is wrong". Each was once the

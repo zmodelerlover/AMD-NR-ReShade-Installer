@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
@@ -115,6 +115,11 @@ public partial class MainWindow : Window
             // the same hashes, so everything still works against whatever is already cached.
             _manifest = PayloadCache.LoadLocalManifest();
         }
+
+        // What every tile compares its own install against, so a folder installed before the
+        // payload moved on says so by itself. See GameCard.Outdated.
+        GameCard.Payload = _manifest;
+        foreach (var card in _all) card.RefreshInstalled();
 
         await ShowPayloadStateAsync();
 

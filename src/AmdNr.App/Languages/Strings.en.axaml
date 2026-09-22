@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
@@ -93,6 +93,7 @@
   <sys:String x:Key="Str.ScanningShort">Scanning…</sys:String>
   <sys:String x:Key="Str.ScanDone">Scan finished: {0} games found, {1} new.</sys:String>
   <sys:String x:Key="Str.InstalledBadge">Installed</sys:String>
+  <sys:String x:Key="Str.UpdateBadge">Update ready</sys:String>
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">The game's executable</sys:String>

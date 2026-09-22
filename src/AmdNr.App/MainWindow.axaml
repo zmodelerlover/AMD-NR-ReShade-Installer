@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:AmdNr.App"
         x:Class="AmdNr.App.MainWindow"
@@ -163,7 +163,10 @@
                                   IsVisible="{Binding Installed}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                               <PathIcon Data="{StaticResource IconCheck}" />
-                              <TextBlock Text="{DynamicResource Str.InstalledBadge}" />
+                              <TextBlock Text="{DynamicResource Str.InstalledBadge}"
+                                         IsVisible="{Binding !Outdated}" />
+                              <TextBlock Text="{DynamicResource Str.UpdateBadge}"
+                                         IsVisible="{Binding Outdated}" />
                             </StackPanel>
                           </Border>
                         </Panel>
@@ -311,7 +314,10 @@
                           <Border Classes="state" Classes.pulse="{Binding Pulsing}" IsVisible="{Binding Installed}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                               <PathIcon Data="{StaticResource IconCheck}" />
-                              <TextBlock Text="{DynamicResource Str.InstalledBadge}" />
+                              <TextBlock Text="{DynamicResource Str.InstalledBadge}"
+                                         IsVisible="{Binding !Outdated}" />
+                              <TextBlock Text="{DynamicResource Str.UpdateBadge}"
+                                         IsVisible="{Binding Outdated}" />
                             </StackPanel>
                           </Border>
                         </StackPanel>
