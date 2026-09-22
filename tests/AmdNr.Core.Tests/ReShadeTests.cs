@@ -119,6 +119,50 @@ public class ReShadeTests
     // -- The install itself --------------------------------------------------------------------------
 
     [Fact]
+    public void UpgradingFromTheOldNamesKeepsOwnershipOfWhatWasInstalled()
+    {
+        // The manifest was renamed along with everything else in v0.6.5. Without migration an
+        // upgrade finds no manifest, treats a folder that already has an install as fresh, and
+        // records every file already there as Owned=false -- and uninstall only removes what it
+        // owns, so ReShade would be left in the game folder for good.
+        var game = Fixture.Temp("upgrade");
+        var (src, pins) = Fixture.Payloads("upgrade");
+        var reShade = Fixture.Pe(true).Concat(new byte[2048]).ToArray();
+        File.WriteAllBytes(Path.Combine(Work.PayloadDir(src), "ReShade64.dll"), reShade);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ReShade64Sha = Engine.Sha(reShade),
+        };
+
+        // Install, then put the folder back the way v0.6.0 left it: old manifest name, and the
+        // add-on under the name it used then.
+        var first = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(first.Failed, first.ToLog("first"));
+        var newManifest = Path.Combine(game, Engine.ManifestNameX64);
+        var oldManifest = Path.Combine(game, "dlss5-neural.install.json");
+        var text = File.ReadAllText(newManifest).Replace(Work.AddonName, "dlss5-neural.addon64");
+        File.WriteAllText(oldManifest, text);
+        File.Delete(newManifest);
+        File.Move(Path.Combine(game, Work.AddonName), Path.Combine(game, "dlss5-neural.addon64"));
+
+        // Upgrading now has to reclaim the folder rather than start a new one.
+        var second = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(second.Failed, second.ToLog("second"));
+        Assert.False(File.Exists(oldManifest), "the old manifest is carried over, not left beside");
+        Assert.False(File.Exists(Path.Combine(game, "dlss5-neural.addon64")),
+            "the old add-on is swept, or ReShade would load both");
+
+        var removed = Work.Uninstall(game, Preset.Dx11);
+        Assert.False(removed.Failed, removed.ToLog("uninstall"));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")),
+            "ReShade was ours before the rename and is still ours after it");
+        Assert.False(File.Exists(Path.Combine(game, Work.AddonName)));
+    }
+
+    [Fact]
     public void TheCompanionEffectLandsWhereReShadeLooksForIt()
     {
         // The effect is the only file this installs outside the game's root, and if it lands
@@ -152,7 +196,7 @@ public class ReShadeTests
     [Fact]
     public void AManifestWithoutAShaderStillInstalls()
     {
-        // Every manifest published before v0.7.0 has no shader component. An install reading one
+        // Every manifest published before v0.6.5 has no shader component. An install reading one
         // has to skip the effect, not fail.
         var game = Fixture.Temp("no-shader");
         var (src, pins) = Fixture.Payloads("no-shader");

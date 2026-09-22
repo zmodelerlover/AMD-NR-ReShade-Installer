@@ -55,12 +55,40 @@ public static class Transaction
         public required bool Existed { get; init; }
     }
 
+    /// <summary>Carries a manifest written before v0.6.5 over to the name this version reads.
+    ///
+    /// The manifest moved with everything else, and nothing read the old name any more -- so an
+    /// upgrade would have found no manifest, treated a folder that already had an install as a
+    /// fresh one, and recorded every file already there as Owned=false. Uninstall only removes
+    /// what it owns, so ReShade and the runtime would have been left behind for good, with the
+    /// backups of whatever they displaced orphaned beside them.
+    ///
+    /// Entries for the add-on's own files are dropped: those are swept by name on install and
+    /// written fresh. Every other entry is kept exactly as it was, backup paths included -- those
+    /// point into the old backup directory, which is still on disk under its old name and is
+    /// still where the originals actually are.</summary>
+    public static void MigrateLegacyManifest(string dir, Route route)
+    {
+        var now = Path.Combine(dir, route.ManifestFileName());
+        var was = Path.Combine(dir, route == Route.X86
+            ? "dlss5-x86bridge.install.json"
+            : "dlss5-neural.install.json");
+        Engine.SafePath(now);
+        Engine.SafePath(was);
+        if (File.Exists(now) || !File.Exists(was)) return;
+
+        var m = Manifest.Decode(Encoding.UTF8.GetString(Engine.Read(was)));
+        m.Entries.RemoveAll(e => Engine.Legacy.Contains(e.Name, StringComparer.Ordinal));
+        Manifest.WriteAtomic(dir, m);
+        try { File.Delete(was); } catch (IOException) { /* the new one is authoritative either way */ }
+    }
     /// <summary><paramref name="desired"/> is whatever the route's own planner decided to write;
     /// this function is deliberately ignorant of what those files mean.</summary>
     public static void Apply(string dir, string preset, Route route,
         SortedDictionary<string, byte[]> desired, List<string> log)
     {
         Guard(dir, desired);
+        MigrateLegacyManifest(dir, route);
         var manifestPath = Path.Combine(dir, route.ManifestFileName());
         Engine.SafePath(manifestPath);
 
@@ -229,6 +257,7 @@ public static class Transaction
     {
         dir = Engine.Absolute(dir);
         Engine.SafePath(dir);
+        MigrateLegacyManifest(dir, route);
         var manifestPath = Path.Combine(dir, route.ManifestFileName());
         Engine.SafePath(manifestPath);
         Engine.Require(File.Exists(manifestPath), "No install manifest");

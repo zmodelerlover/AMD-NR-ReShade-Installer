@@ -2,7 +2,7 @@
   "schema": 1,
   "components": {
     "addon": {
-      "version": "0.7.0",
+      "version": "0.6.5",
       "files": [
         {
           "name": "amd-nr.addon64",
@@ -56,7 +56,7 @@
       ]
     },
     "bridge": {
-      "version": "0.7.0",
+      "version": "0.6.5",
       "files": [
         {
           "name": "amd-nr.addon32",
@@ -106,7 +106,7 @@
       ]
     },
     "shader": {
-      "version": "0.7.0",
+      "version": "0.6.5",
       "files": [
         {
           "name": "AMD_Neural_Feed.fx",

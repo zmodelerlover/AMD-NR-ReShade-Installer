@@ -106,7 +106,7 @@ public static class Work
         Enumerable.Range(2, 9).Select(n => $"dlssnr_amd_pass{n}.dll").Concat(Engine.Legacy);
 
     /// <summary>Whether a ReShade DisabledAddons entry names this add-on, under either the
-    /// name it uses now or the one it used before v0.7.0. A folder upgraded in place can
+    /// name it uses now or the one it used before v0.6.5. A folder upgraded in place can
     /// carry either, and matching only one leaves the other silently disabled.</summary>
     private static bool IsOurs(string entry) =>
         entry.Contains("amd-nr", StringComparison.OrdinalIgnoreCase)
