@@ -1,4 +1,4 @@
-// The manifest format is a compatibility surface, not an internal detail. Installs performed by
+﻿// The manifest format is a compatibility surface, not an internal detail. Installs performed by
 // installer-x86 and by the Rust installer already exist on disk, and Decode accepts a manifest only
 // when re-encoding reproduces the file byte for byte. Any change to spacing, key order or
 // punctuation in Encode makes every existing install unreadable, which reads as "modified or
@@ -42,6 +42,15 @@ public sealed class Manifest(string preset, Route route)
     public Route Route { get; set; } = route;
     public List<Entry> Entries { get; set; } = [];
 
+    /// <summary>What the bridge protocol was when this install was written. Carried on the object
+    /// and written back as it was read, never as the number this build happens to use: Decode
+    /// accepts a manifest only when Encode reproduces it byte for byte, so emitting today's number
+    /// over one an older install wrote makes every manifest on disk unreadable -- and unreadable
+    /// means uninstall refuses and an upgrade cannot see what it owns. A fresh install writes
+    /// Current; an upgrade moves it to Current, because it has just written the current pair.</summary>
+    public const int Current = 3;
+    public int BridgeProtocol { get; set; } = Current;
+
     public override bool Equals(object? o) =>
         o is Manifest m && m.Preset == Preset && m.State == State && m.Route == Route
         && m.Entries.SequenceEqual(Entries);
@@ -57,7 +66,8 @@ public sealed class Manifest(string preset, Route route)
             .Append("\",\n\"state\":\"").Append(m.State).Append("\",\n");
         // Emitted only for x64, so every x86 manifest already on disk still round-trips byte for byte.
         if (m.Route == Route.X64) o.Append("\"route\":\"x64\",\n");
-        o.Append("\"bridge_protocol\":3,\n\"dgVoodoo\":\"none\",\n\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n");
+        o.Append($"\"bridge_protocol\":{m.BridgeProtocol},\n")
+            .Append("\"dgVoodoo\":\"none\",\n\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n");
         for (var i = 0; i < m.Entries.Count; i++)
         {
             var e = m.Entries[i];
@@ -72,6 +82,21 @@ public sealed class Manifest(string preset, Route route)
         // Rust prints booleans lowercase; C# prints them capitalised. That difference alone would
         // orphan every manifest on disk.
         static string Bool(bool b) => b ? "true" : "false";
+    }
+
+    /// <summary>The bridge protocol as written. Missing means a manifest from before the field
+    /// existed, and Current is then the only answer that can round-trip.</summary>
+    private static int Protocol(string s)
+    {
+        const string needle = "\"bridge_protocol\":";
+        var at = s.IndexOf(needle, StringComparison.Ordinal);
+        if (at < 0) return Current;
+        var rest = s[(at + needle.Length)..];
+        var end = 0;
+        while (end < rest.Length && char.IsAsciiDigit(rest[end])) end++;
+        return end > 0 && int.TryParse(rest[..end], out var value) && value is > 0 and < 100
+            ? value
+            : Current;
     }
 
     private static string? Field(string s, string key)
@@ -104,7 +129,7 @@ public sealed class Manifest(string preset, Route route)
         var state = Field(s, "state") ?? string.Empty;
         Engine.Require(state is "installed" or "installing", "Bad manifest state");
 
-        var m = new Manifest(preset, route) { State = state };
+        var m = new Manifest(preset, route) { State = state, BridgeProtocol = Protocol(s) };
         var seen = new HashSet<string>(StringComparer.Ordinal);
 
         var rows = s.Split("{\"name\":\"");

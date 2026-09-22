@@ -80,11 +80,6 @@ public static class Work
     /// something else" is not "out of date", and a guess here would nag for ever.</summary>
     public static bool PayloadMovedOn(string folder, PayloadManifest payload)
     {
-        var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var component in payload.Components.Values)
-            foreach (var file in component.Installed)
-                pinned[Path.GetFileName(file.Name)] = Engine.Lower(file.Sha256);
-
         foreach (var name in new[] { Engine.ManifestName, Engine.ManifestNameX64 })
         {
             var path = Path.Combine(folder, name);
@@ -93,6 +88,8 @@ public static class Work
             try { manifest = Manifest.Decode(Encoding.UTF8.GetString(Engine.Read(path))); }
             catch (InstallException) { continue; }
             if (manifest.State != "installed") continue;
+
+            var pinned = PinnedFor(payload, manifest.Route);
             foreach (var entry in manifest.Entries)
             {
                 if (!entry.Owned || entry.Configuration) continue;
@@ -102,6 +99,31 @@ public static class Work
             }
         }
         return false;
+    }
+
+    /// <summary>What the payload pins for one route, by file name. Per route, because one name is
+    /// two different files: the payload carries ReShade 32-bit as x86-extras\dxgi.dll, and a 64-bit
+    /// install writes ReShade 64-bit under that same name. Comparing every component against every
+    /// install would call every 64-bit install out of date, for ever, over a file that is exactly
+    /// what it should be.
+    ///
+    /// The reshade component itself is never in here under either route: it is published as
+    /// ReShade64.dll and ReShade32.dll and installed as whatever the game's API is called, so its
+    /// name in the folder is not a name this can look up.</summary>
+    private static Dictionary<string, string> PinnedFor(PayloadManifest payload, Route route)
+    {
+        var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string[] components = route == Route.X64
+            ? [PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent, PayloadManifest.ShaderComponent]
+            : [PayloadManifest.BridgeComponent, PayloadManifest.RuntimeComponent,
+               PayloadManifest.ShaderComponent, PayloadManifest.X86ExtrasComponent];
+        foreach (var name in components)
+        {
+            if (!payload.Has(name)) continue;
+            foreach (var file in payload.Component(name).Installed)
+                pinned[Path.GetFileName(file.Name)] = Engine.Lower(file.Sha256);
+        }
+        return pinned;
     }
 
     /// <summary>Known-bad: the runtimes earlier releases pinned. Recognised by their first bytes so
@@ -405,7 +427,7 @@ public static class Work
     /// <summary>ReShade.ini as it has to be for the add-on to be usable the first time the game
     /// starts: the add-on not disabled, the tutorial that covers the screen already dismissed, and the
     /// panel docked. Every other key someone has set is left exactly as it was.</summary>
-    internal static string ReadyReShadeIni(string ini)
+    internal static string ReadyReShadeIni(string ini, uint width = 1920, uint height = 1080)
     {
         var disabled = Engine.GetIni(ini, "ADDON", "DisabledAddons");
         if (IsOurs(disabled))
@@ -416,7 +438,7 @@ public static class Work
         }
         if (Engine.GetIni(ini, "OVERLAY", "TutorialProgress").Length == 0)
             ini = Engine.SetIni(ini, "OVERLAY", "TutorialProgress", "4");
-        return Engine.FirstDock(ini, 1920, 1080);
+        return Engine.FirstDock(ini, width, height);
     }
 
     /// <summary>For an emulator route, whether the emulator is actually in this folder. Any of its
@@ -560,7 +582,16 @@ public static class Work
             s.StartsWith(prefix, StringComparison.Ordinal) ? s[prefix.Length..] : null;
     }
 
-    private static void SweepDead(string dir, Report report)
+    /// <summary>Removes what an older install left under names nothing loads deliberately any more:
+    /// the per-pass runtimes, and the add-on under the name it used before v0.6.5. ReShade loads
+    /// every .addon64 and every .addon32 in the folder, so one of those left beside the new one is
+    /// a second add-on, a second overlay and a second engine competing for the same present.
+    ///
+    /// Both routes call this, because both can be upgraded over a folder that has them -- and the
+    /// 32-bit one is where the old names actually survive, since the rename happened after the
+    /// bridge shipped. Returns what it removed so each route can say so in its own words; a file
+    /// that will not delete is a warning, never a failed install.</summary>
+    internal static IReadOnlyList<string> SweepDead(string dir, Action<string> warn)
     {
         var removed = new List<string>();
         foreach (var name in DeadFiles())
@@ -574,11 +605,10 @@ public static class Work
             }
             catch (Exception e)
             {
-                report.Warn($"could not remove {name}: {e.Message}");
+                warn($"could not remove {name}: {e.Message}");
             }
         }
-        if (removed.Count > 0)
-            report.Ok($"removed {removed.Count} unused file(s) from the old per-pass layout: {string.Join(", ", removed)}");
+        return removed;
     }
 
     // -- Pre-flight ------------------------------------------------------------------------------
@@ -907,7 +937,8 @@ public static class Work
             return report;
         }
 
-        SweepDead(dir, report);
+        if (SweepDead(dir, report.Warn) is { Count: > 0 } swept)
+            report.Ok($"removed {swept.Count} file(s) an older install left behind: {string.Join(", ", swept)}");
 
         if (!report.Failed)
         {

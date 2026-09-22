@@ -187,8 +187,21 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
         // Only an install can be out of date, and only against a manifest that has arrived. Before
         // it does, the tile says nothing rather than guessing -- a badge that appears offline and
         // disappears online is worse than no badge.
-        Outdated = Installed && Payload is { } payload
-                             && folders.Any(folder => Work.PayloadMovedOn(folder, payload));
+        //
+        // Wrapped, and deliberately wrapped around everything: this reads files out of a folder
+        // anybody can edit, on the thread that draws the window, to decide one word on a tile. A
+        // manifest somebody hand-edited, a folder that went away with its drive, a file held open
+        // by an antivirus -- none of that is worth the window closing over, and saying nothing is
+        // the honest answer when the question cannot be asked.
+        try
+        {
+            Outdated = Installed && Payload is { } payload
+                                 && folders.Any(folder => Work.PayloadMovedOn(folder, payload));
+        }
+        catch (Exception)
+        {
+            Outdated = false;
+        }
     }
 
     public void RefreshRoute()

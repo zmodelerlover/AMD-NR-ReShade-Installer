@@ -1,4 +1,4 @@
-// The transactional half of an install, shared by both routes. It records ownership, backs up
+﻿// The transactional half of an install, shared by both routes. It records ownership, backs up
 // anything it is about to displace, writes the journal *before* touching a target, and restores
 // everything it moved if any write fails.
 
@@ -96,6 +96,8 @@ public static class Transaction
         if (File.Exists(manifestPath))
         {
             m = Manifest.Decode(Encoding.UTF8.GetString(Engine.Read(manifestPath)));
+            // What is about to be written is this build's pair, whatever the folder had before.
+            m.BridgeProtocol = Manifest.Current;
             Engine.Require(m.State == "installed",
                 "Interrupted transaction: run uninstall/recovery before reinstall");
             Engine.Require(m.Preset == preset, "Uninstall previous preset before changing API");

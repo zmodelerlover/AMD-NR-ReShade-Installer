@@ -1,4 +1,4 @@
-// The 32-bit bridge route. Ported from the Installer struct in installer/src/engine.rs.
+﻿// The 32-bit bridge route. Ported from the Installer struct in installer/src/engine.rs.
 //
 // Unlike the x64 route, the payloads here are pinned by the release's own payload.sha256 rather
 // than by constants: the bridge frontend and its 64-bit helper have to be the pair that shipped
@@ -130,7 +130,10 @@ public sealed class X86Installer(string release)
         var ini = Path.Combine(dir, "ReShade.ini");
         Engine.SafePath(ini);
         var before = File.Exists(ini) ? Encoding.UTF8.GetString(Engine.Read(ini)) : string.Empty;
-        var after = Engine.FirstDock(before, Width, Height);
+        // The same preparation the x64 route does, through the same function. This one used to dock
+        // the panel and stop there, so an add-on the person had unticked in ReShade's Add-ons tab
+        // stayed unticked: the install reported success, every file was correct, and nothing loaded.
+        var after = Work.ReadyReShadeIni(before, Width, Height);
         if (before != after) p["ReShade.ini"] = Encoding.UTF8.GetBytes(after);
 
         return p;
@@ -142,6 +145,11 @@ public sealed class X86Installer(string release)
         Engine.SafePath(dir);
         var desired = Plan(Engine.Absolute(target), preset, proxyName);
         Transaction.Apply(dir, preset, Route.X86, desired, Log);
+        // The same sweep the x64 route has done since the rename, and this route needs it more:
+        // a 32-bit folder set up before v0.6.5 still has dlss5-neural.addon32 in it, ReShade loads
+        // every .addon32 it finds, and two add-ons on one present is two overlays and two helpers.
+        if (Work.SweepDead(dir, Note) is { Count: > 0 } swept)
+            Note($"removed {swept.Count} file(s) an older install left behind: {string.Join(", ", swept)}");
         var how = preset == "D3D8"
             ? $"d3d8to9 {Engine.D3d8To9Version} -> native D3D9 frontend"
             : "native frontend";

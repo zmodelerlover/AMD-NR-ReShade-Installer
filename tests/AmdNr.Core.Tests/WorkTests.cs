@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using AmdNr.Core;
 
 namespace AmdNr.Core.Tests;
@@ -25,6 +25,51 @@ public class WorkTests
         Assert.Equal("D3D12", m.Preset);
         Assert.Equal(Route.X64, m.Route);
         Assert.Contains(m.Entries, e => e.Name == Work.AddonName && e.Owned);
+    }
+
+    /// <summary>ReShade never loads an add-on named in DisabledAddons, and says so nowhere -- it
+    /// looks exactly like a broken install. Both routes prepare the ini through this one function,
+    /// because the 32-bit one only docked the panel and left the add-on switched off.</summary>
+    [Fact]
+    public void PreparingReShadeIniReEnablesThisAddOnUnderEitherName()
+    {
+        const string ini = """
+            [ADDON]
+            DisabledAddons=SomeoneElse.addon32,dlss5-neural.addon32,amd-nr.addon32
+            """;
+        var ready = Work.ReadyReShadeIni(ini);
+        Assert.Contains("SomeoneElse.addon32", ready, StringComparison.Ordinal);
+        Assert.DoesNotContain("amd-nr.addon32", ready, StringComparison.Ordinal);
+        Assert.DoesNotContain("dlss5-neural.addon32", ready, StringComparison.Ordinal);
+        // And the rest of what a first run needs, which is the other half this route was missing.
+        Assert.Contains("TutorialProgress=4", ready, StringComparison.Ordinal);
+        Assert.Contains("[Window][AMD Neural Rendering]", ready, StringComparison.Ordinal);
+    }
+
+    /// <summary>ReShade loads every add-on in the folder, so one left under the name it used before
+    /// v0.6.5 is a second add-on on the same present. Both routes sweep, and they sweep through this
+    /// one function -- the 32-bit route went without it for a release, which is exactly the shape of
+    /// bug that costs a user an evening.</summary>
+    [Fact]
+    public void TheSweepRemovesAnAddOnLeftUnderTheNameItUsedBeforeTheRename()
+    {
+        var game = Fixture.Temp("sweep-legacy");
+        foreach (var name in new[] { "dlss5-neural.addon32", "dlss5-neural-host64.exe",
+                                     "dlss5-neural.addon64", "dlssnr_amd_pass2.dll" })
+            File.WriteAllText(Path.Combine(game, name), "an older install left this here");
+        // The settings are not swept: the add-on copies them to amd-nr.ini and leaves the original.
+        File.WriteAllText(Path.Combine(game, "dlss5-neural.ini"), "[dlss5]");
+
+        var warnings = new List<string>();
+        var removed = Work.SweepDead(game, warnings.Add);
+
+        Assert.Empty(warnings);
+        Assert.Contains("dlss5-neural.addon32", removed);
+        Assert.Contains("dlss5-neural-host64.exe", removed);
+        Assert.Contains("dlss5-neural.addon64", removed);
+        Assert.Contains("dlssnr_amd_pass2.dll", removed);
+        Assert.Empty(Directory.GetFiles(game, "*.addon32"));
+        Assert.True(File.Exists(Path.Combine(game, "dlss5-neural.ini")), "the old settings are the user's");
     }
 
     [Fact]
@@ -85,7 +130,7 @@ public class WorkTests
             File.WriteAllText(Path.Combine(game, $"dlssnr_amd_pass{n}.dll"), "x");
 
         var report = Work.Install(game, src, Preset.Dx11, pins);
-        Assert.True(Fixture.HasAny(report, "old per-pass layout"), report.ToLog("sweep"));
+        Assert.True(Fixture.HasAny(report, "an older install left behind"), report.ToLog("sweep"));
         for (var n = 2; n <= 10; n++)
             Assert.False(File.Exists(Path.Combine(game, $"dlssnr_amd_pass{n}.dll")), $"pass{n} survived");
     }
