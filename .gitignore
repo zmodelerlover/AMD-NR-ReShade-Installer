@@ -1,5 +1,7 @@
 bin/
 obj/
+# dotnet publish output. A 49 MB single-file exe belongs on a release, not in history.
+publish-*/
 .vs/
 *.user
 TestResults/

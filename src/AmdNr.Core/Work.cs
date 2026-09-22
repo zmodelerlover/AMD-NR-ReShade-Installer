@@ -25,6 +25,11 @@ public sealed class PayloadPins
     /// <summary>The ReShade64.dll a 64-bit install puts in the game folder when the payload carries
     /// it. Checked like every other payload.</summary>
     public string ReShade64Sha { get; init; } = Engine.ReShade64Sha;
+
+    /// <summary>The companion effect. Empty when the manifest does not carry one, which is how
+    /// an install from an older manifest skips it instead of failing.</summary>
+    public string ShaderSha { get; init; } = string.Empty;
+    public ulong ShaderSize { get; init; }
 }
 
 /// <summary>What the target says about which route applies. A folder can hold a 32-bit launcher
@@ -45,6 +50,13 @@ public static class Work
 {
     public const string AddonName = "amd-nr.addon64";
     public const string RuntimeName = "dlssnr_amd_pass1.dll";
+    /// <summary>The companion effect, and where it has to land: ReShade's default
+    /// EffectSearchPaths is reshade-shaders/Shaders/**, so anywhere else and ReShade never
+    /// compiles it. This is what gives a game with no velocity buffer of its own real motion
+    /// vectors -- it reads whatever optical-flow shader is installed above it (iMMERSE
+    /// Launchpad, VORT, LumeniteFX) and hands the field to the add-on.</summary>
+    public const string ShaderName = "AMD_Neural_Feed.fx";
+    public const string ShaderPath = "reshade-shaders/Shaders/" + ShaderName;
     public const string WeightsName = "dlssnr_on_amd_weights.bin";
     public const string Addon32Name = "amd-nr.addon32";
     public const string Host64Name = "amd-nr-host64.exe";
@@ -796,6 +808,19 @@ public static class Work
                  })
         {
             if (VerifiedPayload(payloads, name, want, report) is { } bytes) files[name] = bytes;
+        }
+
+        // The companion effect, when the manifest carries one and the download brought it.
+        // Skipped in silence otherwise: an older manifest has no shader component, and the
+        // add-on works without it -- it falls back to its own motion estimator.
+        if (pins.ShaderSha.Length > 0 && File.Exists(Path.Combine(payloads, ShaderName))
+            && VerifiedPayload(payloads, ShaderName, pins.ShaderSha, report) is { } shader)
+        {
+            files[ShaderPath] = shader;
+            report.Info(
+                $"{ShaderName} goes in reshade-shaders\\Shaders. Enable it in ReShade, under a "
+                + "motion-vector shader such as iMMERSE Launchpad, and the add-on gets real "
+                + "motion vectors in a game that has none of its own.");
         }
 
         // ReShade itself, when the payload carries it: the add-on does nothing without it, and asking

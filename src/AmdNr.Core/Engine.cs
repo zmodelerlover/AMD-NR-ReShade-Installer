@@ -355,6 +355,11 @@ public static class Engine
         "amd-nr-host64.exe",
         "dlssnr_amd_pass1.dll",
         "dlssnr_on_amd_weights.bin",
+        // The companion effect. The only entry here with a directory in it: it is a ReShade
+        // effect, so it goes where ReShade's default EffectSearchPaths looks rather than in
+        // the game's root. Path.Combine takes the forward slashes, and SafePath still walks
+        // every prefix refusing links, so the write cannot leave the folder the user chose.
+        "reshade-shaders/Shaders/AMD_Neural_Feed.fx",
         // The names add-on v0.6.0 and earlier installed. They stay in this set because a
         // manifest written by an older install names them, and a manifest naming anything
         // outside this set is refused -- which would take that folder's state and its

@@ -171,7 +171,14 @@ public static class Transaction
         InstallException? failure = null;
         foreach (var c in changes)
         {
-            try { Engine.Write(Path.Combine(dir, c.Name), c.After); }
+            try
+            {
+                // Not every destination is in the game's root any more: the companion effect
+                // goes into reshade-shaders\Shaders, which may not exist yet.
+                var dst = Path.Combine(dir, c.Name);
+                Engine.MakeParent(dst);
+                Engine.Write(dst, c.After);
+            }
             catch (InstallException e)
             {
                 failure = e;

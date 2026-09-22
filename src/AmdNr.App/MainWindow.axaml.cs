@@ -1336,7 +1336,10 @@ public partial class MainWindow : Window
             PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,
             PayloadManifest.RuntimeComponent,
         ]
-        : [PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent, PayloadManifest.ReShadeComponent];
+        : [
+            PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent,
+            PayloadManifest.ReShadeComponent, PayloadManifest.ShaderComponent,
+        ];
 
     /// <summary>The folder a route would install from, when it is already complete in the cache.</summary>
     private string? CachedPayloadFolder(Preset preset)

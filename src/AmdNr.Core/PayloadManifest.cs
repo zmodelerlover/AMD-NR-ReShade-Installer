@@ -84,6 +84,7 @@ public sealed class PayloadManifest
     public const string X86ExtrasComponent = "x86-extras";
     public const string BridgeComponent = "bridge";
     public const string ReShadeComponent = "reshade";
+    public const string ShaderComponent = "shader";
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -182,6 +183,9 @@ public sealed class PayloadManifest
         var addon = Single(AddonComponent, Work.AddonName);
         var runtime = Single(RuntimeComponent, Work.RuntimeName);
         var weights = Single(RuntimeComponent, Work.WeightsName);
+        var optionalShader = Components.TryGetValue(ShaderComponent, out var sh)
+            ? sh.Files.FirstOrDefault(f => f.Name == Work.ShaderName)
+            : null;
         return new PayloadPins
         {
             AddonSha = addon.Sha256,
@@ -190,6 +194,10 @@ public sealed class PayloadManifest
             RuntimeSize = runtime.Size,
             WeightsSha = weights.Sha256,
             WeightsSize = weights.Size,
+            // Optional on purpose: a manifest published before the companion effect was
+            // installable has no shader component, and an install from one must still work.
+            ShaderSha = optionalShader?.Sha256 ?? string.Empty,
+            ShaderSize = optionalShader?.Size ?? 0,
         };
     }
 

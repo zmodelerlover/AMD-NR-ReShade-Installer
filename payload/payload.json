@@ -104,6 +104,17 @@
           "sha256": "ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5"
         }
       ]
+    },
+    "shader": {
+      "version": "0.7.0",
+      "files": [
+        {
+          "name": "AMD_Neural_Feed.fx",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/AMD_Neural_Feed.fx",
+          "size": 18415,
+          "sha256": "9f53875221c130903bdd205d15011a924ab0f1c0c85b17191e4f39b140e7848e"
+        }
+      ]
     }
   }
 }

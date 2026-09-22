@@ -119,6 +119,52 @@ public class ReShadeTests
     // -- The install itself --------------------------------------------------------------------------
 
     [Fact]
+    public void TheCompanionEffectLandsWhereReShadeLooksForIt()
+    {
+        // The effect is the only file this installs outside the game's root, and if it lands
+        // anywhere but reshade-shaders/Shaders ReShade never compiles it -- so the add-on
+        // silently falls back to its own motion estimator and the whole point of shipping it
+        // is lost, with nothing in any log saying so.
+        var game = Fixture.Temp("with-shader");
+        var (src, pins) = Fixture.Payloads("with-shader");
+        var effect = System.Text.Encoding.UTF8.GetBytes("// AMD_Neural_Feed");
+        File.WriteAllBytes(Path.Combine(Work.PayloadDir(src), Work.ShaderName), effect);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ShaderSha = Engine.Sha(effect), ShaderSize = (ulong)effect.Length,
+        };
+
+        var report = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(report.Failed, report.ToLog("install"));
+        var landed = Path.Combine(game, "reshade-shaders", "Shaders", Work.ShaderName);
+        Assert.True(File.Exists(landed), "the effect must be under reshade-shaders/Shaders");
+        Assert.Equal(effect, File.ReadAllBytes(landed));
+
+        // And it comes back out, subdirectory and all.
+        var removed = Work.Uninstall(game, Preset.Dx11);
+        Assert.False(removed.Failed, removed.ToLog("uninstall"));
+        Assert.False(File.Exists(landed), "the effect was ours, so it goes");
+    }
+
+    [Fact]
+    public void AManifestWithoutAShaderStillInstalls()
+    {
+        // Every manifest published before v0.7.0 has no shader component. An install reading one
+        // has to skip the effect, not fail.
+        var game = Fixture.Temp("no-shader");
+        var (src, pins) = Fixture.Payloads("no-shader");
+        Assert.Equal(string.Empty, pins.ShaderSha);
+
+        var report = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(report.Failed, report.ToLog("install"));
+        Assert.False(Directory.Exists(Path.Combine(game, "reshade-shaders")));
+    }
+
+
+    [Fact]
     public void AnX64InstallPutsReShadeInAndTakesItBackOut()
     {
         var game = Fixture.Temp("with-reshade");
