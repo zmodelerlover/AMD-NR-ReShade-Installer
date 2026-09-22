@@ -145,7 +145,7 @@ public sealed class X86Installer(string release)
         var how = preset == "D3D8"
             ? $"d3d8to9 {Engine.D3d8To9Version} -> native D3D9 frontend"
             : "native frontend";
-        Note($"Installed {preset} x86; {how}; same-frame protocol v2");
+        Note($"Installed {preset} x86; {how}; same-frame protocol v3");
     }
 
     public void Uninstall(string directory, bool removeConfigs) =>

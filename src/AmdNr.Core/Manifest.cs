@@ -57,7 +57,7 @@ public sealed class Manifest(string preset, Route route)
             .Append("\",\n\"state\":\"").Append(m.State).Append("\",\n");
         // Emitted only for x64, so every x86 manifest already on disk still round-trips byte for byte.
         if (m.Route == Route.X64) o.Append("\"route\":\"x64\",\n");
-        o.Append("\"bridge_protocol\":2,\n\"dgVoodoo\":\"none\",\n\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n");
+        o.Append("\"bridge_protocol\":3,\n\"dgVoodoo\":\"none\",\n\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n");
         for (var i = 0; i < m.Entries.Count; i++)
         {
             var e = m.Entries[i];

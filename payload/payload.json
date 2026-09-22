@@ -56,27 +56,27 @@
       ]
     },
     "bridge": {
-      "version": "0.6.5.1",
+      "version": "0.6.6",
       "files": [
         {
           "name": "amd-nr.addon32",
           "path": "files/amd-nr.addon32",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon32",
-          "size": 252416,
-          "sha256": "55e3769e53e50ea2eb98f31d7f6147d6061bfec67df0244b22e1bab60b4bf98a"
+          "size": 259584,
+          "sha256": "d3fa5eb912606042c7042b55ed47dc4aa70762f42333874f3f72f364db244fe5"
         },
         {
           "name": "amd-nr-host64.exe",
           "path": "files/amd-nr-host64.exe",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr-host64.exe",
-          "size": 467456,
-          "sha256": "9aed28e0ca65dcde4c1ecdb3ff08a6e78d053841b515cb3e9067fe36c5b5c70b"
+          "size": 468480,
+          "sha256": "aa5dacff60f773e38fc511b00b2f5bba88489e866bad497600d1a31b7543e10c"
         },
         {
           "name": "payload.sha256",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
           "size": 167,
-          "sha256": "4acc59d05fb2dbfdd6947fa42a05cf49140767f8f6b9638ecf0bbe09d2797f3b"
+          "sha256": "2d6caee9e7e0475d21b2f5f464910ab60b91634e7390b0c81703da7a5a7625b4"
         }
       ]
     },

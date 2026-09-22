@@ -106,7 +106,7 @@ public class EngineTests
     /// disk stops being readable.</summary>
     private static string CapturedManifest() =>
         "{\n\"schema\":1,\n\"preset\":\"D3D8\",\n\"state\":\"installed\",\n"
-        + "\"bridge_protocol\":2,\n\"dgVoodoo\":\"none\",\n"
+        + "\"bridge_protocol\":3,\n\"dgVoodoo\":\"none\",\n"
         + "\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n"
         + "{\"name\":\"d3d8R.dll\",\"sha256\":\"ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5\","
         + "\"backup\":\".amd-nr-x86bridge-backups/17894153360915702/d3d8R.dll\","
