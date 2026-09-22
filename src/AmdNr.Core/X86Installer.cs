@@ -63,7 +63,7 @@ public sealed class X86Installer(string release)
             + "files folder. Point it at the folder you unzipped.");
         var sums = Encoding.UTF8.GetString(Engine.Read(manifest));
 
-        foreach (var name in new[] { "dlss5-neural.addon32", "dlss5-neural-host64.exe" })
+        foreach (var name in new[] { "amd-nr.addon32", "amd-nr-host64.exe" })
         {
             var bytes = Payload(name, BridgeSum(sums, name));
             var want = name.Contains("addon32", StringComparison.Ordinal)
@@ -120,9 +120,9 @@ public sealed class X86Installer(string release)
         Engine.Require(Engine.Machine(reShade) == Engine.MachineX86, "ReShade must be x86");
         p[reShadeName] = reShade;
 
-        var tuning = Path.Combine(dir, "dlss5-neural.ini");
+        var tuning = Path.Combine(dir, "amd-nr.ini");
         Engine.SafePath(tuning);
-        if (!File.Exists(tuning)) p["dlss5-neural.ini"] = Encoding.UTF8.GetBytes(Engine.FreshIni());
+        if (!File.Exists(tuning)) p["amd-nr.ini"] = Encoding.UTF8.GetBytes(Engine.FreshIni());
 
         var ini = Path.Combine(dir, "ReShade.ini");
         Engine.SafePath(ini);

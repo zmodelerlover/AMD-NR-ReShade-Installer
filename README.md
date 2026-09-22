@@ -22,7 +22,7 @@ The same files, verified the same way:
 
 | | |
 |---|---|
-| `dlss5-neural.addon64` | the add-on, from its GitHub release |
+| `amd-nr.addon64` | the add-on, from its GitHub release |
 | `dlssnr_amd_pass1.dll` | the neural runtime |
 | `dlssnr_on_amd_weights.bin` | the weights, 141 MB |
 | ReShade 6.8.0, full add-on support | under the proxy name the route loads, or the one you pick |

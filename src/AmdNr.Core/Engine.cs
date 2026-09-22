@@ -37,9 +37,9 @@ public static class Engine
     public const string D3d8To9Commit = "65870f2302e9c496cd6d873d6095961d5c777668";
     public const string D3d8To9Sha = "ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5";
 
-    public const string ManifestName = "dlss5-x86bridge.install.json";
-    public const string ManifestNameX64 = "dlss5-neural.install.json";
-    public const string BackupDir = ".dlss5-x86bridge-backups";
+    public const string ManifestName = "amd-nr-x86bridge.install.json";
+    public const string ManifestNameX64 = "amd-nr.install.json";
+    public const string BackupDir = ".amd-nr-x86bridge-backups";
 
     /// <summary>x86 keeps the name installer-x86 already wrote, so existing installs stay readable.</summary>
     public static string ManifestFileName(this Route route) =>
@@ -261,7 +261,7 @@ public static class Engine
     }
 
     public static string FreshIni() =>
-        "[dlss5]\r\n; x86 fresh-install overrides. All other values follow upstream defaults.\r\nScale=1.0\r\nColourStrength=0.25\r\nStructure=1\r\nSkin=1\r\nPasses=1\r\n";
+        "[amd-nr]\r\n; x86 fresh-install overrides. All other values follow upstream defaults.\r\nScale=1.0\r\nColourStrength=0.25\r\nStructure=1\r\nSkin=1\r\nPasses=1\r\n";
 
     private static string? DockIdIn(string chunk)
     {
@@ -285,7 +285,7 @@ public static class Engine
     public static string FirstDock(string ini, uint width, uint height)
     {
         var windows = GetIni(ini, "OVERLAY", "Window");
-        const string panel = "[Window][DLSS Neural Rendering (AMD)]";
+        const string panel = "[Window][AMD Neural Rendering]";
         if (windows.Contains(panel, StringComparison.Ordinal)) return ini;
 
         var dock = string.Empty;
@@ -349,12 +349,32 @@ public static class Engine
         "dinput8.dll",
         "dgVoodoo.conf",
         "ReShade.ini",
+        "amd-nr.ini",
+        "amd-nr.addon32",
+        "amd-nr.addon64",
+        "amd-nr-host64.exe",
+        "dlssnr_amd_pass1.dll",
+        "dlssnr_on_amd_weights.bin",
+        // The names add-on v0.6.0 and earlier installed. They stay in this set because a
+        // manifest written by an older install names them, and a manifest naming anything
+        // outside this set is refused -- which would take that folder's state and its
+        // uninstall with it. They are also what Legacy below has to be allowed to delete.
         "dlss5-neural.ini",
         "dlss5-neural.addon32",
         "dlss5-neural.addon64",
         "dlss5-neural-host64.exe",
-        "dlssnr_amd_pass1.dll",
-        "dlssnr_on_amd_weights.bin",
+    };
+
+    /// <summary>What add-on v0.6.0 and earlier left in a game folder, under the name it used
+    /// then. ReShade loads every .addon64 in the folder, so an upgrade that writes
+    /// amd-nr.addon64 beside an existing dlss5-neural.addon64 gets two add-ons, two overlays
+    /// and two engines competing for the same present. The ini is NOT in here: the add-on
+    /// copies it to amd-nr.ini on first run and leaves the original where it is.</summary>
+    public static readonly IReadOnlyList<string> Legacy = new[]
+    {
+        "dlss5-neural.addon64",
+        "dlss5-neural.addon32",
+        "dlss5-neural-host64.exe",
     };
 
     /// <summary>The name the 32-bit route loads ReShade under when nobody has chosen one. D3D8 is
@@ -362,7 +382,7 @@ public static class Engine
     public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
 
     public static bool IsConfig(string name) =>
-        name is "ReShade.ini" or "dgVoodoo.conf" or "dlss5-neural.ini";
+        name is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini";
 
     // -- Paths ---------------------------------------------------------------------------------
 
@@ -461,7 +481,7 @@ public static class Engine
     /// answer.</summary>
     public static bool FolderIsWritable(string dir)
     {
-        var probe = Path.Combine(dir, ".dlss5-installer-write-probe");
+        var probe = Path.Combine(dir, ".amd-nr-installer-write-probe");
         try
         {
             File.WriteAllBytes(probe, []);

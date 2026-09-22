@@ -155,7 +155,7 @@ public class ScanningTests
         // entries it preserved on purpose, and those configuration files themselves.
         File.WriteAllText(Path.Combine(folder, Route.X64.ManifestFileName()), "{}");
         File.WriteAllText(Path.Combine(folder, "ReShade.ini"), "[GENERAL]\r\n");
-        File.WriteAllText(Path.Combine(folder, "dlss5-neural.ini"), "[dlss5]\r\n");
+        File.WriteAllText(Path.Combine(folder, "amd-nr.ini"), "[amd-nr]\r\n");
 
         Assert.False(GameScanner.IsInstalled(folder),
             "a preserved manifest and the user's own ini files are not an install");

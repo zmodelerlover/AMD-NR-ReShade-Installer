@@ -69,7 +69,7 @@ public class EngineTests
     [Fact]
     public void ASavedPanelLayoutIsNeverRedocked()
     {
-        const string saved = "[OVERLAY]\nWindow=[Window][DLSS Neural Rendering (AMD)],Collapsed=0\n";
+        const string saved = "[OVERLAY]\nWindow=[Window][AMD Neural Rendering],Collapsed=0\n";
         Assert.Equal(saved, Engine.FirstDock(saved, 1920, 1080));
     }
 
@@ -85,7 +85,7 @@ public class EngineTests
     {
         const string home = "[OVERLAY]\nWindow=[Window][###home],Collapsed=0,DockId=0x0000ABCD,,0\n";
         var s = Engine.FirstDock(home, 1920, 1080);
-        Assert.Contains("[Window][DLSS Neural Rendering (AMD)],Collapsed=0,DockId=0x0000ABCD", s,
+        Assert.Contains("[Window][AMD Neural Rendering],Collapsed=0,DockId=0x0000ABCD", s,
             StringComparison.Ordinal);
         Assert.DoesNotContain("DockSpace", s, StringComparison.Ordinal);
     }
@@ -94,9 +94,9 @@ public class EngineTests
     public void AFreshInstallWritesTheX86TuningDefaults()
     {
         var ini = Engine.FreshIni();
-        Assert.Equal("0.25", Engine.GetIni(ini, "dlss5", "ColourStrength"));
-        Assert.Equal("1.0", Engine.GetIni(ini, "dlss5", "Scale"));
-        Assert.Equal("1", Engine.GetIni(ini, "dlss5", "Passes"));
+        Assert.Equal("0.25", Engine.GetIni(ini, "amd-nr", "ColourStrength"));
+        Assert.Equal("1.0", Engine.GetIni(ini, "amd-nr", "Scale"));
+        Assert.Equal("1", Engine.GetIni(ini, "amd-nr", "Passes"));
         Assert.Contains("\r\n", ini, StringComparison.Ordinal);
     }
 
@@ -109,7 +109,7 @@ public class EngineTests
         + "\"bridge_protocol\":2,\n\"dgVoodoo\":\"none\",\n"
         + "\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n"
         + "{\"name\":\"d3d8R.dll\",\"sha256\":\"ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5\","
-        + "\"backup\":\".dlss5-x86bridge-backups/17894153360915702/d3d8R.dll\","
+        + "\"backup\":\".amd-nr-x86bridge-backups/17894153360915702/d3d8R.dll\","
         + "\"backup_sha256\":\"ee9b4916304592a31f0882f339bcbeac7133439a297fbd5274e503c0147d209e\","
         + "\"owned\":true,\"configuration\":false},\n"
         + "{\"name\":\"d3d9.dll\",\"sha256\":\"da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8\","
@@ -174,7 +174,7 @@ public class EngineTests
     public void ABackupPathOutsideTheBackupDirectoryIsRefused()
     {
         var escape = CapturedManifest().Replace(
-            ".dlss5-x86bridge-backups/17894153360915702/d3d8R.dll", "../../elsewhere/d3d8R.dll");
+            ".amd-nr-x86bridge-backups/17894153360915702/d3d8R.dll", "../../elsewhere/d3d8R.dll");
         Assert.Throws<InstallException>(() => Manifest.Decode(escape));
     }
 
@@ -193,7 +193,7 @@ public class EngineTests
     public void AnX64ManifestRoundTripsAndNamesItsRoute()
     {
         var m = new Manifest("Vulkan", Route.X64);
-        m.Entries.Add(new Entry { Name = "dlss5-neural.addon64", Hash = new string('a', 64), Owned = true });
+        m.Entries.Add(new Entry { Name = "amd-nr.addon64", Hash = new string('a', 64), Owned = true });
 
         var text = Manifest.Encode(m);
         Assert.Contains("\"route\":\"x64\",", text, StringComparison.Ordinal);
@@ -267,14 +267,14 @@ public class EngineTests
     public void AFileAnotherProgramIsHoldingStopsTheTransactionBeforeItStarts()
     {
         var root = Fixture.Temp("guard-locked");
-        var target = Path.Combine(root, "dlss5-neural.addon64");
+        var target = Path.Combine(root, "amd-nr.addon64");
         File.WriteAllText(target, "in use");
 
         using (var _ = File.Open(target, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
         {
             var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal)
             {
-                ["dlss5-neural.addon64"] = "the new one"u8.ToArray(),
+                ["amd-nr.addon64"] = "the new one"u8.ToArray(),
             };
             var log = new List<string>();
             var error = Assert.Throws<InstallException>(() =>
@@ -295,7 +295,7 @@ public class EngineTests
         var root = Path.Combine(Fixture.Temp("guard-missing"), "no-such-subfolder");
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal)
         {
-            ["dlss5-neural.addon64"] = "x"u8.ToArray(),
+            ["amd-nr.addon64"] = "x"u8.ToArray(),
         };
         var error = Assert.Throws<InstallException>(() =>
             Transaction.Apply(root, "D3D11", Route.X64, files, []));
@@ -308,14 +308,14 @@ public class EngineTests
         var root = Fixture.Temp("guard-space");
         // A file that will be displaced: the transaction needs room for the new bytes and for the
         // copy of the old ones, which is what the old check did not account for.
-        File.WriteAllBytes(Path.Combine(root, "dlss5-neural.addon64"), new byte[2048]);
+        File.WriteAllBytes(Path.Combine(root, "amd-nr.addon64"), new byte[2048]);
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal)
         {
-            ["dlss5-neural.addon64"] = Enumerable.Repeat((byte)1, 4096).ToArray(),
+            ["amd-nr.addon64"] = Enumerable.Repeat((byte)1, 4096).ToArray(),
         };
 
         Transaction.Apply(root, "D3D11", Route.X64, files, []);
-        Assert.Equal(4096, new FileInfo(Path.Combine(root, "dlss5-neural.addon64")).Length);
+        Assert.Equal(4096, new FileInfo(Path.Combine(root, "amd-nr.addon64")).Length);
     }
 
     [Fact]
@@ -362,8 +362,8 @@ public class EngineTests
     [Fact]
     public void TheBridgeChecksumListIsReadByNameNotByPosition()
     {
-        var sums = $"{new string('a', 64)}  dlss5-neural.addon32\n{new string('b', 64)}  dlss5-neural-host64.exe\n";
-        Assert.Equal(new string('b', 64), X86Installer.BridgeSum(sums, "dlss5-neural-host64.exe"));
+        var sums = $"{new string('a', 64)}  amd-nr.addon32\n{new string('b', 64)}  amd-nr-host64.exe\n";
+        Assert.Equal(new string('b', 64), X86Installer.BridgeSum(sums, "amd-nr-host64.exe"));
         Assert.Throws<InstallException>(() => X86Installer.BridgeSum(sums, "not-in-the-list.dll"));
     }
 }

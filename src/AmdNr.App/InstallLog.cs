@@ -154,7 +154,7 @@ public static class InstallLog
         string[] interesting =
         [
             .. Work.InstalledMarkers,
-            "dlss5-neural.ini", "ReShade.ini", "ReShade.log",
+            "amd-nr.ini", "ReShade.ini", "ReShade.log",
             "dxgi.dll", "d3d11.dll", "d3d12.dll", "d3d9.dll", "d3d8.dll", "d3d8R.dll", "opengl32.dll",
             Route.X64.ManifestFileName(), Engine.ManifestName,
         ];

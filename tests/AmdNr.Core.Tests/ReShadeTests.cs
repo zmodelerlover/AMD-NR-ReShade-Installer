@@ -104,13 +104,13 @@ public class ReShadeTests
     [Fact]
     public void TheIniIsReadyOnFirstLaunchAndKeepsEverythingElse()
     {
-        const string before = "[GENERAL]\nPerformanceMode=1\n[ADDON]\nDisabledAddons=Other.addon64,dlss5 neural@dlss5-neural.addon64\n";
+        const string before = "[GENERAL]\nPerformanceMode=1\n[ADDON]\nDisabledAddons=Other.addon64,dlss5 neural@amd-nr.addon64\n";
         var after = Work.ReadyReShadeIni(before);
 
         Assert.Equal("1", Engine.GetIni(after, "GENERAL", "PerformanceMode"));
         Assert.Equal("Other.addon64", Engine.GetIni(after, "ADDON", "DisabledAddons"));
         Assert.Equal("4", Engine.GetIni(after, "OVERLAY", "TutorialProgress"));
-        Assert.Contains("DLSS Neural Rendering (AMD)", Engine.GetIni(after, "OVERLAY", "Window"), StringComparison.Ordinal);
+        Assert.Contains("AMD Neural Rendering", Engine.GetIni(after, "OVERLAY", "Window"), StringComparison.Ordinal);
 
         // Running it again changes nothing: a reinstall must not churn someone's ini.
         Assert.Equal(after, Work.ReadyReShadeIni(after));

@@ -355,7 +355,7 @@ public static partial class GameScanner
     /// there. Cheap enough to ask for every card on every refresh.
     ///
     /// Not by the manifest: uninstall keeps that file whenever it preserves a configuration entry --
-    /// ReShade.ini and dlss5-neural.ini are kept on purpose -- so a folder that has been fully
+    /// ReShade.ini and amd-nr.ini are kept on purpose -- so a folder that has been fully
     /// uninstalled normally still has one. Reading it as "installed" is what left the badge on after
     /// Uninstall said it was done.</summary>
     /// <summary>Every game under one folder, for somebody who keeps them in a folder rather than

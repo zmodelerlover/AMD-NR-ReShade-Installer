@@ -29,11 +29,11 @@ public static class SupportReport
         // the one this report was missing: a game that closes at once leaves a log of a few hundred
         // bytes, and the next launch -- the one people make before asking for help -- pushes it here.
         "ReShade.log1",
-        "ReShade.ini", "dlss5-neural.log", "dlss5-neural.ini",
-        "dlssnr_on_amd.log", "dlssnr_on_amd.ini", "dlss5-pass1.dll",
+        "ReShade.ini", "amd-nr.log", "amd-nr.ini",
+        "dlssnr_on_amd.log", "dlssnr_on_amd.ini", "amd-nr-pass1.dll",
         // The 32-bit bridge does not use the name above: it writes one log per half of the pair,
         // and those two are what said which hotkey the add-on was actually running with.
-        "dlss5-neural-x86.log", "dlss5-neural-x86-host.log",
+        "amd-nr-x86.log", "amd-nr-x86-host.log",
     ];
 
     /// <summary>A single file this big is taken in full; past it, the tail is taken and the cut is

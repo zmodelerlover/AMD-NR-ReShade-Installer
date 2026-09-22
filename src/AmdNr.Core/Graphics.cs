@@ -393,7 +393,7 @@ public static class GraphicsDetector
         "dxil", "vcruntime", "msvcp", "ucrt", "api-ms-", "concrt", "qt", "icu", "libcrypto", "libssl",
         "zlib", "sdl", "xinput", "xaudio", "dinput", "d3d12core", "d3d12sdklayers", "dstorage", "tobii",
         "powrprof", "dbghelp", "crashpad", "sentry", "bugsplat", "overlay", "gameoverlay", "rtss",
-        "reshade", "dlss5", "dlssnr", "dxgi", "d3d11", "d3d12", "d3d9", "d3d8", "opengl32", "vulkan",
+        "reshade", "amd-nr", "dlss5", "dlssnr", "dxgi", "d3d11", "d3d12", "d3d9", "d3d8", "opengl32", "vulkan",
     ];
 
     /// <summary>Engine modules worth opening when the executable imports no renderer itself.</summary>

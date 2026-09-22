@@ -319,7 +319,7 @@ public class WorkTests
         var game = Fixture.Temp("legacy");
         foreach (var name in new[] { Work.AddonName, Work.RuntimeName, Work.WeightsName })
             File.WriteAllText(Path.Combine(game, name), "from an older installer");
-        File.WriteAllText(Path.Combine(game, "dlss5-neural.ini"), "[dlss5]\r\nStartOn=1\r\n");
+        File.WriteAllText(Path.Combine(game, "amd-nr.ini"), "[amd-nr]\r\nStartOn=1\r\n");
         Directory.CreateDirectory(Path.Combine(game, "dlss5-runtime"));
         Assert.False(File.Exists(Path.Combine(game, Route.X64.ManifestFileName())));
 
@@ -328,7 +328,7 @@ public class WorkTests
         foreach (var name in new[] { Work.AddonName, Work.RuntimeName, Work.WeightsName })
             Assert.False(File.Exists(Path.Combine(game, name)), $"{name} survived a legacy uninstall");
         Assert.False(Directory.Exists(Path.Combine(game, "dlss5-runtime")));
-        Assert.True(File.Exists(Path.Combine(game, "dlss5-neural.ini")), "the ini is still the user's");
+        Assert.True(File.Exists(Path.Combine(game, "amd-nr.ini")), "the ini is still the user's");
     }
 
     [Fact]
@@ -341,7 +341,7 @@ public class WorkTests
         // An x86 install into the same folder must journal separately rather than collide.
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal)
         {
-            ["dlss5-neural.addon32"] = Fixture.Pe(false),
+            ["amd-nr.addon32"] = Fixture.Pe(false),
         };
         Transaction.Apply(game, "D3D11", Route.X86, files, []);
 
@@ -357,14 +357,14 @@ public class WorkTests
         Assert.False(Work.Install(game, src, Preset.Dx11, pins).Failed);
         Assert.True(File.Exists(Path.Combine(game, Work.AddonName)));
 
-        File.WriteAllText(Path.Combine(game, "dlss5-neural.ini"), "[dlss5]\r\nScale=0.75\r\n");
+        File.WriteAllText(Path.Combine(game, "amd-nr.ini"), "[amd-nr]\r\nScale=0.75\r\n");
         Directory.CreateDirectory(Path.Combine(game, "dlss5-runtime"));
 
         var report = Work.Uninstall(game, Preset.Dx11);
         Assert.False(report.Failed, report.ToLog("uninstall"));
         Assert.False(File.Exists(Path.Combine(game, Work.AddonName)));
         Assert.False(Directory.Exists(Path.Combine(game, "dlss5-runtime")));
-        Assert.True(File.Exists(Path.Combine(game, "dlss5-neural.ini")), "the ini is the user's, not ours");
+        Assert.True(File.Exists(Path.Combine(game, "amd-nr.ini")), "the ini is the user's, not ours");
 
         // What the window reads to draw the badge. Removing the files was never the broken half:
         // this is, because uninstall keeps the manifest to hold the preserved ini entries.
@@ -388,7 +388,7 @@ public class WorkTests
         // hand with a locally built one, so its hash stopped being the manifest's.
         var addon = Path.Combine(game, Work.AddonName);
         File.WriteAllBytes(addon, [.. File.ReadAllBytes(addon), 0x00, 0x99]);
-        File.WriteAllText(Path.Combine(game, "dlss5-neural.ini"), "[dlss5]\r\nScale=0.75\r\n");
+        File.WriteAllText(Path.Combine(game, "amd-nr.ini"), "[amd-nr]\r\nScale=0.75\r\n");
 
         var kept = Work.Uninstall(game, Preset.Dx11);
         Assert.False(kept.Failed, kept.ToLog("uninstall"));
@@ -399,7 +399,7 @@ public class WorkTests
         Assert.False(forced.Failed, forced.ToLog("forced"));
         Assert.False(File.Exists(addon));
         Assert.False(GameScanner.IsInstalled(game), "forcing it is what makes the badge go out");
-        Assert.True(File.Exists(Path.Combine(game, "dlss5-neural.ini")),
+        Assert.True(File.Exists(Path.Combine(game, "amd-nr.ini")),
             "forcing takes back our files, never the tuning: that has its own switch");
     }
 
@@ -510,7 +510,7 @@ public class WorkTests
         var (src, pins) = Fixture.Payloads("preflight-ini");
         File.WriteAllBytes(Path.Combine(game, "d3d11.dll"), Fixture.Pe(true));
         File.WriteAllText(Path.Combine(game, "ReShade.ini"),
-            "[ADDON]\nDisabledAddons=dlss5 neural@dlss5-neural.addon64\n");
+            "[ADDON]\nDisabledAddons=dlss5 neural@amd-nr.addon64\n");
 
         var report = Work.Preflight(game, src, Preset.Dx11, pins);
         Assert.True(report.Failed);
@@ -554,8 +554,8 @@ public class WorkTests
         File.Delete(Path.Combine(src, Work.AddonName));
         Directory.CreateDirectory(Path.Combine(src, "files"));
         File.WriteAllText(Path.Combine(src, "payload.sha256"), "");
-        File.WriteAllBytes(Path.Combine(src, "files", "dlss5-neural.addon32"), Fixture.Pe(false));
-        File.WriteAllBytes(Path.Combine(src, "files", "dlss5-neural-host64.exe"), Fixture.Pe(true));
+        File.WriteAllBytes(Path.Combine(src, "files", "amd-nr.addon32"), Fixture.Pe(false));
+        File.WriteAllBytes(Path.Combine(src, "files", "amd-nr-host64.exe"), Fixture.Pe(true));
         File.WriteAllBytes(Path.Combine(src, "files", "dxgi.dll"), Fixture.Pe(false));
 
         var report = Work.Preflight(Path.Combine(game, "old.exe"), src, Preset.X86Dx9, pins);
@@ -563,9 +563,9 @@ public class WorkTests
         Assert.False(Fixture.HasAny(report, Work.AddonName), report.ToLog("x86 preflight"));
         Assert.True(Fixture.HasAny(report, "pinned 32-bit ReShade"), report.ToLog("x86 preflight"));
 
-        File.Delete(Path.Combine(src, "files", "dlss5-neural-host64.exe"));
+        File.Delete(Path.Combine(src, "files", "amd-nr-host64.exe"));
         var missing = Work.Preflight(Path.Combine(game, "old.exe"), src, Preset.X86Dx9, pins);
-        Assert.True(Fixture.HasErr(missing, "dlss5-neural-host64.exe"), missing.ToLog("x86 missing"));
+        Assert.True(Fixture.HasErr(missing, "amd-nr-host64.exe"), missing.ToLog("x86 missing"));
     }
 
     [Fact]
@@ -647,7 +647,7 @@ public class WorkTests
     // -- The real payloads -------------------------------------------------------------------------
 
     /// <summary>End to end against the genuine runtime and weights. Set AMDNR_TEST_PAYLOAD_DIR to a
-    /// folder holding dlssnr_amd_pass1.dll, dlssnr_on_amd_weights.bin and dlss5-neural.addon64;
+    /// folder holding dlssnr_amd_pass1.dll, dlssnr_on_amd_weights.bin and amd-nr.addon64;
     /// skipped otherwise, because those are 141 MB and not in any repository.</summary>
     [Fact]
     public void ARealPayloadRoundTrip()

@@ -1,109 +1,109 @@
 ﻿{
-    "schema":  1,
-    "components":  {
-                       "addon":  {
-                                     "version":  "0.6.0",
-                                     "files":  [
-                                                   {
-                                                       "name":  "dlss5-neural.addon64",
-                                                       "size":  574464,
-                                                       "sha256":  "c037a69f31105a7bf029843fbf7e78b420d0f9dbfa0f89610ec2718a6a03942f",
-                                                       "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon64"
-                                                   }
-                                               ]
-                                 },
-                       "runtime":  {
-                                       "version":  "0.3.0",
-                                       "files":  [
-                                                     {
-                                                         "name":  "dlssnr_amd_pass1.dll",
-                                                         "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_amd_pass1.dll",
-                                                         "size":  7290880,
-                                                         "sha256":  "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6"
-                                                     },
-                                                     {
-                                                         "name":  "dlssnr_on_amd_weights.bin",
-                                                         "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_on_amd_weights.bin",
-                                                         "mirrors":  [
-                                                                         "https://files.catbox.moe/s1sh5d.bin"
-                                                                     ],
-                                                         "size":  147689451,
-                                                         "sha256":  "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab"
-                                                     }
-                                                 ]
-                                   },
-                       "reshade":  {
-                                       "version":  "6.8.0",
-                                       "files":  [
-                                                     {
-                                                         "name":  "ReShade_Setup_6.8.0_Addon.exe",
-                                                         "url":  "https://reshade.me/downloads/ReShade_Setup_6.8.0_Addon.exe",
-                                                         "size":  4318424,
-                                                         "sha256":  "afe4c8f13048306307983b8b3d41d5bf00a86820440b0e57dea10950e1176445"
-                                                     }
-                                                 ],
-                                       "extract":  [
-                                                       {
-                                                           "name":  "ReShade64.dll",
-                                                           "size":  5592064,
-                                                           "sha256":  "0cee63f9c9f13f3ac909c5b4903f4dbb4b719a7ab3b4f13b0deaf83c814b94f7"
-                                                       },
-                                                       {
-                                                           "name":  "ReShade32.dll",
-                                                           "size":  4398080,
-                                                           "sha256":  "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8"
-                                                       }
-                                                   ]
-                                   },
-                       "bridge":  {
-                                      "version":  "0.5.3",
-                                      "files":  [
-                                                    {
-                                                        "name":  "dlss5-neural.addon32",
-                                                        "path":  "files/dlss5-neural.addon32",
-                                                        "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural.addon32",
-                                                        "size":  265216,
-                                                        "sha256":  "3330e256182bf9f4f9c21b085fe0552d8d32cc12981fd644201d6a86d0f63316"
-                                                    },
-                                                    {
-                                                        "name":  "dlss5-neural-host64.exe",
-                                                        "path":  "files/dlss5-neural-host64.exe",
-                                                        "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlss5-neural-host64.exe",
-                                                        "size":  446464,
-                                                        "sha256":  "3340b1d89299420803821c120fa1c5d2314f6375346f901fb98c9b2945344631"
-                                                    },
-                                                    {
-                                                        "name":  "payload.sha256",
-                                                        "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
-                                                        "size":  179,
-                                                        "sha256":  "e400aa906a0fa4da55ef133b68007fe153a2879f6613aeea6d22796355141808"
-                                                    }
-                                                ]
-                                  },
-                       "x86-extras":  {
-                                          "version":  "1",
-                                          "files":  [
-                                                        {
-                                                            "name":  "dxgi.dll",
-                                                            "path":  "files/dxgi.dll",
-                                                            "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dxgi.dll",
-                                                            "mirrors":  [
-                                                                            "https://files.catbox.moe/g14bws.dll"
-                                                                        ],
-                                                            "size":  4398080,
-                                                            "sha256":  "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8"
-                                                        },
-                                                        {
-                                                            "name":  "d3d8to9.dll",
-                                                            "path":  "files/d3d8to9.dll",
-                                                            "url":  "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/d3d8to9.dll",
-                                                            "mirrors":  [
-                                                                            "https://files.catbox.moe/oqcqkp.dll"
-                                                                        ],
-                                                            "size":  124416,
-                                                            "sha256":  "ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5"
-                                                        }
-                                                    ]
-                                      }
-                   }
+  "schema": 1,
+  "components": {
+    "addon": {
+      "version": "0.7.0",
+      "files": [
+        {
+          "name": "amd-nr.addon64",
+          "size": 588288,
+          "sha256": "1c47643f547cb81a3c28e7ed1b31608804d70452550acc8de1dcc3e02211495d",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon64"
+        }
+      ]
+    },
+    "runtime": {
+      "version": "0.3.0",
+      "files": [
+        {
+          "name": "dlssnr_amd_pass1.dll",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_amd_pass1.dll",
+          "size": 7290880,
+          "sha256": "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6"
+        },
+        {
+          "name": "dlssnr_on_amd_weights.bin",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_on_amd_weights.bin",
+          "mirrors": [
+            "https://files.catbox.moe/s1sh5d.bin"
+          ],
+          "size": 147689451,
+          "sha256": "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab"
+        }
+      ]
+    },
+    "reshade": {
+      "version": "6.8.0",
+      "files": [
+        {
+          "name": "ReShade_Setup_6.8.0_Addon.exe",
+          "url": "https://reshade.me/downloads/ReShade_Setup_6.8.0_Addon.exe",
+          "size": 4318424,
+          "sha256": "afe4c8f13048306307983b8b3d41d5bf00a86820440b0e57dea10950e1176445"
+        }
+      ],
+      "extract": [
+        {
+          "name": "ReShade64.dll",
+          "size": 5592064,
+          "sha256": "0cee63f9c9f13f3ac909c5b4903f4dbb4b719a7ab3b4f13b0deaf83c814b94f7"
+        },
+        {
+          "name": "ReShade32.dll",
+          "size": 4398080,
+          "sha256": "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8"
+        }
+      ]
+    },
+    "bridge": {
+      "version": "0.7.0",
+      "files": [
+        {
+          "name": "amd-nr.addon32",
+          "path": "files/amd-nr.addon32",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon32",
+          "size": 252416,
+          "sha256": "4b8bb3d6360bd3d374299093a80e62ae7fc498c722a456eae8b60c52ce37141d"
+        },
+        {
+          "name": "amd-nr-host64.exe",
+          "path": "files/amd-nr-host64.exe",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr-host64.exe",
+          "size": 467456,
+          "sha256": "626843954e74025f61aefbf9d8d5f75a9ada4ac0c6468886687c29909fa545a9"
+        },
+        {
+          "name": "payload.sha256",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
+          "size": 167,
+          "sha256": "7fdd10f5bbf8e2ab15358b9b702d5bfefacdd8f95347b8e28041114ef91e4e9a"
+        }
+      ]
+    },
+    "x86-extras": {
+      "version": "1",
+      "files": [
+        {
+          "name": "dxgi.dll",
+          "path": "files/dxgi.dll",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dxgi.dll",
+          "mirrors": [
+            "https://files.catbox.moe/g14bws.dll"
+          ],
+          "size": 4398080,
+          "sha256": "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8"
+        },
+        {
+          "name": "d3d8to9.dll",
+          "path": "files/d3d8to9.dll",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/d3d8to9.dll",
+          "mirrors": [
+            "https://files.catbox.moe/oqcqkp.dll"
+          ],
+          "size": 124416,
+          "sha256": "ab6bf7a9a9f4b3e66a75ca038d8d10289c88acbfe8d52c3b5a8a9a259cb26cd5"
+        }
+      ]
+    }
+  }
 }

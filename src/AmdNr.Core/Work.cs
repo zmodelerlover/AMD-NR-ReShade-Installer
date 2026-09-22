@@ -43,11 +43,11 @@ public sealed class Detected
 
 public static class Work
 {
-    public const string AddonName = "dlss5-neural.addon64";
+    public const string AddonName = "amd-nr.addon64";
     public const string RuntimeName = "dlssnr_amd_pass1.dll";
     public const string WeightsName = "dlssnr_on_amd_weights.bin";
-    public const string Addon32Name = "dlss5-neural.addon32";
-    public const string Host64Name = "dlss5-neural-host64.exe";
+    public const string Addon32Name = "amd-nr.addon32";
+    public const string Host64Name = "amd-nr-host64.exe";
 
     /// <summary>The files whose presence means "this folder has an install of ours", and exactly the
     /// ones uninstall takes back. Deliberately no manifest and no ini: uninstall keeps the manifest
@@ -91,7 +91,14 @@ public static class Work
     /// <summary>Files an older layout left behind: one copy of the runtime per pass, which did not
     /// fit in VRAM and has not been used for several releases.</summary>
     private static IEnumerable<string> DeadFiles() =>
-        Enumerable.Range(2, 9).Select(n => $"dlssnr_amd_pass{n}.dll");
+        Enumerable.Range(2, 9).Select(n => $"dlssnr_amd_pass{n}.dll").Concat(Engine.Legacy);
+
+    /// <summary>Whether a ReShade DisabledAddons entry names this add-on, under either the
+    /// name it uses now or the one it used before v0.7.0. A folder upgraded in place can
+    /// carry either, and matching only one leaves the other silently disabled.</summary>
+    private static bool IsOurs(string entry) =>
+        entry.Contains("amd-nr", StringComparison.OrdinalIgnoreCase)
+        || entry.Contains("dlss5", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>A release folder keeps its payloads in files\, and a folder holding just the
     /// unzipped files works too. Whichever was given, this is where the payloads are read from.</summary>
@@ -339,10 +346,10 @@ public static class Work
     internal static string ReadyReShadeIni(string ini)
     {
         var disabled = Engine.GetIni(ini, "ADDON", "DisabledAddons");
-        if (disabled.Contains("dlss5", StringComparison.OrdinalIgnoreCase))
+        if (IsOurs(disabled))
         {
             var kept = disabled.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Where(a => !a.Contains("dlss5", StringComparison.OrdinalIgnoreCase));
+                .Where(a => !IsOurs(a));
             ini = Engine.SetIni(ini, "ADDON", "DisabledAddons", string.Join(",", kept));
         }
         if (Engine.GetIni(ini, "OVERLAY", "TutorialProgress").Length == 0)
@@ -385,7 +392,7 @@ public static class Work
             if (!line.StartsWith("DisabledAddons=", StringComparison.Ordinal)) continue;
             var list = line["DisabledAddons=".Length..];
             if (list.Contains(AddonName, StringComparison.Ordinal)
-                || list.Contains("dlss5", StringComparison.OrdinalIgnoreCase))
+                || IsOurs(list))
             {
                 report.Err(
                     "ReShade.ini has this add-on in DisabledAddons=. ReShade writes that line if the "
@@ -541,7 +548,7 @@ public static class Work
             // add-on -- asking for that file there is asking for something that is not supposed to exist.
             if (preset.Route() == Route.X86)
             {
-                foreach (var name in new[] { "payload.sha256", @"files\dlss5-neural.addon32", @"files\dlss5-neural-host64.exe" })
+                foreach (var name in new[] { "payload.sha256", @"files\amd-nr.addon32", @"files\amd-nr-host64.exe" })
                 {
                     if (File.Exists(Path.Combine(src, name))) continue;
                     report.Err($"{Path.GetFileName(name)} is not in the payload folder; the 32-bit bridge cannot be installed without it.");
@@ -648,7 +655,7 @@ public static class Work
         if (dead.Count > 0)
         {
             report.Info(
-                $"{dead.Count} file(s) from the old per-pass layout are here and will be removed: "
+                $"{dead.Count} file(s) from an older layout are here and will be removed: "
                 + string.Join(", ", dead));
         }
 
@@ -731,7 +738,7 @@ public static class Work
             report.Info(preset.Note());
             report.Info(
                 "It starts switched off. Open the overlay with Home, or press Ctrl+End. StartOn=1 in "
-                + "dlss5-neural.ini makes it come up enabled.");
+                + "amd-nr.ini makes it come up enabled.");
         }
         catch (InstallException e)
         {
@@ -833,7 +840,7 @@ public static class Work
             report.Info(preset.Note());
             report.Info(
                 "It starts switched off. Open the overlay with Home, or press Ctrl+End. StartOn=1 in "
-                + "dlss5-neural.ini makes it come up enabled.");
+                + "amd-nr.ini makes it come up enabled.");
         }
         return report;
     }
@@ -963,10 +970,10 @@ public static class Work
         gone += SweepDroppings(dir, report);
 
         if (gone == 0) report.Warn("Nothing of ours was in that folder.");
-        if (File.Exists(Path.Combine(dir, "dlss5-neural.ini")))
+        if (File.Exists(Path.Combine(dir, "amd-nr.ini")))
         {
             report.Info(
-                "dlss5-neural.ini was left in place: it is your tuning, not ours. Delete it by hand if "
+                "amd-nr.ini was left in place: it is your tuning, not ours. Delete it by hand if "
                 + "you want a clean slate.");
         }
 
@@ -985,8 +992,8 @@ public static class Work
         var gone = 0;
         foreach (var name in new[]
                  {
-                     "dlss5-pass1.dll", "dlss5-neural.log", "dlss5-neural-x86.log",
-                     "dlss5-neural-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
+                     "amd-nr-pass1.dll", "amd-nr.log", "amd-nr-x86.log",
+                     "amd-nr-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
                  })
             gone += RemoveFile(dir, name, report);
 

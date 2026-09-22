@@ -63,7 +63,7 @@ GitHub release asset remains a valid place to put one of these without any code 
 
 | | what it is | where it comes from |
 |---|---|---|
-| `addon` | `dlss5-neural.addon64` | the dataset repo |
+| `addon` | `amd-nr.addon64` | the dataset repo |
 | `runtime` | `dlssnr_amd_pass1.dll` + `dlssnr_on_amd_weights.bin` | the dataset repo |
 | `reshade` | the official 6.8.0 Addon setup, with `ReShade64.dll`/`ReShade32.dll` extracted from it | reshade.me |
 | `bridge` | the 32-bit pair and the `payload.sha256` that pins it | the dataset repo |
@@ -104,8 +104,8 @@ A release is offered only when it publishes what pins it and what the route inst
 | Asset | Needed for |
 |---|---|
 | `SHA256SUMS.txt` | every release. Without it nothing pins the assets and the version is left out entirely |
-| `dlss5-neural.addon64` | the 64-bit routes |
-| `dlss5-neural.addon32`, `dlss5-neural-host64.exe`, `payload.sha256` | the 32-bit bridge routes |
+| `amd-nr.addon64` | the 64-bit routes |
+| `amd-nr.addon32`, `amd-nr-host64.exe`, `payload.sha256` | the 32-bit bridge routes |
 
 All of them **loose, beside the archive** -- not only inside it. That is what lets the app know what
 a version contains, and pin each file's size and hash, without downloading anything first: the size
@@ -119,9 +119,9 @@ Cutting a release, then, ends with:
 
 ```powershell
 gh release upload v0.5.1 `
-  build\dlss5-neural.addon64 `
-  build-x86bridge\dlss5-neural.addon32 `
-  build-x86bridge\dlss5-neural-host64.exe `
+  build\amd-nr.addon64 `
+  build-x86bridge\amd-nr.addon32 `
+  build-x86bridge\amd-nr-host64.exe `
   release\payload.sha256 `
   SHA256SUMS.txt
 ```

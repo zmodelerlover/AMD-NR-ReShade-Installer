@@ -16,7 +16,7 @@ public class PayloadTests
           "owner": "someone", "repo": "Extras", "tag": "payload-v1",
           "components": {
             "addon":   { "version": "0.5.0", "files": [
-              { "name": "dlss5-neural.addon64", "size": 550400, "sha256": "203f0278b64c5786da2bb95e8635de86bf3b18a852f098c4c0378661e8b48cf7" } ] },
+              { "name": "amd-nr.addon64", "size": 550400, "sha256": "203f0278b64c5786da2bb95e8635de86bf3b18a852f098c4c0378661e8b48cf7" } ] },
             "runtime": { "version": "0.3.0", "files": [
               { "name": "dlssnr_amd_pass1.dll", "size": 7290880, "sha256": "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6" },
               { "name": "dlssnr_on_amd_weights.bin", "size": 147689451, "sha256": "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab" } ] }
@@ -96,7 +96,7 @@ public class PayloadTests
         // under files\.
         var bridge = m.Component("bridge").Files;
         Assert.Equal("payload.sha256", bridge.Single(f => f.Name == "payload.sha256").RelativePath);
-        Assert.Equal("files/dlss5-neural.addon32", bridge.Single(f => f.Name == "dlss5-neural.addon32").RelativePath);
+        Assert.Equal("files/amd-nr.addon32", bridge.Single(f => f.Name == "amd-nr.addon32").RelativePath);
     }
 
     // -- Downloading ------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ public class PayloadTests
                 "runtime": { "version": "{{tag}}", "files": [
                   { "name": "dlssnr_amd_pass1.dll", "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}" } ] },
                 "bridge":  { "version": "{{tag}}", "files": [
-                  { "name": "dlss5-neural.addon32", "path": "files/dlss5-neural.addon32",
+                  { "name": "amd-nr.addon32", "path": "files/amd-nr.addon32",
                     "size": {{blob.Length}}, "sha256": "{{Engine.Sha(blob)}}" } ] }
               }
             }
@@ -380,7 +380,7 @@ public class PayloadTests
 
         var staged = cache.Stage(manifest, "runtime", "bridge");
         Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(staged, Work.RuntimeName)));
-        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(staged, "files", "dlss5-neural.addon32")));
+        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(staged, "files", "amd-nr.addon32")));
 
         // Staging again is free and changes nothing.
         Assert.Equal(staged, cache.Stage(manifest, "runtime", "bridge"));

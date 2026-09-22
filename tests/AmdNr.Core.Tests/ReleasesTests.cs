@@ -18,12 +18,12 @@ public class ReleasesTests
         "tag_name": "v0.5.1", "name": "v0.5.1", "draft": false, "prerelease": false,
         "published_at": "2026-09-16T00:00:00Z",
         "assets": [
-          { "name": "dlss5-neural.addon64", "size": 550400,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/dlss5-neural.addon64" },
-          { "name": "dlss5-neural.addon32", "size": 257536,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/dlss5-neural.addon32" },
-          { "name": "dlss5-neural-host64.exe", "size": 442368,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/dlss5-neural-host64.exe" },
+          { "name": "amd-nr.addon64", "size": 550400,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/amd-nr.addon64" },
+          { "name": "amd-nr.addon32", "size": 257536,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/amd-nr.addon32" },
+          { "name": "amd-nr-host64.exe", "size": 442368,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/amd-nr-host64.exe" },
           { "name": "payload.sha256", "size": 179,
             "browser_download_url": "https://github.com/o/r/releases/download/v0.5.1/payload.sha256" },
           { "name": "SHA256SUMS.txt", "size": 400,
@@ -36,8 +36,8 @@ public class ReleasesTests
         "assets": [
           { "name": "dlss5-neural-amd-v0.5.0.zip", "size": 1121878,
             "browser_download_url": "https://github.com/o/r/releases/download/v0.5.0/dlss5-neural-amd-v0.5.0.zip" },
-          { "name": "dlss5-neural.addon64", "size": 550400,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.0/dlss5-neural.addon64" },
+          { "name": "amd-nr.addon64", "size": 550400,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.0/amd-nr.addon64" },
           { "name": "SHA256SUMS.txt", "size": 181,
             "browser_download_url": "https://github.com/o/r/releases/download/v0.5.0/SHA256SUMS.txt" }
         ]
@@ -54,8 +54,8 @@ public class ReleasesTests
         "tag_name": "v0.4.2", "name": "too old", "draft": false, "prerelease": false,
         "published_at": "2026-09-12T02:09:20Z",
         "assets": [
-          { "name": "dlss5-neural.addon64", "size": 550400,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.4.2/dlss5-neural.addon64" },
+          { "name": "amd-nr.addon64", "size": 550400,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.4.2/amd-nr.addon64" },
           { "name": "SHA256SUMS.txt", "size": 100,
             "browser_download_url": "https://github.com/o/r/releases/download/v0.4.2/SHA256SUMS.txt" }
         ]
@@ -64,8 +64,8 @@ public class ReleasesTests
         "tag_name": "v0.5.2", "name": "unpinned", "draft": false, "prerelease": false,
         "published_at": "2026-09-18T00:00:00Z",
         "assets": [
-          { "name": "dlss5-neural.addon64", "size": 550400,
-            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.2/dlss5-neural.addon64" }
+          { "name": "amd-nr.addon64", "size": 550400,
+            "browser_download_url": "https://github.com/o/r/releases/download/v0.5.2/amd-nr.addon64" }
         ]
       },
       { "tag_name": "media-v1", "name": "media", "draft": false, "prerelease": false, "assets": [] }
@@ -104,7 +104,7 @@ public class ReleasesTests
             f => f.Bare.Tag is "v0.6.0" or "v0.4.2" or "v0.5.0" or "v0.5.2" or "media-v1");
 
         Assert.EndsWith("/v0.5.1/SHA256SUMS.txt", found[0].SumsUrl);
-        Assert.Equal(550400ul, found[0].Bare.Assets["dlss5-neural.addon64"].Size);
+        Assert.Equal(550400ul, found[0].Bare.Assets["amd-nr.addon64"].Size);
     }
 
     /// <summary>Publishing a release has to be the whole of making it the default. This is the
@@ -181,14 +181,14 @@ public class ReleasesTests
     public void SumsAreReadTheWayShaTwoFiveSixSumWritesThem()
     {
         var sums = AddonReleases.ParseSums(
-            $"{Hash('a')} *dlss5-neural.addon64\n" +
-            $"{Hash('b')}  files/dlss5-neural.addon32\r\n" +
+            $"{Hash('a')} *amd-nr.addon64\n" +
+            $"{Hash('b')}  files/amd-nr.addon32\r\n" +
             "not a hash at all\n" +
             $"{Hash('c')} *payload.sha256\n");
 
-        Assert.Equal(Hash('a'), sums["dlss5-neural.addon64"]);
+        Assert.Equal(Hash('a'), sums["amd-nr.addon64"]);
         // Listed with the folder it sits in inside the archive; installed under its own name.
-        Assert.Equal(Hash('b'), sums["dlss5-neural.addon32"]);
+        Assert.Equal(Hash('b'), sums["amd-nr.addon32"]);
         Assert.Equal(Hash('c'), sums["payload.sha256"]);
         Assert.Equal(3, sums.Count);
     }
