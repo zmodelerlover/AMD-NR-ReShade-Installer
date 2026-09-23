@@ -109,6 +109,8 @@
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade loads as</sys:String>
   <sys:String x:Key="Str.ProxyNote">Automatic picks dxgi.dll, which serves every Direct3D. Choose another only when a game refuses to load that one -- some load d3d12.dll and nothing else.</sys:String>
+  <sys:String x:Key="Str.ProxySectionOpti">OptiScaler loads as</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">Automatic picks dxgi.dll. Choose winmm.dll when dxgi.dll has to stay something else's, such as a ReShade you keep.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">Automatic</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Download all now</sys:String>
   <sys:String x:Key="Str.ClearCache">Clear the cache</sys:String>
@@ -183,10 +185,12 @@
   <sys:String x:Key="Str.Preset.X86Dx11">D3D11 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx9">D3D9 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx8">D3D8 game, 32-bit</sys:String>
+  <sys:String x:Key="Str.Preset.OptiScaler">OptiScaler: D3D12 game with DLSS, FSR or XeSS</sys:String>
   <sys:String x:Key="Str.PresetNote.Pcsx2">Set the emulator to Direct3D 11: it is the only renderer whose depth reaches the network. Watch for a per-game override, which beats the global setting silently.</sys:String>
   <sys:String x:Key="Str.PresetNote.Rpcs3">Experimental. ReShade on Vulkan is a global layer, not a proxy DLL: run its installer against rpcs3.exe and pick Vulkan. No depth on Vulkan, only colour and estimated motion.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx11">The best route: D3D11 is the only one where the game’s own depth and motion vectors reach the network.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Dx12">Degraded. On D3D12 the add-on only sees the finished frame, so the network gets colour and guesses the rest. It works; expect less from it.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Dx12">Degraded. On D3D12 the add-on only sees the finished frame, so the network gets colour and guesses the rest. It works; expect less from it. A game with DLSS, FSR or XeSS in its settings is better served by the OptiScaler route.</sys:String>
+  <sys:String x:Key="Str.PresetNote.OptiScaler">Recommended for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS and runs the network inside it, with the game's own depth and motion vectors. The game has to offer one of those upscalers, switched on in its settings. In game, press Insert, open the Neural tab and turn on Enable NR; a game with Ray Reconstruction needs "After the finished frame" as the processing point.</sys:String>
   <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan is a global layer: run its installer against the game’s .exe and pick Vulkan. The game must import vkCreateDevice statically, and there is no depth on Vulkan.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this is an ordinary proxy DLL: ReShade goes in as opengl32.dll beside the game, with no separate installer run. Colour and estimated motion only; the game’s own depth is reachable on this API but is not wired up yet. A 32-bit OpenGL game has no route.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>

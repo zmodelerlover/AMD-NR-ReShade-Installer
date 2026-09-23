@@ -68,7 +68,8 @@ public class GraphicsTests
     {
         var plain = Game("interop", "Game.exe", Fixture.PeWithImports(true, ["d3d12.dll", "d3d11.dll"]));
         var d = GraphicsDetector.Detect(plain);
-        Assert.Equal(Preset.Dx12, d.Preset);
+        // A D3D12 game is recommended the OptiScaler route.
+        Assert.Equal(Preset.OptiScaler, d.Preset);
         Assert.False(d.AlsoD3D11);
 
         var unreal = Game("unreal", @"Project\Binaries\Win64\Project-Win64-Shipping.exe",
@@ -323,7 +324,7 @@ public class GraphicsTests
     {
         var root = Game("frostbite", "NFS16.exe", Fixture.PeWithImports(true, ["d3d12.dll"]));
         var local = GraphicsDetector.Detect(root, "Need for Speed");
-        Assert.Equal(Preset.Dx12, local.Preset);
+        Assert.Equal(Preset.OptiScaler, local.Preset);
 
         var merged = local.With(SampleDb().Lookup("1262540", null));
         Assert.Equal(Preset.Dx11, merged.Preset);

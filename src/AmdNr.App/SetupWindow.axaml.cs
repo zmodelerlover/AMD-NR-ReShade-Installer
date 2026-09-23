@@ -201,7 +201,7 @@ public partial class SetupWindow : Window
         }
 
         var manifest = _manifest;
-        var rows = await Task.Run(() => manifest.Components
+        var rows = await Task.Run(() => manifest.Everyday
             .Select(pair =>
             {
                 var complete = false;
@@ -278,7 +278,8 @@ public partial class SetupWindow : Window
         var cache = new PayloadCache(_http);
         try
         {
-            foreach (var component in _manifest.Components.Keys.ToList())
+            // The OptiScaler route's 132 MB come down when that route is installed, not here.
+            foreach (var component in _manifest.Everyday.Select(pair => pair.Key).ToList())
                 await cache.EnsureAsync(_manifest, component, progress);
             FilesStatus.Text = "";
         }

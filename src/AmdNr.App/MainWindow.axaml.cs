@@ -204,7 +204,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        var rows = await Task.Run(() => manifest.Components.Select(pair =>
+        // The OptiScaler route's components come down when that route is installed, not before, so
+        // they are not counted as missing here.
+        var rows = await Task.Run(() => manifest.Everyday.Select(pair =>
         {
             var complete = false;
             try { complete = PayloadCache.IsComplete(manifest, pair.Key); }
@@ -218,10 +220,10 @@ public partial class MainWindow : Window
         PayloadList.ItemsSource = rows;
 
         var ready = rows.Count(r => r.Ready);
-        var cached = manifest.Components
+        var cached = manifest.Everyday
             .Where(pair => rows.Any(r => r.Name == pair.Key && r.Ready))
             .Aggregate(0UL, (sum, pair) => sum + Bytes(pair.Value));
-        var missing = manifest.Components
+        var missing = manifest.Everyday
             .Where(pair => rows.Any(r => r.Name == pair.Key && !r.Ready))
             .Aggregate(0UL, (sum, pair) => sum + Bytes(pair.Value));
 
@@ -264,7 +266,7 @@ public partial class MainWindow : Window
         {
             // What is actually missing, hashed off the UI thread. Clicking with a full cache is a
             // re-check of every byte, and it says so rather than looking like it did nothing.
-            var pending = await Task.Run(() => manifest.Components.Keys
+            var pending = await Task.Run(() => manifest.Everyday.Select(pair => pair.Key)
                 .Where(name =>
                 {
                     try { return !PayloadCache.IsComplete(manifest, name); }
@@ -1098,7 +1100,10 @@ public partial class MainWindow : Window
         ProxyBox.ItemsSource = new[] { Text("Str.ProxyAuto") }.Concat(choices).ToList();
         ProxyBox.SelectedIndex = _proxy is null ? 0 : Array.IndexOf(choices, _proxy) + 1;
         _settingProxy = false;
-        ProxyNote.Text = Text("Str.ProxyNote");
+        // The OptiScaler route loads OptiScaler under this name, not ReShade.
+        var opti = preset.IsOptiScaler();
+        ProxyTitle.Text = Text(opti ? "Str.ProxySectionOpti" : "Str.ProxySection");
+        ProxyNote.Text = Text(opti ? "Str.ProxyNoteOpti" : "Str.ProxyNote");
     }
 
     private void OnProxyChanged(object? sender, SelectionChangedEventArgs e)
@@ -1114,6 +1119,13 @@ public partial class MainWindow : Window
     {
         var route = preset.Route();
         _versions.Clear();
+        // The OptiScaler route installs no add-on, so there is no add-on release to pick.
+        if (preset.IsOptiScaler())
+        {
+            _version = null;
+            VersionSection.IsVisible = false;
+            return;
+        }
         foreach (var release in _releases.Where(r => r.Covers(route)))
             _versions.Add(new VersionChoice(release.Version, release.Label, release));
 
@@ -1335,9 +1347,17 @@ public partial class MainWindow : Window
     private static string TargetFor(GameCard card) =>
         card.Graphics?.Target is { } target && File.Exists(target) ? target : card.Path;
 
-    /// <summary>What a route needs. Every route needs the add-on and the runtime; the bridge routes
-    /// also need their own 32-bit pair and the pinned ReShade beside it.</summary>
-    private static string[] ComponentsFor(Preset preset) => preset.Route() == Route.X86
+    /// <summary>What a route needs. Every ReShade route needs the add-on and the runtime; the bridge
+    /// routes also need their own 32-bit pair and the pinned ReShade beside it. The OptiScaler route
+    /// needs OptiScaler, the runtime build it drives, and the weights out of the runtime component.</summary>
+    private static string[] ComponentsFor(Preset preset) =>
+        preset.IsOptiScaler()
+            ?
+            [
+                PayloadManifest.OptiScalerComponent, PayloadManifest.OptiRuntimeComponent,
+                PayloadManifest.RuntimeComponent,
+            ]
+        : preset.Route() == Route.X86
         ?
         [
             PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,

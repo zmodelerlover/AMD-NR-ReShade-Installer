@@ -30,6 +30,15 @@ public sealed class PayloadPins
     /// an install from an older manifest skips it instead of failing.</summary>
     public string ShaderSha { get; init; } = string.Empty;
     public ulong ShaderSize { get; init; }
+
+    /// <summary>The OptiScaler route's files, by their path in the payload folder. Empty when the
+    /// manifest does not carry that route.</summary>
+    public IReadOnlyDictionary<string, string> OptiFiles { get; init; } = new Dictionary<string, string>();
+
+    /// <summary>The runtime build OptiScaler drives, installed once per pass. Empty without the route.</summary>
+    public string OptiRuntimeName { get; init; } = string.Empty;
+    public string OptiRuntimeSha { get; init; } = string.Empty;
+    public ulong OptiRuntimeSize { get; init; }
 }
 
 /// <summary>What the target says about which route applies. A folder can hold a 32-bit launcher
@@ -46,7 +55,7 @@ public sealed class Detected
     public static Detected Mixed(string why) => new() { IsMixed = true, Line = why };
 }
 
-public static class Work
+public static partial class Work
 {
     public const string AddonName = "amd-nr.addon64";
     public const string RuntimeName = "dlssnr_amd_pass1.dll";
@@ -89,7 +98,7 @@ public static class Work
             catch (InstallException) { continue; }
             if (manifest.State != "installed") continue;
 
-            var pinned = PinnedFor(payload, manifest.Route);
+            var pinned = PinnedFor(payload, manifest.Route, manifest.Preset);
             foreach (var entry in manifest.Entries)
             {
                 if (!entry.Owned || entry.Configuration) continue;
@@ -110,8 +119,13 @@ public static class Work
     /// The reshade component itself is never in here under either route: it is published as
     /// ReShade64.dll and ReShade32.dll and installed as whatever the game's API is called, so its
     /// name in the folder is not a name this can look up.</summary>
-    private static Dictionary<string, string> PinnedFor(PayloadManifest payload, Route route)
+    private static Dictionary<string, string> PinnedFor(PayloadManifest payload, Route route, string preset)
     {
+        // The OptiScaler route shares the 64-bit manifest but none of its files but the weights,
+        // and its runtime is a different build under the same name: compared against the add-on's
+        // pins, every OptiScaler install would read as out of date for ever.
+        if (preset == Preset.OptiScaler.ManifestPreset()) return PinnedForOptiScaler(payload);
+
         var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         string[] components = route == Route.X64
             ? [PayloadManifest.AddonComponent, PayloadManifest.RuntimeComponent, PayloadManifest.ShaderComponent]
@@ -374,6 +388,9 @@ public static class Work
     public static string[] ProxyChoicesFor(Preset preset) => preset switch
     {
         _ when preset.IsVulkan() => [],
+        // Not ReShade's list: these are names OptiScaler itself can be loaded under. winmm.dll is
+        // the way in when dxgi.dll has to stay something else's.
+        Preset.OptiScaler => ["dxgi.dll", "winmm.dll"],
         Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "dinput8.dll"],
         Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
         Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "dinput8.dll"],
@@ -618,6 +635,8 @@ public static class Work
     public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
         string? proxy = null)
     {
+        if (preset.IsOptiScaler()) return PreflightOptiScaler(gameDir, payloadDir, pins, proxy);
+
         var report = new Report();
         var dir = ResolveSource(gameDir);
         var src = ResolveSource(payloadDir);
@@ -844,6 +863,7 @@ public static class Work
         string? proxy = null)
     {
         if (preset.Route() == Route.X86) return InstallX86(gameDir, payloadDir, preset, proxy);
+        if (preset.IsOptiScaler()) return InstallOptiScaler(gameDir, payloadDir, pins, proxy);
 
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -1064,6 +1084,17 @@ public static class Work
                 report.Err($"could not undo the recorded install: {e.Message}");
             }
         }
+        else if (preset.IsOptiScaler())
+        {
+            // No manifest means this app never installed OptiScaler here. The by-name sweep below
+            // would take the runtime passes and the weights out from under an OptiScaler that some
+            // other installer put there, and leave it broken.
+            report.Warn(
+                "No install record for OptiScaler here, so it was not installed by this app and nothing is "
+                + "removed. Use the uninstaller that came with it: the release package puts "
+                + "Uninstall_OptiScaler_NR.bat in the game folder.");
+            return report;
+        }
         else
         {
             // Everything the add-on installs. The ini is deliberately not in this list.
@@ -1073,6 +1104,7 @@ public static class Work
         }
 
         gone += SweepDroppings(dir, report);
+        if (preset.IsOptiScaler()) AfterOptiScalerUninstall(dir, report);
 
         if (gone == 0) report.Warn("Nothing of ours was in that folder.");
         if (File.Exists(Path.Combine(dir, "amd-nr.ini")))
@@ -1099,6 +1131,8 @@ public static class Work
                  {
                      "amd-nr-pass1.dll", "amd-nr.log", "amd-nr-x86.log",
                      "amd-nr-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
+                     // What OptiScaler and its bridge into the runtime write while a game runs.
+                     "OptiScaler.log", "amd_bridge.log", "amd_presr.log",
                  })
             gone += RemoveFile(dir, name, report);
 

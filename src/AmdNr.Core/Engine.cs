@@ -378,6 +378,25 @@ public static class Engine
         "dlss5-neural.addon32",
         "dlss5-neural.addon64",
         "dlss5-neural-host64.exe",
+        // The OptiScaler route. OptiScaler itself goes in under a proxy name: dxgi.dll above, or
+        // winmm.dll. It drives the runtime through one copy per pass, which the ReShade route
+        // retired, and keeps its upscaler libraries in an OptiScaler folder beside the game.
+        "winmm.dll",
+        "OptiScaler.ini",
+        "dlssnr_amd_pass2.dll",
+        "dlssnr_amd_pass3.dll",
+        "OptiScaler/amd_fidelityfx_loader_dx12.dll",
+        "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
+        "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll",
+        "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
+        "OptiScaler/amd_fidelityfx_vk.dll",
+        "OptiScaler/libxess.dll",
+        "OptiScaler/libxess_dx11.dll",
+        "OptiScaler/libxess_fg.dll",
+        "OptiScaler/libxell.dll",
+        "OptiScaler/D3D12_OptiScaler/D3D12Core.dll",
+        "experimental_lighting/GatherCS.cso",
+        "experimental_lighting/ResolveCS.cso",
     };
 
     /// <summary>What add-on v0.6.0 and earlier left in a game folder, under the name it used
@@ -397,7 +416,7 @@ public static class Engine
     public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
 
     public static bool IsConfig(string name) =>
-        name is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini";
+        name is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini" or "OptiScaler.ini";
 
     // -- Paths ---------------------------------------------------------------------------------
 

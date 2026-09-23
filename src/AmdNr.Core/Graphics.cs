@@ -60,6 +60,11 @@ public sealed record GraphicsDetection(
     /// bin\ for add-ons. Everything has to go there together.</summary>
     public string? InstallTarget { get; init; }
 
+    /// <summary>The DLSS, FSR or XeSS files the game ships, by name. Empty when none
+    /// were found, which is what decides whether a game that also runs D3D11 is recommended the
+    /// OptiScaler route: OptiScaler only has something to do in a game that calls one of them.</summary>
+    public IReadOnlyList<string> Upscalers { get; init; } = [];
+
     /// <summary>What an install is pointed at: the renderer's folder when those differ, the
     /// executable otherwise.</summary>
     public string? Target => InstallTarget ?? Executable;
@@ -106,15 +111,27 @@ public sealed record GraphicsDetection(
             if (Emulator is { } emulator)
                 return emulator.Route ?? RouteFor(Width, emulator.Best);
 
+            // The OptiScaler route rather than a ReShade one for a game whose best route is D3D12,
+            // and for one that runs D3D11 and D3D12 and ships an upscaler: on D3D12 the add-on sees
+            // only the finished frame, while OptiScaler runs the network inside the game's upscaler
+            // call with its depth and motion. A D3D11 game with no upscaler keeps the D3D11 ReShade
+            // route, the one where the add-on gets depth and motion of its own; every ReShade route
+            // stays in the list either way.
             foreach (var api in Preference)
-                if (All.Contains(api) && RouteFor(Width, api) is { } route) return route;
+                if (All.Contains(api) && RouteFor(Width, api) is { } route)
+                    return route == Core.Preset.Dx12
+                           || (route == Core.Preset.Dx11 && All.Contains(GraphicsApi.D3D12) && Upscalers.Count > 0)
+                        ? Core.Preset.OptiScaler
+                        : route;
             return null;
         }
     }
 
-    /// <summary>The API that route runs on.</summary>
+    /// <summary>The API that route runs on. OptiScaler runs the network on D3D12, so a game that
+    /// offers both is told to switch to that one.</summary>
     public GraphicsApi Recommended =>
-        Emulator?.Best ?? Preference.FirstOrDefault(api => All.Contains(api) && RouteFor(Width, api) is not null);
+        Preset == Core.Preset.OptiScaler ? GraphicsApi.D3D12
+        : Emulator?.Best ?? Preference.FirstOrDefault(api => All.Contains(api) && RouteFor(Width, api) is not null);
 
     /// <summary>When the game offers more than one API and the best route is not the only one, the
     /// game has to be told which to use -- which is the difference between "it works" and "it does
@@ -471,6 +488,59 @@ public static class GraphicsDetector
     /// and everything downstream, the width above all, is read off whichever file it picked. This is
     /// how that is corrected without asking anyone to believe the guess.</param>
     public static GraphicsDetection Detect(string root, string? gameName = null, string? executable = null)
+    {
+        var detected = DetectRenderer(root, gameName, executable);
+        if (detected.Emulator is not null || detected.Target is not { } target) return detected;
+        var folder = Directory.Exists(target) ? target : Path.GetDirectoryName(target);
+        return folder is null ? detected : detected with { Upscalers = Upscalers(folder, root) };
+    }
+
+    /// <summary>What a game ships for DLSS, FSR or XeSS to be switched on: beside its executable, in
+    /// its root, and for Unreal in the Plugins folders, where those plugins keep their binaries under
+    /// Binaries\ThirdParty rather than beside the game.</summary>
+    public static IReadOnlyList<string> Upscalers(string folder, string? root = null)
+    {
+        var found = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var dir in new[] { folder, root }.OfType<string>().Distinct(StringComparer.OrdinalIgnoreCase))
+            foreach (var name in Work.UpscalerFiles)
+                if (File.Exists(Path.Combine(dir, name))) found.Add(name);
+
+        // One walk per plugin tree, not one per name: this runs for every game when the app opens.
+        var names = new HashSet<string>(Work.UpscalerFiles, StringComparer.OrdinalIgnoreCase);
+        foreach (var plugins in PluginFolders(folder, root))
+        {
+            try
+            {
+                foreach (var dll in Directory.EnumerateFiles(plugins, "*.dll", SearchOption.AllDirectories))
+                    if (names.Contains(Path.GetFileName(dll))) found.Add(Path.GetFileName(dll).ToLowerInvariant());
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // A plugin tree that cannot be read says nothing either way.
+            }
+        }
+        return [.. found];
+    }
+
+    /// <summary>Unreal's plugin folders for an executable in <c>Project\Binaries\Win64</c>: the
+    /// project's own and the engine's.</summary>
+    private static IEnumerable<string> PluginFolders(string folder, string? root)
+    {
+        var win64 = new DirectoryInfo(folder);
+        if (!win64.Name.Equals("Win64", StringComparison.OrdinalIgnoreCase)
+            || win64.Parent is not { Name: var binaries } bin
+            || !binaries.Equals("Binaries", StringComparison.OrdinalIgnoreCase)
+            || bin.Parent is not { } project)
+            yield break;
+
+        var candidates = new List<string> { Path.Combine(project.FullName, "Plugins") };
+        if (project.Parent is { } gameRoot) candidates.Add(Path.Combine(gameRoot.FullName, "Engine", "Plugins"));
+        if (root is not null) candidates.Add(Path.Combine(root, "Engine", "Plugins"));
+        foreach (var dir in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+            if (Directory.Exists(dir)) yield return dir;
+    }
+
+    private static GraphicsDetection DetectRenderer(string root, string? gameName, string? executable)
     {
         // 0. A known emulator, before anything else. Its executable links every renderer it can be
         //    set to, so reading the imports here answers a different question than the one asked:

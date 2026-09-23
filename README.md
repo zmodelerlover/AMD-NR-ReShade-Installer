@@ -35,6 +35,27 @@ rather than by the add-on failing later with the game already open.
 **Neither the runtime nor the weights are in this repository**, and they never will be: the weights
 are NVIDIA-derived and the runtime comes from a third-party project with its own distribution terms.
 
+## D3D12 games: the OptiScaler route
+
+On D3D12 a ReShade add-on is shown only the finished frame, so the network gets colour and guesses
+the rest. A D3D12 game that offers DLSS, FSR or XeSS has a better way in: the
+[OptiScaler AMD neural rendering build](https://github.com/MatheusFerreiraS/neural-amd-opti), which
+takes over the game's upscaler call and runs the same network inside it, with the game's own depth
+and motion vectors. For a game detected as D3D12, and for one that runs both D3D11 and D3D12 and
+ships an upscaler, that route is the one selected. Every ReShade route stays in the list.
+
+| | |
+|---|---|
+| `dxgi.dll` or `winmm.dll` | OptiScaler, from the neural-amd-opti release archive |
+| `OptiScaler\`, `OptiScaler.ini` | its FidelityFX, XeSS and Agility libraries, and its configuration |
+| `dlssnr_amd_pass1-3.dll` | the neural runtime 0.3.1, once per pass |
+| `dlssnr_on_amd_weights.bin` | the same weights as the add-on |
+
+No ReShade is installed on this route. Its files are downloaded when the route is installed, not
+in the first-run wizard, and the install goes through the same transaction, manifest and backups as
+every other route. In game, OptiScaler opens with Insert; the network is switched on under its
+Neural tab.
+
 ## How an install is kept undoable
 
 Ported verbatim from the Rust engine, because these were paid for the hard way:
@@ -76,6 +97,10 @@ round trip; without it that one test skips and the rest of the suite still runs.
 The network itself is **[DLSS-NR-on-AMD](https://github.com/danielblnc/DLSS-NR-on-AMD)** by
 **danielblnc** — the runtime and the weights this installs are its work, not reimplemented and not
 redistributed here.
+
+The OptiScaler route installs [neural-amd-opti](https://github.com/MatheusFerreiraS/neural-amd-opti),
+an OptiScaler fork (GPL-3.0) that carries the bridge into the same runtime. Its release archive is
+downloaded as published; none of its code is part of this app.
 
 The install engine is ported from the Rust installer in
 [dlss5-neural-amd](https://github.com/zmodelerlover/dlss5-neural-amd) (MIT).

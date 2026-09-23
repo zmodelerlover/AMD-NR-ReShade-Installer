@@ -17,18 +17,25 @@ public enum Preset
     X86Dx11,
     X86Dx9,
     X86Dx8,
+    // Last, so every games.json written before it still reads the same names.
+    OptiScaler,
 }
 
 public static class Presets
 {
     public static readonly Preset[] All =
     [
-        Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL,
+        Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL,
         Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8,
     ];
 
     private static readonly Preset[] X64 =
-        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
+        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
+
+    /// <summary>The route that installs OptiScaler instead of ReShade and the add-on. It runs the same
+    /// network inside the game's own upscaler call, where depth and motion vectors are handed over,
+    /// so on D3D12 it replaces a route that sees only the finished frame.</summary>
+    public static bool IsOptiScaler(this Preset p) => p == Preset.OptiScaler;
 
     private static readonly Preset[] X86 = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
 
@@ -74,11 +81,13 @@ public static class Presets
         Preset.X86Dx11 => "D3D11",
         Preset.X86Dx9 => "D3D9",
         Preset.X86Dx8 => "D3D8",
+        Preset.OptiScaler => "OptiScaler",
         _ => throw new ArgumentOutOfRangeException(nameof(p)),
     };
 
     public static string Label(this Preset p) => p switch
     {
+        Preset.OptiScaler => "OptiScaler: D3D12 game with DLSS, FSR or XeSS",
         Preset.Pcsx2 => "PCSX2",
         Preset.Rpcs3 => "RPCS3",
         Preset.Dx11 => "D3D11 game",
@@ -121,7 +130,15 @@ public static class Presets
             + "reach the network.",
         Preset.Dx12 =>
             "The degraded case. On D3D12 an add-on is shown nothing but the swapchain, so the network "
-            + "gets colour and guesses at the rest. It works; expect less from it.",
+            + "gets colour and guesses at the rest. It works; expect less from it. A game with DLSS, "
+            + "FSR or XeSS in its settings is better served by the OptiScaler route.",
+        Preset.OptiScaler =>
+            "The route for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over "
+            + "the game's DLSS, FSR or XeSS call and runs the network inside it, with the game's own "
+            + "depth and motion vectors. The game has to offer one of those upscalers, and it has to be "
+            + "switched on in its settings. In game, open OptiScaler with Insert, go to the Neural tab "
+            + "and turn on Enable NR; a game that uses Ray Reconstruction needs \"After the finished "
+            + "frame\" as the processing point.",
         Preset.Vulkan =>
             "EXPERIMENTAL. ReShade on Vulkan is a global layer, not a proxy DLL: run its installer "
             + "against the game's own .exe and pick Vulkan, or nothing loads. The game also has to "

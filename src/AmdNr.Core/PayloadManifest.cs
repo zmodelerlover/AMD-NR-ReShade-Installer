@@ -86,6 +86,21 @@ public sealed class PayloadManifest
     public const string ReShadeComponent = "reshade";
     public const string ShaderComponent = "shader";
 
+    /// <summary>The OptiScaler route: the release archive with the files taken out of it, and the
+    /// runtime build OptiScaler recognises, which is not the one the add-on pins.</summary>
+    public const string OptiScalerComponent = "optiscaler";
+    public const string OptiRuntimeComponent = "opti-runtime";
+
+    /// <summary>Components fetched only when a route that uses them is installed. The OptiScaler
+    /// archive alone is 132 MB, so downloading it in the first-run wizard for everybody, most of
+    /// whom run the ReShade route, would be the largest download the app makes, spent on nothing.</summary>
+    public static readonly IReadOnlySet<string> OnDemand =
+        new HashSet<string>(StringComparer.Ordinal) { OptiScalerComponent, OptiRuntimeComponent };
+
+    /// <summary>The components worth having before anybody asks: everything but <see cref="OnDemand"/>.</summary>
+    public IEnumerable<KeyValuePair<string, PayloadComponent>> Everyday =>
+        Components.Where(pair => !OnDemand.Contains(pair.Key));
+
     private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -192,6 +207,12 @@ public sealed class PayloadManifest
         var optionalShader = Components.TryGetValue(ShaderComponent, out var sh)
             ? sh.Files.FirstOrDefault(f => f.Name == Work.ShaderName)
             : null;
+        // Optional like the shader: a manifest published before the OptiScaler route has neither,
+        // and the other routes must keep installing from it.
+        var optiFiles = Components.TryGetValue(OptiScalerComponent, out var opti)
+            ? opti.Installed.ToDictionary(f => f.RelativePath, f => Engine.Lower(f.Sha256), StringComparer.Ordinal)
+            : new Dictionary<string, string>(StringComparer.Ordinal);
+        var optiRuntime = Components.TryGetValue(OptiRuntimeComponent, out var optiRt) ? optiRt.Files.FirstOrDefault() : null;
         return new PayloadPins
         {
             AddonSha = addon.Sha256,
@@ -204,6 +225,10 @@ public sealed class PayloadManifest
             // installable has no shader component, and an install from one must still work.
             ShaderSha = optionalShader?.Sha256 ?? string.Empty,
             ShaderSize = optionalShader?.Size ?? 0,
+            OptiFiles = optiFiles,
+            OptiRuntimeName = optiRuntime?.RelativePath ?? string.Empty,
+            OptiRuntimeSha = optiRuntime is null ? string.Empty : Engine.Lower(optiRuntime.Sha256),
+            OptiRuntimeSize = optiRuntime?.Size ?? 0,
         };
     }
 
