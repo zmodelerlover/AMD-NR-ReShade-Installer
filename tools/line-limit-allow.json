@@ -1,6 +1,5 @@
 {
   "src/AmdNr.App/App.axaml": 742,
   "src/AmdNr.App/MainWindow.axaml": 731,
-  "src/AmdNr.App/MainWindow.axaml.cs": 1638,
-  "tests/AmdNr.Core.Tests/WorkTests.cs": 798
+  "src/AmdNr.App/MainWindow.axaml.cs": 1638
 }
