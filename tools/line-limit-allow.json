@@ -2,7 +2,6 @@
   "src/AmdNr.App/App.axaml": 742,
   "src/AmdNr.App/MainWindow.axaml": 731,
   "src/AmdNr.App/MainWindow.axaml.cs": 1638,
-  "src/AmdNr.Core/Engine.cs": 612,
   "src/AmdNr.Core/Graphics.cs": 798,
   "tests/AmdNr.Core.Tests/WorkTests.cs": 798
 }
