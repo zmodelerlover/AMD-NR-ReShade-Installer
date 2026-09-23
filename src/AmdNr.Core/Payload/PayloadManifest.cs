@@ -101,17 +101,10 @@ public sealed class PayloadManifest
     public IEnumerable<KeyValuePair<string, PayloadComponent>> Everyday =>
         Components.Where(pair => !OnDemand.Contains(pair.Key));
 
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true,
-    };
-
     public static PayloadManifest Parse(string json)
     {
         PayloadManifest? m;
-        try { m = JsonSerializer.Deserialize<PayloadManifest>(json, Options); }
+        try { m = JsonSerializer.Deserialize(json, CoreJson.Default.PayloadManifest); }
         catch (JsonException e) { throw new InstallException($"The payload manifest is not readable: {e.Message}"); }
 
         Engine.Require(m is not null, "The payload manifest is empty.");

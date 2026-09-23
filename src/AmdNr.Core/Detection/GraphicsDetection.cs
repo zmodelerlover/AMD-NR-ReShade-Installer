@@ -92,8 +92,7 @@ public sealed record GraphicsDetection(
             // A known emulator names its own route. Without this the import table decides, and an
             // emulator links every renderer at once, so the answer was whichever this loop hit
             // first -- which is how the PCSX2 and RPCS3 routes were being overwritten with D3D11.
-            if (Emulator is { } emulator)
-                return emulator.Route ?? RouteFor(Width, emulator.Best);
+            if (Emulator is not null) return ReShadeRoute;
 
             // The OptiScaler route rather than a ReShade one for a game whose best route is D3D12,
             // and for one that runs D3D11 and D3D12 and ships an upscaler: on D3D12 the add-on sees
@@ -101,15 +100,34 @@ public sealed record GraphicsDetection(
             // call with its depth and motion. A D3D11 game with no upscaler keeps the D3D11 ReShade
             // route, the one where the add-on gets depth and motion of its own; every ReShade route
             // stays in the list either way.
+            return ReShadeRoute is { } route
+                   && (route == Core.Preset.Dx12
+                       || (route == Core.Preset.Dx11 && All.Contains(GraphicsApi.D3D12) && Upscalers.Count > 0))
+                ? Core.Preset.OptiScaler
+                : ReShadeRoute;
+        }
+    }
+
+    /// <summary>The best ReShade route for this game, whichever route is recommended overall. The
+    /// sheet asks for it when somebody picks ReShade on a game that was recommended OptiScaler: the
+    /// API list then opens on the one this game would run best on, not on the first in the list.</summary>
+    public Preset? ReShadeRoute
+    {
+        get
+        {
+            if (Emulator is { } emulator)
+                return emulator.Route ?? RouteFor(Width, emulator.Best);
             foreach (var api in Preference)
                 if (All.Contains(api) && RouteFor(Width, api) is { } route)
-                    return route == Core.Preset.Dx12
-                           || (route == Core.Preset.Dx11 && All.Contains(GraphicsApi.D3D12) && Upscalers.Count > 0)
-                        ? Core.Preset.OptiScaler
-                        : route;
+                    return route;
             return null;
         }
     }
+
+    /// <summary>Whether this game can run the OptiScaler route at all: a 64-bit build that renders
+    /// with D3D12. Unknown counts as yes -- a game nothing could be read from is not ruled out.</summary>
+    public bool CanRunOptiScaler =>
+        All.Count == 0 || (Width != Route.X86 && All.Contains(GraphicsApi.D3D12));
 
     /// <summary>The API that route runs on. OptiScaler runs the network on D3D12, so a game that
     /// offers both is told to switch to that one.</summary>

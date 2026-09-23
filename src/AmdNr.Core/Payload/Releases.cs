@@ -155,7 +155,7 @@ public static class AddonReleases
         {
             if (!File.Exists(SumsCachePath)) return new Dictionary<string, string>(StringComparer.Ordinal);
             var json = await File.ReadAllTextAsync(SumsCachePath, cancel);
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+            return JsonSerializer.Deserialize(json, CoreJson.Default.DictionaryStringString)
                    ?? new Dictionary<string, string>(StringComparer.Ordinal);
         }
         catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
@@ -167,7 +167,7 @@ public static class AddonReleases
 
     private static async Task WriteSumsCacheAsync(Dictionary<string, string> sums, CancellationToken cancel)
     {
-        try { await File.WriteAllTextAsync(SumsCachePath, JsonSerializer.Serialize(sums), cancel); }
+        try { await File.WriteAllTextAsync(SumsCachePath, JsonSerializer.Serialize(sums, CoreJson.Default.DictionaryStringString), cancel); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             // The list still works for this run; only the next offline one is poorer for it.

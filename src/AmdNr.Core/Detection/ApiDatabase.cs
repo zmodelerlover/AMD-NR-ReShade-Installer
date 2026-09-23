@@ -48,23 +48,17 @@ public sealed class ApiDatabase
 
     private Dictionary<string, ApiRecord>? _byTitle;
 
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        PropertyNameCaseInsensitive = true,
-    };
-
     public static ApiDatabase Parse(string json)
     {
         ApiDatabase? db;
-        try { db = JsonSerializer.Deserialize<ApiDatabase>(json, Options); }
+        try { db = JsonSerializer.Deserialize(json, CoreJson.Default.ApiDatabase); }
         catch (JsonException e) { throw new InstallException($"The game API database is not readable: {e.Message}"); }
         Engine.Require(db is not null, "The game API database is empty.");
         Engine.Require(db!.Schema == 1, $"Game API database schema {db.Schema} is newer than this app understands.");
         return db;
     }
 
-    public string Serialise() => JsonSerializer.Serialize(this, Options);
+    public string Serialise() => JsonSerializer.Serialize(this, CoreJson.Default.ApiDatabase);
 
     public static string SteamKey(string appId) => $"steam:{appId}";
     public static string NameKey(string title) => $"name:{PcgwParser.NormaliseTitle(title)}";
