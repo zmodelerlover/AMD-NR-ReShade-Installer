@@ -16,8 +16,12 @@ public sealed record DownloadProgress(string File, long Received, long? Total)
     public double? Fraction => Total is > 0 ? (double)Received / Total.Value : null;
 }
 
-public sealed class PayloadCache(HttpClient http)
+public sealed partial class PayloadCache(HttpClient http)
 {
+    /// <summary>The client every download goes through. Kept here because a primary constructor's
+    /// parameter is only in scope in the declaration that has it, and the downloads live in their own file.</summary>
+    private HttpClient Http { get; } = http;
+
     /// <summary>Where a component's files sit once they are verified.</summary>
     public static string FolderFor(string component, string version) =>
         Path.Combine(AppPaths.Cache, Sanitise(component), Sanitise(version));
@@ -171,143 +175,6 @@ public sealed class PayloadCache(HttpClient http)
         throw new InstallException($"{Path.GetFileName(path)} carries no archive to extract from.");
     }
 
-    /// <summary>The same file from whichever address answers. Every one of them is checked against
-    /// the same SHA-256, so falling through to a mirror weakens nothing -- a mirror that serves the
-    /// wrong bytes fails exactly as the first address would have.
-    ///
-    /// The last failure is the one reported: by then every address has been tried, and the first
-    /// one's message is no more useful than the last one's.</summary>
-    private async Task FetchAnyAsync(IReadOnlyList<Uri> urls, string path, PayloadFile file,
-        IProgress<DownloadProgress>? progress, CancellationToken cancel)
-    {
-        for (var i = 0; i < urls.Count; i++)
-        {
-            try
-            {
-                await FetchAsync(urls[i], path, file, progress, cancel);
-                return;
-            }
-            catch (Exception e) when (e is HttpRequestException or InstallException or IOException
-                                          && i + 1 < urls.Count)
-            {
-                // Another address has the same bytes, but whatever this one left behind is not
-                // resumable against it: a half-written .part plus a Range request to a different
-                // server splices two answers together. The hash would catch that, having spent the
-                // whole download to do it, so the partial goes instead.
-                try { File.Delete(path + ".part"); }
-                catch (IOException)
-                {
-                    // Held open somehow: the size and hash checks still refuse to install it.
-                }
-            }
-        }
-    }
-
-    /// <summary>How long a download may go without one byte arriving before the address is given
-    /// up on. A server that refuses or drops the connection says so; one that accepts and then
-    /// stops sending says nothing at all, and the client's own 30-minute timeout is then the only
-    /// thing that ever ends it. A minute of silence on a file that was arriving is already
-    /// dead.</summary>
-    private static readonly TimeSpan Stall = TimeSpan.FromMinutes(1);
-
-    /// <summary>The same call as <see cref="FetchOneAsync"/>, with every timeout turned into the
-    /// failure it actually is.
-    ///
-    /// A timeout -- the stall timer's or the client's -- arrives as a cancellation that nobody
-    /// asked for, which is a TaskCanceledException. That type is in none of the filters this
-    /// travels through: not the mirror fall-through above, and not the three EnsureAsync call
-    /// sites, which all list HttpRequestException, InstallException and IOException. So a primary
-    /// that hung rather than refused never tried the mirror, and the exception went on to escape an
-    /// async void handler. It is a download that failed, so it leaves here saying so.</summary>
-    private async Task FetchAsync(Uri url, string path, PayloadFile file,
-        IProgress<DownloadProgress>? progress, CancellationToken cancel)
-    {
-        try
-        {
-            await FetchOneAsync(url, path, file, progress, cancel);
-        }
-        catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
-        {
-            throw new InstallException(
-                $"Could not download {file.Name}: {url.Host} accepted the connection and then stopped "
-                + "answering. Whatever arrived is kept, so trying again picks up where this left off.");
-        }
-    }
-
-    /// <summary>One file, resumed if a part of it is already on disk, verified before it is allowed
-    /// to take the final name. A partial download can never be mistaken for a complete one, because
-    /// the name only changes after the hash matches.</summary>
-    private async Task FetchOneAsync(Uri url, string path, PayloadFile file,
-        IProgress<DownloadProgress>? progress, CancellationToken cancel)
-    {
-        // Re-armed by every byte that lands, so a slow connection has all the time it needs and a
-        // silent one has a minute. The hash below is deliberately not under it: that is a second of
-        // disk and CPU with nothing arriving, which is exactly what this timer is looking for.
-        using var stall = CancellationTokenSource.CreateLinkedTokenSource(cancel);
-        stall.CancelAfter(Stall);
-        var live = stall.Token;
-
-        var part = path + ".part";
-        var have = Engine.SizeOf(part) ?? 0;
-        if (have > file.Size) // A stale part from a different build: start over rather than splice.
-        {
-            File.Delete(part);
-            have = 0;
-        }
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        if (have > 0) request.Headers.Range = new RangeHeaderValue((long)have, null);
-
-        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, live);
-        if (have > 0 && response.StatusCode == HttpStatusCode.OK)
-        {
-            // The server ignored the range and is sending the whole thing: take it from the top.
-            have = 0;
-            File.Delete(part);
-        }
-        else if (have > 0 && response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
-        {
-            // Already have every byte; fall through to the hash check below.
-            have = (ulong)new FileInfo(part).Length;
-        }
-        else
-        {
-            Engine.Require(response.IsSuccessStatusCode,
-                $"Could not download {file.Name}: the server answered {(int)response.StatusCode} {response.ReasonPhrase}.");
-        }
-
-        if (response.StatusCode != HttpStatusCode.RequestedRangeNotSatisfiable)
-        {
-            var total = (response.Content.Headers.ContentLength ?? 0) + (long)have;
-            await using var source = await response.Content.ReadAsStreamAsync(live);
-            await using var target = new FileStream(part, have > 0 ? FileMode.Append : FileMode.Create,
-                FileAccess.Write, FileShare.None);
-
-            var buffer = new byte[128 * 1024];
-            var received = (long)have;
-            int read;
-            while ((read = await source.ReadAsync(buffer, live)) > 0)
-            {
-                stall.CancelAfter(Stall);
-                await target.WriteAsync(buffer.AsMemory(0, read), cancel);
-                received += read;
-                progress?.Report(new DownloadProgress(file.Name, received, total > 0 ? total : null));
-            }
-        }
-
-        var got = await Task.Run(() => Engine.HashFile(part), cancel);
-        if (got != file.Sha256)
-        {
-            File.Delete(part);
-            throw new InstallException(
-                $"{file.Name} downloaded, but it does not match the SHA-256 the manifest gives."
-                + $"\n      expected {file.Sha256}\n      got      {got}"
-                + "\n      Nothing was installed. Try again; if it keeps happening the published file changed.");
-        }
-
-        File.Move(part, path, overwrite: true);
-    }
-
     /// <summary>One folder holding every file the given components need, which is what an install
     /// reads from. The files are hard-linked out of the cache where the filesystem allows it, so
     /// staging 141 MB of weights costs no disk and no copy; a volume that refuses gets a copy.</summary>
@@ -353,63 +220,5 @@ public sealed class PayloadCache(HttpClient http)
     {
         try { return CreateHardLinkW(target, source, IntPtr.Zero); }
         catch (EntryPointNotFoundException) { return false; }
-    }
-
-    /// <summary>The manifest itself. From <paramref name="url"/> when config.json names one, so the
-    /// list can live anywhere; otherwise from raw.githubusercontent.com, which unlike the REST API
-    /// has no rate limit to share with everyone else on the same address.</summary>
-    public async Task<PayloadManifest> FetchManifestAsync(string owner, string repo, string branch = "main",
-        string file = "payload.json", string? url = null, CancellationToken cancel = default)
-    {
-        var address = string.IsNullOrWhiteSpace(url)
-            ? $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file}"
-            : url;
-        using var response = await http.GetAsync(address, cancel);
-        Engine.Require(response.IsSuccessStatusCode,
-            $"Could not read the payload list: the server answered {(int)response.StatusCode} {response.ReasonPhrase}.");
-        return PayloadManifest.Parse(await response.Content.ReadAsStringAsync(cancel));
-    }
-
-    /// <summary>The copy that ships beside the executable, or one the user dropped in the app's own
-    /// folder. This is what makes the app work offline, on a first run behind a captive portal, and
-    /// before the content repository exists at all -- the hashes are the same either way, so a local
-    /// manifest weakens nothing.</summary>
-    public static PayloadManifest? LoadLocalManifest(string fileName = "payload.json")
-    {
-        foreach (var path in new[]
-                 {
-                     Path.Combine(AppPaths.Root, fileName),
-                     Path.Combine(AppContext.BaseDirectory, fileName),
-                 })
-        {
-            try
-            {
-                if (File.Exists(path)) return PayloadManifest.Parse(File.ReadAllText(path));
-            }
-            catch (Exception e) when (e is IOException or InstallException)
-            {
-                // Try the next one; a broken local copy must not stop the app from starting.
-            }
-        }
-        return null;
-    }
-
-    /// <summary>A default client with a User-Agent, because GitHub refuses requests without one.</summary>
-    public static HttpClient DefaultClient(string version)
-    {
-        var client = new HttpClient(new SocketsHttpHandler
-        {
-            AutomaticDecompression = DecompressionMethods.All,
-            // An address that is down has a mirror behind it; without this the connect attempt sits
-            // there until the timeout below, which is not a fall-through, it is a hang.
-            ConnectTimeout = TimeSpan.FromSeconds(20),
-        })
-        {
-            // The whole of a 141 MB download, on a slow line. What ends a dead one is the stall
-            // timer, not this.
-            Timeout = TimeSpan.FromMinutes(30),
-        };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd($"AMD-NR-ReShade-Installer/{version}");
-        return client;
     }
 }
