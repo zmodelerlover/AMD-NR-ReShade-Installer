@@ -147,6 +147,9 @@ public sealed class ApiDatabase
                 // Try the next one.
             }
         }
-        return null;
+
+        // The copy built into the executable, for one that was moved somewhere on its own.
+        try { return PayloadCache.Embedded("api-db.json") is { } embedded ? Parse(embedded) : null; }
+        catch (InstallException) { return null; }
     }
 }

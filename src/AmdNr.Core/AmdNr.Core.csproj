@@ -16,4 +16,11 @@
     <InternalsVisibleTo Include="AmdNr.Core.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The last resort when neither the network nor the copies beside the executable answer: the
+         executable on its own, moved to the desktop, still knows what every file has to hash to. -->
+    <EmbeddedResource Include="..\..\payload\payload.json" LogicalName="payload.json" />
+    <EmbeddedResource Include="..\..\payload\api-db.json" LogicalName="api-db.json" Condition="Exists('..\..\payload\api-db.json')" />
+  </ItemGroup>
+
 </Project>
