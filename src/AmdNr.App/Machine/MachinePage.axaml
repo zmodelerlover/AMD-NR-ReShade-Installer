@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.MachinePage">
+
+  <!-- Horizontal scrolling off, or the page is measured against an endless width and the widest card
+       runs past the window edge. The gutter is the content's margin, never the scroller's padding. -->
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollViewer.AllowAutoHide="False">
+    <StackPanel Spacing="20" MaxWidth="880" Margin="32,26,32,32" HorizontalAlignment="Stretch">
+      <StackPanel Spacing="4">
+        <TextBlock Text="{DynamicResource Str.System}" Classes="page" />
+        <TextBlock Text="{DynamicResource Str.SystemSubtitle}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+      </StackPanel>
+
+      <Border x:Name="Verdict" Classes="result">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border x:Name="VerdictTile" Classes="iconTile" Margin="0,0,14,0">
+            <PathIcon x:Name="VerdictIcon" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+            <TextBlock x:Name="VerdictTitle" Classes="subtitle" TextWrapping="Wrap" />
+            <TextBlock x:Name="Warning" Classes="muted" TextWrapping="Wrap" IsVisible="False" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid ColumnDefinitions="*,12,*,12,*">
+        <Border Grid.Column="0" Classes="card">
+          <StackPanel Spacing="14">
+            <Border Classes="iconTile neutral"><PathIcon Data="{StaticResource IconChip}" /></Border>
+            <StackPanel Spacing="4">
+              <TextBlock Text="{DynamicResource Str.Gpu}" Classes="caption" />
+              <TextBlock x:Name="GpuText" Classes="subtitle" TextWrapping="Wrap" />
+            </StackPanel>
+            <Border x:Name="GpuStatus" Classes="status">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <PathIcon x:Name="GpuStatusIcon" />
+                <TextBlock x:Name="GpuStatusText" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="14">
+            <Border Classes="iconTile neutral"><PathIcon Data="{StaticResource IconDriver}" /></Border>
+            <StackPanel Spacing="4">
+              <TextBlock Text="{DynamicResource Str.Driver}" Classes="caption" />
+              <TextBlock x:Name="DriverText" Classes="subtitle" TextWrapping="Wrap" />
+            </StackPanel>
+            <TextBlock Text="{DynamicResource Str.DriverHint}" Classes="muted" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="4" Classes="card">
+          <StackPanel Spacing="14">
+            <Border Classes="iconTile neutral"><PathIcon Data="{StaticResource IconBolt}" /></Border>
+            <StackPanel Spacing="4">
+              <TextBlock Text="{DynamicResource Str.Hip}" Classes="caption" />
+              <TextBlock Text="amdhip64_7.dll" Classes="subtitle" TextWrapping="Wrap" />
+            </StackPanel>
+            <Border x:Name="HipStatus" Classes="status">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <PathIcon x:Name="HipStatusIcon" />
+                <TextBlock x:Name="HipText" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <local:PayloadPanel x:Name="Payloads" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

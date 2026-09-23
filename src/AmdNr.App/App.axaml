@@ -20,5 +20,7 @@
     <StyleInclude Source="/Styles/Base.axaml" />
     <StyleInclude Source="/Styles/Library.axaml" />
     <StyleInclude Source="/Styles/Sheet.axaml" />
+    <StyleInclude Source="/Styles/Routes.axaml" />
+    <StyleInclude Source="/Styles/Details.axaml" />
   </Application.Styles>
 </Application>

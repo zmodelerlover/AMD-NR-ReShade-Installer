@@ -17,22 +17,13 @@ using AmdNr.Core;
 
 namespace AmdNr.App;
 
-/// <summary>One component as the Files step lists it.</summary>
-public sealed record SetupPayloadRow(string Name, string Version, string Size, string State, bool Ready)
-{
-    public bool NotReady => !Ready;
-}
-
 public sealed record FoundGameRow(string Name, string Platform);
 
 public partial class SetupWindow : Window
 {
-    private readonly AppConfig _config = AppConfig.Load();
-    private readonly HttpClient _http = PayloadCache.DefaultClient(App.Version);
-    private readonly ObservableCollection<SetupPayloadRow> _payloads = [];
+    private readonly Session _session = new();
     private readonly ObservableCollection<FoundGameRow> _found = [];
 
-    private PayloadManifest? _manifest;
     private int _step;
     private bool _busy;
     private bool _settingLanguage;
@@ -48,7 +39,8 @@ public partial class SetupWindow : Window
     {
         InitializeComponent();
 
-        PayloadList.ItemsSource = _payloads;
+        Payloads.Attach(_session, this);
+        _session.BusyChanged += () => Busy(_session.Busy);
         FoundList.ItemsSource = _found;
 
         _settingLanguage = true;
@@ -137,9 +129,9 @@ public partial class SetupWindow : Window
 
     // -- 2. This machine ---------------------------------------------------------------------------
 
-    private void ShowMachine()
+    private async void ShowMachine()
     {
-        var state = GpuService.Read();
+        var state = await _session.ReadMachineAsync();
         GpuText.Text = state.Gpu;
         DriverText.Text = state.Hip7 ? state.Driver : Text("Str.Missing");
 
@@ -174,130 +166,12 @@ public partial class SetupWindow : Window
 
     // -- 3. Files ----------------------------------------------------------------------------------
 
-    /// <summary>What is in the cache already. Hashing every payload is about a second for the 141 MB
-    /// of weights, so it runs off the UI thread and the verdict says it is working meanwhile.</summary>
+    /// <summary>What is in the cache already, read when the step is reached: the list is fetched
+    /// the first time, and the panel does the rest -- downloading, retrying, taking files by hand.</summary>
     private async Task CheckFilesAsync()
     {
-        Busy(true);
-        FilesSpin.IsVisible = true;
-        FilesVerdictIcon.Data = null;
-        FilesVerdictTile.Classes.Set("ok", false);
-        FilesVerdictTile.Classes.Set("err", false);
-        Localize(FilesVerdictText, "Str.SetupFilesCheck");
-        FilesDetail.Text = "";
-        DownloadButton.IsVisible = false;
-
-        _manifest ??= await LoadManifestAsync();
-        if (_manifest is null)
-        {
-            FilesSpin.IsVisible = false;
-            FilesVerdictIcon.Data = Vector("IconWarn");
-            FilesVerdictTile.Classes.Set("err", true);
-            Localize(FilesVerdictText, "Str.ManifestFailed");
-            FilesDetail.Text = Text("Str.SetupFilesOffline");
-            _payloads.Clear();
-            Busy(false);
-            return;
-        }
-
-        var manifest = _manifest;
-        var rows = await Task.Run(() => manifest.Everyday
-            .Select(pair =>
-            {
-                var complete = false;
-                try { complete = PayloadCache.IsComplete(manifest, pair.Key); }
-                catch (Exception e) when (e is InstallException or IOException)
-                {
-                    // A component this build does not understand is not a reason to show nothing.
-                }
-                var bytes = pair.Value.Files.Aggregate(0UL, (sum, f) => sum + f.Size);
-                return new SetupPayloadRow(
-                    pair.Key,
-                    pair.Value.Version,
-                    Size(bytes),
-                    Text(complete ? "Str.PayloadReadyShort" : "Str.NotDownloadedShort"),
-                    complete);
-            })
-            .ToList());
-
-        _payloads.Clear();
-        foreach (var row in rows) _payloads.Add(row);
-
-        FilesSpin.IsVisible = false;
-        var missing = rows.Count(r => !r.Ready);
-        if (missing == 0)
-        {
-            FilesVerdictIcon.Data = Vector("IconOk");
-            FilesVerdictTile.Classes.Set("ok", true);
-            Localize(FilesVerdictText, "Str.SetupFilesAllReady");
-            FilesDetail.Text = "";
-            DownloadButton.IsVisible = false;
-        }
-        else
-        {
-            FilesVerdictIcon.Data = Vector("IconInfo");
-            FilesVerdictText.Text = string.Format(Text("Str.SetupFilesMissing"), missing, rows.Count);
-            FilesDetail.Text = Text("Str.SetupFilesLater");
-            DownloadButton.IsVisible = true;
-        }
-        Busy(false);
-    }
-
-    private async Task<PayloadManifest?> LoadManifestAsync()
-    {
-        var cache = new PayloadCache(_http);
-        try
-        {
-            return await cache.FetchManifestAsync(
-                _config.Payload.Owner, _config.Payload.Repo, _config.Payload.Branch, _config.Payload.File,
-                _config.Payload.ManifestUrl);
-        }
-        catch (Exception e) when (e is HttpRequestException or InstallException or TaskCanceledException)
-        {
-            // Offline, or the content repository is not up: the copy beside the executable pins the
-            // same hashes, so whatever is already cached still installs.
-            return PayloadCache.LoadLocalManifest();
-        }
-    }
-
-    private async void OnDownload(object? sender, RoutedEventArgs e)
-    {
-        if (_busy || _manifest is null) return;
-        Busy(true);
-        DownloadSpin.IsVisible = true;
-        DownloadIcon.IsVisible = false;
-
-        var progress = new Progress<DownloadProgress>(p => Dispatcher.UIThread.Post(() =>
-        {
-            Progress.IsVisible = true;
-            Progress.IsIndeterminate = p.Fraction is null;
-            if (p.Fraction is { } fraction) Progress.Value = fraction * 100;
-            FilesStatus.Text = $"{Text("Str.Downloading")} {p.File} — {p.Received / 1_048_576} MB";
-        }));
-
-        var cache = new PayloadCache(_http);
-        try
-        {
-            // The OptiScaler route's 132 MB come down when that route is installed, not here.
-            foreach (var component in _manifest.Everyday.Select(pair => pair.Key).ToList())
-                await cache.EnsureAsync(_manifest, component, progress);
-            FilesStatus.Text = "";
-        }
-        catch (Exception ex) when (ex is InstallException or HttpRequestException or IOException)
-        {
-            FilesStatus.Text = ex.Message;
-            Localize(DownloadLabel, "Str.SetupFilesRetry");
-        }
-        finally
-        {
-            Progress.IsVisible = false;
-            DownloadSpin.IsVisible = false;
-            DownloadIcon.IsVisible = true;
-            Busy(false);
-        }
-
-        // Re-read rather than assume: a component that failed has to keep saying so.
-        await CheckFilesAsync();
+        if (_session.Manifest is null) await _session.LoadManifestAsync();
+        else await Payloads.RefreshAsync();
     }
 
     // -- 4. Games ----------------------------------------------------------------------------------
@@ -360,19 +234,9 @@ public partial class SetupWindow : Window
         NextButton.IsEnabled = !on;
         BackButton.IsEnabled = !on;
         SkipButton.IsEnabled = !on;
-        DownloadButton.IsEnabled = !on;
         ScanButton.IsEnabled = !on;
         LanguageBox.IsEnabled = !on;
     }
-
-    /// <summary>A download size someone can compare against their connection. Whole megabytes
-    /// truncate every component but the weights to "0 MB", which reads as "nothing to download".</summary>
-    private static string Size(ulong bytes) => bytes switch
-    {
-        >= 10 * 1_048_576 => $"{bytes / 1_048_576} MB",
-        >= 1_048_576 => $"{bytes / 1_048_576.0:0.0} MB",
-        _ => $"{Math.Max(1, bytes / 1024)} KB",
-    };
 
     protected override void OnOpened(EventArgs e)
     {

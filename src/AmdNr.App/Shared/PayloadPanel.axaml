@@ -1,0 +1,145 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.PayloadPanel">
+
+  <!-- The files every install is made of: what is here, what is not, getting the rest, and: when
+       the download does not work on this machine: the way to hand them over by hand. The same
+       panel in the first-run wizard and on "This machine". -->
+  <Border Classes="card" Padding="0">
+    <StackPanel>
+      <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,18,20,14">
+        <Border Classes="iconTile neutral" Margin="0,0,14,0"><PathIcon Data="{StaticResource IconDownload}" /></Border>
+        <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+          <TextBlock Text="{DynamicResource Str.Payloads}" Classes="subtitle" />
+          <TextBlock Text="{DynamicResource Str.FilesHint}" Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+        <Border Grid.Column="2" x:Name="SummaryPill" Classes="status" VerticalAlignment="Center" Margin="12,0,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <PathIcon x:Name="SummaryIcon" />
+            <TextBlock x:Name="SummaryText" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- The copy of the list the app is using, when it could not read the published one. -->
+      <TextBlock x:Name="ListNote" Margin="20,0,20,12" Classes="muted" TextWrapping="Wrap" IsVisible="False" />
+      <!-- What the last action did, where there is no corner for a toast (the first-run wizard). -->
+      <TextBlock x:Name="Outcome" Margin="20,0,20,12" TextWrapping="Wrap" IsVisible="False" />
+
+      <!-- A failure stays on screen until something replaces it: it used to live in a line that was
+           hidden the moment the download ended, which read as "the button does nothing". -->
+      <Border x:Name="ErrorBox" Classes="result err" Margin="20,0,20,14" IsVisible="False">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Classes="iconTile err" Margin="0,0,14,0"><PathIcon Data="{StaticResource IconErr}" /></Border>
+          <StackPanel Grid.Column="1" Spacing="8">
+            <TextBlock x:Name="ErrorTitle" Classes="subtitle" TextWrapping="Wrap" />
+            <SelectableTextBlock x:Name="ErrorText" Classes="muted" TextWrapping="Wrap" FontSize="12" />
+            <TextBlock Text="{DynamicResource Str.DownloadFailedHelp}" Classes="muted" TextWrapping="Wrap" />
+            <WrapPanel ItemSpacing="8" LineSpacing="8">
+              <Button x:Name="RetryButton" Classes="primary" Click="OnDownload" Content="{DynamicResource Str.SetupFilesRetry}" />
+              <Button x:Name="ManualButton" Classes="ghost" Click="OnManual">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconExternal}" />
+                  <TextBlock Text="{DynamicResource Str.ManualDownload}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button x:Name="ImportButton" Classes="ghost" Click="OnImport">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconFolderOpen}" />
+                  <TextBlock Text="{DynamicResource Str.ImportFiles}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </WrapPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Where each missing file can be fetched from by hand, and what to do with it afterwards. -->
+      <Border x:Name="ManualBox" Classes="callout check" Margin="20,0,20,14" IsVisible="False">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{DynamicResource Str.ManualTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{DynamicResource Str.ManualBody}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+          <ItemsControl x:Name="ManualList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="local:ManualFile">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                  <StackPanel Spacing="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Caption}" Classes="caption" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <ItemsControl Grid.Column="1" ItemsSource="{Binding Links}" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="local:ManualLink">
+                        <Button Classes="ghost small" Click="OnOpenLink" Tag="{Binding Url}" ToolTip.Tip="{Binding Url}">
+                          <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="{Binding Host}" VerticalAlignment="Center" />
+                            <PathIcon Data="{StaticResource IconExternal}" Width="11" Height="11" />
+                          </StackPanel>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <ItemsControl x:Name="Rows">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="local:PayloadRow">
+            <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,10">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="1" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Caption}" Classes="caption" />
+                </StackPanel>
+                <Border Grid.Column="1" Classes="status" Classes.ok="{Binding Ready}" Classes.err="{Binding Failed}">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding Ready}" />
+                    <PathIcon Data="{StaticResource IconDot}" IsVisible="{Binding !Ready}" />
+                    <TextBlock Text="{Binding State}" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <StackPanel x:Name="ProgressBox" IsVisible="False" Margin="20,14,20,2" Spacing="7">
+        <ProgressBar x:Name="Progress" Height="4" MinHeight="4" CornerRadius="2"
+                     Foreground="{DynamicResource AccentHover}" Background="{DynamicResource SurfaceTop}" />
+        <TextBlock x:Name="ProgressText" Classes="caption" TextWrapping="Wrap" />
+      </StackPanel>
+
+      <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"
+              Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" Foreground="{DynamicResource Faint}" />
+          <TextBlock Grid.Column="1" x:Name="CacheFolder" Classes="muted" Margin="10,0,16,0"
+                     VerticalAlignment="Center" TextTrimming="PathSegmentEllipsis" />
+          <WrapPanel Grid.Column="2" ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
+            <Button Classes="ghost" Content="{DynamicResource Str.OpenFolder}" Click="OnOpenCache" />
+            <Button x:Name="ClearButton" Classes="ghost danger" Click="OnClearCache"
+                    Content="{DynamicResource Str.ClearCache}" ToolTip.Tip="{DynamicResource Str.ClearCacheBody}" />
+            <Button x:Name="ImportFooterButton" Classes="ghost" Click="OnImport" Content="{DynamicResource Str.ImportFiles}"
+                    ToolTip.Tip="{DynamicResource Str.ImportHint}" />
+            <Button x:Name="DownloadButton" Classes="primary" Click="OnDownload">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon x:Name="DownloadIcon" Data="{StaticResource IconDownload}" />
+                <Arc x:Name="DownloadSpin" Classes="spin" Stroke="White" IsVisible="False" />
+                <TextBlock Text="{DynamicResource Str.PrefetchAll}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+                    x:Class="AmdNr.App.Languages.Portuguese">
 
   <sys:String x:Key="Str.AppTitle">AMD-NR ReShade Installer</sys:String>
   <sys:String x:Key="Str.Subtitle">DLSS 5 neural rendering em Radeon, instalado pra você</sys:String>
@@ -40,12 +41,12 @@
   <sys:String x:Key="Str.Downloading">Baixando</sys:String>
   <sys:String x:Key="Str.Verifying">Conferindo o que já está aqui…</sys:String>
   <sys:String x:Key="Str.PayloadsReady">Baixado e conferido.</sys:String>
-  <sys:String x:Key="Str.ManifestLocal">Usando a lista que vem junto com o app: o site não respondeu.</sys:String>
+  <sys:String x:Key="Str.ManifestLocal">Não deu para ler a lista publicada, então está em uso a cópia que vem com este app.</sys:String>
   <sys:String x:Key="Str.ManifestFailed">Não deu pra ler a lista de downloads. Confira a conexão e tente de novo.</sys:String>
 
   <sys:String x:Key="Str.Language">Idioma</sys:String>
   <sys:String x:Key="Str.UpdateAvailable">Saiu uma versão nova</sys:String>
-  <sys:String x:Key="Str.UpdateWorking">Atualizando...</sys:String>
+  <sys:String x:Key="Str.UpdateWorking">Atualizando…</sys:String>
   <sys:String x:Key="Str.OpenReleases">Abrir a página de releases</sys:String>
   <sys:String x:Key="Str.Dismiss">Agora não</sys:String>
 
@@ -94,7 +95,7 @@
   <sys:String x:Key="Str.Close">Fechar</sys:String>
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">O executável do jogo</sys:String>
-  <sys:String x:Key="Str.ExeChoose">Escolher...</sys:String>
+  <sys:String x:Key="Str.ExeChoose">Escolher…</sys:String>
   <sys:String x:Key="Str.ExeUseDetected">Usar o detectado</sys:String>
   <sys:String x:Key="Str.ExeNone">Nenhum executável encontrado nesta pasta.</sys:String>
   <sys:String x:Key="Str.ExeNote">A largura e a API são lidas deste arquivo, e as rotas abaixo seguem dele. Um jogo que deixa um lançador pequeno na raiz e a coisa real em Bin64 é o caso que isto erra -- se o número de bits aqui não for o que você espera, aponte para o arquivo certo.</sys:String>
@@ -131,10 +132,10 @@
   <sys:String x:Key="Str.Installing">Instalando…</sys:String>
   <sys:String x:Key="Str.Removing">Removendo…</sys:String>
   <sys:String x:Key="Str.InstallOk">{0} está pronto. É só abrir o jogo.</sys:String>
-  <sys:String x:Key="Str.InstallWarn">Instalado em {0}, com {1} aviso(s) pra ler abaixo.</sys:String>
+  <sys:String x:Key="Str.InstallWarn">Instalado em {0}, com {1} aviso para ler abaixo.</sys:String>
   <sys:String x:Key="Str.InstallFail">A instalação em {0} não terminou.</sys:String>
   <sys:String x:Key="Str.UninstallOk">Removido de {0}.</sys:String>
-  <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso(s) pra ler abaixo.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso para ler abaixo.</sys:String>
   <sys:String x:Key="Str.UninstallLeft">{0} ainda conta como instalado: arquivos que mudaram depois da instalação foram deixados no lugar.</sys:String>
   <sys:String x:Key="Str.UninstallLeftTitle">Alguns arquivos ficaram no lugar</sys:String>
   <sys:String x:Key="Str.UninstallLeftBody">Arquivos em {0} não são os que este instalador escreveu — mudaram depois da instalação, então o desinstalar preferiu mantê-los a apagar o trabalho de outra pessoa. É por isso que o jogo continua aparecendo como instalado. A lista está em Detalhes.</sys:String>
@@ -143,7 +144,7 @@
   <sys:String x:Key="Str.UninstallKeep">Deixar como está</sys:String>
   <sys:String x:Key="Str.UninstallKeepBody">Nada mais é tocado, e o jogo segue contando como instalado.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Não deu pra remover tudo de {0}.</sys:String>
-  <sys:String x:Key="Str.ResultErrors">{0} problema(s) listado(s) abaixo.</sys:String>
+  <sys:String x:Key="Str.ResultErrors">{0} problema listado abaixo.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>
   <sys:String x:Key="Str.Folder">Pasta</sys:String>
   <!-- Second layout pass -->
@@ -154,8 +155,8 @@
   <sys:String x:Key="Str.DetailsCount">{0} linhas</sys:String>
   <sys:String x:Key="Str.PreflightOk">Pronto pra instalar</sys:String>
   <sys:String x:Key="Str.PreflightOkDetail">Nada no caminho. Escolha a rota abaixo e clique em Instalar.</sys:String>
-  <sys:String x:Key="Str.PreflightWarn">Pronto pra instalar, com {0} aviso(s) pra ler</sys:String>
-  <sys:String x:Key="Str.PreflightErr">{0} problema(s) encontrado(s) nesta pasta</sys:String>
+  <sys:String x:Key="Str.PreflightWarn">Pronto para instalar, com {0} aviso para ler</sys:String>
+  <sys:String x:Key="Str.PreflightErr">{0} problema encontrado nesta pasta</sys:String>
   <sys:String x:Key="Str.PreflightInstalled">Instalado neste jogo</sys:String>
   <sys:String x:Key="Str.PreflightInstalledDetail">Abra o jogo pra usar. Instale de novo pra atualizar os arquivos, ou desinstale pra removê-los.</sys:String>
   <sys:String x:Key="Str.SeeDetails">Abra Detalhes abaixo pra ver o que foi encontrado.</sys:String>
@@ -169,7 +170,7 @@
   <sys:String x:Key="Str.FilesHint">Baixados uma vez, conferidos contra um hash fixo e reaproveitados em todos os jogos.</sys:String>
   <sys:String x:Key="Str.PayloadReadyShort">Verificado</sys:String>
   <sys:String x:Key="Str.NotDownloadedShort">Não baixado</sys:String>
-  <sys:String x:Key="Str.SettingsSubtitle">Idioma, e onde este app guarda os arquivos dele.</sys:String>
+  <sys:String x:Key="Str.SettingsSubtitle">Idioma, atualizações e sobre este app.</sys:String>
   <sys:String x:Key="Str.LanguageHint">Todos os textos mudam na hora, sem reiniciar.</sys:String>
   <sys:String x:Key="Str.DataFolder">Pasta de dados</sys:String>
   <!-- Routes: the names and notes Core carries in English, said in this language. -->
@@ -197,7 +198,7 @@
   <!-- First run -->
   <sys:String x:Key="Str.SetupTitle">Primeiros passos</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Bem-vindo</sys:String>
-  <sys:String x:Key="Str.SetupWelcomeBody">A rede de Neural Rendering do DLSS 5 em placas Radeon, através do ReShade. São quatro passos rápidos.</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">A rede DLSS 5 Neural Rendering em placas Radeon, pelo ReShade ou pelo OptiScaler. Quatro passos rápidos.</sys:String>
   <sys:String x:Key="Str.SetupStepLanguage">Idioma</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Esta máquina</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Arquivos</sys:String>
@@ -272,5 +273,86 @@
   <sys:String x:Key="Str.ReportSaved">Relatório salvo e a pasta foi aberta: {0}</sys:String>
   <sys:String x:Key="Str.ReportFailed">Não deu pra montar o relatório. Os logs estão em {0}</sys:String>
   <sys:String x:Key="Str.ReportWorking">Juntando…</sys:String>
+
+  <!-- The sheet's two routes, the files panel, updates. -->
+  <sys:String x:Key="Str.Add">Adicionar</sys:String>
+  <sys:String x:Key="Str.AddMenuMany">Procurar jogos numa pasta…</sys:String>
+  <sys:String x:Key="Str.AddMenuOne">Pasta de um jogo…</sys:String>
+  <sys:String x:Key="Str.AddMenuEmulator">Um emulador…</sys:String>
+  <sys:String x:Key="Str.UpdateShort">Atualizar</sys:String>
+  <sys:String x:Key="Str.GamesAway">{0} num disco desconectado</sys:String>
+  <sys:String x:Key="Str.GamesAwayHint">Jogos num disco que não está conectado agora continuam lembrados, com tudo o que foi escolhido para eles, e voltam quando o disco voltar.</sys:String>
+  <sys:String x:Key="Str.GameGone">{0} não está mais instalado e saiu da lista.</sys:String>
+  <sys:String x:Key="Str.GamesGone">{0} jogo não está mais instalado e saiu da lista.</sys:String>
+  <sys:String x:Key="Str.GamesGone.Many">{0} jogos não estão mais instalados e saíram da lista.</sys:String>
+  <sys:String x:Key="Str.ShowDetails">Ver os detalhes</sys:String>
+  <sys:String x:Key="Str.DetectedSection">Detectado</sys:String>
+  <sys:String x:Key="Str.CheckApiTip">Os arquivos dizem com o que o jogo se liga, não no que ele roda: uma pasta pode ter um executável D3D11 e um D3D12. A wiki diz qual o jogo usa.</sys:String>
+  <sys:String x:Key="Str.DetectedFromFiles">Lido dos arquivos do próprio jogo.</sys:String>
+  <sys:String x:Key="Str.DetectedFromWiki">Da PCGamingWiki e dos arquivos do jogo.</sys:String>
+  <sys:String x:Key="Str.InstallWith">Instalar com</sys:String>
+  <sys:String x:Key="Str.RouteReShade">ReShade + add-on</sys:String>
+  <sys:String x:Key="Str.RouteOpti">OptiScaler</sys:String>
+  <sys:String x:Key="Str.Recommended">Recomendado</sys:String>
+  <sys:String x:Key="Str.RecommendedLower">recomendado</sys:String>
+  <sys:String x:Key="Str.RouteReShadeSummary">O add-on dentro do ReShade. D3D11, D3D12, Vulkan, OpenGL, jogos 32-bit e emuladores.</sys:String>
+  <sys:String x:Key="Str.RouteReShadeMisfit">Não há rota ReShade para o que este jogo usa ({0}).</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummary">Roda dentro do DLSS, FSR ou XeSS do jogo, com a profundidade e o movimento dele. Substitui o ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiFound">Roda dentro do upscaler do jogo ({0} encontrado aqui). Substitui o ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfit">Feito para jogos D3D12 de 64 bits; este aparece como {0}.</sys:String>
+  <sys:String x:Key="Str.ApiSection">API gráfica</sys:String>
+  <sys:String x:Key="Str.Group64">Jogos 64-bit</sys:String>
+  <sys:String x:Key="Str.Group32">Jogos 32-bit (experimental)</sys:String>
+  <sys:String x:Key="Str.GroupEmulators">Emuladores</sys:String>
+  <sys:String x:Key="Str.OptiAbout">No lugar do ReShade, instala o OptiScaler, que assume o DLSS, FSR ou XeSS do jogo e roda a rede dentro dele, com a profundidade e os vetores de movimento do próprio jogo.</sys:String>
+  <sys:String x:Key="Str.InGame">No jogo</sys:String>
+  <sys:String x:Key="Str.OptiStep1">Ligue DLSS, FSR ou XeSS nas opções gráficas do jogo.</sys:String>
+  <sys:String x:Key="Str.OptiStep2">Aperte Insert, abra a aba Neural e ligue Enable NR.</sys:String>
+  <sys:String x:Key="Str.OptiStep3">Com Ray Reconstruction ligado, ponha o ponto de processamento em "After the finished frame".</sys:String>
+  <sys:String x:Key="Str.InstallOpti">Instalar OptiScaler</sys:String>
+  <sys:String x:Key="Str.Update">Atualizar</sys:String>
+  <sys:String x:Key="Str.Reinstall">Reinstalar</sys:String>
+  <sys:String x:Key="Str.SwitchToOpti">Trocar para OptiScaler</sys:String>
+  <sys:String x:Key="Str.SwitchToReShade">Trocar para ReShade</sys:String>
+  <sys:String x:Key="Str.SwitchTitle">Trocar para {0}?</sys:String>
+  <sys:String x:Key="Str.SwitchBody">{0} está com a rota {1} instalada, e as duas não cabem na mesma pasta. Primeiro o {1} é removido, devolvendo o que ele tinha substituído, e depois o {2} é instalado.</sys:String>
+  <sys:String x:Key="Str.SwitchYes">Remover {0}, instalar {1}</sys:String>
+  <sys:String x:Key="Str.SwitchYesBody">Seus arquivos de configuração ficam onde estão.</sys:String>
+  <sys:String x:Key="Str.SwitchNoBody">Nada muda; o {0} continua instalado.</sys:String>
+  <sys:String x:Key="Str.DownloadFailedDetail">O motivo está em Detalhes. Nada foi instalado.</sys:String>
+  <sys:String x:Key="Str.DownloadFailedHelp">Os arquivos também podem ser baixados pelo navegador e entregues ao app: Esta máquina &gt; Arquivos &gt; Baixar manualmente, depois Importar arquivos. Arquivos na pasta Downloads são encontrados sozinhos.</sys:String>
+  <sys:String x:Key="Str.PreflightErr.Many">{0} problemas encontrados nesta pasta</sys:String>
+  <sys:String x:Key="Str.PreflightWarn.Many">Pronto para instalar, com {0} avisos para ler</sys:String>
+  <sys:String x:Key="Str.InstallWarn.Many">Instalado em {0}, com {1} avisos para ler abaixo.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn.Many">Removido de {0}, com {1} avisos para ler abaixo.</sys:String>
+  <sys:String x:Key="Str.ResultErrors.Many">{0} problemas listados abaixo.</sys:String>
+  <sys:String x:Key="Str.ManifestFailedShort">Sem lista de download</sys:String>
+  <sys:String x:Key="Str.FailedShort">Falhou</sys:String>
+  <sys:String x:Key="Str.PayloadsAllReadyShort">Todos os {0} prontos</sys:String>
+  <sys:String x:Key="Str.PayloadsMissingShort">{0} faltando · {1}</sys:String>
+  <sys:String x:Key="Str.DownloadFailedOne">Não foi possível baixar: {0}</sys:String>
+  <sys:String x:Key="Str.ManualDownload">Baixar manualmente</sys:String>
+  <sys:String x:Key="Str.ImportFiles">Importar arquivos…</sys:String>
+  <sys:String x:Key="Str.ImportHint">Escolha uma pasta com arquivos que você mesmo baixou. Cada um é encontrado pelo nome e só é aceito se bater com o hash fixado.</sys:String>
+  <sys:String x:Key="Str.ManualTitle">Baixe os arquivos você mesmo</sys:String>
+  <sys:String x:Key="Str.ManualBody">Abra cada link no navegador e salve o arquivo onde quiser: a pasta Downloads é vasculhada sozinha, e Importar arquivos aceita qualquer outra pasta. Não precisa renomear nada, e nada que não bata com o SHA-256 fixado é usado.</sys:String>
+  <sys:String x:Key="Str.ImportPick">Escolha a pasta com os arquivos que você baixou</sys:String>
+  <sys:String x:Key="Str.ImportAll">Todos os arquivos estão aqui e verificados.</sys:String>
+  <sys:String x:Key="Str.ImportNothing">Nada naquela pasta bate com um arquivo necessário.</sys:String>
+  <sys:String x:Key="Str.ImportSome">{0} arquivo(s) aceito(s); ainda faltam {1}.</sys:String>
+  <sys:String x:Key="Str.Component.addon">Add-on</sys:String>
+  <sys:String x:Key="Str.Component.runtime">Runtime neural e pesos</sys:String>
+  <sys:String x:Key="Str.Component.reshade">ReShade</sys:String>
+  <sys:String x:Key="Str.Component.bridge">Ponte 32-bit</sys:String>
+  <sys:String x:Key="Str.Component.x86-extras">Extras 32-bit</sys:String>
+  <sys:String x:Key="Str.Component.shader">Efeito companheiro</sys:String>
+  <sys:String x:Key="Str.Updates">Atualizações</sys:String>
+  <sys:String x:Key="Str.UpToDate">Atualizado</sys:String>
+  <sys:String x:Key="Str.UpdateChecking">Procurando uma versão mais nova…</sys:String>
+  <sys:String x:Key="Str.UpdateLatest">A v{0} é a versão mais nova. Verificado às {1}.</sys:String>
+  <sys:String x:Key="Str.UpdateOut">A v{0} saiu. Esta é a v{1}.</sys:String>
+  <sys:String x:Key="Str.UpdateFailed">Não deu para verificar: o GitHub não respondeu. O app funciona igual.</sys:String>
+  <sys:String x:Key="Str.UpdateNow">Atualizar agora</sys:String>
+  <sys:String x:Key="Str.UpdateCheck">Procurar atualizações</sys:String>
 
 </ResourceDictionary>

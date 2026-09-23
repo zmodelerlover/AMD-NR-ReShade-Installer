@@ -116,7 +116,7 @@
     <Setter Property="Padding" Value="7,2,7,3" />
   </Style>
   <Style Selector="Border.badge TextBlock">
-    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontSize" Value="11" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="#E6FFFFFF" />
   </Style>
@@ -130,7 +130,7 @@
     <Setter Property="Padding" Value="5,2,8,3" />
   </Style>
   <Style Selector="Border.state TextBlock">
-    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontSize" Value="11" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="#E3F6EA" />
     <Setter Property="VerticalAlignment" Value="Center" />
@@ -172,7 +172,7 @@
     <Setter Property="Margin" Value="0,0,4,0" />
   </Style>
   <Style Selector="Border.tag TextBlock">
-    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontSize" Value="11" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="#DDD3D0" />
   </Style>

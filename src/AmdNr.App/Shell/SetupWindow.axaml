@@ -116,69 +116,21 @@
               <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="16" Height="16"
                         Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
               <TextBlock Grid.Column="1" x:Name="MachineWarning" TextWrapping="Wrap" LineHeight="19"
-                         Foreground="#F2D7A6" />
+                         Foreground="{DynamicResource WarnText}" />
             </Grid>
           </Border>
         </StackPanel>
 
-        <!-- 3. Files -->
+        <!-- 3. Files: the same panel "This machine" shows, with its retry, manual links and import. -->
         <StackPanel x:Name="PageFiles" Spacing="18" IsVisible="False">
           <StackPanel Spacing="6">
             <TextBlock Text="{DynamicResource Str.SetupStepFiles}" Classes="page" />
             <TextBlock Text="{DynamicResource Str.SetupFilesBody}" Classes="muted"
                        TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
+            <TextBlock Text="{DynamicResource Str.SetupFilesLater}" Classes="muted"
+                       TextWrapping="Wrap" LineHeight="20" MaxWidth="560" HorizontalAlignment="Left" />
           </StackPanel>
-
-          <Border x:Name="FilesVerdict" Classes="card">
-            <Grid ColumnDefinitions="Auto,*">
-              <Border Grid.Column="0" x:Name="FilesVerdictTile" Classes="iconTile" Margin="0,0,14,0">
-                <Panel>
-                  <PathIcon x:Name="FilesVerdictIcon" Width="20" Height="20" />
-                  <Arc x:Name="FilesSpin" Classes="spin" Width="18" Height="18"
-                       Stroke="{DynamicResource AccentText}" IsVisible="False" HorizontalAlignment="Center" />
-                </Panel>
-              </Border>
-              <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-                <TextBlock x:Name="FilesVerdictText" Classes="subtitle" TextWrapping="Wrap" />
-                <TextBlock x:Name="FilesDetail" Classes="muted" TextWrapping="Wrap" />
-              </StackPanel>
-            </Grid>
-          </Border>
-
-          <Border Classes="card">
-            <StackPanel Spacing="10">
-              <ItemsControl x:Name="PayloadList">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Grid Classes="line" ColumnDefinitions="*,Auto,Auto" Margin="0,5">
-                      <StackPanel Grid.Column="0" Spacing="1" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" />
-                        <TextBlock Text="{Binding Version}" Classes="caption" />
-                      </StackPanel>
-                      <TextBlock Grid.Column="1" Text="{Binding Size}" Classes="muted" FontSize="12"
-                                 VerticalAlignment="Center" Margin="0,0,12,0" />
-                      <Border Grid.Column="2" Classes="status" Classes.ok="{Binding Ready}"
-                              Classes.err="{Binding NotReady}" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding State}" />
-                      </Border>
-                    </Grid>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-              <ProgressBar x:Name="Progress" Height="4" MinHeight="4" IsVisible="False" CornerRadius="2"
-                           Foreground="{DynamicResource AccentHover}" Background="{DynamicResource SurfaceTop}" />
-              <TextBlock x:Name="FilesStatus" Classes="muted" TextWrapping="Wrap" />
-              <Button x:Name="DownloadButton" Classes="primary large" Click="OnDownload"
-                      HorizontalAlignment="Left" IsVisible="False">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <PathIcon x:Name="DownloadIcon" Data="{StaticResource IconDownload}" />
-                  <Arc x:Name="DownloadSpin" Classes="spin" Stroke="White" IsVisible="False" />
-                  <TextBlock x:Name="DownloadLabel" Text="{DynamicResource Str.SetupFilesDownload}"
-                             VerticalAlignment="Center" />
-                </StackPanel>
-              </Button>
-            </StackPanel>
-          </Border>
+          <local:PayloadPanel x:Name="Payloads" />
         </StackPanel>
 
         <!-- 4. Games -->
@@ -203,7 +155,7 @@
                          LineHeight="19" />
               <ItemsControl x:Name="FoundList">
                 <ItemsControl.ItemTemplate>
-                  <DataTemplate>
+                  <DataTemplate x:DataType="local:FoundGameRow">
                     <Grid Classes="line" ColumnDefinitions="*,Auto" Margin="0,4">
                       <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13"
                                  TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />

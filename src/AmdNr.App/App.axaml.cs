@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Styling;
 using AmdNr.Core;
 
 namespace AmdNr.App;
@@ -13,10 +12,10 @@ public partial class App : Application
 {
     /// <summary>Every language file that ships. The first is the fallback, and a key missing from
     /// one of the others falls through to it.</summary>
-    public static readonly (string Code, string Name)[] Languages =
+    public static readonly (string Code, string Name, Func<ResourceDictionary> Strings)[] Languages =
     [
-        ("en", "English"),
-        ("pt-BR", "Português (Brasil)"),
+        ("en", "English", () => new Languages.English()),
+        ("pt-BR", "Português (Brasil)", () => new Languages.Portuguese()),
     ];
 
     public static string CurrentLanguage { get; private set; } = "en";
@@ -99,22 +98,11 @@ public partial class App : Application
     /// so the window relabels itself without being rebuilt.</summary>
     public static void ChangeLanguage(string code)
     {
-        try
-        {
-            var include = new ResourceInclude(new Uri("avares://AMD-NR-ReShade-Installer/App.axaml"))
-            {
-                Source = new Uri($"avares://AMD-NR-ReShade-Installer/Languages/Strings.{code}.axaml"),
-            };
-
-            var dictionaries = Current?.Resources.MergedDictionaries;
-            if (dictionaries is null) return;
-            if (dictionaries.Count > 0) dictionaries.RemoveAt(0);
-            dictionaries.Insert(0, include);
-            CurrentLanguage = code;
-        }
-        catch (Exception e) when (e is UriFormatException or FileNotFoundException or KeyNotFoundException)
-        {
-            // A missing language file leaves the previous one in place rather than an empty window.
-        }
+        var language = Languages.FirstOrDefault(l => l.Code == code);
+        var dictionaries = Current?.Resources.MergedDictionaries;
+        if (language.Strings is null || dictionaries is null) return;
+        if (dictionaries.Count > 0) dictionaries.RemoveAt(0);
+        dictionaries.Insert(0, language.Strings());
+        CurrentLanguage = code;
     }
 }

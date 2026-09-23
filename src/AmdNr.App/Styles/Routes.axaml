@@ -1,0 +1,76 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- The sheet's choice of route: two cards, the panel of the one chosen, what was detected above
+       them, and the grouped API list inside the ReShade panel. -->
+
+  <!-- A route card is a radio button drawn like the tiles: the chosen one gets the accent that the
+       open game's tile already wears, so the two read as the same kind of "this one". -->
+  <Style Selector="RadioButton.route">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="card" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+                BorderThickness="1" CornerRadius="10" Padding="14,12">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.15" />
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}" HorizontalContentAlignment="Stretch" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.route:pointerover /template/ Border#card">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+  </Style>
+  <Style Selector="RadioButton.route:checked /template/ Border#card">
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+  </Style>
+  <Style Selector="RadioButton.route:focus-visible /template/ Border#card">
+    <Setter Property="BorderBrush" Value="{DynamicResource Text}" />
+  </Style>
+  <!-- A route that does not fit the game stays clickable, faded, until it is the one chosen. -->
+  <Style Selector="RadioButton.route.misfit"><Setter Property="Opacity" Value="0.6" /></Style>
+  <Style Selector="RadioButton.route.misfit:checked, RadioButton.route.misfit:pointerover"><Setter Property="Opacity" Value="1" /></Style>
+
+  <!-- The chosen route's panel, attached under the cards. -->
+  <Style Selector="Border.routePanel">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14" />
+    <Setter Property="Margin" Value="0,4,0,0" />
+  </Style>
+
+  <!-- What the route is read off: one quiet row, not a paragraph on every game. -->
+  <Style Selector="Border.detect">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14,10" />
+  </Style>
+
+  <Style Selector="TextBlock.stepNumber">
+    <Setter Property="Foreground" Value="{DynamicResource AccentText}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- The headers inside the API list: they group, they are not choices. -->
+  <Style Selector="ComboBoxItem.group">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Faint}" />
+    <Setter Property="Padding" Value="12,10,12,2" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+</Styles>

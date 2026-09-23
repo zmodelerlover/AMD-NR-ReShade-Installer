@@ -153,10 +153,11 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     public string RouteLabel => _graphics?.Tag ?? "…";
 
     /// <summary>The same label as separate chips: each API on its own, the architecture quieter, all
-    /// of them red when none has a route. Nothing yet while detection is still running.</summary>
+    /// of them red when none has a route. Nothing at all while detection is still running: a row of
+    /// empty chips on every tile read as broken, and the tags arriving a second later say enough.</summary>
     public IReadOnlyList<RouteTag> RouteTags => _graphics switch
     {
-        null => [new RouteTag("…", Quiet: true, Bad: false)],
+        null => [],
         { All.Count: 0 } => [],
         var g => [
             .. g.All.Select(a => new RouteTag(GraphicsDetection.Short(a), Quiet: false, Bad: NoRoute)),
@@ -176,14 +177,38 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     private void Raise([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+    private RouteFamily? _installedVia;
+
+    /// <summary>Which route is installed in this game, read off its folder: the tile says "ReShade"
+    /// or "OptiScaler" rather than only "Installed", because the two are alternatives and the sheet
+    /// offers both.</summary>
+    public RouteFamily? InstalledVia
+    {
+        get => _installedVia;
+        private set
+        {
+            _installedVia = value;
+            Raise();
+            Raise(nameof(InstalledName));
+        }
+    }
+
+    /// <summary>The route's name as the tile prints it. Product names, so not translated.</summary>
+    public string InstalledName => _installedVia?.ToString() ?? "";
+
     /// <summary>Looked for beside the folder the install writes into as well as at the root: an
     /// Unreal install lands in Binaries\Win64 and a Source one in bin\, and neither is the root.</summary>
     public void RefreshInstalled()
     {
         List<string> folders = [Entry.Path];
-        if (_graphics?.Target is { } target)
-            folders.Add(System.IO.Path.GetDirectoryName(target)!);
-        Installed = folders.Any(GameScanner.IsInstalled);
+        if (_graphics?.Target is { } target && System.IO.Path.GetDirectoryName(target) is { } targetFolder)
+            folders.Add(targetFolder);
+        try { InstalledVia = folders.Select(GameScanner.InstalledAs).FirstOrDefault(v => v is not null); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            InstalledVia = null;
+        }
+        Installed = InstalledVia is not null;
         // Only an install can be out of date, and only against a manifest that has arrived. Before
         // it does, the tile says nothing rather than guessing -- a badge that appears offline and
         // disappears online is worse than no badge.

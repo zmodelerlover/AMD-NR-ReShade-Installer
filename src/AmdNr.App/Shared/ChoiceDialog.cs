@@ -8,7 +8,7 @@ using Avalonia.Media;
 
 namespace AmdNr.App;
 
-public static class EmulatorPicker
+public static class ChoiceDialog
 {
     /// <summary>The window and a way to read what was picked. Separate from <see cref="ShowAsync"/>
     /// so the headless render harness can build and capture it without a modal loop -- a dialog

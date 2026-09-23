@@ -1,0 +1,62 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Small shared pieces added with the second layout pass: neutral and small icon tiles, the amber
+       states, links that are buttons, and compact buttons. -->
+
+  <!-- A decorative icon. The red tile is kept for what needs attention; a red Driver tile next to a
+       green "Ready" read as a problem that was not there. -->
+  <Style Selector="Border.iconTile.neutral"><Setter Property="Background" Value="{DynamicResource SurfaceHigh}" /></Style>
+  <Style Selector="Border.iconTile.neutral PathIcon"><Setter Property="Foreground" Value="{DynamicResource Muted}" /></Style>
+  <Style Selector="Border.iconTile.small">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="Border.iconTile.small PathIcon">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+  </Style>
+
+  <Style Selector="Border.status.warn"><Setter Property="Background" Value="{DynamicResource WarnSoft}" /></Style>
+  <Style Selector="Border.status.warn TextBlock"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+  <Style Selector="Border.status.warn PathIcon"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+
+  <!-- "Update" on a tile is not "Installed": amber, and the download arrow instead of the check. -->
+  <Style Selector="Border.state.update">
+    <Setter Property="Background" Value="#E63A2A10" />
+    <Setter Property="BorderBrush" Value="#99DDA13A" />
+  </Style>
+  <Style Selector="Border.state.update PathIcon"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+  <Style Selector="Border.state.update TextBlock"><Setter Property="Foreground" Value="#FBEBCB" /></Style>
+
+  <!-- The label over each group reads as a label, not as one more muted line under it. -->
+  <Style Selector="TextBlock.section"><Setter Property="Foreground" Value="{DynamicResource TextSoft}" /></Style>
+
+  <!-- A link that is a button: text in the accent, no box. -->
+  <Style Selector="Button.link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+  <Style Selector="Button.link /template/ ContentPresenter, Button.link:pointerover /template/ ContentPresenter, Button.link:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.link TextBlock"><Setter Property="Foreground" Value="{DynamicResource AccentText}" /></Style>
+  <Style Selector="Button.link PathIcon"><Setter Property="Foreground" Value="{DynamicResource AccentText}" /></Style>
+  <Style Selector="Button.link:pointerover TextBlock"><Setter Property="Foreground" Value="{DynamicResource Text}" /></Style>
+  <Style Selector="Button.link:pointerover PathIcon"><Setter Property="Foreground" Value="{DynamicResource Text}" /></Style>
+  <Style Selector="Button.link /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource AccentText}" />
+  </Style>
+
+  <Style Selector="Button.small">
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+</Styles>

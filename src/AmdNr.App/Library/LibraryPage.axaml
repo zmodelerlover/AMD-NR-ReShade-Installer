@@ -1,0 +1,198 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.LibraryPage">
+
+  <!-- Spacing scale: 4 / 8 / 12 / 16 / 24 / 32. The page gutter is 24. -->
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- Top bar: what this page is on the left, what can be done to it on the right. -->
+    <Grid Grid.Row="0" x:Name="TopBar" ColumnDefinitions="Auto,*,Auto" Margin="24,18,24,14">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+        <TextBlock Text="{DynamicResource Str.Games}" Classes="h1" FontSize="22" VerticalAlignment="Center" />
+        <TextBlock x:Name="FootText" Classes="muted" VerticalAlignment="Center" Margin="0,3,0,0"
+                   MaxWidth="260" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+
+      <TextBox Grid.Column="1" x:Name="SearchBox" Classes="search" Margin="20,0,12,0" MaxWidth="360"
+               MinWidth="150" HorizontalAlignment="Left"
+               Watermark="{DynamicResource Str.Search}" TextChanged="OnSearch"
+               AutomationProperties.Name="{DynamicResource Str.Search}">
+        <TextBox.InnerLeftContent>
+          <PathIcon Data="{StaticResource IconSearch}" Width="15" Height="15" Margin="12,0,6,0"
+                    Foreground="{DynamicResource Faint}" />
+        </TextBox.InnerLeftContent>
+      </TextBox>
+
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+        <!-- One button for the three ways a game gets into the list by hand: they are one question,
+             and three buttons for it pushed the GPU off the edge of a small window. -->
+        <Button x:Name="AddButton" Classes="ghost" AutomationProperties.Name="{DynamicResource Str.Add}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <PathIcon Data="{StaticResource IconAdd}" />
+            <TextBlock Text="{DynamicResource Str.Add}" VerticalAlignment="Center" />
+            <PathIcon Data="{StaticResource IconChevronDown}" Width="12" Height="12" Foreground="{DynamicResource Muted}" />
+          </StackPanel>
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="{DynamicResource Str.AddMenuMany}" Click="OnSearchFolder">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconSearchFolder}" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem Header="{DynamicResource Str.AddMenuOne}" Click="OnAddOne">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconFolder}" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem Header="{DynamicResource Str.AddMenuEmulator}" Click="OnAddEmulator">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconEmulator}" /></MenuItem.Icon>
+              </MenuItem>
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+        <Button x:Name="ScanButton" Classes="primary" Click="OnScan"
+                AutomationProperties.Name="{DynamicResource Str.Scan}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <PathIcon x:Name="ScanGlyph" Data="{StaticResource IconRefresh}" />
+            <Arc x:Name="ScanSpin" Classes="spin" Stroke="White" IsVisible="False" />
+            <TextBlock x:Name="ScanLabel" Text="{DynamicResource Str.Scan}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+        <!-- The GPU at a glance; it opens the page that explains it. A narrow window keeps the dot. -->
+        <Button x:Name="GpuPill" Classes="ghost" Margin="4,0,0,0" Click="OnGpuPill"
+                ToolTip.Tip="{DynamicResource Str.System}" AutomationProperties.Name="{DynamicResource Str.System}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Ellipse x:Name="GpuDot" Width="8" Height="8" Fill="{DynamicResource Faint}" VerticalAlignment="Center" />
+            <TextBlock x:Name="GpuPillText" FontSize="12" MaxWidth="170" TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- The gutter is the list's margin, not the scroller's padding: padding is subtracted when the
+         content is arranged but not when it is measured, so the scroller believed the list was
+         shorter than it is and stopped before the last row. -->
+    <ScrollViewer Grid.Row="1" x:Name="GridScroll" SizeChanged="OnGridResized"
+                  HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl x:Name="CardList" HorizontalAlignment="Left" Margin="24,6,24,24">
+        <ItemsControl.Resources>
+          <!-- Set from the window width, so a row always fills the page edge to edge. -->
+          <x:Double x:Key="TileWidth">176</x:Double>
+          <x:Double x:Key="CoverHeight">264</x:Double>
+        </ItemsControl.Resources>
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="local:GameCard">
+            <Button Classes="card" Classes.selected="{Binding IsSelected}" Click="OnCardClick"
+                    Tag="{Binding}" Margin="0,0,0,18" HorizontalAlignment="Left"
+                    Width="{DynamicResource TileWidth}" AutomationProperties.Name="{Binding Name}">
+              <!-- The name first: the tile cuts it, and the path alone did not say which game it was. -->
+              <ToolTip.Tip>
+                <StackPanel Spacing="2" MaxWidth="380">
+                  <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Path}" Classes="muted" TextWrapping="Wrap" />
+                </StackPanel>
+              </ToolTip.Tip>
+              <Border Classes="tile">
+                <StackPanel>
+                  <Panel Height="{DynamicResource CoverHeight}">
+                    <Border CornerRadius="11,11,0,0" ClipToBounds="True">
+                      <Panel>
+                        <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                          <TextBlock Text="{Binding Initials}" FontSize="48" FontWeight="Bold"
+                                     Foreground="#38FFFFFF" HorizontalAlignment="Center"
+                                     VerticalAlignment="Center" />
+                        </Border>
+                        <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
+                        <Border Background="{DynamicResource CoverScrim}" />
+                      </Panel>
+                    </Border>
+                    <Border Classes="badge" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                      <Panel>
+                        <TextBlock Text="{Binding Platform}" IsVisible="{Binding IsLauncher}" />
+                        <TextBlock Text="{DynamicResource Str.Folder}" IsVisible="{Binding IsManual}" />
+                      </Panel>
+                    </Border>
+                    <!-- Colour says the state, the words say the route. -->
+                    <Border Classes="state" Classes.update="{Binding Outdated}" Classes.pulse="{Binding Pulsing}"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
+                            IsVisible="{Binding Installed}">
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding !Outdated}" />
+                        <PathIcon Data="{StaticResource IconDownload}" IsVisible="{Binding Outdated}" />
+                        <TextBlock Text="{DynamicResource Str.UpdateShort}" IsVisible="{Binding Outdated}" />
+                        <TextBlock Text="·" IsVisible="{Binding Outdated}" />
+                        <TextBlock Text="{Binding InstalledName}" />
+                      </StackPanel>
+                    </Border>
+                  </Panel>
+                  <StackPanel Margin="12,10,12,12" Spacing="8">
+                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis" />
+                    <Panel Height="20" ClipToBounds="True">
+                      <ItemsControl ItemsSource="{Binding RouteTags}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="local:RouteTag">
+                            <Border Classes="tag" Classes.quiet="{Binding Quiet}" Classes.bad="{Binding Bad}">
+                              <TextBlock Text="{Binding Text}" />
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <Border Classes="tag quiet" HorizontalAlignment="Left" IsVisible="{Binding UnknownApi}">
+                        <TextBlock Text="{DynamicResource Str.UnknownApi}" />
+                      </Border>
+                    </Panel>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <ProgressBar Grid.Row="1" x:Name="ScanSpinner" Height="2" MinHeight="2" IsIndeterminate="True"
+                 VerticalAlignment="Top" Margin="24,0" IsVisible="False"
+                 Foreground="{DynamicResource AccentHover}" Background="Transparent" />
+
+    <!-- Empty library, or a search that matched nothing. -->
+    <StackPanel Grid.Row="1" x:Name="EmptyHint" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Spacing="10" MaxWidth="440" Margin="24,0,24,60" IsVisible="False">
+      <Border Width="76" Height="76" CornerRadius="38" HorizontalAlignment="Center" Margin="0,0,0,8"
+              Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+        <PathIcon x:Name="EmptyIcon" Data="{StaticResource IconGames}" Width="32" Height="32"
+                  Foreground="{DynamicResource Muted}" />
+      </Border>
+      <TextBlock x:Name="EmptyTitle" Classes="h1" HorizontalAlignment="Center" TextAlignment="Center"
+                 TextWrapping="Wrap" />
+      <TextBlock x:Name="EmptyBody" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"
+                 HorizontalAlignment="Center" TextAlignment="Center" LineHeight="20" />
+      <WrapPanel x:Name="EmptyActions" HorizontalAlignment="Center" Margin="0,10,0,0" ItemSpacing="8" LineSpacing="8">
+        <Button Classes="primary" Click="OnScan" AutomationProperties.Name="{DynamicResource Str.Scan}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <PathIcon Data="{StaticResource IconRefresh}" />
+            <TextBlock Text="{DynamicResource Str.Scan}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+        <Button Classes="ghost" Click="OnSearchFolder" AutomationProperties.Name="{DynamicResource Str.AddGameMany}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <PathIcon Data="{StaticResource IconSearchFolder}" />
+            <TextBlock Text="{DynamicResource Str.AddGameMany}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+        <Button Classes="ghost" Click="OnAddEmulator" AutomationProperties.Name="{DynamicResource Str.AddEmulator}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <PathIcon Data="{StaticResource IconEmulator}" />
+            <TextBlock Text="{DynamicResource Str.AddEmulator}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </WrapPanel>
+    </StackPanel>
+  </Grid>
+</UserControl>

@@ -12,11 +12,23 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
 
-    <!-- One file to hand out, like the add-on's own installer. Trimming stays off: Avalonia's XAML
-         loader resolves types by name, and the reference manager this follows disables it too. -->
+    <!-- One file to hand out, like the add-on's own installer. Trimmed, which is what takes it from
+         49 MB to about 23: everything that used to need reflection no longer does. The JSON is
+         generated at compile time, the bindings are compiled, the languages are classes, and the
+         GPU is read through DXGI instead of WMI. Partial, so only the libraries that declare
+         themselves safe to trim are trimmed; this app's own code is kept whole. -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    <PublishTrimmed>false</PublishTrimmed>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- What the file says about itself. An executable with no publisher, no description and no
+         version reads to an antivirus the way a dropped payload does. -->
+    <Company>AMD-NR community</Company>
+    <Product>AMD-NR ReShade Installer</Product>
+    <Description>Installs the AMD-NR neural rendering add-on into PC games</Description>
+    <Copyright>MIT License</Copyright>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <!-- Skia and the GL loader are native, and without this they sit beside the exe instead of
          inside it. One file is the point: people drop this next to a game. -->
@@ -34,7 +46,6 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-    <AvaloniaResource Include="Languages\**" />
     <None Update="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -51,7 +62,6 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.12" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.12" />
     <PackageReference Include="Avalonia.Diagnostics" Version="11.3.12" Condition="'$(Configuration)' == 'Debug'" />
-    <PackageReference Include="System.Management" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

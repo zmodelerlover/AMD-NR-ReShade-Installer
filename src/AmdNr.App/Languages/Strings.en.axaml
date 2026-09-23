@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+                    x:Class="AmdNr.App.Languages.English">
 
   <!-- The fallback language. Every other Strings.*.axaml carries the same keys; one that is missing
        falls through to whatever this file says. -->
@@ -43,12 +44,12 @@
   <sys:String x:Key="Str.Downloading">Downloading</sys:String>
   <sys:String x:Key="Str.Verifying">Verifying what is already here…</sys:String>
   <sys:String x:Key="Str.PayloadsReady">Downloaded and verified.</sys:String>
-  <sys:String x:Key="Str.ManifestLocal">Using the list that ships with this app: the site could not be reached.</sys:String>
+  <sys:String x:Key="Str.ManifestLocal">The published download list could not be read, so the copy that ships with this app is in use.</sys:String>
   <sys:String x:Key="Str.ManifestFailed">Could not read the download list. Check the connection and try again.</sys:String>
 
   <sys:String x:Key="Str.Language">Language</sys:String>
   <sys:String x:Key="Str.UpdateAvailable">A newer version is out</sys:String>
-  <sys:String x:Key="Str.UpdateWorking">Updating...</sys:String>
+  <sys:String x:Key="Str.UpdateWorking">Updating…</sys:String>
   <sys:String x:Key="Str.OpenReleases">Open the releases page</sys:String>
   <sys:String x:Key="Str.Dismiss">Not now</sys:String>
 
@@ -97,7 +98,7 @@
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">The game's executable</sys:String>
-  <sys:String x:Key="Str.ExeChoose">Choose...</sys:String>
+  <sys:String x:Key="Str.ExeChoose">Choose…</sys:String>
   <sys:String x:Key="Str.ExeUseDetected">Use the detected one</sys:String>
   <sys:String x:Key="Str.ExeNone">No executable found in this folder.</sys:String>
   <sys:String x:Key="Str.ExeNote">The width and the API are read off this file, and the routes below follow from it. A game that keeps a small launcher in the root and the real thing in Bin64 is the case this gets wrong -- if the bitness here is not the one you expect, point it at the right file.</sys:String>
@@ -134,10 +135,10 @@
   <sys:String x:Key="Str.Installing">Installing…</sys:String>
   <sys:String x:Key="Str.Removing">Removing…</sys:String>
   <sys:String x:Key="Str.InstallOk">{0} is set up. Start the game to use it.</sys:String>
-  <sys:String x:Key="Str.InstallWarn">Installed on {0}, with {1} warning(s) to read below.</sys:String>
+  <sys:String x:Key="Str.InstallWarn">Installed on {0}, with {1} warning to read below.</sys:String>
   <sys:String x:Key="Str.InstallFail">The install on {0} did not finish.</sys:String>
   <sys:String x:Key="Str.UninstallOk">Removed from {0}.</sys:String>
-  <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning(s) to read below.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning to read below.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Could not remove everything from {0}.</sys:String>
   <sys:String x:Key="Str.UninstallLeft">{0} still counts as installed: files that changed after the install were left in place.</sys:String>
   <sys:String x:Key="Str.UninstallLeftTitle">Some files were left in place</sys:String>
@@ -146,7 +147,7 @@
   <sys:String x:Key="Str.UninstallForceBody">Deletes them and puts back whatever they replaced. Your dlss5-neural.ini is kept either way.</sys:String>
   <sys:String x:Key="Str.UninstallKeep">Leave them</sys:String>
   <sys:String x:Key="Str.UninstallKeepBody">Nothing more is touched, and the game goes on counting as installed.</sys:String>
-  <sys:String x:Key="Str.ResultErrors">{0} problem(s) listed below.</sys:String>
+  <sys:String x:Key="Str.ResultErrors">{0} problem listed below.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
   <sys:String x:Key="Str.Folder">Folder</sys:String>
   <!-- Second layout pass -->
@@ -157,8 +158,8 @@
   <sys:String x:Key="Str.DetailsCount">{0} lines</sys:String>
   <sys:String x:Key="Str.PreflightOk">Ready to install</sys:String>
   <sys:String x:Key="Str.PreflightOkDetail">Nothing in the way. Pick a route below and press Install.</sys:String>
-  <sys:String x:Key="Str.PreflightWarn">Ready to install, with {0} note(s) to read</sys:String>
-  <sys:String x:Key="Str.PreflightErr">{0} problem(s) found in this folder</sys:String>
+  <sys:String x:Key="Str.PreflightWarn">Ready to install, with {0} note to read</sys:String>
+  <sys:String x:Key="Str.PreflightErr">{0} problem found in this folder</sys:String>
   <sys:String x:Key="Str.PreflightInstalled">Installed in this game</sys:String>
   <sys:String x:Key="Str.PreflightInstalledDetail">Start the game to use it. Install again to refresh the files, or uninstall to remove them.</sys:String>
   <sys:String x:Key="Str.SeeDetails">Open Details below to see what was found.</sys:String>
@@ -172,7 +173,7 @@
   <sys:String x:Key="Str.FilesHint">Downloaded once, checked against a pinned hash, and reused for every game.</sys:String>
   <sys:String x:Key="Str.PayloadReadyShort">Verified</sys:String>
   <sys:String x:Key="Str.NotDownloadedShort">Not downloaded</sys:String>
-  <sys:String x:Key="Str.SettingsSubtitle">Language, and where this app keeps its files.</sys:String>
+  <sys:String x:Key="Str.SettingsSubtitle">Language, updates, and about this app.</sys:String>
   <sys:String x:Key="Str.LanguageHint">Every label switches right away; no restart needed.</sys:String>
   <sys:String x:Key="Str.DataFolder">Data folder</sys:String>
   <!-- Routes: the names and notes Core carries in English, said in this language. -->
@@ -200,7 +201,7 @@
   <!-- First run -->
   <sys:String x:Key="Str.SetupTitle">Getting started</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Welcome</sys:String>
-  <sys:String x:Key="Str.SetupWelcomeBody">The DLSS 5 Neural Rendering network on Radeon cards, through ReShade. Four quick steps.</sys:String>
+  <sys:String x:Key="Str.SetupWelcomeBody">The DLSS 5 Neural Rendering network on Radeon cards, through ReShade or OptiScaler. Four quick steps.</sys:String>
   <sys:String x:Key="Str.SetupStepLanguage">Language</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">This machine</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Files</sys:String>
@@ -257,5 +258,86 @@
   <sys:String x:Key="Str.ReportSaved">Report saved and the folder opened: {0}</sys:String>
   <sys:String x:Key="Str.ReportFailed">The report could not be built. The logs are in {0}</sys:String>
   <sys:String x:Key="Str.ReportWorking">Collecting…</sys:String>
+
+  <!-- The sheet's two routes, the files panel, updates. -->
+  <sys:String x:Key="Str.Add">Add</sys:String>
+  <sys:String x:Key="Str.AddMenuMany">Search a folder for games…</sys:String>
+  <sys:String x:Key="Str.AddMenuOne">One game's folder…</sys:String>
+  <sys:String x:Key="Str.AddMenuEmulator">An emulator…</sys:String>
+  <sys:String x:Key="Str.UpdateShort">Update</sys:String>
+  <sys:String x:Key="Str.GamesAway">{0} on a drive that is not connected</sys:String>
+  <sys:String x:Key="Str.GamesAwayHint">Games on a drive that is not plugged in right now stay remembered, with everything chosen for them, and come back when the drive does.</sys:String>
+  <sys:String x:Key="Str.GameGone">{0} is no longer installed, so it left the list.</sys:String>
+  <sys:String x:Key="Str.GamesGone">{0} game is no longer installed, so it left the list.</sys:String>
+  <sys:String x:Key="Str.GamesGone.Many">{0} games are no longer installed, so they left the list.</sys:String>
+  <sys:String x:Key="Str.ShowDetails">Show the details</sys:String>
+  <sys:String x:Key="Str.DetectedSection">Detected</sys:String>
+  <sys:String x:Key="Str.CheckApiTip">Files say what a game links against, not what it runs on: one folder can hold a D3D11 and a D3D12 executable. The wiki says which the game uses.</sys:String>
+  <sys:String x:Key="Str.DetectedFromFiles">Read from the game's own files.</sys:String>
+  <sys:String x:Key="Str.DetectedFromWiki">From PCGamingWiki and the game's files.</sys:String>
+  <sys:String x:Key="Str.InstallWith">Install with</sys:String>
+  <sys:String x:Key="Str.RouteReShade">ReShade + add-on</sys:String>
+  <sys:String x:Key="Str.RouteOpti">OptiScaler</sys:String>
+  <sys:String x:Key="Str.Recommended">Recommended</sys:String>
+  <sys:String x:Key="Str.RecommendedLower">recommended</sys:String>
+  <sys:String x:Key="Str.RouteReShadeSummary">The add-on inside ReShade. D3D11, D3D12, Vulkan, OpenGL, 32-bit games and emulators.</sys:String>
+  <sys:String x:Key="Str.RouteReShadeMisfit">No ReShade route for what this game reads as ({0}).</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummary">Runs inside the game's DLSS, FSR or XeSS, with its own depth and motion. Replaces ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiFound">Runs inside the game's upscaler ({0} found here). Replaces ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfit">Made for 64-bit D3D12 games; this one reads as {0}.</sys:String>
+  <sys:String x:Key="Str.ApiSection">Graphics API</sys:String>
+  <sys:String x:Key="Str.Group64">64-bit games</sys:String>
+  <sys:String x:Key="Str.Group32">32-bit games (experimental)</sys:String>
+  <sys:String x:Key="Str.GroupEmulators">Emulators</sys:String>
+  <sys:String x:Key="Str.OptiAbout">Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS and runs the network inside it, with the game's own depth and motion vectors.</sys:String>
+  <sys:String x:Key="Str.InGame">In the game</sys:String>
+  <sys:String x:Key="Str.OptiStep1">Turn on DLSS, FSR or XeSS in the game's graphics settings.</sys:String>
+  <sys:String x:Key="Str.OptiStep2">Press Insert, open the Neural tab and turn on Enable NR.</sys:String>
+  <sys:String x:Key="Str.OptiStep3">With Ray Reconstruction on, set the processing point to "After the finished frame".</sys:String>
+  <sys:String x:Key="Str.InstallOpti">Install OptiScaler</sys:String>
+  <sys:String x:Key="Str.Update">Update</sys:String>
+  <sys:String x:Key="Str.Reinstall">Reinstall</sys:String>
+  <sys:String x:Key="Str.SwitchToOpti">Switch to OptiScaler</sys:String>
+  <sys:String x:Key="Str.SwitchToReShade">Switch to ReShade</sys:String>
+  <sys:String x:Key="Str.SwitchTitle">Switch to {0}?</sys:String>
+  <sys:String x:Key="Str.SwitchBody">{0} has the {1} route installed, and the two cannot be in one folder at once. {1} is removed first, putting back anything it replaced, and then {2} is installed.</sys:String>
+  <sys:String x:Key="Str.SwitchYes">Remove {0}, install {1}</sys:String>
+  <sys:String x:Key="Str.SwitchYesBody">Your own settings files stay where they are.</sys:String>
+  <sys:String x:Key="Str.SwitchNoBody">Nothing is changed; {0} stays installed.</sys:String>
+  <sys:String x:Key="Str.DownloadFailedDetail">Why is under Details. Nothing was installed.</sys:String>
+  <sys:String x:Key="Str.DownloadFailedHelp">The files can also be fetched with a browser and handed over: This machine &gt; Files &gt; Download manually, then Import files. Files in your Downloads folder are found on their own.</sys:String>
+  <sys:String x:Key="Str.PreflightErr.Many">{0} problems found in this folder</sys:String>
+  <sys:String x:Key="Str.PreflightWarn.Many">Ready to install, with {0} notes to read</sys:String>
+  <sys:String x:Key="Str.InstallWarn.Many">Installed on {0}, with {1} warnings to read below.</sys:String>
+  <sys:String x:Key="Str.UninstallWarn.Many">Removed from {0}, with {1} warnings to read below.</sys:String>
+  <sys:String x:Key="Str.ResultErrors.Many">{0} problems listed below.</sys:String>
+  <sys:String x:Key="Str.ManifestFailedShort">No download list</sys:String>
+  <sys:String x:Key="Str.FailedShort">Failed</sys:String>
+  <sys:String x:Key="Str.PayloadsAllReadyShort">All {0} ready</sys:String>
+  <sys:String x:Key="Str.PayloadsMissingShort">{0} missing · {1}</sys:String>
+  <sys:String x:Key="Str.DownloadFailedOne">Could not download: {0}</sys:String>
+  <sys:String x:Key="Str.ManualDownload">Download manually</sys:String>
+  <sys:String x:Key="Str.ImportFiles">Import files…</sys:String>
+  <sys:String x:Key="Str.ImportHint">Pick a folder with files you downloaded yourself. Each one is found by its name and taken only if it matches its pinned hash.</sys:String>
+  <sys:String x:Key="Str.ManualTitle">Download the files yourself</sys:String>
+  <sys:String x:Key="Str.ManualBody">Open each link in a browser and save the file anywhere: the Downloads folder is searched on its own, and Import files takes any other folder. Names do not need changing, and nothing that does not match its pinned SHA-256 is used.</sys:String>
+  <sys:String x:Key="Str.ImportPick">Pick the folder with the files you downloaded</sys:String>
+  <sys:String x:Key="Str.ImportAll">Every file is here now and verified.</sys:String>
+  <sys:String x:Key="Str.ImportNothing">Nothing in that folder matched a file this needs.</sys:String>
+  <sys:String x:Key="Str.ImportSome">{0} file(s) taken; {1} still missing.</sys:String>
+  <sys:String x:Key="Str.Component.addon">Add-on</sys:String>
+  <sys:String x:Key="Str.Component.runtime">Neural runtime and weights</sys:String>
+  <sys:String x:Key="Str.Component.reshade">ReShade</sys:String>
+  <sys:String x:Key="Str.Component.bridge">32-bit bridge</sys:String>
+  <sys:String x:Key="Str.Component.x86-extras">32-bit extras</sys:String>
+  <sys:String x:Key="Str.Component.shader">Companion effect</sys:String>
+  <sys:String x:Key="Str.Updates">Updates</sys:String>
+  <sys:String x:Key="Str.UpToDate">Up to date</sys:String>
+  <sys:String x:Key="Str.UpdateChecking">Checking for a newer version…</sys:String>
+  <sys:String x:Key="Str.UpdateLatest">v{0} is the newest version. Checked at {1}.</sys:String>
+  <sys:String x:Key="Str.UpdateOut">v{0} is out. This is v{1}.</sys:String>
+  <sys:String x:Key="Str.UpdateFailed">Could not check: GitHub did not answer. The app works the same either way.</sys:String>
+  <sys:String x:Key="Str.UpdateNow">Update now</sys:String>
+  <sys:String x:Key="Str.UpdateCheck">Check for updates</sys:String>
 
 </ResourceDictionary>

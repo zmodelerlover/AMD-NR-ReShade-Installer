@@ -441,7 +441,7 @@ public class PayloadTests
         Assert.Empty(empty);
 
         // And both routes have to ask for the component, or there is nothing on disk to plan.
-        var ui = File.ReadAllText(FindUp("src/AmdNr.App/MainWindow.axaml.cs"));
+        var ui = File.ReadAllText(FindUp("src/AmdNr.App/Sheet/GameSheet.Actions.cs"));
         var asks = ui.Split("ShaderComponent").Length - 1;
         Assert.True(asks >= 2, $"ComponentsFor names ShaderComponent {asks} time(s); both routes need it");
     }

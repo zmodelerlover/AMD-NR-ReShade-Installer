@@ -20,7 +20,9 @@
   <SolidColorBrush x:Key="Text" Color="#F0EAE8" />
   <SolidColorBrush x:Key="TextSoft" Color="#DDD3D0" />
   <SolidColorBrush x:Key="Muted" Color="#A89A95" />
-  <SolidColorBrush x:Key="Faint" Color="#7C706C" />
+  <!-- Captions are 11 px, and at #7C706C they measured 3.8:1 on a card, below what small text needs.
+       This is 4.7:1 and still a clear step below Muted. -->
+  <SolidColorBrush x:Key="Faint" Color="#8C7F7A" />
   <SolidColorBrush x:Key="Ok" Color="#5CB37E" />
   <SolidColorBrush x:Key="OkSoft" Color="#1F5CB37E" />
   <SolidColorBrush x:Key="Warn" Color="#DDA13A" />

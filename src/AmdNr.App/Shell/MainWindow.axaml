@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AmdNr.App"
+        x:Class="AmdNr.App.MainWindow"
+        Title="AMD-NR ReShade Installer"
+        Icon="avares://AMD-NR-ReShade-Installer/Assets/app.ico"
+        Width="1240" Height="800" MinWidth="980" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Bg}">
+
+  <!-- The frame: the rail, the update banner, whichever page is open, the game sheet over them all,
+       and the toast. Each page is its own control and does its own work. -->
+  <Grid ColumnDefinitions="72,*">
+
+    <Border Grid.Column="0" Background="{DynamicResource Rail}" BorderBrush="{DynamicResource Border}"
+            BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0" Width="40" Height="40" Margin="0,18,0,22" CornerRadius="11"
+                Background="{DynamicResource LogoFill}" BoxShadow="0 6 18 0 #59A61C22"
+                ToolTip.Tip="{DynamicResource Str.AppTitle}">
+          <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
+                 Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+
+        <StackPanel Grid.Row="1" Spacing="4">
+          <RadioButton x:Name="TabGames" Classes="rail" GroupName="nav" IsChecked="True"
+                       ToolTip.Tip="{DynamicResource Str.Games}" ToolTip.Placement="Right"
+                       AutomationProperties.Name="{DynamicResource Str.Games}" Checked="OnTabChanged">
+            <PathIcon Data="{StaticResource IconGames}" />
+          </RadioButton>
+          <RadioButton x:Name="TabSystem" Classes="rail" GroupName="nav"
+                       ToolTip.Tip="{DynamicResource Str.System}" ToolTip.Placement="Right"
+                       AutomationProperties.Name="{DynamicResource Str.System}" Checked="OnTabChanged">
+            <PathIcon Data="{StaticResource IconChip}" />
+          </RadioButton>
+          <RadioButton x:Name="TabSettings" Classes="rail" GroupName="nav"
+                       ToolTip.Tip="{DynamicResource Str.Settings}" ToolTip.Placement="Right"
+                       AutomationProperties.Name="{DynamicResource Str.Settings}" Checked="OnTabChanged">
+            <Panel>
+              <PathIcon Data="{StaticResource IconSettings}" />
+              <!-- A newer release is out: the page that says so is marked, so it is found. -->
+              <Ellipse x:Name="UpdateDot" Width="8" Height="8" Fill="{DynamicResource Warn}" IsVisible="False"
+                       HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-4,0" />
+            </Panel>
+          </RadioButton>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" x:Name="VersionText" Classes="caption" Margin="0,0,0,14" HorizontalAlignment="Center" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1" RowDefinitions="Auto,*">
+      <Border x:Name="UpdateBanner" Grid.Row="0" IsVisible="False" Margin="24,16,24,0"
+              Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Chrome}"
+              BorderThickness="1" CornerRadius="12" Padding="12,10">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+          <Border Grid.Column="0" Classes="iconTile warn" Width="32" Height="32" CornerRadius="8" VerticalAlignment="Center">
+            <PathIcon Data="{StaticResource IconDownload}" Width="16" Height="16" />
+          </Border>
+          <TextBlock Grid.Column="1" x:Name="UpdateText" Margin="12,0" FontWeight="SemiBold"
+                     VerticalAlignment="Center" TextWrapping="Wrap" />
+          <Button Grid.Column="2" x:Name="UpdateButton" Classes="primary" Content="{DynamicResource Str.UpdateNow}" Click="OnUpdate" />
+          <Button Grid.Column="3" Classes="ghost" Margin="8,0,0,0" Content="{DynamicResource Str.Dismiss}" Click="OnDismissUpdate" />
+        </Grid>
+      </Border>
+
+      <Panel Grid.Row="1">
+        <local:LibraryPage x:Name="GamesPage" />
+        <local:MachinePage x:Name="SystemPage" IsVisible="False" />
+        <local:SettingsPage x:Name="SettingsPage" IsVisible="False" />
+        <local:GameSheet x:Name="Sheet" />
+
+        <!-- Toast: a one-line summary at the bottom, for results that happen away from the sheet. -->
+        <Border x:Name="ToastBox" Classes="toast" IsHitTestVisible="False"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="24,0,24,24" MaxWidth="520">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <PathIcon x:Name="ToastIcon" Width="16" Height="16" VerticalAlignment="Center" />
+            <TextBlock x:Name="ToastText" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="460" />
+          </StackPanel>
+        </Border>
+      </Panel>
+    </Grid>
+  </Grid>
+</Window>

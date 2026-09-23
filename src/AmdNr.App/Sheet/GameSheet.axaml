@@ -1,0 +1,378 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.GameSheet"
+             IsVisible="False">
+
+  <!-- A large sheet over the library, the game's own art behind its header. The choice it exists for
+       comes first: which of the two routes, then what that route needs to know, then the evidence. -->
+  <Panel x:Name="Drawer">
+    <Border Background="#C2080505" PointerPressed="OnBackdropPressed" />
+    <Border x:Name="DrawerPanel" Margin="24" MaxWidth="900" MaxHeight="920"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{DynamicResource Surface}" BorderBrush="{DynamicResource BorderStrong}"
+            BorderThickness="1" CornerRadius="16" ClipToBounds="True" BoxShadow="0 30 80 0 #D0000000">
+      <Panel x:Name="DrawerHeader" x:DataType="local:GameCard">
+        <Panel Height="240" VerticalAlignment="Top" ClipToBounds="True" IsHitTestVisible="False">
+          <Image Source="{Binding Cover}" Stretch="UniformToFill" Opacity="0.5" Effect="blur(48)" />
+          <Border Background="{DynamicResource HeroFade}" />
+        </Panel>
+
+        <Grid ColumnDefinitions="Auto,*" Margin="24">
+          <!-- Left: the cover, where the game lives, and what can be done with it besides installing. -->
+          <StackPanel Grid.Column="0" Width="208" Spacing="12">
+            <Border x:Name="CoverBox" CornerRadius="12" ClipToBounds="True" Height="312" BoxShadow="0 14 34 0 #99000000">
+              <Panel>
+                <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                  <TextBlock Text="{Binding Initials}" FontSize="56" FontWeight="Bold" Foreground="#38FFFFFF"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
+              </Panel>
+            </Border>
+            <StackPanel Spacing="4" Margin="2,4,2,0">
+              <TextBlock Text="{DynamicResource Str.Location}" Classes="section" />
+              <!-- One line, cut in the middle: a folder path has no spaces to wrap on. -->
+              <TextBlock Text="{Binding Path}" Classes="muted" TextTrimming="PathSegmentEllipsis"
+                         ToolTip.Tip="{Binding Path}" />
+            </StackPanel>
+            <!-- A ghost: Install is the one red button on this sheet. -->
+            <Button x:Name="PlayButton" Classes="ghost" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Click="OnPlay"
+                    AutomationProperties.Name="{DynamicResource Str.Play}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconPlay}" />
+                <TextBlock x:Name="PlayLabel" Text="{DynamicResource Str.Play}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Click="OnOpenFolder" AutomationProperties.Name="{DynamicResource Str.OpenFolder}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconFolder}" />
+                <TextBlock Text="{DynamicResource Str.OpenFolder}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button x:Name="RemoveButton" Classes="ghost" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Click="OnRemoveGame"
+                    ToolTip.Tip="{DynamicResource Str.RemoveGameHint}"
+                    AutomationProperties.Name="{DynamicResource Str.RemoveGame}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconDelete}" />
+                <TextBlock Text="{DynamicResource Str.RemoveGame}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+
+          <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" Margin="28,0,0,0">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="10" Margin="0,4,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Border Classes="tag">
+                    <Panel>
+                      <TextBlock Text="{Binding Platform}" IsVisible="{Binding IsLauncher}" />
+                      <TextBlock Text="{DynamicResource Str.Folder}" IsVisible="{Binding IsManual}" />
+                    </Panel>
+                  </Border>
+                  <Border Classes="tag"><TextBlock x:Name="ApiTag" /></Border>
+                  <Border Classes="state" Classes.update="{Binding Outdated}" Classes.pulse="{Binding Pulsing}"
+                          IsVisible="{Binding Installed}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding !Outdated}" />
+                      <PathIcon Data="{StaticResource IconDownload}" IsVisible="{Binding Outdated}" />
+                      <TextBlock Text="{DynamicResource Str.UpdateShort}" IsVisible="{Binding Outdated}" />
+                      <TextBlock Text="·" IsVisible="{Binding Outdated}" />
+                      <TextBlock Text="{Binding InstalledName}" />
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+                <TextBlock Text="{Binding Name}" Classes="page" TextWrapping="Wrap" MaxLines="2"
+                           TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <Button Grid.Column="1" x:Name="CloseButton" Classes="ghost icon" Click="OnClose"
+                      VerticalAlignment="Top" Margin="12,0,0,0"
+                      AutomationProperties.Name="{DynamicResource Str.Close}"
+                      ToolTip.Tip="{DynamicResource Str.CloseHint}">
+                <PathIcon Data="{StaticResource IconClose}" />
+              </Button>
+            </Grid>
+
+            <!-- The gutter for the scrollbar is the content's margin, not the scroller's padding. -->
+            <ScrollViewer Grid.Row="1" x:Name="ReportScroll" Margin="0,18,0,0" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Spacing="18" Margin="0,0,14,4">
+                <!-- The verdict, or what the running action is doing. -->
+                <StackPanel Spacing="12">
+                  <Border x:Name="ReportEmpty" Classes="result">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                      <Arc Classes="spin" Stroke="{DynamicResource Muted}" />
+                      <TextBlock Text="{DynamicResource Str.Checking}" Foreground="{DynamicResource Muted}"
+                                 VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Border>
+                  <Border x:Name="ResultBanner" Classes="result" IsVisible="False">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <Border Grid.Column="0" x:Name="ResultDot" Classes="iconTile" Margin="0,0,14,0">
+                        <Panel>
+                          <PathIcon x:Name="ResultGlyph" Width="20" Height="20" />
+                          <Arc x:Name="ResultSpin" Classes="spin" Width="18" Height="18"
+                               Stroke="{DynamicResource AccentText}" IsVisible="False" HorizontalAlignment="Center" />
+                        </Panel>
+                      </Border>
+                      <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock x:Name="ResultTitle" Classes="subtitle" TextWrapping="Wrap" />
+                        <TextBlock x:Name="ResultDetail" Classes="muted" TextWrapping="Wrap" />
+                        <Button x:Name="ShowDetailsButton" Classes="link" Click="OnShowDetails" IsVisible="False"
+                                Content="{DynamicResource Str.ShowDetails}" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                  <Grid x:Name="Steps" ColumnDefinitions="*,*,*,*" IsVisible="False" Margin="2,0">
+                    <Border Grid.Column="0" Classes="step" Margin="0,0,6,0">
+                      <StackPanel Spacing="6"><Border Classes="seg" /><TextBlock Text="{DynamicResource Str.StepDownload}" /></StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Classes="step" Margin="0,0,6,0">
+                      <StackPanel Spacing="6"><Border Classes="seg" /><TextBlock Text="{DynamicResource Str.StepVerify}" /></StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Classes="step" Margin="0,0,6,0">
+                      <StackPanel Spacing="6"><Border Classes="seg" /><TextBlock Text="{DynamicResource Str.StepInstall}" /></StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Classes="step">
+                      <StackPanel Spacing="6"><Border Classes="seg" /><TextBlock Text="{DynamicResource Str.StepDone}" /></StackPanel>
+                    </Border>
+                  </Grid>
+                </StackPanel>
+
+                <!-- Everything the person can change, locked as one while something is running. -->
+                <StackPanel x:Name="Options" Spacing="18">
+                  <!-- What the route is read off. Detection picks the file out of the folder and can
+                       pick a launcher instead of the game, so it is shown and it can be changed. -->
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{DynamicResource Str.DetectedSection}" Classes="section" />
+                    <Border Classes="detect">
+                      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+                          <TextBlock x:Name="ExeLine" FontWeight="SemiBold" TextWrapping="Wrap" />
+                          <WrapPanel>
+                            <TextBlock x:Name="DetectedHow" Classes="muted" TextWrapping="Wrap" Margin="0,0,8,0"
+                                       VerticalAlignment="Center" />
+                            <Button Classes="link" Click="OnOpenWiki" ToolTip.Tip="{DynamicResource Str.CheckApiTip}"
+                                    AutomationProperties.Name="{DynamicResource Str.CheckWiki}">
+                              <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{DynamicResource Str.CheckWiki}" />
+                                <PathIcon Data="{StaticResource IconExternal}" Width="12" Height="12" />
+                              </StackPanel>
+                            </Button>
+                          </WrapPanel>
+                        </StackPanel>
+                        <Button Grid.Column="1" x:Name="ExeButton" Classes="ghost" Click="OnChooseExecutable"
+                                VerticalAlignment="Center" />
+                      </Grid>
+                    </Border>
+                    <TextBlock x:Name="ExeNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                    <Border x:Name="ApiHintBox" Classes="callout" IsVisible="False">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="16" Height="16"
+                                  Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
+                        <TextBlock Grid.Column="1" x:Name="ApiHint" TextWrapping="Wrap" LineHeight="19"
+                                   Foreground="{DynamicResource WarnText}" />
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+
+                  <!-- The two ways in. They are alternatives, so the choice is two cards, not one list. -->
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{DynamicResource Str.InstallWith}" Classes="section" />
+                    <Grid ColumnDefinitions="*,12,*">
+                      <RadioButton Grid.Column="0" x:Name="RouteReShade" Classes="route" GroupName="route"
+                                   IsCheckedChanged="OnRouteChanged" AutomationProperties.Name="ReShade">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                          <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconLayers}" /></Border>
+                          <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="{DynamicResource Str.RouteReShade}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <WrapPanel ItemSpacing="4" LineSpacing="4">
+                              <Border x:Name="ReShadeRecommended" Classes="status ok"><TextBlock Text="{DynamicResource Str.Recommended}" /></Border>
+                              <Border x:Name="ReShadeInstalled" Classes="status ok">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                  <PathIcon Data="{StaticResource IconCheck}" />
+                                  <TextBlock Text="{DynamicResource Str.InstalledBadge}" />
+                                </StackPanel>
+                              </Border>
+                            </WrapPanel>
+                          </StackPanel>
+                          <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="ReShadeSummary" Classes="muted"
+                                     TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="17" />
+                        </Grid>
+                      </RadioButton>
+                      <RadioButton Grid.Column="2" x:Name="RouteOpti" Classes="route" GroupName="route"
+                                   IsCheckedChanged="OnRouteChanged" AutomationProperties.Name="OptiScaler">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                          <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconSparkle}" /></Border>
+                          <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="{DynamicResource Str.RouteOpti}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <WrapPanel ItemSpacing="4" LineSpacing="4">
+                              <Border x:Name="OptiRecommended" Classes="status ok"><TextBlock Text="{DynamicResource Str.Recommended}" /></Border>
+                              <Border x:Name="OptiInstalled" Classes="status ok">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                  <PathIcon Data="{StaticResource IconCheck}" />
+                                  <TextBlock Text="{DynamicResource Str.InstalledBadge}" />
+                                </StackPanel>
+                              </Border>
+                            </WrapPanel>
+                          </StackPanel>
+                          <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="OptiSummary" Classes="muted"
+                                     TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="17" />
+                        </Grid>
+                      </RadioButton>
+                    </Grid>
+
+                    <!-- ReShade: which API, the name it loads as, and the add-on version. -->
+                    <Border x:Name="ReShadePanel" Classes="routePanel">
+                      <StackPanel Spacing="12">
+                        <StackPanel Spacing="6">
+                          <TextBlock Text="{DynamicResource Str.ApiSection}" Classes="section" />
+                          <ComboBox x:Name="PresetBox" HorizontalAlignment="Stretch" SelectionChanged="OnPresetChanged"
+                                    AutomationProperties.Name="{DynamicResource Str.ApiSection}" />
+                          <TextBlock x:Name="PresetNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
+                        <Border x:Name="MismatchBox" Classes="callout" IsVisible="False">
+                          <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource IconWarn}" Width="16" Height="16"
+                                      Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
+                            <TextBlock Grid.Column="1" x:Name="MismatchText" TextWrapping="Wrap" LineHeight="19"
+                                       Foreground="{DynamicResource WarnText}" />
+                          </Grid>
+                        </Border>
+                        <Grid ColumnDefinitions="*,12,*">
+                          <StackPanel Grid.Column="0" x:Name="ProxySection" Spacing="6">
+                            <TextBlock Text="{DynamicResource Str.ProxySection}" Classes="section" />
+                            <ComboBox x:Name="ProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
+                                      AutomationProperties.Name="{DynamicResource Str.ProxySection}" />
+                            <TextBlock Text="{DynamicResource Str.ProxyNote}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          </StackPanel>
+                          <StackPanel Grid.Column="2" x:Name="VersionSection" Spacing="6">
+                            <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
+                            <ComboBox x:Name="AddonVersionBox" HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnAddonVersionChanged"
+                                      AutomationProperties.Name="{DynamicResource Str.VersionSection}" />
+                            <TextBlock x:Name="VersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          </StackPanel>
+                        </Grid>
+                      </StackPanel>
+                    </Border>
+
+                    <!-- OptiScaler: the name it loads as, and the three things to do in the game. -->
+                    <Border x:Name="OptiPanel" Classes="routePanel" IsVisible="False">
+                      <StackPanel Spacing="12">
+                        <TextBlock Text="{DynamicResource Str.OptiAbout}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        <Border x:Name="OptiMismatchBox" Classes="callout" IsVisible="False">
+                          <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource IconWarn}" Width="16" Height="16"
+                                      Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
+                            <TextBlock Grid.Column="1" x:Name="OptiMismatchText" TextWrapping="Wrap" LineHeight="19"
+                                       Foreground="{DynamicResource WarnText}" />
+                          </Grid>
+                        </Border>
+                        <StackPanel Spacing="6">
+                          <TextBlock Text="{DynamicResource Str.ProxySectionOpti}" Classes="section" />
+                          <ComboBox x:Name="OptiProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
+                                    AutomationProperties.Name="{DynamicResource Str.ProxySectionOpti}" />
+                          <TextBlock Text="{DynamicResource Str.ProxyNoteOpti}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                          <TextBlock Text="{DynamicResource Str.InGame}" Classes="section" />
+                          <Grid ColumnDefinitions="22,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
+                            <TextBlock Grid.Row="0" Text="1" Classes="stepNumber" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{DynamicResource Str.OptiStep1}" TextWrapping="Wrap" />
+                            <TextBlock Grid.Row="1" Text="2" Classes="stepNumber" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{DynamicResource Str.OptiStep2}" TextWrapping="Wrap" />
+                            <TextBlock Grid.Row="2" Text="3" Classes="stepNumber" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{DynamicResource Str.OptiStep3}" TextWrapping="Wrap" />
+                          </Grid>
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </StackPanel>
+                </StackPanel>
+
+                <!-- The raw pre-flight, for whoever wants to see why. -->
+                <Expander x:Name="DetailsExpander" Classes="details">
+                  <Expander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <TextBlock Text="{DynamicResource Str.Details}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <TextBlock x:Name="DetailsCount" Classes="caption" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Expander.Header>
+                  <StackPanel Spacing="8">
+                    <SelectableTextBlock x:Name="DetectedLine" Classes="muted" TextWrapping="Wrap" />
+                    <ItemsControl x:Name="ReportList">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:ReportLine">
+                          <Grid Classes="line" ColumnDefinitions="22,*" Margin="0,4">
+                            <PathIcon Grid.Column="0" Data="{Binding Glyph}" Foreground="{Binding Brush}"
+                                      Width="13" Height="13" VerticalAlignment="Top" HorizontalAlignment="Left"
+                                      Margin="0,2,0,0" />
+                            <SelectableTextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap" FontSize="12"
+                                                 Foreground="{DynamicResource TextSoft}" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Expander>
+
+                <!-- The install can say "done" and the game still show nothing: that is the most
+                     common failure this project has, and it is the one a clean banner hides. So the
+                     offer to report stands whatever the result was. -->
+                <Border Classes="callout" Background="Transparent" BorderBrush="{DynamicResource Border}">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                      <TextBlock Text="{DynamicResource Str.ReportTitle}" FontWeight="SemiBold" FontSize="13" />
+                      <TextBlock Text="{DynamicResource Str.ReportBody}" Classes="muted" TextWrapping="Wrap" FontSize="12" />
+                    </StackPanel>
+                    <Button Grid.Column="1" x:Name="ReportButton" Classes="ghost" Margin="12,0,0,0"
+                            VerticalAlignment="Center" Click="OnReport"
+                            AutomationProperties.Name="{DynamicResource Str.Report}">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconReport}" />
+                        <TextBlock Text="{DynamicResource Str.Report}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </ScrollViewer>
+
+            <!-- Action bar, pinned -->
+            <Border Grid.Row="2" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
+                    Padding="0,16,0,0" Margin="0,12,0,0">
+              <StackPanel Spacing="10">
+                <ProgressBar x:Name="Progress" Height="4" MinHeight="4" IsVisible="False" CornerRadius="2"
+                             Foreground="{DynamicResource AccentHover}" Background="{DynamicResource SurfaceTop}" />
+                <!-- The sentence gets the full width above the buttons: beside them it was cut
+                     mid-word as soon as the window narrowed. -->
+                <TextBlock x:Name="StatusText" Classes="muted" TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <Button Grid.Column="0" HorizontalAlignment="Right" x:Name="UninstallButton" Classes="ghost danger large"
+                          Click="OnUninstall" Margin="0,0,8,0" AutomationProperties.Name="{DynamicResource Str.Uninstall}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <PathIcon x:Name="UninstallIcon" Data="{StaticResource IconDelete}" />
+                      <Arc x:Name="UninstallSpin" Classes="spin" Stroke="{DynamicResource Text}" IsVisible="False" />
+                      <TextBlock x:Name="UninstallLabel" Text="{DynamicResource Str.Uninstall}" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Column="1" x:Name="InstallButton" Classes="primary large" Click="OnInstall" MinWidth="168"
+                          HorizontalContentAlignment="Center" AutomationProperties.Name="{DynamicResource Str.Install}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <PathIcon x:Name="InstallIcon" Data="{StaticResource IconDownload}" />
+                      <Arc x:Name="InstallSpin" Classes="spin" Stroke="White" IsVisible="False" />
+                      <TextBlock x:Name="InstallLabel" Text="{DynamicResource Str.Install}" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Grid>
+      </Panel>
+    </Border>
+  </Panel>
+</UserControl>

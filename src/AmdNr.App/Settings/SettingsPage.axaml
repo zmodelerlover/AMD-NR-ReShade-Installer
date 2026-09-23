@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.SettingsPage">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollViewer.AllowAutoHide="False">
+    <!-- The same width as "This machine", so the title does not jump sideways between the two. -->
+    <StackPanel Spacing="20" MaxWidth="880" Margin="32,26,32,32" HorizontalAlignment="Stretch">
+      <StackPanel Spacing="4">
+        <TextBlock Text="{DynamicResource Str.Settings}" Classes="page" />
+        <TextBlock Text="{DynamicResource Str.SettingsSubtitle}" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" />
+      </StackPanel>
+
+      <Border Classes="card">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Classes="iconTile neutral" Margin="0,0,14,0" VerticalAlignment="Center"><PathIcon Data="{StaticResource IconGlobe}" /></Border>
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center" Margin="0,0,16,0">
+            <TextBlock Text="{DynamicResource Str.Language}" Classes="subtitle" />
+            <TextBlock Text="{DynamicResource Str.LanguageHint}" Classes="muted" TextWrapping="Wrap" />
+          </StackPanel>
+          <ComboBox Grid.Column="2" x:Name="LanguageBox" Width="220" VerticalAlignment="Center"
+                    SelectionChanged="OnLanguageChanged" AutomationProperties.Name="{DynamicResource Str.Language}" />
+        </Grid>
+      </Border>
+
+      <!-- Updates: whether this is the newest release, said either way. -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border x:Name="UpdateTile" Classes="iconTile neutral" Margin="0,0,14,0" VerticalAlignment="Center">
+            <Panel>
+              <PathIcon x:Name="UpdateIcon" Data="{StaticResource IconRefresh}" />
+              <Arc x:Name="UpdateSpin" Classes="spin" Width="18" Height="18" Stroke="{DynamicResource Muted}"
+                   IsVisible="False" HorizontalAlignment="Center" />
+            </Panel>
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center" Margin="0,0,16,0">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="{DynamicResource Str.Updates}" Classes="subtitle" VerticalAlignment="Center" />
+              <Border x:Name="UpdatePill" Classes="status" IsVisible="False">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <PathIcon x:Name="UpdatePillIcon" />
+                  <TextBlock x:Name="UpdatePillText" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <TextBlock x:Name="UpdateText" Classes="muted" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button Grid.Column="2" x:Name="UpdateButton" Classes="ghost" VerticalAlignment="Center" Click="OnUpdate" />
+        </Grid>
+      </Border>
+
+      <Border Classes="card" Padding="0">
+        <StackPanel>
+          <Grid ColumnDefinitions="Auto,*" Margin="20,18">
+            <Border Width="40" Height="40" CornerRadius="11" Margin="0,0,14,0" Background="{DynamicResource LogoFill}">
+              <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
+                     Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="{DynamicResource Str.AppTitle}" Classes="subtitle" />
+                <TextBlock x:Name="AboutVersion" Classes="caption" VerticalAlignment="Center" Margin="0,2,0,0" />
+              </StackPanel>
+              <TextBlock Text="{DynamicResource Str.Subtitle}" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+          </Grid>
+          <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,16">
+            <local:CreditsPanel />
+          </Border>
+          <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="20,12"
+                  Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <TextBlock Text="{DynamicResource Str.DataFolder}" Classes="caption" VerticalAlignment="Center" Margin="0,0,12,0" />
+              <TextBlock Grid.Column="1" x:Name="DataFolderText" Classes="muted" VerticalAlignment="Center"
+                         TextTrimming="PathSegmentEllipsis" />
+              <Button Grid.Column="2" Classes="ghost small" Margin="12,0,0,0" Content="{DynamicResource Str.OpenFolder}"
+                      Click="OnOpenData" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
