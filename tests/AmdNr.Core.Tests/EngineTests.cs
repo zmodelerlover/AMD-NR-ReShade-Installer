@@ -91,6 +91,16 @@ public class EngineTests
     }
 
     [Fact]
+    public void TheX86PanelIsDockedUnderItsOwnTitle()
+    {
+        const string home = "[OVERLAY]\nWindow=[Window][###home],Collapsed=0,DockId=0x0000ABCD,,0\n";
+        var s = Engine.FirstDock(home, 1920, 1080, Engine.PanelTitle32);
+        Assert.Contains("[Window][AMD Neural Rendering (32-bit)],Collapsed=0,DockId=0x0000ABCD", s,
+            StringComparison.Ordinal);
+        Assert.Equal(s, Engine.FirstDock(s, 1920, 1080, Engine.PanelTitle32));
+    }
+
+    [Fact]
     public void AFreshInstallWritesTheX86TuningDefaults()
     {
         var ini = Engine.FreshIni();

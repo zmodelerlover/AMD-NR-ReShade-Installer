@@ -133,7 +133,7 @@ public sealed class X86Installer(string release)
         // The same preparation the x64 route does, through the same function. This one used to dock
         // the panel and stop there, so an add-on the person had unticked in ReShade's Add-ons tab
         // stayed unticked: the install reported success, every file was correct, and nothing loaded.
-        var after = Work.ReadyReShadeIni(before, Width, Height);
+        var after = Work.ReadyReShadeIni(before, Width, Height, Engine.PanelTitle32);
         if (before != after) p["ReShade.ini"] = Encoding.UTF8.GetBytes(after);
 
         return p;

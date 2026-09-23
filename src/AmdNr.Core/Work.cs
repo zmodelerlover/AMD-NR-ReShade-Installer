@@ -444,7 +444,8 @@ public static partial class Work
     /// <summary>ReShade.ini as it has to be for the add-on to be usable the first time the game
     /// starts: the add-on not disabled, the tutorial that covers the screen already dismissed, and the
     /// panel docked. Every other key someone has set is left exactly as it was.</summary>
-    internal static string ReadyReShadeIni(string ini, uint width = 1920, uint height = 1080)
+    internal static string ReadyReShadeIni(string ini, uint width = 1920, uint height = 1080,
+        string panel = Engine.PanelTitle)
     {
         var disabled = Engine.GetIni(ini, "ADDON", "DisabledAddons");
         if (IsOurs(disabled))
@@ -455,7 +456,7 @@ public static partial class Work
         }
         if (Engine.GetIni(ini, "OVERLAY", "TutorialProgress").Length == 0)
             ini = Engine.SetIni(ini, "OVERLAY", "TutorialProgress", "4");
-        return Engine.FirstDock(ini, width, height);
+        return Engine.FirstDock(ini, width, height, panel);
     }
 
     /// <summary>For an emulator route, whether the emulator is actually in this folder. Any of its
