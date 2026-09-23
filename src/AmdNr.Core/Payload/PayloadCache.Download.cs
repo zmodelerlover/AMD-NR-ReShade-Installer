@@ -3,42 +3,97 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
+using System.Security.Authentication;
 
 namespace AmdNr.Core;
 
 public sealed partial class PayloadCache
 {
+    /// <summary>How many times one address is picked up again after it cut a download off part
+    /// way. Only then: a connection that dropped after 80 MB is worth resuming, and one that never
+    /// got going will not get going on a second try either -- the next address might.</summary>
+    private const int Resumes = 3;
+
     /// <summary>The same file from whichever address answers. Every one of them is checked against
     /// the same SHA-256, so falling through to a mirror weakens nothing -- a mirror that serves the
     /// wrong bytes fails exactly as the first address would have.
     ///
-    /// The last failure is the one reported: by then every address has been tried, and the first
-    /// one's message is no more useful than the last one's.</summary>
+    /// When none of them works, every address is named with what went wrong there, in words. "The
+    /// download failed" with nothing after it is what sent people to copy files into the cache by
+    /// hand and guess at which folder they went in.</summary>
     private async Task FetchAnyAsync(IReadOnlyList<Uri> urls, string path, PayloadFile file,
         IProgress<DownloadProgress>? progress, CancellationToken cancel)
     {
+        var failures = new List<string>();
         for (var i = 0; i < urls.Count; i++)
         {
-            try
+            for (var attempt = 1; ; attempt++)
             {
-                await FetchAsync(urls[i], path, file, progress, cancel);
-                return;
-            }
-            catch (Exception e) when (e is HttpRequestException or InstallException or IOException
-                                          && i + 1 < urls.Count)
-            {
-                // Another address has the same bytes, but whatever this one left behind is not
-                // resumable against it: a half-written .part plus a Range request to a different
-                // server splices two answers together. The hash would catch that, having spent the
-                // whole download to do it, so the partial goes instead.
-                try { File.Delete(path + ".part"); }
-                catch (IOException)
+                var before = Engine.SizeOf(path + ".part") ?? 0;
+                try
                 {
-                    // Held open somehow: the size and hash checks still refuse to install it.
+                    await FetchAsync(urls[i], path, file, progress, cancel);
+                    return;
+                }
+                catch (Exception e) when (e is HttpRequestException or InstallException or IOException
+                                              or UnauthorizedAccessException && !cancel.IsCancellationRequested)
+                {
+                    if ((Engine.SizeOf(path + ".part") ?? 0) > before && attempt <= Resumes)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(attempt), cancel);
+                        continue;
+                    }
+                    failures.Add($"{urls[i].Host}: {Describe(e)}");
+                    break;
                 }
             }
+
+            if (i + 1 >= urls.Count) break;
+            // Another address has the same bytes, but whatever this one left behind is not
+            // resumable against it: a half-written .part plus a Range request to a different
+            // server splices two answers together. The hash would catch that, having spent the
+            // whole download to do it, so the partial goes instead.
+            try { File.Delete(path + ".part"); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // Held open somehow: the size and hash checks still refuse to install it.
+            }
         }
+
+        throw new InstallException($"Could not download {file.Name}.\n      " + string.Join("\n      ", failures));
     }
+
+    /// <summary>Why one address did not work, as somebody who has to do something about it would
+    /// put it. The cases are the ones that actually happen: no network, a name that cannot be
+    /// looked up because DNS is filtered, an address that never answers, and a security suite that
+    /// breaks HTTPS for every program that is not a browser.</summary>
+    internal static string Describe(Exception e) => e switch
+    {
+        InstallException => e.Message,
+        HttpRequestException { StatusCode: { } code } => $"the server answered {(int)code} {code}.",
+        HttpRequestException { InnerException: SocketException s } => s.SocketErrorCode switch
+        {
+            SocketError.HostNotFound or SocketError.NoData or SocketError.TryAgain =>
+                "the address could not be looked up. There is no internet connection, or something on "
+                + "this network is blocking the name.",
+            SocketError.TimedOut => "it never answered. A firewall may be dropping the connection.",
+            SocketError.ConnectionRefused => "it refused the connection.",
+            SocketError.NetworkUnreachable or SocketError.HostUnreachable or SocketError.NetworkDown =>
+                "the network could not reach it.",
+            SocketError.ConnectionReset or SocketError.ConnectionAborted =>
+                "the connection was cut. An antivirus or a firewall that inspects downloads can do this.",
+            _ => s.Message,
+        },
+        HttpRequestException { InnerException: AuthenticationException } =>
+            "the secure connection was refused. An antivirus or proxy that inspects HTTPS, or a wrong "
+            + "date and time on this PC, causes this.",
+        HttpRequestException h => h.InnerException?.Message ?? h.Message,
+        UnauthorizedAccessException or IOException =>
+            $"the file could not be written: {e.Message} An antivirus, or Windows' controlled folder "
+            + "access, can block this.",
+        _ => e.Message,
+    };
 
     /// <summary>How long a download may go without one byte arriving before the address is given
     /// up on. A server that refuses or drops the connection says so; one that accepts and then
@@ -66,8 +121,8 @@ public sealed partial class PayloadCache
         catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
         {
             throw new InstallException(
-                $"Could not download {file.Name}: {url.Host} accepted the connection and then stopped "
-                + "answering. Whatever arrived is kept, so trying again picks up where this left off.");
+                "it stopped answering, or never started. Whatever arrived is kept, so trying again "
+                + "picks up where this left off.");
         }
     }
 
@@ -142,7 +197,16 @@ public sealed partial class PayloadCache
                 + "\n      Nothing was installed. Try again; if it keeps happening the published file changed.");
         }
 
-        File.Move(part, path, overwrite: true);
+        try { File.Move(part, path, overwrite: true); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Verified a moment ago and gone or locked now: that is an antivirus taking the file,
+            // which is the one explanation worth giving -- the add-on and ReShade are both DLLs that
+            // hook into other programs, which is exactly what heuristics flag.
+            throw new InstallException(
+                $"{file.Name} downloaded and matched its hash, then something took it away ({e.Message}). "
+                + $"That is almost always an antivirus. Allow {AppPaths.Cache} in it, or restore the file "
+                + "from its quarantine, and try again.");
+        }
     }
-
 }

@@ -16,11 +16,16 @@ public sealed record DownloadProgress(string File, long Received, long? Total)
     public double? Fraction => Total is > 0 ? (double)Received / Total.Value : null;
 }
 
-public sealed partial class PayloadCache(HttpClient http)
+/// <param name="nearby">Folders to look in for a file before downloading it, and the same component
+/// cached under another version beside them: see <see cref="Adopt"/>. Null looks nowhere, which is
+/// what a test wants and what the app does not.</param>
+public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>? nearby = null)
 {
     /// <summary>The client every download goes through. Kept here because a primary constructor's
     /// parameter is only in scope in the declaration that has it, and the downloads live in their own file.</summary>
     private HttpClient Http { get; } = http;
+
+    private IReadOnlyList<string>? Nearby { get; } = nearby;
 
     /// <summary>Where a component's files sit once they are verified.</summary>
     public static string FolderFor(string component, string version) =>
@@ -39,16 +44,13 @@ public sealed partial class PayloadCache(HttpClient http)
     }
 
     /// <summary>Every file present and hashing to what the manifest says. Hashing 141 MB takes
-    /// about a second, which is worth paying before an install rather than trusting a size.</summary>
+    /// about a second, which is worth paying before an install rather than trusting a size -- once:
+    /// see <see cref="Verified"/> for why the second time is free.</summary>
     public static bool IsComplete(PayloadManifest manifest, string component)
     {
         var c = manifest.Component(component);
         var dir = FolderFor(component, c.Version);
-        return c.Installed.All(f =>
-        {
-            var path = Path.Combine(dir, f.RelativePath);
-            return Engine.SizeOf(path) == f.Size && Engine.HashFile(path) == f.Sha256;
-        });
+        return c.Installed.All(f => Verified(Path.Combine(dir, f.RelativePath), f.Size, f.Sha256));
     }
 
     /// <summary>Empties the cache and says how many bytes went with it. Everything in here comes
@@ -104,30 +106,53 @@ public sealed partial class PayloadCache(HttpClient http)
     }
 
     /// <summary>Downloads whatever is missing or wrong and returns the folder to install from.
-    /// A file that is already there and already hashes correctly is not fetched again.</summary>
+    /// A file that is already there and already hashes correctly is not fetched again.
+    ///
+    /// Every hash runs off the calling thread. The caller is a click handler, and the weights are a
+    /// second of hashing: on the thread that draws the window that second was a frozen window, every
+    /// time somebody pressed Download all with the cache already full.
+    ///
+    /// When everything an install reads is already there -- the files taken out of an archive,
+    /// imported by hand -- the archive itself is not fetched: nothing reads it.</summary>
     public async Task<string> EnsureAsync(PayloadManifest manifest, string component,
         IProgress<DownloadProgress>? progress = null, CancellationToken cancel = default)
     {
         var c = manifest.Component(component);
         var dir = FolderFor(component, c.Version);
-        Directory.CreateDirectory(dir);
+        CreateFolder(dir);
+        if (await Task.Run(() => IsComplete(manifest, component), cancel)) return dir;
 
         foreach (var file in c.Files)
         {
             var path = Path.Combine(dir, file.RelativePath);
-            if (Engine.SizeOf(path) == file.Size && Engine.HashFile(path) == file.Sha256) continue;
+            if (await Task.Run(() => Verified(path, file.Size, file.Sha256), cancel)) continue;
             Engine.MakeParent(path);
+            if (await Task.Run(() => Adopt(component, file, path), cancel)) continue;
             await FetchAnyAsync(manifest.DownloadUrls(component, file), path, file, progress, cancel);
         }
 
         foreach (var entry in c.Extract ?? [])
         {
             var target = Path.Combine(dir, entry.RelativePath);
-            if (Engine.SizeOf(target) == entry.Size && Engine.HashFile(target) == entry.Sha256) continue;
+            if (await Task.Run(() => Verified(target, entry.Size, entry.Sha256), cancel)) continue;
             var archive = Path.Combine(dir, c.Files[0].RelativePath);
             await Task.Run(() => ExtractVerified(archive, entry, target), cancel);
         }
         return dir;
+    }
+
+    /// <summary>The cache folder, or a sentence saying why it cannot be made. A download folder that
+    /// cannot be written to is an antivirus or Windows' controlled folder access far more often than
+    /// a full disk, and "Access to the path is denied" names neither.</summary>
+    private static void CreateFolder(string dir)
+    {
+        try { Directory.CreateDirectory(dir); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            throw new InstallException(
+                $"Cannot write to the download folder {dir}: {e.Message} An antivirus or Windows' "
+                + "controlled folder access can block this; allowing this app there fixes it.");
+        }
     }
 
     /// <summary>Takes one entry out of an archive and keeps it only if it hashes to its pin. The
