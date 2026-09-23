@@ -1,4 +1,4 @@
-// Ported from installer/src/work.rs. The prose here is the product: these are the sentences the
+﻿// Ported from installer/src/work.rs. The prose here is the product: these are the sentences the
 // screen shows, and they are the difference between "it does nothing" and "it is on D3D12, which
 // is the degraded case".
 
@@ -21,6 +21,15 @@ public enum Preset
     OptiScaler,
 }
 
+/// <summary>The two ways into a game. They are alternatives rather than layers: both write the
+/// 64-bit manifest, and Transaction.Apply refuses a second preset in a folder that already has one.
+/// ReShade is every preset but one -- the API, the width and the emulators are choices inside it.</summary>
+public enum RouteFamily
+{
+    ReShade,
+    OptiScaler,
+}
+
 public static class Presets
 {
     public static readonly Preset[] All =
@@ -36,6 +45,8 @@ public static class Presets
     /// network inside the game's own upscaler call, where depth and motion vectors are handed over,
     /// so on D3D12 it replaces a route that sees only the finished frame.</summary>
     public static bool IsOptiScaler(this Preset p) => p == Preset.OptiScaler;
+
+    public static RouteFamily Family(this Preset p) => p.IsOptiScaler() ? RouteFamily.OptiScaler : RouteFamily.ReShade;
 
     private static readonly Preset[] X86 = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
 

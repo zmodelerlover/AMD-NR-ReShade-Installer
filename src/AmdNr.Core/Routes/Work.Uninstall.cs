@@ -89,6 +89,16 @@ public static partial class Work
         return report;
     }
 
+    internal static readonly string[] Droppings =
+    [
+        "amd-nr-pass1.dll", "amd-nr.log", "amd-nr-x86.log",
+        "amd-nr-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
+        // What OptiScaler and its bridge into the runtime write while a game runs.
+        "OptiScaler.log", "amd_bridge.log", "amd_presr.log",
+    ];
+
+    internal static readonly string[] DroppingFolders = ["amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures"];
+
     /// <summary>What the add-on itself writes while a game runs: the unpacked runtime, its logs,
     /// its capture folder. They are never in a manifest, because nothing here put them there, so
     /// they are swept by name -- and by both routes. The x86 uninstall used to skip this entirely
@@ -96,16 +106,9 @@ public static partial class Work
     private static int SweepDroppings(string dir, Report report)
     {
         var gone = 0;
-        foreach (var name in new[]
-                 {
-                     "amd-nr-pass1.dll", "amd-nr.log", "amd-nr-x86.log",
-                     "amd-nr-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
-                     // What OptiScaler and its bridge into the runtime write while a game runs.
-                     "OptiScaler.log", "amd_bridge.log", "amd_presr.log",
-                 })
-            gone += RemoveFile(dir, name, report);
+        foreach (var name in Droppings) gone += RemoveFile(dir, name, report);
 
-        foreach (var folder in new[] { "amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures" })
+        foreach (var folder in DroppingFolders)
         {
             var p = Path.Combine(dir, folder);
             if (!Directory.Exists(p)) continue;
