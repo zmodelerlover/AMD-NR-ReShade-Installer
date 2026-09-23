@@ -8,7 +8,10 @@
           "name": "amd-nr.addon64",
           "size": 588288,
           "sha256": "16b3012dce86638c1b68d15cdcd8205a955e97a1840583f40e85ed1a0bfdfaff",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon64"
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon64",
+          "mirrors": [
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/amd-nr.addon64"
+          ]
         }
       ]
     },
@@ -62,6 +65,9 @@
           "name": "amd-nr.addon32",
           "path": "files/amd-nr.addon32",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr.addon32",
+          "mirrors": [
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/amd-nr.addon32"
+          ],
           "size": 259584,
           "sha256": "281bd02493c160041149d600d027e1097f42f0fc411c5cd8fdd6722c6aea81b3"
         },
@@ -69,12 +75,18 @@
           "name": "amd-nr-host64.exe",
           "path": "files/amd-nr-host64.exe",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/amd-nr-host64.exe",
+          "mirrors": [
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/amd-nr-host64.exe"
+          ],
           "size": 468480,
           "sha256": "c1cbd5764f4d34850654b3d339065d53fc2009a87723fd3b50e7baae6facf855"
         },
         {
           "name": "payload.sha256",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/payload.sha256",
+          "mirrors": [
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/payload.sha256"
+          ],
           "size": 167,
           "sha256": "a971fe2c1ad573bf7d039d4a0e783ed9f6e8f3e15bfc7ad993f9aa5ad06bdb8b"
         }
@@ -111,6 +123,9 @@
         {
           "name": "AMD_Neural_Feed.fx",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/AMD_Neural_Feed.fx",
+          "mirrors": [
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/AMD_Neural_Feed.fx"
+          ],
           "size": 18415,
           "sha256": "9f53875221c130903bdd205d15011a924ab0f1c0c85b17191e4f39b140e7848e"
         }
