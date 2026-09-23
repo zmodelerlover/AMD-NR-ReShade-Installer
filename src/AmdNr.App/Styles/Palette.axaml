@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- The add-on's own palette: the contained red, not the one that glows on a dark terminal.
+       Surfaces step up in lightness a few percent at a time, warm rather than blue-grey. -->
+  <Color x:Key="AccentColor">#A61C22</Color>
+  <SolidColorBrush x:Key="Accent" Color="#A61C22" />
+  <SolidColorBrush x:Key="AccentHover" Color="#C4242C" />
+  <SolidColorBrush x:Key="AccentPressed" Color="#8A171C" />
+  <SolidColorBrush x:Key="AccentSoft" Color="#2EA61C22" />
+  <SolidColorBrush x:Key="AccentText" Color="#FF7A7E" />
+  <SolidColorBrush x:Key="Chrome" Color="#601E1E" />
+  <SolidColorBrush x:Key="Bg" Color="#110D0D" />
+  <SolidColorBrush x:Key="Rail" Color="#0B0808" />
+  <SolidColorBrush x:Key="Surface" Color="#1A1514" />
+  <SolidColorBrush x:Key="SurfaceHigh" Color="#241D1C" />
+  <SolidColorBrush x:Key="SurfaceTop" Color="#2E2524" />
+  <SolidColorBrush x:Key="Border" Color="#2F2524" />
+  <SolidColorBrush x:Key="BorderStrong" Color="#4A3A38" />
+  <SolidColorBrush x:Key="Text" Color="#F0EAE8" />
+  <SolidColorBrush x:Key="TextSoft" Color="#DDD3D0" />
+  <SolidColorBrush x:Key="Muted" Color="#A89A95" />
+  <SolidColorBrush x:Key="Faint" Color="#7C706C" />
+  <SolidColorBrush x:Key="Ok" Color="#5CB37E" />
+  <SolidColorBrush x:Key="OkSoft" Color="#1F5CB37E" />
+  <SolidColorBrush x:Key="Warn" Color="#DDA13A" />
+  <SolidColorBrush x:Key="WarnSoft" Color="#1FDDA13A" />
+  <!-- Body text on an amber callout: Warn itself is too loud for a paragraph. -->
+  <SolidColorBrush x:Key="WarnText" Color="#F2D7A6" />
+  <SolidColorBrush x:Key="Err" Color="#E05B4C" />
+  <SolidColorBrush x:Key="ErrSoft" Color="#24E05B4C" />
+
+  <!-- The Fluent theme's own accent follows ours, so combo boxes, focus and the expander agree. -->
+  <Color x:Key="SystemAccentColor">#A61C22</Color>
+  <Color x:Key="SystemAccentColorLight1">#C4242C</Color>
+  <Color x:Key="SystemAccentColorLight2">#D9464C</Color>
+  <Color x:Key="SystemAccentColorDark1">#8A171C</Color>
+
+  <!-- The shade under anything laid over cover art, so a badge reads on any cover. -->
+  <LinearGradientBrush x:Key="CoverScrim" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="#A6000000" />
+    <GradientStop Offset="0.25" Color="#00000000" />
+    <GradientStop Offset="0.6" Color="#00000000" />
+    <GradientStop Offset="1" Color="#CC000000" />
+  </LinearGradientBrush>
+  <!-- The detail panel's blurred cover fades into the panel instead of ending on an edge. -->
+  <LinearGradientBrush x:Key="HeroFade" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="#661A1514" />
+    <GradientStop Offset="1" Color="#FF1A1514" />
+  </LinearGradientBrush>
+  <!-- The mark is a red logo with transparency, so the tile behind it is white: red on red
+       would not read at 40px. -->
+  <SolidColorBrush x:Key="LogoFill" Color="#FFFFFF" />
+</ResourceDictionary>

@@ -1,0 +1,87 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- The sheet a game opens: its entrance, the install steps and the report lines. -->
+
+  <!-- Report lines arrive with a short rise instead of appearing all at once. -->
+  <Style Selector="Grid.line">
+    <Style.Animations>
+      <Animation Duration="0:0:0.22" Easing="CubicEaseOut" FillMode="Backward">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="0" />
+          <Setter Property="TranslateTransform.Y" Value="6" />
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="TranslateTransform.Y" Value="0" />
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
+  <!-- The detail panel fades its backdrop in and rises into place; closing plays it backwards
+       before it is hidden. -->
+  <Style Selector="Panel#Drawer">
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel#Drawer.open">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="Panel#Drawer Border#DrawerPanel">
+    <Setter Property="RenderTransform" Value="translateY(16px) scale(0.98)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.24" Easing="CubicEaseOut" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel#Drawer.open Border#DrawerPanel">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
+  <!-- Install steps as a segmented bar: pending, the one running, the ones done, the one that failed. -->
+  <Style Selector="Border.step Border.seg">
+    <Setter Property="Height" Value="4" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+    <Setter Property="Transitions">
+      <Transitions><BrushTransition Property="Background" Duration="0:0:0.25" /></Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.step TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource Faint}" />
+  </Style>
+  <Style Selector="Border.step.active Border.seg">
+    <Setter Property="Background" Value="{DynamicResource AccentHover}" />
+    <Style.Animations>
+      <Animation Duration="0:0:0.9" IterationCount="Infinite" PlaybackDirection="Alternate">
+        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.4" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+  <Style Selector="Border.step.active TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Border.step.done Border.seg">
+    <Setter Property="Background" Value="{DynamicResource Ok}" />
+  </Style>
+  <Style Selector="Border.step.done TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Ok}" />
+  </Style>
+  <Style Selector="Border.step.failed Border.seg">
+    <Setter Property="Background" Value="{DynamicResource Err}" />
+  </Style>
+  <Style Selector="Border.step.failed TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Err}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+</Styles>
