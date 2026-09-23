@@ -366,4 +366,24 @@ public class EngineTests
         Assert.Equal(new string('b', 64), X86Installer.BridgeSum(sums, "amd-nr-host64.exe"));
         Assert.Throws<InstallException>(() => X86Installer.BridgeSum(sums, "not-in-the-list.dll"));
     }
+    [Fact]
+    public void ABackupWrittenBeforeTheRenameStillDecodes()
+    {
+        // A folder installed before v0.6.5 has its backups under .dlss5-x86bridge-backups, and a
+        // manifest carried over to the new name still points at them -- the files really are
+        // there. Requiring the current directory's prefix made the whole manifest undecodable, so
+        // the install failed with "Unsafe backup entry" and rolled itself back. Reported from
+        // GTA IV, where it meant the add-on could not be installed at all.
+        var legacy = CapturedManifest().Replace(Engine.BackupDir, Engine.LegacyBackupDir,
+            StringComparison.Ordinal);
+        var m = Manifest.Decode(legacy);
+        Assert.StartsWith(Engine.LegacyBackupDir, m.Entries[0].Backup, StringComparison.Ordinal);
+
+        // Anywhere else is still refused: that check is what stops a tampered manifest pointing a
+        // backup at a path outside the folder.
+        Assert.Throws<InstallException>(() => Manifest.Decode(
+            CapturedManifest().Replace(Engine.BackupDir, "..", StringComparison.Ordinal)));
+        Assert.Throws<InstallException>(() => Manifest.Decode(
+            CapturedManifest().Replace(Engine.BackupDir, "elsewhere", StringComparison.Ordinal)));
+    }
 }

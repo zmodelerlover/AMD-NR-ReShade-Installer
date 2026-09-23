@@ -157,7 +157,12 @@ public sealed class Manifest(string preset, Route route)
 
             if (e.Backup.Length > 0)
             {
+                // Either directory: the current one, or the one installs before v0.6.5 used.
                 var prefix = $"{Engine.BackupDir}/";
+                var legacy = $"{Engine.LegacyBackupDir}/";
+                if (!e.Backup.StartsWith(prefix, StringComparison.Ordinal)
+                    && e.Backup.StartsWith(legacy, StringComparison.Ordinal))
+                    prefix = legacy;
                 var stamped = false;
                 if (e.Backup.StartsWith(prefix, StringComparison.Ordinal))
                 {

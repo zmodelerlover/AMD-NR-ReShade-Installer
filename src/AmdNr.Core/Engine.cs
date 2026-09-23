@@ -40,6 +40,13 @@ public static class Engine
     public const string ManifestName = "amd-nr-x86bridge.install.json";
     public const string ManifestNameX64 = "amd-nr.install.json";
     public const string BackupDir = ".amd-nr-x86bridge-backups";
+    /// <summary>Where installs before v0.6.5 put their backups. Still read, never written:
+    /// the files are on disk under this name in every folder installed back then, and a
+    /// manifest carried over to the new name still points at them. Refusing the prefix made
+    /// the whole manifest undecodable, which failed the install with "Unsafe backup entry"
+    /// and rolled it back -- reported from GTA IV, where it meant the add-on could not be
+    /// installed at all.</summary>
+    public const string LegacyBackupDir = ".dlss5-x86bridge-backups";
 
     /// <summary>x86 keeps the name installer-x86 already wrote, so existing installs stay readable.</summary>
     public static string ManifestFileName(this Route route) =>
