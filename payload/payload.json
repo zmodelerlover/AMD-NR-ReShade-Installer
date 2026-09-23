@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": 1,
   "components": {
     "addon": {
@@ -113,6 +113,114 @@
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/AMD_Neural_Feed.fx",
           "size": 18415,
           "sha256": "9f53875221c130903bdd205d15011a924ab0f1c0c85b17191e4f39b140e7848e"
+        }
+      ]
+    },
+    "optiscaler": {
+      "version": "0.1.1-amd-nr",
+      "files": [
+        {
+          "name": "OptiScaler-0.1.1-amd-nr.zip",
+          "size": 138533825,
+          "sha256": "fc88a154c4618a1e7f78a544bdc25002a58e85f8ef2e6e1d232dde7bdd84ea56",
+          "url": "https://github.com/MatheusFerreiraS/neural-amd-opti/releases/download/v0.1.1-amd-nr/OptiScaler-0.1.1-amd-nr.zip"
+        }
+      ],
+      "extract": [
+        {
+          "name": "OptiScaler.dll",
+          "path": "OptiScaler.dll",
+          "size": 26817536,
+          "sha256": "6698f9541def9124aec4eea4695db806b3eed92e93cc387432d105e93fe5c144"
+        },
+        {
+          "name": "OptiScaler.ini",
+          "path": "OptiScaler.ini",
+          "size": 58595,
+          "sha256": "a3d81cfef5007de6212d29f0fb1b81e636533d9c7918231bace90e2ab3a788a1"
+        },
+        {
+          "name": "amd_fidelityfx_loader_dx12.dll",
+          "path": "OptiScaler/amd_fidelityfx_loader_dx12.dll",
+          "size": 26376,
+          "sha256": "e2d85aa05a9bd9ed8b38935fdf5199372cca6f74c12015143bb6f945ee1608aa"
+        },
+        {
+          "name": "amd_fidelityfx_upscaler_dx12.dll",
+          "path": "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
+          "size": 28761864,
+          "sha256": "d0dcccc74a43c44ba435b7a369b456e0970d8a4464e4bd683119b374f2c9fb46"
+        },
+        {
+          "name": "amd_fidelityfx_framegeneration_dx12.dll",
+          "path": "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll",
+          "size": 40085776,
+          "sha256": "02297beedd285e822d3a64f314cf00faf378dcec0edc47ff0c4dd71b3a8c2f18"
+        },
+        {
+          "name": "amd_fidelityfx_denoiser_dx12.dll",
+          "path": "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
+          "size": 13782280,
+          "sha256": "48f1e5888ba6a0a3d59a98b9751e37c392b0f7b8c223d0082d5c1f40642879d3"
+        },
+        {
+          "name": "amd_fidelityfx_vk.dll",
+          "path": "OptiScaler/amd_fidelityfx_vk.dll",
+          "size": 9332432,
+          "sha256": "a1624cc4238fef046f30c4d80ce3f47be63fc5f5373f49e3ee9edb9960f54c78"
+        },
+        {
+          "name": "libxess.dll",
+          "path": "OptiScaler/libxess.dll",
+          "size": 77795704,
+          "sha256": "251659dd84a3e84de67c886a4186e01f3eca49b00641906fe38bb6b807e5d5b7"
+        },
+        {
+          "name": "libxess_dx11.dll",
+          "path": "OptiScaler/libxess_dx11.dll",
+          "size": 156016,
+          "sha256": "c7cfe86f0c9d94e4fb3696d3cd5035e2bbb6a8b1b0572f8b7395a4cdfd0c625e"
+        },
+        {
+          "name": "libxess_fg.dll",
+          "path": "OptiScaler/libxess_fg.dll",
+          "size": 22957432,
+          "sha256": "ec5e0c65e075570c6ede72618bb666d0be0c2e10b2ea9762c0fe8cb8e375ab27"
+        },
+        {
+          "name": "libxell.dll",
+          "path": "OptiScaler/libxell.dll",
+          "size": 415368,
+          "sha256": "d2030dcd694fda8f2ec7e044b13e6db8f0b56d4ba9113a5efad334e3f3ded8c7"
+        },
+        {
+          "name": "D3D12Core.dll",
+          "path": "D3D12_OptiScaler/D3D12Core.dll",
+          "size": 3351064,
+          "sha256": "07d286c306f8117321422affd9e6388c12d0fb4be1c7fc689d9e899324feeb24"
+        },
+        {
+          "name": "GatherCS.cso",
+          "path": "experimental_lighting/GatherCS.cso",
+          "size": 8608,
+          "sha256": "2f7bfd42c78b1256ed56eb93e3d75e494369a90168c06c22486a4ac1011b31ee"
+        },
+        {
+          "name": "ResolveCS.cso",
+          "path": "experimental_lighting/ResolveCS.cso",
+          "size": 9308,
+          "sha256": "fe19e23f3ea2ca8a9fb2e4017e9d803a8cc9f0657890e0dd69b329d7f4e3f350"
+        }
+      ]
+    },
+    "opti-runtime": {
+      "version": "0.3.1",
+      "files": [
+        {
+          "name": "dlssnr_amd_runtime-0.3.1.dll",
+          "size": 7304192,
+          "sha256": "b108d6407eb7f094a4f9111edd778eee7b978b648d413a9fc7aeedfdd914c154",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/dlssnr_amd_runtime-0.3.1.dll"
         }
       ]
     }
