@@ -83,10 +83,12 @@ public static class DownloadLog
             if (error is not null)
             {
                 Head(o, "What went wrong");
-                Line(o, "kind", PayloadCache.Classify(error));
+                // The attempts know what each address did; the exception that ends it only sums them up.
+                var kinds = trace?.Attempts.Select(a => a.Kind).OfType<string>().Distinct().ToList() ?? [];
+                Line(o, "kind", kinds.Count > 0 ? string.Join(", ", kinds) : PayloadCache.Classify(error));
                 Line(o, "network", PayloadCache.IsNetwork(error) ? "yes: the server was never reached" : "no");
                 Line(o, "said", Indent(error.Message));
-                Line(o, "exception", Indent(PayloadCache.Chain(error)));
+                Line(o, "exception", Indent(error.InnerException is null ? error.GetType().Name : PayloadCache.Chain(error)));
             }
 
             Head(o, "The cache afterwards");
@@ -110,10 +112,16 @@ public static class DownloadLog
     {
         var manifest = session.Manifest;
         var components = manifest?.Everyday.Select(p => p.Key).ToList() ?? [];
+        // Every host anything could come from, the on-demand components and every release included:
+        // the OptiScaler route downloads from places the first-run files never touch.
+        var every = manifest is null
+            ? []
+            : (manifest.Releases ?? []).SelectMany(r => r.Value).Select(manifest.With).Prepend(manifest)
+                .SelectMany(m => Urls(m, m.Components.Keys));
         var urls = session.Config.ManifestAddresses()
             .Select(a => Uri.TryCreate(a, UriKind.Absolute, out var u) ? u : null).OfType<Uri>()
-            .Concat(Urls(manifest, components))
-            .DistinctBy(u => u.Host, StringComparer.OrdinalIgnoreCase).ToList();
+            .Concat(every)
+            .DistinctBy(u => u.Authority, StringComparer.OrdinalIgnoreCase).ToList();
         var checks = await Task.WhenAll(urls.Select(u => CheckAsync(session.Http, u)));
 
         var o = new StringBuilder();
@@ -132,7 +140,7 @@ public static class DownloadLog
     private static async Task<(bool Failed, string Text)> CheckAsync(HttpClient http, Uri url)
     {
         var o = new StringBuilder();
-        Line(o, url.Host, url.AbsoluteUri);
+        Line(o, url.Authority, url.AbsoluteUri);
         Line(o, "  proxy", PayloadCache.ProxyFor(url));
         Line(o, "  name lookup", await PayloadCache.LookUpAsync(url.Host, TimeSpan.FromSeconds(5)));
         var clock = Stopwatch.StartNew();
@@ -183,6 +191,9 @@ public static class DownloadLog
             return;
         }
         foreach (var (name, c) in manifest.Components) Line(o, name, c.Version);
+        foreach (var (name, releases) in manifest.Releases ?? [])
+            Line(o, $"releases of {name}", string.Join(", ",
+                releases.Select(r => $"{r.Version} ({string.Join(", ", r.Components.Keys)})")));
         foreach (var component in components.Where(manifest.Has))
         {
             o.AppendLine();
@@ -218,7 +229,13 @@ public static class DownloadLog
         foreach (var component in components.Where(manifest.Has))
         {
             Line(o, component, PayloadCache.FolderFor(component, manifest.Component(component).Version));
-            foreach (var (file, state) in PayloadCache.CacheState(manifest, component)) Line(o, "  " + file, state);
+            // The lmxxf weights are some 460 files out of one archive: past a screenful, only the
+            // ones that are not right are worth a line each.
+            var states = PayloadCache.CacheState(manifest, component);
+            var verified = states.Count(s => s.State.EndsWith(", verified", StringComparison.Ordinal));
+            var shown = states.Count <= 16 ? states : states.Where(s => !s.State.EndsWith(", verified", StringComparison.Ordinal)).Take(16);
+            foreach (var (file, state) in shown) Line(o, "  " + file, state);
+            if (states.Count > 16) Line(o, "  ...", $"{verified} of {states.Count} verified; only the others are listed");
         }
     }
 
