@@ -1,5 +1,6 @@
 # Every check a commit has to pass, in one run: the build, the tests, the line limit, and with -Ui
-# the headless render of every window, which fails when a scroller cannot reach its own end.
+# the headless render of every window, which fails when a scroller cannot reach its own end, and the
+# game sheet driven through install, switching routes, uninstall and update.
 #
 #   powershell -ExecutionPolicy Bypass -File tools\gate.ps1 [-Ui]
 #
@@ -30,6 +31,10 @@ Gate 'line-limit' { powershell -NoProfile -ExecutionPolicy Bypass -File tools\li
 if ($Ui) {
     $shots = Join-Path $scratch 'shots'
     Gate 'ui' { dotnet run --project tools\uishot -- $shots } 'every scroll reaches its end'
+    # The flows write their own config and payload list, so they get a home of their own.
+    $env:AMDNR_HOME = Join-Path $scratch 'flows-home'
+    New-Item -ItemType Directory -Force $env:AMDNR_HOME | Out-Null
+    Gate 'flows' { dotnet run --project tools\uishot -- $shots flows } 'every flow did what it says'
     "screenshots: $shots"
 }
 
