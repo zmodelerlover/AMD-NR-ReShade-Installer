@@ -122,6 +122,14 @@
   <sys:String x:Key="Str.UninstallOk">Removido de {0}.</sys:String>
   <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso para ler abaixo.</sys:String>
   <sys:String x:Key="Str.UninstallLeft">{0} ainda conta como instalado: um arquivo deste app não pôde ser removido. Feche o jogo e desinstale de novo.</sys:String>
+  <sys:String x:Key="Str.UninstallClean">Removido de {0} — nada deste app ficou na pasta.</sys:String>
+  <sys:String x:Key="Str.UninstallKeptSettings">Removido de {0} — só suas configurações ficaram: {1}.</sys:String>
+  <sys:String x:Key="Str.SettingsLeftTitle">Remover também suas configurações?</sys:String>
+  <sys:String x:Key="Str.SettingsLeftBody">Tudo o que este app instalou em {0} já saiu. Ficaram estes arquivos de configuração — eles guardam o que foi ajustado no overlay:</sys:String>
+  <sys:String x:Key="Str.SettingsRemove">Remover também</sys:String>
+  <sys:String x:Key="Str.SettingsRemoveBody">A pasta volta a ficar como era antes da instalação.</sys:String>
+  <sys:String x:Key="Str.SettingsKeep">Manter minhas configurações</sys:String>
+  <sys:String x:Key="Str.SettingsKeepBody">Ficam para a próxima vez que você instalar.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Não deu pra remover tudo de {0}.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problema listado abaixo.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>

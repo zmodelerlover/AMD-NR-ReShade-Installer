@@ -286,10 +286,7 @@ void Flows()
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated
           && card.Entry.OptiScalerVersion == "1.0.2", $"Update installs the newer one ({verdict.Text})");
 
-    Click(uninstall);
-    Check(Until(() => !session.Busy), "Uninstall finishes");
-    Check(card.InstalledVia is null && !uninstall.IsVisible && label.Text == S("Str.InstallOpti"),
-        $"the installed route is the one taken out, whatever was selected ({verdict.Text})");
+    UninstallFlow.Run(main, sheet, card, game, TileSays, Check, Until, Click, (w, n) => Save(w, n)); // the installed route, whatever is selected
 
     Named<RadioButton>("RouteReShade").IsChecked = true;
     Settle(6);

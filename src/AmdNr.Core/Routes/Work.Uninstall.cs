@@ -79,7 +79,7 @@ public static partial class Work
 
         if (gone == 0) report.Warn("Nothing of ours was in that folder.");
         if (KeptConfigurationIn(dir) is { Count: > 0 } kept)
-            report.Info($"Kept your settings: {string.Join(", ", kept)}. Uninstall again to take them too.");
+            report.Info($"Kept your settings: {string.Join(", ", kept)}.");
         if (proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
             report.Info("A ReShade this app did not install was left alone. Use its own installer to remove it.");
         return report;

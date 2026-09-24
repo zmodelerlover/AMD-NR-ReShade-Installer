@@ -174,11 +174,24 @@ public partial class GameSheet
             var preset = InstalledPreset(card);
             var report = await RunUninstallAsync(card, preset, removeConfig: false);
 
+            // One question, asked once everything of this app's is already out, and only about what
+            // is left: the settings files, by name. Nothing left, nothing asked.
+            IReadOnlyList<string> kept = report.Failed || card.Installed ? [] : Work.KeptConfiguration(TargetFor(card), preset);
+            if (kept.Count > 0 && await AskRemoveSettingsAsync(card, kept))
+            {
+                report = await RunUninstallAsync(card, preset, removeConfig: true);
+                kept = Work.KeptConfiguration(TargetFor(card), preset);
+            }
+
             // Everything of this app's goes by name or by pinned hash, so the one thing that leaves
             // a folder installed now is a file the running game still has open -- and against that
             // the answer is "close the game", which the line in Details says.
             if (!report.Failed && card.Installed)
                 ShowResult(Level.Warn, Ui.Format("Str.UninstallLeft", card.Name), Ui.Text("Str.SeeDetails"));
+            else if (!report.Failed && report.Lines.All(l => l.Level != Level.Warn))
+                ShowResult(Level.Ok, kept.Count == 0
+                    ? Ui.Format("Str.UninstallClean", card.Name)
+                    : Ui.Format("Str.UninstallKeptSettings", card.Name, string.Join(", ", kept)), "");
             else
                 ShowOutcome(report, "Str.Uninstall", card.Name);
             Status(report.Failed ? Ui.Text("Str.LogSaved") : Ui.Text("Str.Ready"));
@@ -220,6 +233,24 @@ public partial class GameSheet
         card.RefreshInstalled();
         return report;
     }
+
+    private async Task<bool> AskRemoveSettingsAsync(GameCard card, IReadOnlyList<string> files)
+    {
+        var (window, chosen) = SettingsQuestion(_shell, card.Name, files);
+        await window.ShowDialog(_shell);
+        return chosen() == "remove";
+    }
+
+    /// <summary>What uninstall asks when it has left settings behind: the files by name, and whether
+    /// they go too. Taking them is the main choice -- somebody who pressed Uninstall wants the folder
+    /// clean -- and keeping them is one click away. Public so the render harness can draw it.</summary>
+    public static (Avalonia.Controls.Window Window, Func<string?> Chosen) SettingsQuestion(
+        Avalonia.Controls.Window owner, string game, IReadOnlyList<string> files) =>
+        ChoiceDialog.Build(owner, Ui.Text("Str.SettingsLeftTitle"), Ui.Format("Str.SettingsLeftBody", game),
+            [
+                ("remove", Ui.Text("Str.SettingsRemove"), Ui.Text("Str.SettingsRemoveBody")),
+                ("keep", Ui.Text("Str.SettingsKeep"), Ui.Text("Str.SettingsKeepBody")),
+            ], files, primary: "remove");
 
     /// <summary>Work inside the game folder, off the UI thread and marked for as long as it runs, so
     /// the window is not closed on it: see <see cref="Session.Writing"/>.</summary>

@@ -13,15 +13,20 @@ public static class ChoiceDialog
     /// <summary>The window and a way to read what was picked. Separate from <see cref="ShowAsync"/>
     /// so the headless render harness can build and capture it without a modal loop -- a dialog
     /// nobody can look at is how the centring in here was wrong in the first place.</summary>
+    /// <param name="items">Names to show between the sentence and the choices -- the files a question
+    /// is about, so nobody has to open Details to know what they are deciding.</param>
+    /// <param name="primary">The choice the dialog recommends, drawn in the accent colour.</param>
     public static (Window Window, Func<string?> Chosen) Build(
         Window owner, string title, string body,
-        IReadOnlyList<(string Id, string Title, string Detail)> options)
+        IReadOnlyList<(string Id, string Title, string Detail)> options,
+        IReadOnlyList<string>? items = null, string? primary = null)
     {
         string? chosen = null;
 
         var list = new StackPanel { Spacing = 8 };
         foreach (var (id, name, detail) in options)
         {
+            var main = id == primary;
             // Centred, both halves: the options read as a row of choices, and a left-aligned title
             // over a long wrapped sentence made each card look ragged.
             var text = new StackPanel { Spacing = 4, HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -41,7 +46,7 @@ public static class ChoiceDialog
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 FontSize = 12,
                 LineHeight = 17,
-                Foreground = Brush(owner, "Muted"),
+                Foreground = main ? new SolidColorBrush(Color.FromArgb(0xD9, 0xFF, 0xFF, 0xFF)) : Brush(owner, "Muted"),
             });
 
             var button = new Button
@@ -53,6 +58,7 @@ public static class ChoiceDialog
                 Padding = new Thickness(16, 14),
             };
             button.Classes.Add("pick");
+            button.Classes.Set("main", main);
             list.Children.Add(button);
         }
 
@@ -72,6 +78,23 @@ public static class ChoiceDialog
             Foreground = Brush(owner, "Muted"),
             LineHeight = 19,
         });
+        if (items is { Count: > 0 })
+        {
+            var names = new StackPanel { Spacing = 4 };
+            foreach (var item in items)
+                names.Children.Add(new TextBlock { Text = item, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap });
+            panel.Children.Add(new Border
+            {
+                Child = names,
+                Background = Brush(owner, "Surface"),
+                BorderBrush = Brush(owner, "Border"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(16, 10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                MinWidth = 200,
+            });
+        }
         panel.Children.Add(list);
 
         var window = new Window
@@ -103,9 +126,10 @@ public static class ChoiceDialog
     /// dismissed.</summary>
     public static async Task<string?> ShowAsync(
         Window owner, string title, string body,
-        IReadOnlyList<(string Id, string Title, string Detail)> options)
+        IReadOnlyList<(string Id, string Title, string Detail)> options,
+        IReadOnlyList<string>? items = null, string? primary = null)
     {
-        var (window, chosen) = Build(owner, title, body, options);
+        var (window, chosen) = Build(owner, title, body, options, items, primary);
         await window.ShowDialog(owner);
         return chosen();
     }

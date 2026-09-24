@@ -126,6 +126,14 @@
   <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning to read below.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Could not remove everything from {0}.</sys:String>
   <sys:String x:Key="Str.UninstallLeft">{0} still counts as installed: a file of this app could not be removed. Close the game and uninstall again.</sys:String>
+  <sys:String x:Key="Str.UninstallClean">Removed from {0} — nothing of this app is left in its folder.</sys:String>
+  <sys:String x:Key="Str.UninstallKeptSettings">Removed from {0} — only your settings stayed: {1}.</sys:String>
+  <sys:String x:Key="Str.SettingsLeftTitle">Remove your settings too?</sys:String>
+  <sys:String x:Key="Str.SettingsLeftBody">Everything this app installed in {0} is gone. These settings files stayed — they hold what was set in the overlay:</sys:String>
+  <sys:String x:Key="Str.SettingsRemove">Remove them too</sys:String>
+  <sys:String x:Key="Str.SettingsRemoveBody">The folder goes back to how it was before the install.</sys:String>
+  <sys:String x:Key="Str.SettingsKeep">Keep my settings</sys:String>
+  <sys:String x:Key="Str.SettingsKeepBody">They stay for the next time you install.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problem listed below.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
   <sys:String x:Key="Str.Folder">Folder</sys:String>

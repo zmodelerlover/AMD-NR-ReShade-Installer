@@ -224,6 +224,20 @@
   <Style Selector="Button.pick:pressed /template/ ContentPresenter">
     <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
   </Style>
+  <!-- The choice a dialog recommends: the primary look, keeping the picker's height. -->
+  <Style Selector="Button.pick.main">
+    <Setter Property="Background" Value="{DynamicResource Accent}" />
+    <Setter Property="BorderBrush" Value="#2EFFFFFF" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+  </Style>
+  <Style Selector="Button.pick.main:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentHover}" />
+    <Setter Property="BorderBrush" Value="#4DFFFFFF" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+  </Style>
+  <Style Selector="Button.pick.main:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentPressed}" />
+  </Style>
 
   <Style Selector="Button.icon">
     <Setter Property="Width" Value="36" />
