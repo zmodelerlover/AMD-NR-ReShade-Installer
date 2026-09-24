@@ -266,26 +266,25 @@ void Flows()
     App.ChangeLanguage("en");
     main.Relabel();
     Click(install);
-    Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated,
-        $"Update brings OptiScaler in line ({verdict.Text})");
+    Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated, $"Update brings OptiScaler in line ({verdict.Text})");
     Check(card.Entry.OptiScalerVersion == "1.0.1", "and the game remembers the OptiScaler version it has");
 
-    // A newer OptiScaler listed only under "releases": the menu offers both, stays on the one this
-    // game has, and picking the newer one installs it.
+    // A newer OptiScaler listed only under "releases": out of date, the menu opens on it, and Update installs it.
     SeedPayload("1.0.0", "1.0.1", optiRelease: "1.0.2");
     var releasesReload = session.LoadManifestAsync();
     var optiVersions = Named<ComboBox>("OptiVersionBox");
     Check(Until(() => releasesReload.IsCompleted && card.Outdated)
           && Until(() => optiVersions.IsEffectivelyVisible && optiVersions.ItemCount == 2, 10),
         $"the OptiScaler version menu lists both versions ({optiVersions.ItemCount})");
-    Check(optiVersions.SelectedItem is string s1 && s1.StartsWith("v1.0.1"), "and stays on the one this game has");
+    Check(optiVersions.SelectedItem is string s1 && s1.StartsWith("v1.0.2") && label.Text == S("Str.Update"), "out of date, it opens on the newer one, and Update means it");
     Save(main, "flow-2-optiscaler-versions");
+    optiVersions.SelectedIndex = 1;
+    Check(Until(() => label.Text == S("Str.Reinstall"), 5), "the older one picked by hand is a Reinstall, not an Update");
     optiVersions.SelectedIndex = 0;
     Settle(6);
     Click(install);
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated
-          && card.Entry.OptiScalerVersion == "1.0.2",
-        $"picking the newer one installs it ({verdict.Text})");
+          && card.Entry.OptiScalerVersion == "1.0.2", $"Update installs the newer one ({verdict.Text})");
 
     Click(uninstall);
     Check(Until(() => !session.Busy), "Uninstall finishes");

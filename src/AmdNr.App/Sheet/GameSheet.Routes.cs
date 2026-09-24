@@ -196,22 +196,33 @@ public partial class GameSheet
         foreach (var release in Session.Releases.Where(r => r.Covers(route)))
             _versions.Add(new VersionChoice(release.Version, release.Label, release));
 
+        _updateTarget = null;
         if (Session.Manifest is { } manifest)
         {
             var component = route == Route.X86 ? PayloadManifest.BridgeComponent : PayloadManifest.AddonComponent;
-            if (manifest.Has(component)
-                && AddonReleases.Version(manifest.Component(component).Version) is { } pinned
-                && _versions.All(v => v.Version != pinned))
-                _versions.Add(new VersionChoice(pinned, $"v{pinned} - {Ui.Text("Str.VersionShipped")}", null));
+            if (manifest.Has(component) && AddonReleases.Version(manifest.Component(component).Version) is { } pinned)
+            {
+                _updateTarget = pinned;
+                if (_versions.All(v => v.Version != pinned))
+                    _versions.Add(new VersionChoice(pinned, $"v{pinned} — {Ui.Text("Str.VersionShipped")}", null));
+            }
         }
         _versions.Sort((a, b) => b.Version.CompareTo(a.Version));
 
         // What this game was last installed with, then whatever the app is currently set to, then
-        // the newest. The rule lives in Core so it can be asserted against.
+        // the newest. The rule lives in Core so it can be asserted against. A game that is out of
+        // date opens on the version that brings it up to date, or Update would put the old one back.
         var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
-            _card?.Entry.AddonVersion, _version?.Opti is null ? _version?.Version : null);
+            SavedVersion(_card?.Entry.AddonVersion), _version?.Opti is null ? _version?.Version : null);
         FillVersions(AddonVersionBox, VersionSection, VersionNote, index);
     }
+
+    /// <summary>The version an out-of-date install is measured against: the one the payload list pins.
+    /// Update means that one and nothing else.</summary>
+    private Version? _updateTarget;
+
+    private string? SavedVersion(string? saved) =>
+        _card is { Outdated: true } && _updateTarget is { } target ? target.ToString() : saved;
 
     /// <summary>The OptiScaler versions the payload manifest lists, newest first. They come from
     /// the manifest rather than from GitHub, because each one is pinned file by file inside its
@@ -227,8 +238,10 @@ public partial class GameSheet
         }
 
         // Same rule as the add-on: this game's last version, then the session's, then the newest.
+        // Out of date is measured against the newest here, so that is what Update installs.
+        _updateTarget = _versions.Count > 0 ? _versions.Max(v => v.Version) : null;
         var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
-            _card?.Entry.OptiScalerVersion, _version?.Opti is null ? null : _version.Version);
+            SavedVersion(_card?.Entry.OptiScalerVersion), _version?.Opti is null ? null : _version.Version);
         FillVersions(OptiVersionBox, OptiVersionSection, OptiVersionNote, index);
     }
 
@@ -261,6 +274,7 @@ public partial class GameSheet
         Remember(card, _version);
         Library.Save();
         (box == OptiVersionBox ? OptiVersionNote : VersionNote).Text = VersionNoteText();
+        ShowInstallLabel();
         // A different version is a different pair of hashes, so the pre-flight has to be redone:
         // "already installed" is only true of the version that is actually in the folder.
         _ = RefreshAsync();
@@ -282,7 +296,11 @@ public partial class GameSheet
         var key = card.InstalledVia switch
         {
             null => family == RouteFamily.OptiScaler ? "Str.InstallOpti" : "Str.Install",
-            var via when via == family => card.Outdated ? "Str.Update" : "Str.Reinstall",
+            // Update only when the version picked is the one that brings it up to date; an older one
+            // picked by hand is put back as it is, and the button says so.
+            var via when via == family => card.Outdated && (_updateTarget is null || _version?.Version == _updateTarget)
+                ? "Str.Update"
+                : "Str.Reinstall",
             _ => family == RouteFamily.OptiScaler ? "Str.SwitchToOpti" : "Str.SwitchToReShade",
         };
         if (!InstallSpin.IsVisible) Ui.Localize(InstallLabel, key);
