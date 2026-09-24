@@ -44,8 +44,8 @@
     <Button x:Name="RuntimeLink" Classes="pick" Padding="14,13" Click="OnOpen"
             HorizontalAlignment="Stretch">
       <Grid ColumnDefinitions="Auto,*,Auto">
-        <Border Classes="iconTile" Margin="0,0,13,0">
-          <PathIcon Data="{StaticResource IconGitHub}" />
+        <Border Classes="iconTile neutral" Margin="0,0,13,0">
+          <PathIcon Data="{StaticResource IconGitHub}" Foreground="{DynamicResource Text}" />
         </Border>
         <StackPanel Grid.Column="1" Spacing="4">
           <TextBlock Text="{DynamicResource Str.CreditRuntimeTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
@@ -60,7 +60,7 @@
     <Button x:Name="AddonLink" Classes="pick" Padding="14,13" Click="OnOpen"
             HorizontalAlignment="Stretch">
       <Grid ColumnDefinitions="Auto,*,Auto">
-        <Border Classes="iconTile" Margin="0,0,13,0" Background="{DynamicResource SurfaceTop}">
+        <Border Classes="iconTile neutral" Margin="0,0,13,0">
           <PathIcon Data="{StaticResource IconGitHub}" Foreground="{DynamicResource Text}" />
         </Border>
         <StackPanel Grid.Column="1" Spacing="4">
