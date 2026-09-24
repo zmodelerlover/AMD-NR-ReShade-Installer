@@ -68,6 +68,25 @@
       </Grid>
 
       <local:PayloadPanel x:Name="Payloads" />
+
+      <!-- A download that does not work is the failure nobody can see from outside: this gathers
+           what every download did at every address, and asks each address again now. -->
+      <Border Classes="callout" Background="Transparent" BorderBrush="{DynamicResource Border}">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Text="{DynamicResource Str.DownloadReportTitle}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap" />
+            <TextBlock Text="{DynamicResource Str.DownloadReportBody}" Classes="muted" TextWrapping="Wrap" FontSize="12" />
+          </StackPanel>
+          <Button Grid.Column="1" x:Name="DownloadReportButton" Classes="ghost" Margin="12,0,0,0"
+                  VerticalAlignment="Center" Click="OnDownloadReport"
+                  AutomationProperties.Name="{DynamicResource Str.DownloadReport}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconReport}" />
+              <TextBlock x:Name="DownloadReportLabel" Text="{DynamicResource Str.DownloadReport}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </Grid>
+      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

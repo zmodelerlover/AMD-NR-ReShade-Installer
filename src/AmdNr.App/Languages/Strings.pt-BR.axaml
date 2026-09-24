@@ -280,6 +280,9 @@
   <sys:String x:Key="Str.ReportSaved">Relatório salvo e a pasta foi aberta: {0}</sys:String>
   <sys:String x:Key="Str.ReportFailed">Não deu pra montar o relatório. Os logs estão em {0}</sys:String>
   <sys:String x:Key="Str.ReportWorking">Juntando…</sys:String>
+  <sys:String x:Key="Str.DownloadReportTitle">Os arquivos não baixam?</sys:String>
+  <sys:String x:Key="Str.DownloadReportBody">Junta o que cada download tentou — cada endereço, a consulta de nome, o proxy e a resposta — e testa cada endereço de novo agora, num .zip. Nada é enviado: o arquivo fica no seu PC pra você mandar onde quiser.</sys:String>
+  <sys:String x:Key="Str.DownloadReport">Logs de download</sys:String>
 
   <!-- The sheet's two routes, the files panel, updates. -->
   <sys:String x:Key="Str.Add">Adicionar</sys:String>

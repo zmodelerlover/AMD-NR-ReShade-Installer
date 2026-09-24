@@ -59,19 +59,13 @@ public static class SupportReport
         // patterns can be counted separately at all.
         var logs = Recent(AppPaths.Logs, "*-install-*.log", 8)
             .Concat(Recent(AppPaths.Logs, "*uninstall*.log", 8))
+            .Concat(Recent(AppPaths.Logs, "*-download-*.log", 8))
             .Concat(Recent(AppPaths.Logs, "amd-nr-installer.log", 1))
             .DistinctBy(f => f.FullName);
         foreach (var log in logs)
             Copy(zip, log, $"logs/{log.Name}");
 
-        // What the app is configured with, which is how a wrong manifest or a stale config shows up.
-        foreach (var name in new[] { "games.json", "settings.json", "config.json", "payload.json", "api-db.json" })
-        {
-            var beside = Path.Combine(AppPaths.Root, name);
-            var shipped = Path.Combine(AppContext.BaseDirectory, name);
-            if (File.Exists(beside)) Copy(zip, new FileInfo(beside), $"config/{name}");
-            else if (File.Exists(shipped)) Copy(zip, new FileInfo(shipped), $"config/shipped-{name}");
-        }
+        Config(zip, "games.json", "settings.json", "config.json", "payload.json", "api-db.json");
 
         // The game folder itself: what is in it, and what the add-on and ReShade wrote there.
         if (installFolder is { Length: > 0 })
@@ -98,17 +92,44 @@ public static class SupportReport
         return path;
     }
 
+    /// <summary>The same, for somebody whose download does not work: every download and import log,
+    /// the check of each address run just now, and the payload list and config those came from.
+    /// No game in it, because there is nothing installed yet to look at.</summary>
+    public static string BuildDownloads(string diagnosis)
+    {
+        var path = Path.Combine(Folder, $"amd-nr-downloads-{DateTime.Now:yyyyMMdd-HHmmss}.zip");
+        using var zip = ZipFile.Open(path, ZipArchiveMode.Create);
+
+        Text(zip, "addresses.txt", diagnosis);
+        var logs = Recent(AppPaths.Logs, "*-download-*.log", 20)
+            .Concat(Recent(AppPaths.Logs, "*-import-*.log", 5))
+            .Concat(Recent(AppPaths.Logs, "amd-nr-installer.log", 1));
+        foreach (var log in logs)
+            Copy(zip, log, $"logs/{log.Name}");
+        Config(zip, "config.json", "payload.json");
+        return path;
+    }
+
     /// <summary>Saves the report and shows it in Explorer, selected. Returns the path, or null when
     /// it could not be written.</summary>
-    public static string? Save(GameCard? card, string? installFolder)
+    public static string? Save(GameCard? card, string? installFolder) => Save(() => Build(card, installFolder));
+
+    public static string? SaveDownloads(string diagnosis) => Save(() => BuildDownloads(diagnosis));
+
+    /// <summary>Whether a saved report is shown in Explorer. The headless flows turn it off: nobody is
+    /// there to look, and a window opening in the middle of a test run is somebody else's desktop.</summary>
+    public static bool Reveal { get; set; } = true;
+
+    private static string? Save(Func<string> build)
     {
         string path;
-        try { path = Build(card, installFolder); }
+        try { path = build(); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             return null;
         }
 
+        if (!Reveal) return path;
         try { Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true }); }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or FileNotFoundException)
         {
@@ -165,7 +186,7 @@ public static class SupportReport
         o.AppendLine("What is in here");
         o.AppendLine("  report.txt      this file");
         o.AppendLine("  system.txt      the machine, and whether it can run the add-on at all");
-        o.AppendLine("  logs/           one file per install or uninstall, plus the rolling log");
+        o.AppendLine("  logs/           one file per install, uninstall or download, plus the rolling log");
         o.AppendLine("  config/         what the app is configured with and what it downloaded");
         o.AppendLine("  game/           the game folder's listing, and what ReShade and the add-on");
         o.AppendLine("                  wrote there at run time -- ReShade.log is usually the answer");
@@ -244,6 +265,19 @@ public static class SupportReport
     }
 
     // -- Zip plumbing ------------------------------------------------------------------------------
+
+    /// <summary>What the app is configured with, which is how a wrong manifest or a stale config
+    /// shows up: the copy in the data folder, or the one shipped beside the app.</summary>
+    private static void Config(ZipArchive zip, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            var beside = Path.Combine(AppPaths.Root, name);
+            var shipped = Path.Combine(AppContext.BaseDirectory, name);
+            if (File.Exists(beside)) Copy(zip, new FileInfo(beside), $"config/{name}");
+            else if (File.Exists(shipped)) Copy(zip, new FileInfo(shipped), $"config/shipped-{name}");
+        }
+    }
 
     private static IEnumerable<FileInfo> Recent(string dir, string pattern, int count)
     {

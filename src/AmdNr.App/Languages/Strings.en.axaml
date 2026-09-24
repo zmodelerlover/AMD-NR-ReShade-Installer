@@ -265,6 +265,9 @@
   <sys:String x:Key="Str.ReportSaved">Report saved and the folder opened: {0}</sys:String>
   <sys:String x:Key="Str.ReportFailed">The report could not be built. The logs are in {0}</sys:String>
   <sys:String x:Key="Str.ReportWorking">Collecting…</sys:String>
+  <sys:String x:Key="Str.DownloadReportTitle">Files will not download?</sys:String>
+  <sys:String x:Key="Str.DownloadReportBody">Collects what every download tried — each address, its name lookup, proxy and answer — and checks each address again now, into one .zip. Nothing is sent: the file stays on your PC for you to share where you like.</sys:String>
+  <sys:String x:Key="Str.DownloadReport">Download logs</sys:String>
 
   <!-- The sheet's two routes, the files panel, updates. -->
   <sys:String x:Key="Str.Add">Add</sys:String>
