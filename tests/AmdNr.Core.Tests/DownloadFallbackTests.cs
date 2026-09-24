@@ -242,6 +242,19 @@ public class DownloadFallbackTests
         Assert.Contains("could not be written", PayloadCache.Describe(new IOException("denied")), StringComparison.Ordinal);
     }
 
+    /// <summary>"Stopped answering, or never started" told nobody which. A connection that was never
+    /// made in time comes with a TimeoutException inside; a download that went quiet does not.</summary>
+    [Fact]
+    public async Task AConnectionNeverMadeIsToldApartFromOneThatWentQuiet()
+    {
+        var cache = new PayloadCache(new HttpClient(new Answers(_ =>
+            throw new TaskCanceledException("connect", new TimeoutException()))));
+        var error = await Assert.ThrowsAsync<InstallException>(() =>
+            cache.EnsureAsync(OneFile(Version("ct"), Blob(19), "https://slow.example/f"), PayloadManifest.RuntimeComponent));
+        Assert.Contains("never answered", error.Message, StringComparison.Ordinal);
+        Assert.True(error.Network);
+    }
+
     /// <summary>A full disk is not the server's fault. It was taken for one: the part was thrown away
     /// and the mirror downloaded it again, into the same full disk, and the message blamed an
     /// antivirus. It stops at once, keeps what arrived, and says which drive.</summary>

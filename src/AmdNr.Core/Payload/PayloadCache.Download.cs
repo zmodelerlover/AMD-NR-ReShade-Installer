@@ -149,11 +149,16 @@ public sealed partial class PayloadCache
         {
             await FetchOneAsync(url, path, file, progress, cancel);
         }
-        catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
+        catch (OperationCanceledException e) when (!cancel.IsCancellationRequested)
         {
-            throw new InstallException(
-                "it stopped answering, or never started. Whatever arrived is kept, so trying again "
-                + "picks up where this left off.") { Network = true };
+            // The client's own timeouts -- the connect one, the one up to the headers -- carry a
+            // TimeoutException: nothing ever came back. The stall timer's does not: it went quiet.
+            throw new InstallException(e.InnerException is TimeoutException
+                ? "it never answered. A firewall, a VPN or a proxy may be dropping the connection."
+                : "it stopped answering. Whatever arrived is kept, so trying again picks up where this left off.")
+            {
+                Network = true,
+            };
         }
     }
 

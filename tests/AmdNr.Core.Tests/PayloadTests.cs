@@ -320,7 +320,8 @@ public class PayloadTests
         });
 
         var error = await Assert.ThrowsAsync<InstallException>(() => cache.EnsureAsync(manifest, component));
-        Assert.Contains("stopped", error.Message, StringComparison.Ordinal);
+        // Nothing ever came back from either address, which is not the same as a download that stopped.
+        Assert.Contains("never answered", error.Message, StringComparison.Ordinal);
     }
 
     /// <summary>The one call in here that deletes. It has to take the whole cache and leave the
