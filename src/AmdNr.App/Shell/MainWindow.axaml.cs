@@ -120,10 +120,11 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Opens a game's sheet. While something is running the sheet belongs to the game it
-    /// is running for: switching it away would put that result on another game.</summary>
+    /// is running for -- closed or not -- and switching it away would put that result, and another
+    /// game's route and version, on it.</summary>
     public void OpenSheet(GameCard card)
     {
-        if (Session.Busy && Sheet.IsOpen && Sheet.Card != card)
+        if (Session.Busy && Sheet.Card is { } working && working != card)
         {
             Toast(Ui.Text("Str.Working"), Level.Info);
             return;

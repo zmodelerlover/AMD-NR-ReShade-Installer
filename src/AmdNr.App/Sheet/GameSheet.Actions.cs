@@ -13,11 +13,15 @@ public partial class GameSheet
     // The install steps, in the order the chips sit in the sheet.
     private const int StepDownload = 0, StepVerify = 1, StepInstall = 2, StepDone = 3;
 
+    /// <summary>How many pre-flights have started, so only the latest one is shown.</summary>
+    private int _checks;
+
     /// <summary>The pre-flight for the open game, off the UI thread: deciding whether the cache is
     /// complete can mean hashing 141 MB, which is a second of frozen window the first time.</summary>
     private async Task RefreshAsync()
     {
         if (_card is not { } card || Session.Busy) return;
+        var check = ++_checks;
         var pins = Pins();
         var preset = card.Entry.Preset;
         var proxy = _proxy;
@@ -42,8 +46,9 @@ public partial class GameSheet
             report = Failure(e);
             staged = null;
         }
-        // The sheet moved on to another game, or a route, while this ran.
-        if (_card != card || card.Entry.Preset != preset || Session.Busy) return;
+        // The sheet moved on while this ran -- another game, a route, a version, a name -- and the
+        // check that started after this one is the one to show, even if it finished first.
+        if (check != _checks || _card != card || Session.Busy) return;
 
         Show(report);
         card.RefreshInstalled();
@@ -64,6 +69,12 @@ public partial class GameSheet
         if (switching && !await AskSwitchAsync(card)) return;
 
         Busy(true, InstallButton);
+        // What this install is, fixed now: the route, the hashes of the chosen version and the name
+        // ReShade goes in as, as the sheet showed them when Install was pressed. Read again after a
+        // long download they could be something else by then.
+        var preset = card.Entry.Preset;
+        var pins = Pins();
+        var proxy = _proxy;
         try
         {
             if (switching)
@@ -78,7 +89,7 @@ public partial class GameSheet
 
             ResultBanner.IsVisible = false;
             ShowStep(StepDownload);
-            var folder = await EnsurePayloadsAsync(card.Entry.Preset);
+            var folder = await EnsurePayloadsAsync(preset);
             if (folder is null)
             {
                 ShowStep(StepDownload, failed: true);
@@ -89,9 +100,6 @@ public partial class GameSheet
 
             ShowStep(StepInstall);
             Status(Ui.Text("Str.Working"));
-            var pins = Pins();
-            var preset = card.Entry.Preset;
-            var proxy = _proxy;
             var target = TargetFor(card);
             Report report;
             try { report = await Task.Run(() => Work.Install(target, folder, preset, pins, proxy)); }

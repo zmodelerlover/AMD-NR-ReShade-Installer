@@ -48,7 +48,11 @@ public partial class GameSheet : UserControl
     public void Attach(MainWindow shell)
     {
         _shell = shell;
-        Session.BusyChanged += () => Lock(Session.Busy);
+        Session.BusyChanged += () =>
+        {
+            Lock(Session.Busy);
+            if (!Session.Busy && !IsOpen) _card = null;
+        };
         Session.ManifestChanged += () =>
         {
             if (_card is { } card && !Session.Busy) Show(card);
@@ -79,7 +83,11 @@ public partial class GameSheet : UserControl
     public async void Close()
     {
         if (_card is not null) _card.IsSelected = false;
-        _card = null;
+        // While something runs the sheet goes on belonging to the game it runs for, closed or not:
+        // the install reads that game's route and version when its download is done, and its report
+        // lands here. Another game's sheet opened meanwhile swapped those under it. Let go of it when
+        // the work ends; see Attach.
+        if (!Session.Busy) _card = null;
         Drawer.Classes.Set("open", false);
         await Task.Delay(220);
         // Reopened while it was sliding out: leave it be.
