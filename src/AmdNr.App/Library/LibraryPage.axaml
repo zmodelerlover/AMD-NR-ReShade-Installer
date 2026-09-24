@@ -126,8 +126,9 @@
                       <StackPanel Orientation="Horizontal" Spacing="4">
                         <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding !Outdated}" />
                         <PathIcon Data="{StaticResource IconDownload}" IsVisible="{Binding Outdated}" />
+                        <!-- "Update OptiScaler", no separator: with one, the Portuguese ran four pixels
+                             past the narrowest tile. -->
                         <TextBlock Text="{DynamicResource Str.UpdateShort}" IsVisible="{Binding Outdated}" />
-                        <TextBlock Text="·" IsVisible="{Binding Outdated}" />
                         <TextBlock Text="{Binding InstalledName}" />
                       </StackPanel>
                     </Border>

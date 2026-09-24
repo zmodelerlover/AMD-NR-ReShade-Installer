@@ -79,8 +79,8 @@
                     <StackPanel Orientation="Horizontal" Spacing="4">
                       <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding !Outdated}" />
                       <PathIcon Data="{StaticResource IconDownload}" IsVisible="{Binding Outdated}" />
+                      <!-- Read the same as the tile's badge: "Update OptiScaler". -->
                       <TextBlock Text="{DynamicResource Str.UpdateShort}" IsVisible="{Binding Outdated}" />
-                      <TextBlock Text="·" IsVisible="{Binding Outdated}" />
                       <TextBlock Text="{Binding InstalledName}" />
                     </StackPanel>
                   </Border>
