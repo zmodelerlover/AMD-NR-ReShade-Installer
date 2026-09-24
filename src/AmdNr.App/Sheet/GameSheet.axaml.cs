@@ -1,7 +1,8 @@
 // The sheet a game opens: what was detected about it, which of the two routes to install it with and
 // what that route needs to know, and the install itself. Split by what each part does -- the routes
-// (GameSheet.Routes.cs), the actions (GameSheet.Actions.cs) and what the sheet says about them
-// (GameSheet.Verdict.cs); this part opens and closes it and reads the game.
+// (GameSheet.Routes.cs), the install and uninstall (GameSheet.Actions.cs), the smaller things around
+// them (GameSheet.Tools.cs) and what the sheet says about all of it (GameSheet.Verdict.cs); this
+// part opens and closes it and reads the game.
 
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
