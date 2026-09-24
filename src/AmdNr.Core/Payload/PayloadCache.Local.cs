@@ -86,10 +86,29 @@ public sealed partial class PayloadCache
         {
             places.Add(Path.Combine(folder, file.Name));
             if (file.AssetName != file.Name) places.Add(Path.Combine(folder, file.AssetName));
+            places.AddRange(SameSize(folder, file.Size));
         }
 
-        return places.Any(place => !Engine.SamePath(Path.GetFullPath(place), Path.GetFullPath(target))
-                                   && TakeVerified(place, file, target));
+        return places.Distinct(StringComparer.OrdinalIgnoreCase)
+            .Any(place => !Engine.SamePath(Path.GetFullPath(place), Path.GetFullPath(target))
+                          && TakeVerified(place, file, target));
+    }
+
+    /// <summary>Files in a folder that are exactly this size, whatever they are called. A browser
+    /// names a file after the address it came from -- the mirror's copy of the weights lands as
+    /// s1sh5d.bin -- and a second download of anything as "name (1).ext". The size comes off the
+    /// folder listing, so only a file that is exactly the pinned size is ever hashed.</summary>
+    private static List<string> SameSize(string folder, ulong size)
+    {
+        try
+        {
+            return new DirectoryInfo(folder).EnumerateFiles()
+                .Where(f => (ulong)f.Length == size).Select(f => f.FullName).ToList();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            return [];
+        }
     }
 
     /// <summary>Copies <paramref name="source"/> to <paramref name="target"/> when it is the pinned
@@ -120,12 +139,12 @@ public sealed partial class PayloadCache
     /// <summary>Every file the given components need, taken out of a folder somebody downloaded
     /// them into by hand. It is searched a few levels deep, because an unzipped release has
     /// subfolders and nobody should have to know which one holds what; each file is matched by its
-    /// name and size and taken only if it hashes to its pin. A file taken out of an archive is
-    /// accepted on its own as well -- ReShade64.dll without the setup it came in -- and the archive,
+    /// name, or by its exact size under any name, and taken only if it hashes to its pin. A file
+    /// taken out of an archive is accepted on its own as well -- ReShade64.dll without the setup it came in -- and the archive,
     /// when that is what was found, is unpacked the way a download would have been.</summary>
     public static ImportResult Import(PayloadManifest manifest, IEnumerable<string> components, string folder)
     {
-        var found = Index(folder);
+        var (found, sized) = Index(folder);
         var taken = new List<string>();
         var missing = new List<string>();
 
@@ -139,7 +158,8 @@ public sealed partial class PayloadCache
             {
                 var target = Path.Combine(dir, file.RelativePath);
                 if (Verified(target, file.Size, file.Sha256)) continue;
-                var candidates = found.GetValueOrDefault(file.Name, []).Concat(found.GetValueOrDefault(file.AssetName, []));
+                var candidates = found.GetValueOrDefault(file.Name, []).Concat(found.GetValueOrDefault(file.AssetName, []))
+                    .Concat(sized.GetValueOrDefault(file.Size, []));
                 if (candidates.Distinct(StringComparer.OrdinalIgnoreCase).Any(path => TakeVerified(path, file, target)))
                     taken.Add(file.Name);
             }
@@ -160,22 +180,25 @@ public sealed partial class PayloadCache
         return new ImportResult(taken.Distinct().ToList(), missing.Distinct().ToList());
     }
 
-    /// <summary>The files under a folder, by name, a few levels down and no further: somebody may
-    /// pick their whole Downloads folder, and that should take seconds, not the rest of the day.
-    /// Links are not followed, so a folder cannot lead the search out of itself.</summary>
-    private static Dictionary<string, List<string>> Index(string folder, int depth = 4, int limit = 20000)
+    /// <summary>The files under a folder, by name and by size, a few levels down and no further:
+    /// somebody may pick their whole Downloads folder, and that should take seconds, not the rest of
+    /// the day. Links are not followed, so a folder cannot lead the search out of itself.</summary>
+    private static (Dictionary<string, List<string>> ByName, Dictionary<ulong, List<string>> BySize) Index(
+        string folder, int depth = 4, int limit = 20000)
     {
         var index = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var sizes = new Dictionary<ulong, List<string>>();
         var seen = 0;
         Walk(folder, 0);
-        return index;
+        return (index, sizes);
 
         void Walk(string dir, int level)
         {
-            string[] files, dirs;
+            FileInfo[] files;
+            string[] dirs;
             try
             {
-                files = Directory.GetFiles(dir);
+                files = new DirectoryInfo(dir).GetFiles();
                 dirs = level < depth ? Directory.GetDirectories(dir) : [];
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -185,9 +208,10 @@ public sealed partial class PayloadCache
             foreach (var file in files)
             {
                 if (++seen > limit) return;
-                var name = Path.GetFileName(file);
-                if (!index.TryGetValue(name, out var list)) index[name] = list = [];
-                list.Add(file);
+                if (!index.TryGetValue(file.Name, out var list)) index[file.Name] = list = [];
+                list.Add(file.FullName);
+                if (!sizes.TryGetValue((ulong)file.Length, out var same)) sizes[(ulong)file.Length] = same = [];
+                same.Add(file.FullName);
             }
             foreach (var sub in dirs)
             {

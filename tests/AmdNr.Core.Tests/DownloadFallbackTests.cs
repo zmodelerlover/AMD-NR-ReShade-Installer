@@ -108,6 +108,29 @@ public class DownloadFallbackTests
         Assert.True(PayloadCache.IsComplete(manifest, PayloadManifest.RuntimeComponent));
     }
 
+    /// <summary>A browser names a file after the address it came from: the mirror's copy of the weights
+    /// lands as s1sh5d.bin, and a second download of anything as "name (1).ext". The app's own words
+    /// are "names do not need changing", so neither the Downloads check nor an import may care.</summary>
+    [Fact]
+    public async Task AFileSavedUnderAnotherNameIsFoundByItsSize()
+    {
+        var blob = Blob(16);
+        var nearby = Fixture.Temp("nearby-renamed");
+        await File.WriteAllBytesAsync(Path.Combine(nearby, "s1sh5d.bin"), blob);
+        await File.WriteAllBytesAsync(Path.Combine(nearby, "same size, other bytes.bin"), Blob(17));
+        var server = new Refusing();
+        var dir = await new PayloadCache(new HttpClient(server), [nearby])
+            .EnsureAsync(OneFile(Version("rn"), blob), PayloadManifest.RuntimeComponent);
+        Assert.Equal(blob, await File.ReadAllBytesAsync(Path.Combine(dir, Work.RuntimeName)));
+        Assert.Equal(0, server.Requests);
+
+        var other = Blob(18);
+        var picked = Fixture.Temp("picked-renamed");
+        File.WriteAllBytes(Path.Combine(picked, "dlssnr_amd_pass1 (1).dll"), other);
+        var manifest = OneFile(Version("ri"), other);
+        Assert.Empty(PayloadCache.Import(manifest, [PayloadManifest.RuntimeComponent], picked).Missing);
+    }
+
     [Fact]
     public void AnImportSaysWhatItStillCouldNotFind()
     {
