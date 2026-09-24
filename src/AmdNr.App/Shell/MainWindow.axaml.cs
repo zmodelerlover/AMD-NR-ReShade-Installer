@@ -52,8 +52,7 @@ public partial class MainWindow : Window
         Activated += (_, _) => OnBack();
 
         // The previous executable, parked by an update. The process that held it has exited by now.
-        if (Environment.ProcessPath is { } self && Path.GetDirectoryName(self) is { } home)
-            AppUpdater.SweepOld(home);
+        if (Environment.ProcessPath is { } self) AppUpdater.SweepOld(self);
 
         Run("startup", StartAsync);
     }

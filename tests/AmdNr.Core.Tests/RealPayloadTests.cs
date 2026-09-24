@@ -100,10 +100,14 @@ public class RealPayloadTests
         Assert.Equal("the old build"u8.ToArray(), File.ReadAllBytes(parked));
         Assert.False(File.Exists(staged));
 
-        // And the sweep takes the parked one, which is what the next start does.
-        AppUpdater.SweepOld(dir);
+        // And the sweep takes the parked one, which is what the next start does -- and only that one:
+        // the exe usually sits on a desktop or in Downloads, among files that are somebody else's.
+        var theirs = Path.Combine(dir, "notes.old");
+        File.WriteAllText(theirs, "not ours");
+        AppUpdater.SweepOld(current);
         Assert.False(File.Exists(parked));
         Assert.True(File.Exists(current));
+        Assert.True(File.Exists(theirs));
 
         // A staged file that is not there is refused before the running one is moved anywhere.
         Assert.Throws<InstallException>(() => AppUpdater.Swap(current, Path.Combine(dir, "gone.exe")));

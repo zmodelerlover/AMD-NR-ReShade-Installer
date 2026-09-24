@@ -72,18 +72,12 @@ public static class AppUpdater
 
     /// <summary>Removes what the last swap parked. Called at startup, where the previous process has
     /// exited and the file is finally deletable; a copy still held by something is left for the next
-    /// run rather than reported, because there is nothing for anyone to do about it.</summary>
-    public static void SweepOld(string dir)
-    {
-        try
-        {
-            foreach (var f in Directory.GetFiles(dir, "*" + OldSuffix))
-                TryDelete(f);
-        }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-        {
-        }
-    }
+    /// run rather than reported, because there is nothing for anyone to do about it.
+    ///
+    /// That one file, by name. It was every *.old in the folder, and the folder is wherever the exe
+    /// was put -- a desktop, Downloads -- so every start deleted other people's .old files there,
+    /// past the Recycle Bin.</summary>
+    public static void SweepOld(string current) => TryDelete(current + OldSuffix);
 
     private static void TryDelete(string path)
     {
