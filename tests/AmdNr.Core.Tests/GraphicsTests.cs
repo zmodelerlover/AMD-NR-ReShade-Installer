@@ -333,6 +333,16 @@ public class GraphicsTests
         Assert.Equal("DX11", merged.Tag);
     }
 
+    /// <summary>The compile-time reader gave a property the file leaves out its type's default -- 0,
+    /// null -- rather than the one the class declares, while the properties were init-only.</summary>
+    [Fact]
+    public void WhatTheFileLeavesOutKeepsItsDefault()
+    {
+        var db = ApiDatabase.Parse("{\"games\":{}}");
+        Assert.Equal(1, db.Schema);
+        Assert.NotNull(db.Source);
+    }
+
     [Fact]
     public void ADatabaseFromTheFutureIsRefused() =>
         Assert.Throws<InstallException>(() => ApiDatabase.Parse("{\"schema\":2,\"games\":{}}"));

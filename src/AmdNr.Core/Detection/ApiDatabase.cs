@@ -39,12 +39,14 @@ public sealed class ApiRecord
 
 public sealed class ApiDatabase
 {
-    [JsonPropertyName("schema")] public int Schema { get; init; } = 1;
+    // Settable, not init: the compile-time reader would hand a property the file leaves out its
+    // type's default (0, null) instead of the one written here.
+    [JsonPropertyName("schema")] public int Schema { get; set; } = 1;
     [JsonPropertyName("generated")] public DateTime Generated { get; set; } = DateTime.UtcNow;
-    [JsonPropertyName("source")] public string Source { get; init; } = "PCGamingWiki (CC BY-NC-SA 3.0)";
+    [JsonPropertyName("source")] public string Source { get; set; } = "PCGamingWiki (CC BY-NC-SA 3.0)";
 
     /// <summary>"steam:12210" -> record. Also "name:&lt;normalised title&gt;" for games with no app id.</summary>
-    [JsonPropertyName("games")] public Dictionary<string, ApiRecord> Games { get; init; } = new(StringComparer.Ordinal);
+    [JsonPropertyName("games")] public Dictionary<string, ApiRecord> Games { get; set; } = new(StringComparer.Ordinal);
 
     private Dictionary<string, ApiRecord>? _byTitle;
 
