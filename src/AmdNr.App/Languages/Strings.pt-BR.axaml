@@ -7,26 +7,19 @@
   <sys:String x:Key="Str.Subtitle">DLSS 5 neural rendering em Radeon, instalado pra você</sys:String>
 
   <sys:String x:Key="Str.Games">Jogos</sys:String>
-  <sys:String x:Key="Str.AddGame">Adicionar um jogo…</sys:String>
   <sys:String x:Key="Str.RemoveGame">Tirar da lista</sys:String>
   <sys:String x:Key="Str.RemoveGameHint">Tira a linha da lista. Nenhum arquivo da pasta do jogo é tocado.</sys:String>
   <sys:String x:Key="Str.RemovedGame">{0} saiu da lista. Nada na pasta dele foi tocado.</sys:String>
   <sys:String x:Key="Str.RemovedGameInstalled">{0} saiu da lista, mas o add-on continua instalado na pasta dele. Adicione a pasta de volta se quiser desinstalar.</sys:String>
   <sys:String x:Key="Str.NoGames">Nada aqui ainda. Adicione a pasta de onde o jogo ou o emulador roda.</sys:String>
   <sys:String x:Key="Str.PickFolder">Escolha a pasta de onde o jogo roda</sys:String>
-  <sys:String x:Key="Str.AddGameTitle">Adicionar jogos</sys:String>
-  <sys:String x:Key="Str.AddGameBody">Ou um jogo só, ou tudo que estiver numa pasta onde você guarda jogos.</sys:String>
   <sys:String x:Key="Str.AddGameMany">Procurar numa pasta</sys:String>
-  <sys:String x:Key="Str.AddGameManyBody">Aponte a pasta onde seus jogos ficam — um HD de Games, uma biblioteca copiada de outra máquina — e todos os jogos dentro dela entram de uma vez. Só leitura: olhar não instala nem muda nada.</sys:String>
-  <sys:String x:Key="Str.AddGameOne">Adicionar um jogo</sys:String>
-  <sys:String x:Key="Str.AddGameOneBody">Aponte direto a pasta de onde aquele jogo roda.</sys:String>
   <sys:String x:Key="Str.AddGamePickLibrary">Escolha a pasta onde você guarda os jogos</sys:String>
   <sys:String x:Key="Str.AddGameNone">Nada com cara de jogo foi encontrado em "{0}".</sys:String>
 
   <sys:String x:Key="Str.Preset">Rota</sys:String>
   <sys:String x:Key="Str.Install">Instalar</sys:String>
   <sys:String x:Key="Str.Uninstall">Desinstalar</sys:String>
-  <sys:String x:Key="Str.Recheck">Conferir de novo</sys:String>
   <sys:String x:Key="Str.OpenFolder">Abrir a pasta</sys:String>
 
   <sys:String x:Key="Str.System">Esta máquina</sys:String>
@@ -71,17 +64,11 @@
 
   <sys:String x:Key="Str.Scan">Procurar jogos</sys:String>
   <sys:String x:Key="Str.Scanning">Lendo Steam, Epic, GOG, EA, Ubisoft, Battle.net e Xbox…</sys:String>
-  <sys:String x:Key="Str.Found">encontrados</sys:String>
-  <sys:String x:Key="Str.Added">novos</sys:String>
-  <sys:String x:Key="Str.FirstScanHint">Lista vazia. Procurar jogos lê seus launchers; olhar não muda nada.</sys:String>
   <sys:String x:Key="Str.Search">Buscar jogos…</sys:String>
   <sys:String x:Key="Str.Settings">Configurações</sys:String>
-  <sys:String x:Key="Str.NotDownloaded">ainda não baixado</sys:String>
   <sys:String x:Key="Str.WillDownload">Os arquivos são baixados e conferidos na hora de instalar.</sys:String>
   <sys:String x:Key="Str.NoRoute">Nada com que este jogo renderiza tem rota: o add-on funciona em D3D11, D3D12, Vulkan e OpenGL, e em D3D8, D3D9 e D3D11 nos jogos 32-bit. Jogo OpenGL 32-bit, D3D9 64-bit e renderizador por software não têm.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">Este jogo roda em {1}. Coloque em {0} nas configurações gráficas dele — é a rota escolhida aqui, e em outra API o add-on vê outro jogo.</sys:String>
-  <sys:String x:Key="Str.CheckApiTitle">Confira a API antes de instalar</sys:String>
-  <sys:String x:Key="Str.CheckApiBody">{0} foi lido dos arquivos deste jogo, e arquivo diz contra o que foi ligado, não em que o jogo roda. Uma pasta pode ter um executável D3D11 e um D3D12; um jogo pode abrir em D3D10 a partir de um executável que também faz D3D9. As duas respostas são verdade e só uma delas é a rota certa — e rota errada instala perfeitinho e depois não faz nada no jogo.</sys:String>
   <sys:String x:Key="Str.CheckWiki">Procurar este jogo no PCGamingWiki</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">É um jogo Unreal: adicione -{0} nas opções de inicialização.</sys:String>
   <!-- Feedback e layout -->
@@ -91,7 +78,6 @@
   <sys:String x:Key="Str.ScanningShort">Procurando…</sys:String>
   <sys:String x:Key="Str.ScanDone">Busca concluída: {0} jogos encontrados, {1} novos.</sys:String>
   <sys:String x:Key="Str.InstalledBadge">Instalado</sys:String>
-  <sys:String x:Key="Str.UpdateBadge">Tem atualização</sys:String>
   <sys:String x:Key="Str.Close">Fechar</sys:String>
   <sys:String x:Key="Str.CloseHint">Fechar (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">O executável do jogo</sys:String>
@@ -102,7 +88,6 @@
   <sys:String x:Key="Str.ExeNoteChosen">Você escolheu este arquivo, então a detecção não mexe nele — nem depois de um re-scan.</sys:String>
   <sys:String x:Key="Str.ExeNotHere">Esse arquivo não está dentro da pasta deste jogo.</sys:String>
   <sys:String x:Key="Str.ExeUnreadable">Esse arquivo não é um executável do Windows que dê para ler.</sys:String>
-  <sys:String x:Key="Str.RouteSection">Rota</sys:String>
   <sys:String x:Key="Str.RouteMismatch">Esta rota é para jogos {0} e o executável acima é {1}. Nada impede você — a detecção pode ter lido o arquivo errado — mas se ela leu o certo, isto não vai carregar.</sys:String>
   <sys:String x:Key="Str.VersionSection">Versão do add-on</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade carrega como</sys:String>
@@ -117,8 +102,6 @@
   <sys:String x:Key="Str.ClearCacheYesBody">Tudo que está nele é baixado de novo na próxima instalação.</sys:String>
   <sys:String x:Key="Str.ClearCacheNoBody">Deixar o cache como está.</sys:String>
   <sys:String x:Key="Str.CacheCleared">Cache esvaziado — {0} liberados.</sys:String>
-  <sys:String x:Key="Str.PayloadsAllReady">{0} de {1} componentes prontos — {2} no cache</sys:String>
-  <sys:String x:Key="Str.PayloadsMissing">{0} de {1} componentes prontos — faltam {2} para baixar</sys:String>
   <sys:String x:Key="Str.PayloadsAlreadyThere">Já estava tudo aí, e cada byte acabou de ser conferido.</sys:String>
   <sys:String x:Key="Str.VersionShipped">que acompanha o instalador</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">A versão com que este instalador foi publicado.</sys:String>
@@ -126,7 +109,6 @@
   <sys:String x:Key="Str.VersionSectionOpti">Versão do OptiScaler</sys:String>
   <sys:String x:Key="Str.VersionNoteOpti">OptiScaler {0}, do release no GitHub. Cada arquivo dele é conferido contra o hash que a lista do payload dá a ele.</sys:String>
   <sys:String x:Key="Str.VersionNoteOptiLmxxf">Instala também os pesos do runtime lmxxf, cerca de 590 MB, que só placas RDNA4 usam.</sys:String>
-  <sys:String x:Key="Str.WhatHappens">O que vai acontecer</sys:String>
   <sys:String x:Key="Str.Checking">Conferindo esta pasta…</sys:String>
   <sys:String x:Key="Str.StepDownload">Baixar</sys:String>
   <sys:String x:Key="Str.StepVerify">Conferir</sys:String>
@@ -201,10 +183,8 @@
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. O D3D8 é traduzido para D3D9 e segue a rota do D3D9 acima, com a mesma dupla de 32 bits. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
 
   <!-- First run -->
-  <sys:String x:Key="Str.SetupTitle">Primeiros passos</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Bem-vindo</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">A rede DLSS 5 Neural Rendering em placas Radeon, pelo ReShade ou pelo OptiScaler. Quatro passos rápidos.</sys:String>
-  <sys:String x:Key="Str.SetupStepLanguage">Idioma</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Esta máquina</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Arquivos</sys:String>
   <sys:String x:Key="Str.SetupStepGames">Seus jogos</sys:String>
@@ -219,19 +199,13 @@
   <sys:String x:Key="Str.SetupMachineBad">Falta algo. Dá pra continuar e resolver depois, mas dentro do jogo não vai funcionar até resolver.</sys:String>
 
   <sys:String x:Key="Str.SetupFilesBody">São os mesmos arquivos pra todos os jogos: baixados uma vez, conferidos contra um hash fixo e reaproveitados.</sys:String>
-  <sys:String x:Key="Str.SetupFilesCheck">Conferindo o que já está aqui…</sys:String>
-  <sys:String x:Key="Str.SetupFilesAllReady">Todos os arquivos estão aqui e conferidos.</sys:String>
-  <sys:String x:Key="Str.SetupFilesMissing">{0} de {1} componentes ainda faltam.</sys:String>
-  <sys:String x:Key="Str.SetupFilesDownload">Baixar tudo agora</sys:String>
   <sys:String x:Key="Str.SetupFilesRetry">Tentar de novo</sys:String>
   <sys:String x:Key="Str.SetupFilesLater">Se pular, eles são baixados na primeira instalação.</sys:String>
-  <sys:String x:Key="Str.SetupFilesOffline">Não deu pra ler a lista de downloads — provavelmente sem internet. Dá pra continuar: o app tenta de novo quando você instalar.</sys:String>
 
   <sys:String x:Key="Str.SetupGamesBody">Ler os launchers é só leitura: nada é instalado nem alterado por olhar. Você pode adicionar pastas à mão depois.</sys:String>
   <sys:String x:Key="Str.SetupGamesApi">Cada jogo é lido pra descobrir qual API gráfica ele usa, e essa leitura costuma acertar, mas não sempre: uma pasta pode ter um executável D3D11 e um D3D12, e um jogo pode abrir numa API enquanto o executável também aceita uma mais antiga. Antes de instalar, vale conferir o jogo no pcgamingwiki.com — cada jogo tem um link direto pra lá.</sys:String>
   <sys:String x:Key="Str.SetupGamesNone">Nenhum jogo encontrado. Dá pra adicionar a pasta à mão na janela principal.</sys:String>
   <sys:String x:Key="Str.SetupGamesFound">{0} jogos encontrados.</sys:String>
-  <sys:String x:Key="Str.SetupDoneBody">Tudo pronto. A janela principal abre com a sua biblioteca.</sys:String>
 
   <sys:String x:Key="Str.Unexpected">Algo inesperado aconteceu. O log completo foi gravado.</sys:String>
 

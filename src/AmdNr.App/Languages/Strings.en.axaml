@@ -10,26 +10,19 @@
   <sys:String x:Key="Str.Subtitle">DLSS 5 neural rendering on Radeon, installed for you</sys:String>
 
   <sys:String x:Key="Str.Games">Games</sys:String>
-  <sys:String x:Key="Str.AddGame">Add a game…</sys:String>
   <sys:String x:Key="Str.RemoveGame">Remove from list</sys:String>
   <sys:String x:Key="Str.RemoveGameHint">Takes the row out of the list. No file in the game folder is touched.</sys:String>
   <sys:String x:Key="Str.RemovedGame">{0} is off the list. Nothing in its folder was touched.</sys:String>
   <sys:String x:Key="Str.RemovedGameInstalled">{0} is off the list, but the add-on is still installed in its folder. Add the folder back if you want to uninstall it.</sys:String>
   <sys:String x:Key="Str.NoGames">Nothing here yet. Add the folder a game or emulator runs from.</sys:String>
   <sys:String x:Key="Str.PickFolder">Pick the folder the game runs from</sys:String>
-  <sys:String x:Key="Str.AddGameTitle">Add games</sys:String>
-  <sys:String x:Key="Str.AddGameBody">Either one game, or everything in a folder you keep games in.</sys:String>
   <sys:String x:Key="Str.AddGameMany">Search a folder</sys:String>
-  <sys:String x:Key="Str.AddGameManyBody">Point at the folder your games live in — a Games drive, a library copied off another machine — and every game under it is added at once. Only reads; nothing is installed or changed by looking.</sys:String>
-  <sys:String x:Key="Str.AddGameOne">Add one game</sys:String>
-  <sys:String x:Key="Str.AddGameOneBody">Point straight at the folder that one game runs from.</sys:String>
   <sys:String x:Key="Str.AddGamePickLibrary">Pick the folder your games are kept in</sys:String>
   <sys:String x:Key="Str.AddGameNone">Nothing that looks like a game was found under "{0}".</sys:String>
 
   <sys:String x:Key="Str.Preset">Route</sys:String>
   <sys:String x:Key="Str.Install">Install</sys:String>
   <sys:String x:Key="Str.Uninstall">Uninstall</sys:String>
-  <sys:String x:Key="Str.Recheck">Check again</sys:String>
   <sys:String x:Key="Str.OpenFolder">Open folder</sys:String>
 
   <sys:String x:Key="Str.System">This machine</sys:String>
@@ -74,18 +67,12 @@
 
   <sys:String x:Key="Str.Scan">Scan games</sys:String>
   <sys:String x:Key="Str.Scanning">Reading Steam, Epic, GOG, EA, Ubisoft, Battle.net and Xbox…</sys:String>
-  <sys:String x:Key="Str.Found">found</sys:String>
-  <sys:String x:Key="Str.Added">new</sys:String>
-  <sys:String x:Key="Str.FirstScanHint">Nothing in the list yet. Scan games reads your launchers; nothing is changed by looking.</sys:String>
   <sys:String x:Key="Str.Search">Search games…</sys:String>
   <sys:String x:Key="Str.Settings">Settings</sys:String>
-  <sys:String x:Key="Str.NotDownloaded">not downloaded yet</sys:String>
   <sys:String x:Key="Str.WillDownload">The files are downloaded and verified when you install.</sys:String>
   <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12, Vulkan and OpenGL, and on D3D8, D3D9 and D3D11 for 32-bit games. A 32-bit OpenGL game, a 64-bit D3D9 one and a software renderer have none.</sys:String>
   <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings — that is the route picked here, and on another API the add-on sees a different game.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
-  <sys:String x:Key="Str.CheckApiTitle">Check the API before you install</sys:String>
-  <sys:String x:Key="Str.CheckApiBody">{0} was read out of this game's own files, and files say what they link against, not what the game runs on. One folder can hold a D3D11 and a D3D12 executable; one game can start on D3D10 from an executable that will also do D3D9. Both answers are true and only one of them is the route you want — and a wrong route installs perfectly and then does nothing in the game.</sys:String>
   <sys:String x:Key="Str.CheckWiki">Look this game up on PCGamingWiki</sys:String>
   <!-- Feedback and layout -->
   <sys:String x:Key="Str.EmptyTitle">No games yet</sys:String>
@@ -94,7 +81,6 @@
   <sys:String x:Key="Str.ScanningShort">Scanning…</sys:String>
   <sys:String x:Key="Str.ScanDone">Scan finished: {0} games found, {1} new.</sys:String>
   <sys:String x:Key="Str.InstalledBadge">Installed</sys:String>
-  <sys:String x:Key="Str.UpdateBadge">Update ready</sys:String>
   <sys:String x:Key="Str.Close">Close</sys:String>
   <sys:String x:Key="Str.CloseHint">Close (Esc)</sys:String>
   <sys:String x:Key="Str.ExeSection">The game's executable</sys:String>
@@ -105,7 +91,6 @@
   <sys:String x:Key="Str.ExeNoteChosen">You chose this file, so detection leaves it alone — including after a re-scan.</sys:String>
   <sys:String x:Key="Str.ExeNotHere">That file is not inside this game's folder.</sys:String>
   <sys:String x:Key="Str.ExeUnreadable">That file is not a Windows executable this can read.</sys:String>
-  <sys:String x:Key="Str.RouteSection">Route</sys:String>
   <sys:String x:Key="Str.RouteMismatch">This route is for {0} games and the executable above is {1}. Nothing stops you — the detection may have read the wrong file — but if it read the right one, this will not load.</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade loads as</sys:String>
@@ -120,8 +105,6 @@
   <sys:String x:Key="Str.ClearCacheYesBody">Everything in it is downloaded again the next time you install.</sys:String>
   <sys:String x:Key="Str.ClearCacheNoBody">Leave the cache as it is.</sys:String>
   <sys:String x:Key="Str.CacheCleared">Cache emptied — {0} freed.</sys:String>
-  <sys:String x:Key="Str.PayloadsAllReady">{0} of {1} components ready — {2} in the cache</sys:String>
-  <sys:String x:Key="Str.PayloadsMissing">{0} of {1} components ready — {2} left to download</sys:String>
   <sys:String x:Key="Str.PayloadsAlreadyThere">Everything was already there, and every byte just checked out.</sys:String>
   <sys:String x:Key="Str.VersionShipped">bundled</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">The version this installer was published with.</sys:String>
@@ -129,7 +112,6 @@
   <sys:String x:Key="Str.VersionSectionOpti">OptiScaler version</sys:String>
   <sys:String x:Key="Str.VersionNoteOpti">OptiScaler {0}, from its release on GitHub. Every file in it is checked against the hash the payload list gives it.</sys:String>
   <sys:String x:Key="Str.VersionNoteOptiLmxxf">It also installs the lmxxf runtime's weights, about 590 MB, which only RDNA4 cards use.</sys:String>
-  <sys:String x:Key="Str.WhatHappens">What will happen</sys:String>
   <sys:String x:Key="Str.Checking">Checking this folder…</sys:String>
   <sys:String x:Key="Str.StepDownload">Download</sys:String>
   <sys:String x:Key="Str.StepVerify">Verify</sys:String>
@@ -204,10 +186,8 @@
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 is translated to D3D9 and then takes the D3D9 route above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>
 
   <!-- First run -->
-  <sys:String x:Key="Str.SetupTitle">Getting started</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Welcome</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">The DLSS 5 Neural Rendering network on Radeon cards, through ReShade or OptiScaler. Four quick steps.</sys:String>
-  <sys:String x:Key="Str.SetupStepLanguage">Language</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">This machine</sys:String>
   <sys:String x:Key="Str.SetupStepFiles">Files</sys:String>
   <sys:String x:Key="Str.SetupStepGames">Your games</sys:String>
@@ -222,19 +202,13 @@
   <sys:String x:Key="Str.SetupMachineBad">Something is missing. You can continue and fix it later, but it will not work in game until you do.</sys:String>
 
   <sys:String x:Key="Str.SetupFilesBody">The same files serve every game: downloaded once, checked against a pinned hash, and reused.</sys:String>
-  <sys:String x:Key="Str.SetupFilesCheck">Checking what is already here…</sys:String>
-  <sys:String x:Key="Str.SetupFilesAllReady">Every file is here and verified.</sys:String>
-  <sys:String x:Key="Str.SetupFilesMissing">{0} of {1} components are still missing.</sys:String>
-  <sys:String x:Key="Str.SetupFilesDownload">Download everything now</sys:String>
   <sys:String x:Key="Str.SetupFilesRetry">Try again</sys:String>
   <sys:String x:Key="Str.SetupFilesLater">Skip this and they are downloaded on the first install.</sys:String>
-  <sys:String x:Key="Str.SetupFilesOffline">Could not read the download list — most likely no connection. You can continue: the app tries again when you install.</sys:String>
 
   <sys:String x:Key="Str.SetupGamesBody">Reading the launchers is read-only: nothing is installed or changed by looking. You can add folders by hand afterwards.</sys:String>
   <sys:String x:Key="Str.SetupGamesApi">Each game is read to work out which graphics API it uses, and that reading is usually right but not always: one folder can hold a D3D11 and a D3D12 executable, and a game can default to one API while its executable also supports an older one. Before installing, it is worth checking the game on pcgamingwiki.com — every game card has a link straight to it.</sys:String>
   <sys:String x:Key="Str.SetupGamesNone">No games found. You can add a folder by hand in the main window.</sys:String>
   <sys:String x:Key="Str.SetupGamesFound">{0} games found.</sys:String>
-  <sys:String x:Key="Str.SetupDoneBody">All set. The main window opens with your library.</sys:String>
 
   <sys:String x:Key="Str.Unexpected">Something unexpected happened. The full log was written.</sys:String>
 
