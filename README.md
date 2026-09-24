@@ -13,8 +13,9 @@ and checks everything including ReShade itself, installs it, and takes it all ba
 problem** collects the logs, the folder listing and what ReShade wrote into one zip that goes
 nowhere until you hand it over.
 
-Radeon **RDNA3 or RDNA4** with **HIP 7** (`amdhip64_7.dll`, from a current Adrenalin driver). It
-checks on its second screen and fetches the rest itself.
+Radeon **RDNA3 or RDNA4** with **HIP 7** (`amdhip64_7.dll`, from a current Adrenalin driver). The
+first-run wizard checks both, the **This machine** page keeps showing them, and the app fetches the
+rest itself.
 
 ## What it installs
 
@@ -26,6 +27,9 @@ The same files, verified the same way:
 | `dlssnr_amd_pass1.dll` | the neural runtime |
 | `dlssnr_on_amd_weights.bin` | the weights, 141 MB |
 | ReShade 6.8.0, full add-on support | under the proxy name the route loads, or the one you pick |
+| `AMD_Neural_Feed.fx` | the companion effect, in `reshade-shaders\Shaders\` |
+| `amd-nr.addon32`, `amd-nr-host64.exe` | 32-bit games: the add-on inside the game, and the 64-bit process that runs the network for it |
+| `dxgi.dll`, `d3d8to9.dll` | 32-bit games: the pinned 32-bit ReShade, and the D3D8-to-D3D9 layer D3D8 games go through |
 
 Every one is pinned by SHA-256 and checked after download and again before a byte is copied into a
 game folder. The add-on hashes the runtime at load and refuses anything else, because the
@@ -53,8 +57,9 @@ ships an upscaler, that route is the one selected. Every ReShade route stays in 
 | `LmxxfNrRuntime.dll`, `lmxxf-modules\`, `shaders\` | the second runtime OptiScaler 0.2.0 can drive, lmxxf's open-source port (RDNA4) |
 | `native-game-tiled-assets\` | its weights, about 590 MB |
 
-The sheet has an **OptiScaler version** menu, like the add-on's: every version the payload list
-carries, newest first, remembered per game. The lmxxf files come with 0.2.0 and later only.
+The game's OptiScaler panel has an **OptiScaler version** menu, beside the name it loads as, like the
+add-on's on the ReShade side: every version the payload list carries, newest first, remembered per
+game. The lmxxf files come with 0.2.0 and later only.
 
 No ReShade is installed on this route. Its files are downloaded when the route is installed, not
 in the first-run wizard, and the install goes through the same transaction, manifest and backups as
@@ -85,14 +90,38 @@ Ported verbatim from the Rust engine, because these were paid for the hard way:
   match the detected width lead the list, and the rest stay reachable, because a list that hides
   every working route is a dead end exactly when the guess was wrong.
 
+## When something goes wrong
+
+- **A download that fails says why**: the address never answered, went quiet halfway, the disk is
+  full, or an antivirus took the file. A file the payload list gives a mirror for is fetched from
+  the mirror next. When the failure is the network, **Clear DNS and try again** empties Windows' DNS
+  cache — no administrator rights needed — and retries.
+- **Download logs**, on the This machine page, saves one zip with a log of every download: each
+  address tried, its name lookup, the proxy, what it answered and how many bytes arrived. It also
+  checks every address again on the spot. Nothing is sent anywhere.
+- **Import files…** takes the files from a folder you downloaded them into yourself — found by name,
+  or by size under any name, and kept only if they hash to their pin.
+- **Updates** install in place: **Download update** fetches the new executable and replaces this one
+  only if it matches the SHA-256 the release publishes. A release that does not publish its sums
+  offers **Download from GitHub** instead.
+- A game on a drive that is unplugged stays in the list and comes back with the drive. A
+  `games.json` that cannot be read is set aside, not overwritten. A second copy of the app brings
+  the first one forward instead of opening beside it.
+
 ## Building
 
 ```powershell
 dotnet test
+powershell -ExecutionPolicy Bypass -File tools\gate.ps1 -Ui
 ```
 
 .NET 10 SDK, Windows. The engine is Windows-only on purpose: reparse-point refusal, the
 write-through commit and the PE machine check are the substance of it.
+
+`tools\gate.ps1` is what every commit passes: build, tests, a 500-line limit per file, and with
+`-Ui` a headless render of every page in English and Portuguese (`tools\uishot`) plus the game sheet
+driven through install, route switching, uninstall, update and a failed download. It runs against a
+throwaway `AMDNR_HOME` and never opens a window.
 
 Set `AMDNR_TEST_PAYLOAD_DIR` to a folder holding the three real files to include the end-to-end
 round trip; without it that one test skips and the rest of the suite still runs.
