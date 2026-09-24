@@ -289,6 +289,14 @@ public static class Transaction
             if (e.Backup.Length > 0)
             {
                 Engine.SafePath(backupPath);
+                // Put back already, by an uninstall cut off before it could rewrite this manifest --
+                // the window closed, the power went. The backup is gone because it was used, and the
+                // file there is the original: done, not a backup that has to be read.
+                if (!File.Exists(backupPath) && File.Exists(dst) && Engine.HashFile(dst) == e.BackupHash)
+                {
+                    log.Add($"RESTORED: {e.Name}");
+                    continue;
+                }
                 Engine.HashIs(Engine.Read(backupPath), e.BackupHash, "Original backup");
             }
 

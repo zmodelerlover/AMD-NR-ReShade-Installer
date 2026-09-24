@@ -136,6 +136,31 @@ public class UninstallTests
         Assert.Equal("an old copy", File.ReadAllText(existing));
     }
 
+    /// <summary>An uninstall cut off -- the window closed, the power went -- after it put an original
+    /// back and deleted its backup, and before it rewrote the manifest. Every uninstall after that
+    /// failed reading a backup that was gone, and every install found a file "changed since
+    /// install": a folder nothing could be done with but deleting the manifest by hand.</summary>
+    [Fact]
+    public void AnUninstallCutOffAfterPuttingAFileBackCanBeFinished()
+    {
+        var game = Fixture.Temp("cut-off");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
+        var original = Path.Combine(game, Work.RuntimeName);
+        File.WriteAllText(original, "the game's own copy");
+        var (src, pins) = Fixture.Payloads("cut-off");
+        Assert.False(Work.Install(game, src, Preset.Dx11, pins).Failed);
+
+        // What the cut-off uninstall had already done to that one file.
+        var backup = Fixture.Walk(Path.Combine(game, Engine.BackupDir)).Single(f => Path.GetFileName(f) == Work.RuntimeName);
+        File.Copy(backup, original, overwrite: true);
+        File.Delete(backup);
+
+        var report = Work.Uninstall(game, Preset.Dx11);
+        Assert.False(report.Failed, report.ToLog("finishing a cut-off uninstall"));
+        Assert.Equal("the game's own copy", File.ReadAllText(original));
+        Assert.False(File.Exists(Path.Combine(game, Work.AddonName)));
+    }
+
     /// <summary>A game folder past 260 characters. .NET's own file calls take it; the one rename done
     /// through Win32 directly did not, and the install failed with "Manifest commit failed" and no
     /// reason, leaving its backups behind.</summary>
