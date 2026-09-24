@@ -66,7 +66,14 @@ public static partial class GameScanner
         }
         if (root.Length == 0) return Presence.Gone;
         if (!Directory.Exists(root)) return Presence.Unreachable;
-        if (!Directory.Exists(folder)) return Presence.Gone;
+        // Gone only when the folder it sat in is still there: an uninstall takes the game's own
+        // folder and leaves its library. A drive letter taken by another disk -- the external SSD
+        // unplugged, a USB stick given its letter -- has none of the path, and is the same as a
+        // drive that is not there.
+        if (!Directory.Exists(folder))
+            return Path.GetDirectoryName(Path.GetFullPath(folder)) is { } parent && Directory.Exists(parent)
+                ? Presence.Gone
+                : Presence.Unreachable;
 
         try
         {

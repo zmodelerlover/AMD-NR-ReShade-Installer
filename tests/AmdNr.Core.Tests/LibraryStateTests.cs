@@ -86,4 +86,20 @@ public class LibraryStateTests
         Assert.NotNull(missing);
         Assert.Equal(Presence.Unreachable, GameScanner.PresenceOf(Path.Combine(missing!, "Games", "Something")));
     }
+
+    /// <summary>The drive letter is there and belongs to another disk now: the external SSD is
+    /// unplugged and a USB stick took E:. None of the game's path is on it. Taking that for "every
+    /// game on E: was uninstalled" dropped all of them, with every route chosen for them.</summary>
+    [Fact]
+    public void AGameWhoseLibraryIsNotThereEitherIsUnreachableNotGone()
+    {
+        var root = Fixture.Temp("presence-library");
+        var common = Path.Combine(root, "SteamLibrary", "steamapps", "common");
+        Directory.CreateDirectory(common);
+        // Uninstalled: its library is still there, its own folder is not.
+        Assert.Equal(Presence.Gone, GameScanner.PresenceOf(Path.Combine(common, "Some Game")));
+        // Another disk under the same letter: nothing on the way to the game is there.
+        Assert.Equal(Presence.Unreachable,
+            GameScanner.PresenceOf(Path.Combine(root, "OtherLibrary", "steamapps", "common", "Some Game")));
+    }
 }
