@@ -48,9 +48,7 @@
   <sys:String x:Key="Str.ManifestFailed">Could not read the download list. Check the connection and try again.</sys:String>
 
   <sys:String x:Key="Str.Language">Language</sys:String>
-  <sys:String x:Key="Str.UpdateAvailable">A newer version is out</sys:String>
-  <sys:String x:Key="Str.UpdateWorking">Updating…</sys:String>
-  <sys:String x:Key="Str.OpenReleases">Open the releases page</sys:String>
+  <sys:String x:Key="Str.UpdateWorking">Downloading the update…</sys:String>
   <sys:String x:Key="Str.Dismiss">Not now</sys:String>
 
   <sys:String x:Key="Str.LogSaved">The full log was written next to this app.</sys:String>
@@ -347,9 +345,10 @@
   <sys:String x:Key="Str.UpToDate">Up to date</sys:String>
   <sys:String x:Key="Str.UpdateChecking">Checking for a newer version…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} is the newest version. Checked at {1}.</sys:String>
-  <sys:String x:Key="Str.UpdateOut">v{0} is out. This is v{1}.</sys:String>
+  <sys:String x:Key="Str.UpdateOut">Version {0} is available. You have {1}.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Could not check: GitHub did not answer. The app works the same either way.</sys:String>
-  <sys:String x:Key="Str.UpdateNow">Update now</sys:String>
+  <sys:String x:Key="Str.UpdateNow">Download update</sys:String>
+  <sys:String x:Key="Str.UpdateOnGitHub">Download from GitHub</sys:String>
   <sys:String x:Key="Str.UpdateCheck">Check for updates</sys:String>
 
 </ResourceDictionary>

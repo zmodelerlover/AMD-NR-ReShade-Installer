@@ -45,9 +45,7 @@
   <sys:String x:Key="Str.ManifestFailed">Não deu pra ler a lista de downloads. Confira a conexão e tente de novo.</sys:String>
 
   <sys:String x:Key="Str.Language">Idioma</sys:String>
-  <sys:String x:Key="Str.UpdateAvailable">Saiu uma versão nova</sys:String>
-  <sys:String x:Key="Str.UpdateWorking">Atualizando…</sys:String>
-  <sys:String x:Key="Str.OpenReleases">Abrir a página de releases</sys:String>
+  <sys:String x:Key="Str.UpdateWorking">Baixando a atualização…</sys:String>
   <sys:String x:Key="Str.Dismiss">Agora não</sys:String>
 
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
@@ -362,9 +360,10 @@
   <sys:String x:Key="Str.UpToDate">Atualizado</sys:String>
   <sys:String x:Key="Str.UpdateChecking">Procurando uma versão mais nova…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">A v{0} é a versão mais nova. Verificado às {1}.</sys:String>
-  <sys:String x:Key="Str.UpdateOut">A v{0} saiu. Esta é a v{1}.</sys:String>
+  <sys:String x:Key="Str.UpdateOut">A versão {0} está disponível. Você tem a {1}.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Não deu para verificar: o GitHub não respondeu. O app funciona igual.</sys:String>
-  <sys:String x:Key="Str.UpdateNow">Atualizar agora</sys:String>
+  <sys:String x:Key="Str.UpdateNow">Baixar atualização</sys:String>
+  <sys:String x:Key="Str.UpdateOnGitHub">Baixar no GitHub</sys:String>
   <sys:String x:Key="Str.UpdateCheck">Procurar atualizações</sys:String>
 
 </ResourceDictionary>

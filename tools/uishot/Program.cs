@@ -332,13 +332,18 @@ void Flows()
              {
                  new(UpdateState.Checking), new(UpdateState.UpToDate, When: DateTimeOffset.Now),
                  new(UpdateState.Available, new AppRelease("9.9.9", "", "https://example.invalid", new Dictionary<string, string>())),
+                 new(UpdateState.Available, new AppRelease("9.9.9", "", "https://example.invalid",
+                     new Dictionary<string, string> { [AppUpdate.ExeAsset] = "", [AppUpdate.SumsAsset] = "" })),
                  new(UpdateState.Failed),
              })
     {
         update.SetValue(session, check);
         main.Relabel();
         Settle(6);
-        Save(main, $"flow-4-update-{check.State.ToString().ToLowerInvariant()}");
+        Save(main, $"flow-4-update-{check.State.ToString().ToLowerInvariant()}{(check.Release?.CanSelfUpdate == true ? "-self" : "")}");
+        if (check.Release is { } r)
+            Check(main.FindControl<Button>("UpdateButton")!.Content as string == S(r.ActionKey) && S(r.ActionKey) != r.ActionKey,
+                $"the update button says what it does: \"{S(r.ActionKey)}\"");
         Check(main.FindControl<Control>("UpdateDot")!.IsVisible == (check.State == UpdateState.Available),
             $"update {check.State}: the dot on the gear only when there is one");
     }

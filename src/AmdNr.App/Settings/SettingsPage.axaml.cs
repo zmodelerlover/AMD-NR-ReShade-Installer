@@ -69,7 +69,9 @@ public partial class SettingsPage : UserControl
             _ => Ui.Text("Str.UpdateFailed"),
         };
         UpdateButton.IsEnabled = update.State != UpdateState.Checking;
-        UpdateButton.Content = Ui.Text(update.State == UpdateState.Available ? "Str.UpdateNow" : "Str.UpdateCheck");
+        UpdateButton.Content = Ui.Text(update is { State: UpdateState.Available, Release: { } release }
+            ? release.ActionKey
+            : "Str.UpdateCheck");
         UpdateButton.Classes.Set("primary", update.State == UpdateState.Available);
         UpdateButton.Classes.Set("ghost", update.State != UpdateState.Available);
     }

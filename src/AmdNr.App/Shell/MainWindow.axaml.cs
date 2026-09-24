@@ -203,12 +203,13 @@ public partial class MainWindow : Window
 
     private void ShowUpdate()
     {
-        var available = Session.Update is { State: UpdateState.Available, Release: { } release };
-        UpdateDot.IsVisible = available;
-        if (!available) UpdateBanner.IsVisible = false;
+        var release = Session.Update is { State: UpdateState.Available, Release: { } found } ? found : null;
+        UpdateDot.IsVisible = release is not null;
+        if (release is null) UpdateBanner.IsVisible = false;
         else if (!_dismissed)
         {
-            UpdateText.Text = Ui.Format("Str.UpdateOut", Session.Update.Release!.Version, App.Version);
+            UpdateText.Text = Ui.Format("Str.UpdateOut", release.Version, App.Version);
+            UpdateButton.Content = Ui.Text(release.ActionKey);
             UpdateBanner.IsVisible = true;
         }
     }

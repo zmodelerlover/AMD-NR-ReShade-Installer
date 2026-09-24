@@ -14,6 +14,11 @@ public sealed record AppRelease(string Version, string Notes, string Url,
     /// unverified bytes is worse than one the person fetches by hand.</summary>
     public bool CanSelfUpdate =>
         Assets.ContainsKey(AppUpdate.ExeAsset) && Assets.ContainsKey(AppUpdate.SumsAsset);
+
+    /// <summary>The button says what pressing it does: download and install here, or send the
+    /// person to GitHub for a release this cannot verify. v0.5.0 said "Open the releases page" on
+    /// a button that actually downloaded and restarted.</summary>
+    public string ActionKey => CanSelfUpdate ? "Str.UpdateNow" : "Str.UpdateOnGitHub";
 }
 
 public enum UpdateState
