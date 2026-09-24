@@ -79,8 +79,10 @@ Ported verbatim from the Rust engine, because these were paid for the hard way:
   by definition the one the route was not looking for.
 - **The journal lands before the writes it describes**, through `MoveFileEx` with write-through, so
   an interrupted install is recoverable rather than half-applied.
-- **Everything displaced is backed up**, and uninstall puts it back instead of deleting filenames it
-  recognises. A file you changed after installing is kept, with a warning.
+- **Everything displaced is backed up**, and uninstall puts it back. Uninstall takes out every file
+  under a name only this project uses, whether the install recorded it or it was copied in by hand,
+  and a ReShade only when it is a build this app pins; anybody else's file stays. The settings files
+  left at the end are named, and you choose whether they go too.
 - **The manifest is a compatibility surface.** It is accepted only when re-encoding reproduces it
   byte for byte, which is what makes hand-editing detectable — and what keeps installs written by
   the older C++ and Rust installers readable. The captured literal in the test suite is the guard.
