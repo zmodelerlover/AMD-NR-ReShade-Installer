@@ -110,7 +110,8 @@ public class OptiScalerVersionTests
     {
         var shipped = PayloadManifest.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "payload.json")));
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
-        Assert.Equal("0.2.0-amd-nr", offered[0].Version);
+        Assert.Equal("0.3.0-amd-nr", offered[0].Version);
+        Assert.Contains(offered, r => r.Version == "0.2.0-amd-nr");
         Assert.Contains(offered, r => r.Version == "0.1.1-amd-nr");
         // What v0.4.0 reads stays the version it knows how to install.
         Assert.Equal("0.1.1-amd-nr", shipped.Component(PayloadManifest.OptiScalerComponent).Version);
