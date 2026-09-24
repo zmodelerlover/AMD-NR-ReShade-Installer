@@ -54,16 +54,17 @@ public sealed class Library(Session session)
 
     /// <summary>The same check for games already on screen, when the window comes back to the front:
     /// somebody who switched to Steam and uninstalled one should not have to restart this to see it
-    /// go. The game whose sheet is open, and anything while work is running, is left alone.</summary>
-    public async Task<IReadOnlyList<string>> PruneAsync(GameCard? open)
+    /// go. The game whose sheet is open, and anything while work is running, is left alone -- unless
+    /// the work is the scan asking for this, which is <paramref name="scanning"/>.</summary>
+    public async Task<IReadOnlyList<string>> PruneAsync(GameCard? open, bool scanning = false)
     {
-        if (session.Busy || _cards.Count + _away.Count == 0) return [];
+        if ((session.Busy && !scanning) || _cards.Count + _away.Count == 0) return [];
         var cards = _cards.Where(c => c != open).ToList();
         var away = _away.ToList();
         var (presence, back) = await Task.Run(() => (
             cards.Select(c => GameScanner.PresenceOf(c.Path)).ToList(),
             away.Select(e => GameScanner.PresenceOf(e.Path)).ToList()));
-        if (session.Busy) return [];
+        if (session.Busy && !scanning) return [];
 
         var gone = new List<string>();
         var changed = false;

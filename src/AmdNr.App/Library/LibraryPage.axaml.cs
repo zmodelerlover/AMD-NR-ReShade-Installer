@@ -118,7 +118,7 @@ public partial class LibraryPage : UserControl
     private async Task MergeAsync(IReadOnlyList<ScannedGame> found)
     {
         var added = Library.Merge(found);
-        var gone = await Library.PruneAsync(null);
+        var gone = await Library.PruneAsync(_shell.Sheet.Card, scanning: true);
         await Library.DetectAsync();
         _ = Library.LoadCoversAsync();
         _shell.Toast(Ui.Format("Str.ScanDone", found.Count, added)
@@ -131,8 +131,12 @@ public partial class LibraryPage : UserControl
     {
         if (Session.Busy) return;
         var path = await PickFolderAsync(Ui.Text("Str.AddGamePickLibrary"));
-        if (path is null) return;
+        if (path is not null) await SearchFolderAsync(path);
+    });
 
+    public async Task SearchFolderAsync(string path)
+    {
+        if (Session.Busy) return;
         Session.Busy = true;
         ScanSpinner.IsVisible = true;
         Foot(Ui.Text("Str.Scanning"));
@@ -152,7 +156,7 @@ public partial class LibraryPage : UserControl
             Session.Busy = false;
             Refresh();
         }
-    });
+    }
 
     /// <summary>The folder one game runs from.</summary>
     private void OnAddOne(object? sender, RoutedEventArgs e) => _shell.Run("add a game", async () =>

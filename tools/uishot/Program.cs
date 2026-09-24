@@ -353,7 +353,7 @@ void Flows()
     Click(main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card")));
     Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
         "nothing is left busy: a sheet opened afterwards can install");
-    SheetFlow.Run(main, sheet, main.Library.Cards[0], Check, Until);
+    SheetFlow.Run(main, sheet, main.Library.Cards[0], Check, Until); LibraryFlow.Run(main, Pe64(), Check, Until);
 
     // Closed while a game folder is being written: refused, and said. Any other time: closed.
     session.Writing = true;
