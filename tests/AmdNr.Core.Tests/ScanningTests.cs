@@ -214,13 +214,38 @@ public class ScanningTests
         Exe(root, Path.Combine("Publisher", "Beta"), "beta.exe");
         // Nothing in it at all.
         Directory.CreateDirectory(Path.Combine(root, "Empty"));
+        // Unreal with its project in a folder of its own and Engine beside it: the game is the root,
+        // not the project -- which came back as a game of its own, "UFG" beside Strikers Club.
+        Exe(root, Path.Combine("Kappa", "KappaGame", "Binaries", "Win64"), "KappaGame-Win64-Shipping.exe");
+        Directory.CreateDirectory(Path.Combine(root, "Kappa", "Engine"));
+        // The same shape with no Engine beside it is a publisher folder holding an Unreal game.
+        Exe(root, Path.Combine("Studio", "Lambda", "Binaries", "Win64"), "Lambda-Win64-Shipping.exe");
+        // The executable in a folder of its own name: GTAIV\GTAIV.exe under Grand Theft Auto IV.
+        Exe(root, Path.Combine("Grand Theft Auto IV", "GTAIV"), "GTAIV.exe");
+        // Euro Truck Simulator 2's layout, which came back as a game called "win_x64".
+        Exe(root, Path.Combine("Euro Truck Simulator 2", "bin", "win_x64"), "eurotrucks2.exe");
+        // Anti-cheat on its own is not a game, however large its setup.
+        Exe(root, "EasyAntiCheat", "EasyAntiCheat_EOS_Setup.exe");
 
         var found = GameScanner.UnderFolder(root);
         var paths = found.Select(g => Path.GetRelativePath(root, g.InstallPath)).OrderBy(p => p).ToList();
 
-        Assert.Equal(["Alpha", "Omega", Path.Combine("Publisher", "Beta"), "Sigma"], paths);
+        Assert.Equal(["Alpha", "Euro Truck Simulator 2", "Grand Theft Auto IV", "Kappa", "Omega",
+            Path.Combine("Publisher", "Beta"), "Sigma", Path.Combine("Studio", "Lambda")], paths);
         Assert.All(found, g => Assert.Equal(GamePlatform.Manual, g.Platform));
         Assert.Equal("Beta", found.Single(g => g.InstallPath.EndsWith("Beta", StringComparison.Ordinal)).Name);
+    }
+
+    /// <summary>Our own 64-bit host beside a 32-bit game is not the game: the folder read as mixed,
+    /// and the first guess at its route was a 64-bit one.</summary>
+    [Fact]
+    public void OurOwnHostIsNotTakenForTheGame()
+    {
+        var game = Fixture.Temp("with-host");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(false));
+        File.WriteAllBytes(Path.Combine(game, Work.Host64Name), Fixture.Pe(true));
+        Assert.Equal(Route.X86, Work.Detect(game).Route);
+        Assert.Equal("game.exe", Path.GetFileName(GraphicsDetector.FindExecutable(game)));
     }
 
     private static void Exe(string root, string folder, string name)

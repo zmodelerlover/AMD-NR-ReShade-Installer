@@ -37,6 +37,8 @@ public static partial class Work
         {
             foreach (var p in Directory.EnumerateFiles(path, "*.exe"))
             {
+                // Our own 64-bit host, beside a 32-bit game on the bridge route: not the game's width.
+                if (string.Equals(Path.GetFileName(p), Host64Name, StringComparison.OrdinalIgnoreCase)) continue;
                 switch (RouteOf(Engine.MachineOfFile(p)))
                 {
                     case Route.X86: x86.Add(NameOf(p)); break;

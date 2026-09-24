@@ -256,7 +256,9 @@ public static partial class GameScanner
     {
         foreach (var drive in DriveInfo.GetDrives())
         {
-            if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue;
+            // The type first: IsReady on a mapped drive that is offline waits out a network timeout,
+            // and the whole scan waited with it.
+            if (drive.DriveType != DriveType.Fixed || !drive.IsReady) continue;
 
             var root = Path.Combine(drive.Name, "XboxGames");
             string[] folders;
@@ -390,8 +392,11 @@ public static partial class GameScanner
             {
                 if (IsExcluded(child) || !HasContent(child)) continue;
 
+                // Only an executable that looks like a game makes its folder one. The detection's
+                // last resort takes the largest executable of any kind, which is right for a game it
+                // already knows is one and wrong here: EasyAntiCheat's setup made a game of its folder.
                 var exe = GraphicsDetector.FindExecutable(child);
-                if (exe is not null && !IsContainer(child, exe))
+                if (exe is not null && GraphicsDetector.LooksLikeTheGame(exe) && !IsContainer(child, exe))
                 {
                     found.Add(new ScannedGame(Path.GetFileName(child), child, GamePlatform.Manual));
                     continue;
@@ -413,7 +418,14 @@ public static partial class GameScanner
         var relative = Path.GetRelativePath(folder, exe);
         var segments = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         if (segments.Length < 2) return false; // Straight in the folder: it is the game.
-        return !EngineFolders.Contains(segments[0]);
+        if (EngineFolders.Contains(segments[0])) return false;
+        // Unreal keeps the game under a folder named after its project, <Project>\Binaries\Win64,
+        // with Engine beside it -- which a publisher folder holding one Unreal game does not have.
+        if (segments.Length > 2 && EngineFolders.Contains(segments[1]) && Directory.Exists(Path.Combine(folder, "Engine")))
+            return false;
+        // The game's executable in a folder of its own name, GTAIV\GTAIV.exe under Grand Theft Auto
+        // IV, is the game again, not a second one inside it.
+        return !GraphicsDetector.NamedLike(folder, exe);
     }
 
     /// <summary>Where an engine puts its executable, as the first segment under the game's root.

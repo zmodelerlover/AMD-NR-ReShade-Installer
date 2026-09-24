@@ -19,9 +19,11 @@ public static partial class GraphicsDetector
         "settings", "editor", "server.exe", "dedicated", "languageselect", "_trial", "trial.exe",
         "activation", "register", "patcher", "repair", "diagnostic", "support", "feedback",
         "bootstrap", "startup", "splash", "vrmonitor", "handler", "service", "agent",
+        // Ours: the 64-bit host the bridge route puts beside a 32-bit game.
+        "amd-nr",
     ];
 
-    private static bool LooksLikeTheGame(string exe)
+    internal static bool LooksLikeTheGame(string exe)
     {
         var name = Path.GetFileName(exe).ToLowerInvariant();
         return !NotTheGame.Any(name.Contains);
@@ -46,7 +48,10 @@ public static partial class GraphicsDetector
         }
 
         yield return root;
-        foreach (var sub in new[] { "bin", @"bin\x64", @"bin\win64", "x64", "Bin64", "Game", "bin_x64", "Binaries" })
+        // bin\win_x64 is SCS (Euro Truck Simulator 2, American Truck Simulator); game\bin\win64 is
+        // Source 2 (Counter-Strike 2, Dota 2).
+        foreach (var sub in new[] { "bin", @"bin\x64", @"bin\win64", @"bin\win_x64", @"game\bin\win64", "x64",
+                                    "Bin64", "Game", "bin_x64", "Binaries" })
             yield return Path.Combine(root, sub);
         foreach (var child in children) yield return child;
     }
@@ -127,7 +132,7 @@ public static partial class GraphicsDetector
 
     /// <summary>Folders a game keeps its 64-bit build in when the root holds only a launcher.</summary>
     private static readonly string[] WideFolders =
-        ["Bin64", @"bin\x64", @"bin\win64", "x64", "bin_x64", @"Binaries\Win64"];
+        ["Bin64", @"bin\x64", @"bin\win64", @"bin\win_x64", @"game\bin\win64", "x64", "bin_x64", @"Binaries\Win64"];
 
     /// <summary>The 64-bit build of the same game, in one of the folders that only ever hold one.
     /// The name still has to look like the game: a crash handler in x64\ is not the game, and taking
@@ -188,6 +193,12 @@ public static partial class GraphicsDetector
 
     private static string Normalise(string s) =>
         new(s.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+
+    /// <summary>Whether an executable is plainly named after a folder -- GTAIV.exe and "Grand Theft
+    /// Auto IV" -- by a whole name or its initials of four letters or more, starting the same way.
+    /// Two-letter initials are left out: "Electronic Arts" would claim anything starting "ea".</summary>
+    internal static bool NamedLike(string folder, string exe) =>
+        Similarity(Path.GetFileNameWithoutExtension(exe), Hints(folder, null).Where(h => h.Length >= 4).ToList()) >= 60;
 
     private static int Similarity(string exeName, List<string> hints)
     {
