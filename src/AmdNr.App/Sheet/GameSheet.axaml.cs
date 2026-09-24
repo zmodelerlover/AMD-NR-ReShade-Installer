@@ -52,6 +52,7 @@ public partial class GameSheet : UserControl
         {
             Lock(Session.Busy);
             if (!Session.Busy && !IsOpen) _card = null;
+            if (!Session.Busy && IsOpen && _checkWaiting) _ = RefreshAsync();
         };
         Session.ManifestChanged += () =>
         {

@@ -41,6 +41,7 @@ public partial class GameSheet
     /// else is locked through <see cref="Session.Busy"/>.</summary>
     private void Busy(bool on, Button? pressed = null)
     {
+        _ownBusy = on;
         Session.Busy = on;
         InstallSpin.IsVisible = on && pressed == InstallButton;
         UninstallSpin.IsVisible = on && pressed == UninstallButton;

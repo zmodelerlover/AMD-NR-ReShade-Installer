@@ -208,8 +208,7 @@ void Flows()
     string S(string key) => main.FindResource(key) as string ?? key;
     Check(Until(() => session.Manifest is not null && main.Library.Cards is [{ Graphics: not null }]),
         "the window starts, on the payload list beside it when the published one cannot be read");
-    Check(session.ManifestProblem?.Contains("127.0.0.1") == true,
-        $"and knows the published one could not be read, and why ({session.ManifestProblem})");
+    Check(session.ManifestProblem?.Contains("127.0.0.1") == true, $"and knows why the published one could not be read ({session.ManifestProblem})");
     var card = main.Library.Cards[0];
     var tile = main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card"));
     bool TileSays(string text) => tile.GetVisualDescendants().OfType<TextBlock>()
@@ -355,6 +354,7 @@ void Flows()
     Click(main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card")));
     Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
         "nothing is left busy: a sheet opened afterwards can install");
+    SheetFlow.Run(main, sheet, main.Library.Cards[0], Check, Until);
 
     // Closed while a game folder is being written: refused, and said. Any other time: closed.
     session.Writing = true;

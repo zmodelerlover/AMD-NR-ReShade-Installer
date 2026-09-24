@@ -16,11 +16,29 @@ public partial class GameSheet
     /// <summary>How many pre-flights have started, so only the latest one is shown.</summary>
     private int _checks;
 
+    /// <summary>Whether the busy flag is this sheet's own install or uninstall, and whether a check
+    /// was put off because it was somebody else's.</summary>
+    private bool _ownBusy, _checkWaiting;
+
     /// <summary>The pre-flight for the open game, off the UI thread: deciding whether the cache is
     /// complete can mean hashing 141 MB, which is a second of frozen window the first time.</summary>
     private async Task RefreshAsync()
     {
-        if (_card is not { } card || Session.Busy) return;
+        if (_card is not { } card) return;
+        if (Session.Busy)
+        {
+            // Someone else's work -- a scan, Download all -- is running: what is on screen may be
+            // another game's verdict, so it goes, and the check runs once that work is done.
+            if (!_ownBusy)
+            {
+                _checkWaiting = true;
+                Steps.IsVisible = false;
+                ResultBanner.IsVisible = false;
+                _report.Clear();
+            }
+            return;
+        }
+        _checkWaiting = false;
         var check = ++_checks;
         var pins = Pins();
         var preset = card.Entry.Preset;
