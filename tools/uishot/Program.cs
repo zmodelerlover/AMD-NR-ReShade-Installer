@@ -140,7 +140,7 @@ byte[] Pe64()
 
 // A payload list whose every file is already in the cache. No ReShade component, whose hash is pinned
 // in the engine and cannot be stood in for; the add-on route installs without it.
-void SeedPayload(string addonVersion)
+void SeedPayload(string addonVersion, string optiVersion = "1.0.0")
 {
     var components = new System.Text.Json.Nodes.JsonObject();
     void Component(string name, string version, params string[] paths)
@@ -148,10 +148,10 @@ void SeedPayload(string addonVersion)
         var files = new System.Text.Json.Nodes.JsonArray();
         foreach (var path in paths)
         {
-            // The add-on's bytes carry its version, so a second list pins a different build.
+            // The bytes carry the version, so a second list pins a different build.
             byte[] bytes = path == "amd-nr.addon64"
                 ? [.. Pe64(), .. System.Text.Encoding.UTF8.GetBytes(addonVersion)]
-                : System.Text.Encoding.UTF8.GetBytes($"stand-in {path}");
+                : System.Text.Encoding.UTF8.GetBytes($"stand-in {path} {version}");
             var full = Path.Combine(PayloadCache.FolderFor(name, version), path);
             Directory.CreateDirectory(Path.GetDirectoryName(full)!);
             File.WriteAllBytes(full, bytes);
@@ -168,7 +168,7 @@ void SeedPayload(string addonVersion)
     }
     Component("addon", addonVersion, "amd-nr.addon64");
     Component("runtime", "1.0.0", "dlssnr_amd_pass1.dll", "dlssnr_on_amd_weights.bin");
-    Component("optiscaler", "1.0.0", "OptiScaler.dll", "OptiScaler.ini",
+    Component("optiscaler", optiVersion, "OptiScaler.dll", "OptiScaler.ini",
         "OptiScaler/amd_fidelityfx_loader_dx12.dll", "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
         "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll", "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
         "OptiScaler/amd_fidelityfx_vk.dll", "OptiScaler/libxess.dll", "OptiScaler/libxess_dx11.dll",
@@ -235,6 +235,28 @@ void Flows()
     Check(!File.Exists(Path.Combine(game, "amd-nr.addon64")), "leaving no add-on behind");
     Check(label.Text == S("Str.Reinstall") && TileSays("OptiScaler"), "the sheet and the tile say OptiScaler");
     Save(main, "flow-2-optiscaler");
+
+    // OptiScaler moves on too, and its badge is the longest one there is -- in Portuguese. It has to
+    // fit the narrowest tile the grid makes, 150 wide, inside its 8 of margin either side.
+    SeedPayload("1.0.0", "1.0.1");
+    var optiReload = session.LoadManifestAsync();
+    Check(Until(() => optiReload.IsCompleted && card.Outdated) && Until(() => label.Text == S("Str.Update"), 10),
+        "an OptiScaler the payload moved past offers Update");
+    App.ChangeLanguage("pt-BR");
+    main.Relabel();
+    Settle(6);
+    var state = tile.GetVisualDescendants().OfType<Border>().First(b => b.Classes.Contains("state"));
+    var row = (StackPanel)state.Child!;
+    var shown = row.Children.Where(c => c.IsVisible).ToList();
+    var need = shown.Sum(c => c.DesiredSize.Width) + row.Spacing * (shown.Count - 1)
+               + state.Padding.Left + state.Padding.Right + state.BorderThickness.Left + state.BorderThickness.Right;
+    Check(need <= 150 - 16, $"\"{S("Str.UpdateShort")} OptiScaler\" fits the narrowest tile ({need:0} of {150 - 16})");
+    Save(main, "flow-2-optiscaler-outdated-pt");
+    App.ChangeLanguage("en");
+    main.Relabel();
+    Click(install);
+    Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated,
+        $"Update brings OptiScaler in line ({verdict.Text})");
 
     Click(uninstall);
     Check(Until(() => !session.Busy), "Uninstall finishes");
@@ -388,6 +410,10 @@ void Main(int w, int h, string suffix = "")
     var main = new MainWindow { Width = w, Height = h };
     main.Show();
     Settle(15);
+    // The update check is real, and a newer release puts a banner over the grid: waited for, or it
+    // lands between scrolling to the end and measuring, and the last row reads as cut off.
+    Until(() => main.Session.Update.State != UpdateState.Checking, 20);
+    Settle(4);
     foreach (var page in new[] { "GamesPage", "SystemPage", "SettingsPage" })
     {
         foreach (var other in new[] { "GamesPage", "SystemPage", "SettingsPage" })
