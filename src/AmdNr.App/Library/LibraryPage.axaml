@@ -78,6 +78,10 @@
           <x:Double x:Key="TileWidth">176</x:Double>
           <x:Double x:Key="CoverHeight">264</x:Double>
         </ItemsControl.Resources>
+        <!-- ponytail: not virtualised. Every tile is built, about 6 ms each: 300 games take close to
+             two seconds the first time the grid is laid out (uishot perf measures it). The search
+             no longer rebuilds them. ItemsRepeater with a UniformGridLayout, from the
+             Avalonia.Controls.ItemsRepeater package, if libraries that size turn up. -->
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <WrapPanel />

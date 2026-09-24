@@ -37,10 +37,18 @@ public partial class LibraryPage : UserControl
     public void Refresh()
     {
         var needle = SearchBox.Text?.Trim() ?? "";
-        _shown.Clear();
-        foreach (var card in Library.Cards.Where(c => needle.Length == 0
-                                                      || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)))
-            _shown.Add(card);
+        var wanted = Library.Cards.Where(c => needle.Length == 0
+                                              || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+        // Brought in line, not rebuilt. A tile is a few controls deep, and clearing the grid built
+        // every one of them again: over a second for each key typed in the search with a few hundred
+        // games, and the same again on every language switch. Only the tiles that come or go are.
+        var keep = wanted.ToHashSet();
+        for (var i = _shown.Count - 1; i >= 0; i--)
+            if (!keep.Contains(_shown[i])) _shown.RemoveAt(i);
+        for (var i = 0; i < wanted.Count; i++)
+            if (i >= _shown.Count || _shown[i] != wanted[i]) _shown.Insert(i, wanted[i]);
+        while (_shown.Count > wanted.Count) _shown.RemoveAt(_shown.Count - 1);
 
         var all = Library.Cards.Count;
         var noMatch = all > 0 && _shown.Count == 0;
