@@ -255,6 +255,18 @@ public class DownloadFallbackTests
         Assert.True(error.Network);
     }
 
+    /// <summary>The stall timer also runs while the headers are awaited, and its cancellation carries
+    /// no TimeoutException: a server that took the connection and never sent a header read as one that
+    /// "stopped answering, whatever arrived is kept" -- when nothing had.</summary>
+    [Fact]
+    public async Task NoHeadersBeforeTheStallTimerIsNeverAnswered()
+    {
+        var cache = new PayloadCache(new HttpClient(new Answers(_ => throw new TaskCanceledException("stall"))));
+        var error = await Assert.ThrowsAsync<InstallException>(() =>
+            cache.EnsureAsync(OneFile(Version("ns"), Blob(19), "https://mute.example/f"), PayloadManifest.RuntimeComponent));
+        Assert.Contains("never answered", error.Message, StringComparison.Ordinal);
+    }
+
     /// <summary>A full disk is not the server's fault. It was taken for one: the part was thrown away
     /// and the mirror downloaded it again, into the same full disk, and the message blamed an
     /// antivirus. It stops at once, keeps what arrived, and says which drive.</summary>

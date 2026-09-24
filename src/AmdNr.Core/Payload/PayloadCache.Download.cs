@@ -143,8 +143,8 @@ public sealed partial class PayloadCache
 
     /// <summary>How long a download may go without one byte arriving before the address is given
     /// up on. A server that refuses or drops the connection says so; one that accepts and then
-    /// stops sending says nothing at all, and the client's own 30-minute timeout is then the only
-    /// thing that ever ends it. A minute of silence on a file that was arriving is already
+    /// stops sending says nothing at all, and the client's own 100-second timeout ends only the wait for the
+    /// headers, never the body. A minute of silence on a file that was arriving is already
     /// dead.</summary>
     private static readonly TimeSpan Stall = TimeSpan.FromMinutes(1);
 
@@ -166,11 +166,13 @@ public sealed partial class PayloadCache
         }
         catch (OperationCanceledException e) when (!cancel.IsCancellationRequested)
         {
-            record.Error = e;
-            record.Kind = Classify(e);
             // The client's own timeouts -- the connect one, the one up to the headers -- carry a
-            // TimeoutException: nothing ever came back. The stall timer's does not: it went quiet.
-            throw new InstallException(e.InnerException is TimeoutException
+            // TimeoutException: nothing ever came back. The stall timer's does not, and it went quiet
+            // only if a status line had arrived first; before one, it never answered either.
+            var never = e.InnerException is TimeoutException || record.Status is null;
+            record.Error = e;
+            record.Kind = never ? "never answered" : Classify(e);
+            throw new InstallException(never
                 ? "it never answered. A firewall, a VPN or a proxy may be dropping the connection."
                 : "it stopped answering. Whatever arrived is kept, so trying again picks up where this left off.")
             {
