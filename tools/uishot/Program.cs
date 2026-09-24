@@ -62,17 +62,6 @@ void Save(Window window, string name, bool dump = false)
     Dump(window, 0, w);
 }
 
-void Shot(Window window, string name, int width, int height, bool dump = false)
-{
-    window.Width = width;
-    window.Height = height;
-    window.Show();
-    Settle();
-    Save(window, name, dump);
-    Console.WriteLine($"{name}: {window.Width}x{window.Height}");
-    window.Close();
-}
-
 /// <summary>Scrolls every visible ScrollViewer to its end and checks that the last thing inside it
 /// can actually be reached: its bottom edge has to land inside the viewport. This is the check the
 /// "scrolled to the bottom and the last row is still cut off" bug fails, whatever caused it.</summary>
@@ -295,11 +284,35 @@ if (args.Length > 1 && args[1] == "flows")
     return failures == 0 ? 0 : 1;
 }
 
-Shot(new SetupWindow(), "setup", 820, 900, dump: true);
-Shot(new SetupWindow(), "setup-small", 700, 640);
+// Every step of the first run, not only the first: the files step is the payload panel the main
+// window shares, and it is the step people get stuck on.
+void Wizard(string suffix, int width, int height)
+{
+    var setup = new SetupWindow { Width = width, Height = height };
+    setup.Show();
+    Settle();
+    var next = setup.FindControl<Button>("NextButton")!;
+    var files = setup.FindControl<PayloadPanel>("Payloads")!;
+    for (var step = 1; step <= 4; step++)
+    {
+        // The files step reads the payload list off the network; offline it says so, which is a
+        // page worth seeing too, so the wait is bounded and not a check.
+        if (step == 3) Until(() => files.Missing >= 0, 20);
+        var name = $"setup{suffix}-{step}-{width}x{height}";
+        Save(setup, name, dump: step == 1 && suffix.Length == 0 && width == 820);
+        CheckScrollReach(setup, name);
+        if (step < 4)
+        {
+            Click(next);
+            Settle(8);
+        }
+    }
+    Console.WriteLine($"setup{suffix} {width}x{height}: ok");
+    setup.Close();
+}
 
-SeedLibrary(61);
-foreach (var (w, h) in new[] { (1240, 820), (1920, 1040), (2560, 1400), (980, 620) })
+// The main window at one size: every page, each scrolled to its end, and the sheet a tile opens.
+void Main(int w, int h, string suffix = "")
 {
     var main = new MainWindow { Width = w, Height = h };
     main.Show();
@@ -309,8 +322,8 @@ foreach (var (w, h) in new[] { (1240, 820), (1920, 1040), (2560, 1400), (980, 62
         foreach (var other in new[] { "GamesPage", "SystemPage", "SettingsPage" })
             if (main.FindControl<Control>(other) is { } c) c.IsVisible = other == page;
         Settle(8);
-        var name = $"{page.Replace("Page", "").ToLowerInvariant()}-{w}x{h}";
-        Save(main, name, dump: w == 1920 && page == "GamesPage");
+        var name = $"{page.Replace("Page", "").ToLowerInvariant()}{suffix}-{w}x{h}";
+        Save(main, name, dump: w == 1920 && page == "GamesPage" && suffix.Length == 0);
         CheckScrollReach(main, name);
         Save(main, name + "-end");
     }
@@ -320,15 +333,27 @@ foreach (var (w, h) in new[] { (1240, 820), (1920, 1040), (2560, 1400), (980, 62
         if (main.FindControl<Control>(other) is { } c) c.IsVisible = other == "GamesPage";
     if (main.GetVisualDescendants().OfType<Button>().FirstOrDefault(b => b.Classes.Contains("card")) is { } card)
     {
-        card.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        Click(card);
         Settle(20);
-        Save(main, $"sheet-{w}x{h}", dump: w == 1240);
-        CheckScrollReach(main, $"sheet-{w}x{h}");
-        Save(main, $"sheet-{w}x{h}-end");
+        Save(main, $"sheet{suffix}-{w}x{h}", dump: w == 1240 && suffix.Length == 0);
+        CheckScrollReach(main, $"sheet{suffix}-{w}x{h}");
+        Save(main, $"sheet{suffix}-{w}x{h}-end");
     }
-    Console.WriteLine($"main {w}x{h}: ok");
+    Console.WriteLine($"main{suffix} {w}x{h}: ok");
     main.Close();
 }
+
+Wizard("", 820, 900);
+Wizard("", 700, 640);
+SeedLibrary(61);
+foreach (var (w, h) in new[] { (1240, 820), (1920, 1040), (2560, 1400), (980, 620) }) Main(w, h);
+
+// Portuguese runs longer than English almost everywhere, so it is where a label wraps or a row
+// overflows first: the smallest sizes, where that shows.
+App.ChangeLanguage("pt-BR");
+Wizard("-pt", 700, 640);
+Main(1240, 820, "-pt");
+Main(980, 620, "-pt");
 
 Console.WriteLine(failures == 0 ? "every scroll reaches its end" : $"{failures} scroll(s) cut off");
 return failures == 0 ? 0 : 1;
