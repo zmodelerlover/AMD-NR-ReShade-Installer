@@ -125,6 +125,9 @@
   <sys:String x:Key="Str.VersionShipped">que acompanha o instalador</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">A versão com que este instalador foi publicado.</sys:String>
   <sys:String x:Key="Str.VersionNoteRelease">Vem do release v{0} no GitHub, conferida contra os hashes que aquele release publica.</sys:String>
+  <sys:String x:Key="Str.VersionSectionOpti">Versão do OptiScaler</sys:String>
+  <sys:String x:Key="Str.VersionNoteOpti">OptiScaler {0}, do release no GitHub. Cada arquivo dele é conferido contra o hash que a lista do payload dá a ele.</sys:String>
+  <sys:String x:Key="Str.VersionNoteOptiLmxxf">Instala também os pesos do runtime lmxxf, cerca de 590 MB, que só placas RDNA4 usam.</sys:String>
   <sys:String x:Key="Str.WhatHappens">O que vai acontecer</sys:String>
   <sys:String x:Key="Str.Checking">Conferindo esta pasta…</sys:String>
   <sys:String x:Key="Str.StepDownload">Baixar</sys:String>

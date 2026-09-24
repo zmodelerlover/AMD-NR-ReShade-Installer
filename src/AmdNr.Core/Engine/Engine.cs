@@ -140,9 +140,9 @@ public static partial class Engine
 
     // -- Ownership -----------------------------------------------------------------------------
 
-    /// <summary>The only filenames this installer will ever create, back up or remove. A manifest
-    /// naming anything else is rejected, which is what stops a tampered manifest from deleting
-    /// arbitrary files. Case-sensitive, like the Rust set: d3d8R.dll is spelled that way on disk.</summary>
+    /// <summary>The filenames this installer will ever create, back up or remove, besides the
+    /// folders <see cref="IsAllowed"/> matches by rule. A manifest naming anything else is
+    /// rejected, which is what stops a tampered manifest from deleting arbitrary files. Case-sensitive, like the Rust set: d3d8R.dll is spelled that way on disk.</summary>
     public static readonly IReadOnlySet<string> Allowed = new HashSet<string>(StringComparer.Ordinal)
     {
         "dxgi.dll",
@@ -201,7 +201,38 @@ public static partial class Engine
         "OptiScaler/D3D12_OptiScaler/D3D12Core.dll",
         "experimental_lighting/GatherCS.cso",
         "experimental_lighting/ResolveCS.cso",
+        // OptiScaler 0.2.0's second runtime. Its modules, shaders and weights are matched by
+        // IsAllowed below rather than listed.
+        "LmxxfNrRuntime.dll",
     };
+
+    /// <summary>Folders whose every plain file is ours: the lmxxf runtime's HIP modules and its
+    /// weights. The names inside come from upstream and change with it, so listing each one here
+    /// would tie every weights update to a new build of this app. The folder names are the
+    /// runtime's own and nothing else uses them.</summary>
+    private static readonly string[] OwnedFolders = ["lmxxf-modules", "native-game-tiled-assets"];
+
+    /// <summary>Whether this installer may create, back up or remove a file under this name:
+    /// everything in <see cref="Allowed"/>, one plain file directly inside an
+    /// <see cref="OwnedFolders"/> folder, and the lmxxf runtime's own shaders. "shaders" is a name
+    /// other software uses too, so only the native_*.hlsl the runtime ships are ours there.</summary>
+    public static bool IsAllowed(string name)
+    {
+        if (Allowed.Contains(name)) return true;
+        var slash = name.IndexOf('/');
+        if (slash <= 0 || name.IndexOf('/', slash + 1) >= 0) return false;
+        var folder = name[..slash];
+        var file = name[(slash + 1)..];
+        if (file.Length is 0 or > 96 || file is "." or ".."
+            || file.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return false;
+        return OwnedFolders.Contains(folder, StringComparer.Ordinal)
+               || folder == "shaders" && file.StartsWith("native_", StringComparison.Ordinal)
+                                      && file.EndsWith(".hlsl", StringComparison.Ordinal);
+    }
+
+    /// <summary>The most entries a manifest may hold. A sanity bound only: the lmxxf weights alone
+    /// are some 460 files.</summary>
+    public const int MaxManifestEntries = 4096;
 
     /// <summary>What add-on v0.6.0 and earlier left in a game folder, under the name it used
     /// then. ReShade loads every .addon64 in the folder, so an upgrade that writes

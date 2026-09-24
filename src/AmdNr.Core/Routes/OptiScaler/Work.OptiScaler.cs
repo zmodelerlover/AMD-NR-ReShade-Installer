@@ -26,7 +26,19 @@ public static partial class Work
 
     /// <summary>Folders this route creates, deepest first, so the uninstall can take each one back
     /// once it is empty and leave it alone when something else put files there too.</summary>
-    private static readonly string[] OptiFolders = ["OptiScaler/D3D12_OptiScaler", "OptiScaler", "experimental_lighting"];
+    private static readonly string[] OptiFolders =
+    [
+        "OptiScaler/D3D12_OptiScaler", "OptiScaler", "experimental_lighting",
+        "lmxxf-modules", "native-game-tiled-assets", "shaders",
+    ];
+
+    /// <summary>The lmxxf runtime, which OptiScaler 0.2.0 and later install beside the danielblnc one.</summary>
+    internal const string LmxxfRuntimeName = "LmxxfNrRuntime.dll";
+
+    /// <summary>Where the lmxxf runtime keeps the shaders it compiled, next to their source. It is
+    /// the runtime's, written while a game runs, so nothing records it; uninstall takes it when it
+    /// holds nothing but those.</summary>
+    private const string ShaderCache = "shaders/shader-cache";
 
     /// <summary>The runtime builds this project has seen, by the start of their SHA-256: danielblnc's
     /// 0.2.14, 0.2.17, 0.3.0 and 0.3.1, and the 0.3.0 the add-on pins. Any of them sitting in the
@@ -60,12 +72,17 @@ public static partial class Work
             ? ProxyChoicesFor(Preset.OptiScaler).First(n => string.Equals(n, wanted, StringComparison.OrdinalIgnoreCase))
             : ProxyChoicesFor(Preset.OptiScaler)[0];
 
+    /// <summary>What an OptiScaler install is compared against: the newest version the payload
+    /// offers, the one an install gets when nobody picks another. Keyed by the path in the game
+    /// folder, because the lmxxf weights and shaders share file names across folders.</summary>
     private static Dictionary<string, string> PinnedForOptiScaler(PayloadManifest payload)
     {
+        payload = payload.Newest(PayloadManifest.OptiScalerComponent);
         var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        if (payload.Has(PayloadManifest.OptiScalerComponent))
-            foreach (var file in payload.Component(PayloadManifest.OptiScalerComponent).Installed)
-                pinned[Path.GetFileName(file.RelativePath)] = Engine.Lower(file.Sha256);
+        foreach (var name in new[] { PayloadManifest.OptiScalerComponent, PayloadManifest.LmxxfWeightsComponent })
+            if (payload.Has(name))
+                foreach (var file in payload.Component(name).Installed)
+                    pinned[OptiDestination(file.RelativePath, OptiScalerDllPayload)] = Engine.Lower(file.Sha256);
         if (payload.Has(PayloadManifest.OptiRuntimeComponent)
             && payload.Component(PayloadManifest.OptiRuntimeComponent).Files.FirstOrDefault() is { } runtime)
             foreach (var pass in OptiPasses)
@@ -316,6 +333,10 @@ public static partial class Work
         }
 
         report.Info($"OptiScaler goes in as {proxyName}.");
+        if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
+            report.Info(
+                "The lmxxf runtime went in too, with its weights. It runs on RDNA4 (gfx1201) cards only: "
+                + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
         report.Info(Preset.OptiScaler.Note());
         return report;
     }
@@ -324,6 +345,21 @@ public static partial class Work
     /// configuration it keeps.</summary>
     private static void AfterOptiScalerUninstall(string dir, Report report)
     {
+        var cache = Path.Combine(dir, ShaderCache);
+        try
+        {
+            if (Directory.Exists(cache) && Directory.EnumerateFileSystemEntries(cache)
+                    .All(e => File.Exists(e) && e.EndsWith(".dxbc", StringComparison.OrdinalIgnoreCase)))
+            {
+                Directory.Delete(cache, recursive: true);
+                report.Ok($"removed {ShaderCache.Replace('/', '\\')}\\");
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            report.Warn($"could not remove {ShaderCache}: {e.Message}");
+        }
+
         foreach (var folder in OptiFolders)
         {
             var path = Path.Combine(dir, folder);

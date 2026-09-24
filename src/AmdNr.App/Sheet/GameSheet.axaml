@@ -273,12 +273,21 @@
                                        Foreground="{DynamicResource WarnText}" />
                           </Grid>
                         </Border>
-                        <StackPanel Spacing="6">
-                          <TextBlock Text="{DynamicResource Str.ProxySectionOpti}" Classes="section" />
-                          <ComboBox x:Name="OptiProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
-                                    AutomationProperties.Name="{DynamicResource Str.ProxySectionOpti}" />
-                          <TextBlock Text="{DynamicResource Str.ProxyNoteOpti}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
-                        </StackPanel>
+                        <Grid ColumnDefinitions="*,12,*">
+                          <StackPanel Grid.Column="0" Spacing="6">
+                            <TextBlock Text="{DynamicResource Str.ProxySectionOpti}" Classes="section" />
+                            <ComboBox x:Name="OptiProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
+                                      AutomationProperties.Name="{DynamicResource Str.ProxySectionOpti}" />
+                            <TextBlock Text="{DynamicResource Str.ProxyNoteOpti}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          </StackPanel>
+                          <StackPanel Grid.Column="2" x:Name="OptiVersionSection" Spacing="6">
+                            <TextBlock Text="{DynamicResource Str.VersionSectionOpti}" Classes="section" />
+                            <ComboBox x:Name="OptiVersionBox" HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnAddonVersionChanged"
+                                      AutomationProperties.Name="{DynamicResource Str.VersionSectionOpti}" />
+                            <TextBlock x:Name="OptiVersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          </StackPanel>
+                        </Grid>
                         <StackPanel Spacing="8">
                           <TextBlock Text="{DynamicResource Str.InGame}" Classes="section" />
                           <Grid ColumnDefinitions="22,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">

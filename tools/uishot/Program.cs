@@ -139,11 +139,22 @@ byte[] Pe64()
 }
 
 // A payload list whose every file is already in the cache. No ReShade component, whose hash is pinned
-// in the engine and cannot be stood in for; the add-on route installs without it.
-void SeedPayload(string addonVersion, string optiVersion = "1.0.0")
+// in the engine and cannot be stood in for; the add-on route installs without it. An OptiScaler release
+// goes under "releases", the way v0.5.0 lists every OptiScaler beyond the one older apps read.
+void SeedPayload(string addonVersion, string optiVersion = "1.0.0", string? optiRelease = null)
 {
     var components = new System.Text.Json.Nodes.JsonObject();
-    void Component(string name, string version, params string[] paths)
+    string[] optiPaths =
+    [
+        "OptiScaler.dll", "OptiScaler.ini",
+        "OptiScaler/amd_fidelityfx_loader_dx12.dll", "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
+        "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll", "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
+        "OptiScaler/amd_fidelityfx_vk.dll", "OptiScaler/libxess.dll", "OptiScaler/libxess_dx11.dll",
+        "OptiScaler/libxess_fg.dll", "OptiScaler/libxell.dll", "D3D12_OptiScaler/D3D12Core.dll",
+    ];
+    void Component(string name, string version, params string[] paths) =>
+        components[name] = Pinned(name, version, paths);
+    System.Text.Json.Nodes.JsonObject Pinned(string name, string version, params string[] paths)
     {
         var files = new System.Text.Json.Nodes.JsonArray();
         foreach (var path in paths)
@@ -164,17 +175,17 @@ void SeedPayload(string addonVersion, string optiVersion = "1.0.0")
                 ["url"] = "https://127.0.0.1:1/" + Path.GetFileName(path),
             });
         }
-        components[name] = new System.Text.Json.Nodes.JsonObject { ["version"] = version, ["files"] = files };
+        return new System.Text.Json.Nodes.JsonObject { ["version"] = version, ["files"] = files };
     }
     Component("addon", addonVersion, "amd-nr.addon64");
     Component("runtime", "1.0.0", "dlssnr_amd_pass1.dll", "dlssnr_on_amd_weights.bin");
-    Component("optiscaler", optiVersion, "OptiScaler.dll", "OptiScaler.ini",
-        "OptiScaler/amd_fidelityfx_loader_dx12.dll", "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
-        "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll", "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
-        "OptiScaler/amd_fidelityfx_vk.dll", "OptiScaler/libxess.dll", "OptiScaler/libxess_dx11.dll",
-        "OptiScaler/libxess_fg.dll", "OptiScaler/libxell.dll", "D3D12_OptiScaler/D3D12Core.dll");
+    Component("optiscaler", optiVersion, optiPaths);
     Component("opti-runtime", "1.0.0", "dlssnr_amd_runtime-0.3.1.dll");
     var manifest = new System.Text.Json.Nodes.JsonObject { ["schema"] = 1, ["components"] = components };
+    if (optiRelease is not null)
+        manifest["releases"] = new System.Text.Json.Nodes.JsonObject { ["optiscaler"] = new System.Text.Json.Nodes.JsonArray(
+            new System.Text.Json.Nodes.JsonObject { ["version"] = optiRelease, ["components"] =
+                new System.Text.Json.Nodes.JsonObject { ["optiscaler"] = Pinned("optiscaler", optiRelease, optiPaths) } }) };
     File.WriteAllText(Path.Combine(AppPaths.Root, "payload.json"), manifest.ToJsonString());
 }
 
@@ -257,6 +268,24 @@ void Flows()
     Click(install);
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated,
         $"Update brings OptiScaler in line ({verdict.Text})");
+    Check(card.Entry.OptiScalerVersion == "1.0.1", "and the game remembers the OptiScaler version it has");
+
+    // A newer OptiScaler listed only under "releases": the menu offers both, stays on the one this
+    // game has, and picking the newer one installs it.
+    SeedPayload("1.0.0", "1.0.1", optiRelease: "1.0.2");
+    var releasesReload = session.LoadManifestAsync();
+    var optiVersions = Named<ComboBox>("OptiVersionBox");
+    Check(Until(() => releasesReload.IsCompleted && card.Outdated)
+          && Until(() => optiVersions.IsEffectivelyVisible && optiVersions.ItemCount == 2, 10),
+        $"the OptiScaler version menu lists both versions ({optiVersions.ItemCount})");
+    Check(optiVersions.SelectedItem is string s1 && s1.StartsWith("v1.0.1"), "and stays on the one this game has");
+    Save(main, "flow-2-optiscaler-versions");
+    optiVersions.SelectedIndex = 0;
+    Settle(6);
+    Click(install);
+    Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated
+          && card.Entry.OptiScalerVersion == "1.0.2",
+        $"picking the newer one installs it ({verdict.Text})");
 
     Click(uninstall);
     Check(Until(() => !session.Busy), "Uninstall finishes");

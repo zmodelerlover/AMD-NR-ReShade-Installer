@@ -128,6 +128,9 @@
   <sys:String x:Key="Str.VersionShipped">bundled</sys:String>
   <sys:String x:Key="Str.VersionNoteShipped">The version this installer was published with.</sys:String>
   <sys:String x:Key="Str.VersionNoteRelease">Taken from the v{0} release on GitHub, and checked against the hashes that release publishes.</sys:String>
+  <sys:String x:Key="Str.VersionSectionOpti">OptiScaler version</sys:String>
+  <sys:String x:Key="Str.VersionNoteOpti">OptiScaler {0}, from its release on GitHub. Every file in it is checked against the hash the payload list gives it.</sys:String>
+  <sys:String x:Key="Str.VersionNoteOptiLmxxf">It also installs the lmxxf runtime's weights, about 590 MB, which only RDNA4 cards use.</sys:String>
   <sys:String x:Key="Str.WhatHappens">What will happen</sys:String>
   <sys:String x:Key="Str.Checking">Checking this folder…</sys:String>
   <sys:String x:Key="Str.StepDownload">Download</sys:String>

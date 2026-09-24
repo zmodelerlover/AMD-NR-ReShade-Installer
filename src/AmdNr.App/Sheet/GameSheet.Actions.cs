@@ -118,7 +118,7 @@ public partial class GameSheet
             // for somebody who never opened that menu -- which is nearly everybody.
             if (!report.Failed && _version is { } installed)
             {
-                card.Entry.AddonVersion = installed.Version.ToString();
+                Remember(card, installed);
                 Library.Save();
             }
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
@@ -303,7 +303,8 @@ public partial class GameSheet
     /// needs OptiScaler, the runtime build it drives, and the weights out of the runtime component.</summary>
     private static string[] ComponentsFor(Preset preset) =>
         preset.IsOptiScaler()
-            ? [PayloadManifest.OptiScalerComponent, PayloadManifest.OptiRuntimeComponent, PayloadManifest.RuntimeComponent]
+            ? [PayloadManifest.OptiScalerComponent, PayloadManifest.OptiRuntimeComponent, PayloadManifest.RuntimeComponent,
+               PayloadManifest.LmxxfWeightsComponent]
             : preset.Route() == Route.X86
                 ? [PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,
                    PayloadManifest.RuntimeComponent, PayloadManifest.ShaderComponent]
@@ -328,10 +329,13 @@ public partial class GameSheet
     }
 
     /// <summary>The manifest this sheet installs from: the published one, with the chosen release's
-    /// add-on swapped in when that is not the version the manifest already pins.</summary>
-    private PayloadManifest? Selected() => Session.Manifest is { } manifest && _version?.Release is { } release
-        ? AddonReleases.With(manifest, release)
-        : Session.Manifest;
+    /// add-on swapped in when that is not the version the manifest already pins, or the chosen
+    /// OptiScaler version's components in place of the ones it pins.</summary>
+    private PayloadManifest? Selected() =>
+        Session.Manifest is not { } manifest ? null
+        : _version?.Opti is { } opti ? manifest.With(opti)
+        : _version?.Release is { } release ? AddonReleases.With(manifest, release)
+        : manifest;
 
     private PayloadPins Pins()
     {

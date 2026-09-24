@@ -8,9 +8,10 @@ using AmdNr.Core;
 
 namespace AmdNr.App;
 
-/// <summary>One installable version of the add-on, as the sheet offers it. A null release means
-/// the version the payload manifest pins, which is the one this build was published with.</summary>
-public sealed record VersionChoice(Version Version, string Label, AddonRelease? Release);
+/// <summary>One installable version, as the sheet offers it. For the add-on, a null release means
+/// the version the payload manifest pins, which is the one this build was published with. For the
+/// OptiScaler route, Opti is the version of it the payload manifest lists.</summary>
+public sealed record VersionChoice(Version Version, string Label, AddonRelease? Release, ComponentRelease? Opti = null);
 
 public partial class GameSheet
 {
@@ -182,13 +183,13 @@ public partial class GameSheet
     /// what the route needs, plus the one the payload manifest pins. That last one is not
     /// decoration -- v0.5.0 published its 32-bit pair inside the archive rather than beside it,
     /// so for a bridge route the manifest is the only place those two files can be pinned from.
-    /// The OptiScaler route installs no add-on, so there is no version to pick on it.</summary>
+    /// The OptiScaler route installs no add-on: what it picks is the OptiScaler version.</summary>
     private void ShowVersions(Preset preset)
     {
         _versions.Clear();
         if (preset.IsOptiScaler())
         {
-            _version = null;
+            ShowOptiScalerVersions();
             return;
         }
         var route = preset.Route();
@@ -208,32 +209,68 @@ public partial class GameSheet
         // What this game was last installed with, then whatever the app is currently set to, then
         // the newest. The rule lives in Core so it can be asserted against.
         var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
-            _card?.Entry.AddonVersion, _version?.Version);
+            _card?.Entry.AddonVersion, _version?.Opti is null ? _version?.Version : null);
+        FillVersions(AddonVersionBox, VersionSection, VersionNote, index);
+    }
+
+    /// <summary>The OptiScaler versions the payload manifest lists, newest first. They come from
+    /// the manifest rather than from GitHub, because each one is pinned file by file inside its
+    /// archive, and a release's own sums cannot say where each file goes.</summary>
+    private void ShowOptiScalerVersions()
+    {
+        foreach (var release in Session.Manifest?.Offered(PayloadManifest.OptiScalerComponent) ?? [])
+        {
+            if (AddonReleases.Version(release.Version) is not { } version) continue;
+            var published = release.Components[PayloadManifest.OptiScalerComponent].Published;
+            _versions.Add(new VersionChoice(version,
+                $"v{release.Version}" + (published is null ? "" : $" — {published}"), null, release));
+        }
+
+        // Same rule as the add-on: this game's last version, then the session's, then the newest.
+        var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
+            _card?.Entry.OptiScalerVersion, _version?.Opti is null ? null : _version.Version);
+        FillVersions(OptiVersionBox, OptiVersionSection, OptiVersionNote, index);
+    }
+
+    private void FillVersions(ComboBox box, Control section, TextBlock note, int index)
+    {
         _setting = true;
-        AddonVersionBox.ItemsSource = _versions.Select(v => v.Label).ToList();
-        AddonVersionBox.SelectedIndex = index;
+        box.ItemsSource = _versions.Select(v => v.Label).ToList();
+        box.SelectedIndex = index;
         _setting = false;
 
         _version = index >= 0 ? _versions[index] : null;
-        VersionSection.IsVisible = _versions.Count > 0;
-        VersionNote.Text = _version is null ? ""
-            : _version.Release is null ? Ui.Text("Str.VersionNoteShipped")
-            : Ui.Format("Str.VersionNoteRelease", _version.Version);
+        section.IsVisible = _versions.Count > 0;
+        note.Text = VersionNoteText();
     }
+
+    private string VersionNoteText() => _version switch
+    {
+        null => "",
+        { Opti: { } opti } => Ui.Format("Str.VersionNoteOpti", opti.Version)
+            + (opti.Components.ContainsKey(PayloadManifest.LmxxfWeightsComponent) ? " " + Ui.Text("Str.VersionNoteOptiLmxxf") : ""),
+        { Release: null } => Ui.Text("Str.VersionNoteShipped"),
+        _ => Ui.Format("Str.VersionNoteRelease", _version.Version),
+    };
 
     private void OnAddonVersionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (_setting || _card is not { } card) return;
-        if (AddonVersionBox.SelectedIndex < 0 || AddonVersionBox.SelectedIndex >= _versions.Count) return;
-        _version = _versions[AddonVersionBox.SelectedIndex];
-        card.Entry.AddonVersion = _version.Version.ToString();
+        if (_setting || _card is not { } card || sender is not ComboBox box) return;
+        if (box.SelectedIndex < 0 || box.SelectedIndex >= _versions.Count) return;
+        _version = _versions[box.SelectedIndex];
+        Remember(card, _version);
         Library.Save();
-        VersionNote.Text = _version.Release is null
-            ? Ui.Text("Str.VersionNoteShipped")
-            : Ui.Format("Str.VersionNoteRelease", _version.Version);
+        (box == OptiVersionBox ? OptiVersionNote : VersionNote).Text = VersionNoteText();
         // A different version is a different pair of hashes, so the pre-flight has to be redone:
         // "already installed" is only true of the version that is actually in the folder.
         _ = RefreshAsync();
+    }
+
+    /// <summary>Records a chosen version on the game, in the field for the kind of version it is.</summary>
+    private static void Remember(GameCard card, VersionChoice choice)
+    {
+        if (choice.Opti is { } opti) card.Entry.OptiScalerVersion = opti.Version;
+        else card.Entry.AddonVersion = choice.Version.ToString();
     }
 
     /// <summary>What pressing Install will actually do here, said on the button: install, put the

@@ -35,6 +35,11 @@ public sealed class GameEntry
     /// longer published quietly falls back to the newest offered.</summary>
     public string? AddonVersion { get; set; }
 
+    /// <summary>The same, for the OptiScaler route: the OptiScaler version this game was last
+    /// installed with or set to. Separate from AddonVersion because the two number differently and
+    /// a game can move between the routes.</summary>
+    public string? OptiScalerVersion { get; set; }
+
     [JsonIgnore]
     public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
 

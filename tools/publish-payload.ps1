@@ -87,12 +87,31 @@ function BumpVersion($version) {
 if (-not (Test-Path $manifestPath)) { Fail "no payload.json at $manifestPath" }
 $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
 
+# Every component in the manifest: the ones under components, and the ones each version under
+# releases carries (OptiScaler 0.2.0 and the lmxxf weights live there, out of v0.4.0's sight).
+# The objects are the manifest's own, so what the loops below change is what gets written back.
+function Get-AllComponents {
+    foreach ($n in $manifest.components.PSObject.Properties.Name) {
+        [pscustomobject]@{ Name = $n; Component = $manifest.components.$n; Release = $null }
+    }
+    if ($manifest.PSObject.Properties['releases']) {
+        foreach ($key in $manifest.releases.PSObject.Properties.Name) {
+            foreach ($release in @($manifest.releases.$key)) {
+                foreach ($n in $release.components.PSObject.Properties.Name) {
+                    [pscustomobject]@{ Name = $n; Component = $release.components.$n; Release = "$key $($release.version)" }
+                }
+            }
+        }
+    }
+}
+
 # --- Verify-only ------------------------------------------------------------------------------
 if ($Verify) {
     Step "Checking every published file against the manifest"
     $bad = 0
-    foreach ($name in $manifest.components.PSObject.Properties.Name) {
-        foreach ($f in $manifest.components.$name.files) {
+    foreach ($entry in Get-AllComponents) {
+        $name = $entry.Name
+        foreach ($f in $entry.Component.files) {
             $tmp = New-TemporaryFile
             try {
                 Invoke-WebRequest -Uri $f.url -OutFile $tmp -MaximumRedirection 5 | Out-Null
@@ -142,8 +161,9 @@ foreach ($pair in $SetVersion) {
 # --- Upload what changed ----------------------------------------------------------------------
 $uploaded = [System.Collections.Generic.List[string]]::new()
 
-foreach ($componentName in $manifest.components.PSObject.Properties.Name) {
-    $component = $manifest.components.$componentName
+foreach ($entry in Get-AllComponents) {
+    $componentName = $entry.Name
+    $component = $entry.Component
     $changed = $false
 
     foreach ($f in $component.files) {
@@ -188,8 +208,11 @@ foreach ($componentName in $manifest.components.PSObject.Properties.Name) {
     }
 
     # The cache is keyed by component and version, so new bytes under an unchanged version would be
-    # read as a corrupt cache by everyone who already has the old one.
-    if ($explicit.ContainsKey($componentName)) {
+    # read as a corrupt cache by everyone who already has the old one. A release's own component
+    # keeps the release's version: the app refuses a release whose component says otherwise.
+    if ($entry.Release -and $entry.Release.StartsWith("$componentName ")) {
+        if ($changed) { Fail "$componentName in release $($entry.Release) changed; publish it as a new release instead" }
+    } elseif ($explicit.ContainsKey($componentName)) {
         $component.version = $explicit[$componentName]
         Note "$componentName version set to $($component.version)"
     } elseif ($changed) {

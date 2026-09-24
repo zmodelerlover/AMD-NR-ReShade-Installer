@@ -50,11 +50,16 @@ ships an upscaler, that route is the one selected. Every ReShade route stays in 
 | `OptiScaler\`, `OptiScaler.ini` | its FidelityFX, XeSS and Agility libraries, and its configuration |
 | `dlssnr_amd_pass1-3.dll` | the neural runtime 0.3.1, once per pass |
 | `dlssnr_on_amd_weights.bin` | the same weights as the add-on |
+| `LmxxfNrRuntime.dll`, `lmxxf-modules\`, `shaders\` | the second runtime OptiScaler 0.2.0 can drive, lmxxf's open-source port (RDNA4) |
+| `native-game-tiled-assets\` | its weights, about 590 MB |
+
+The sheet has an **OptiScaler version** menu, like the add-on's: every version the payload list
+carries, newest first, remembered per game. The lmxxf files come with 0.2.0 and later only.
 
 No ReShade is installed on this route. Its files are downloaded when the route is installed, not
 in the first-run wizard, and the install goes through the same transaction, manifest and backups as
 every other route. In game, OptiScaler opens with Insert; the network is switched on under its
-Neural tab.
+Neural tab, and lmxxf is picked under NR runtime there.
 
 ## How an install is kept undoable
 
@@ -100,7 +105,9 @@ redistributed here.
 
 The OptiScaler route installs [neural-amd-opti](https://github.com/MatheusFerreiraS/neural-amd-opti),
 an OptiScaler fork (GPL-3.0) that carries the bridge into the same runtime. Its release archive is
-downloaded as published; none of its code is part of this app.
+downloaded as published; none of its code is part of this app. The lmxxf runtime it ships is
+[lmxxf/dlss5-on-amd-9070xt-porting](https://github.com/lmxxf/dlss5-on-amd-9070xt-porting) (MIT);
+its weights are NVIDIA-derived and, like the others, are not in this repository.
 
 The install engine is ported from the Rust installer in
 [dlss5-neural-amd](https://github.com/zmodelerlover/dlss5-neural-amd) (MIT).

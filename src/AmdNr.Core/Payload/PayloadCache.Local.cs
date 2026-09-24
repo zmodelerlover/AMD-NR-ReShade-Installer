@@ -164,13 +164,14 @@ public sealed partial class PayloadCache
                     taken.Add(file.Name);
             }
 
-            foreach (var entry in c.Extract ?? [])
+            // The archive opened once for every entry, as EnsureAsync does: the lmxxf weights are
+            // some 460 of them.
+            if (c.Extract is { Count: > 0 } extract)
             {
-                var target = Path.Combine(dir, entry.RelativePath);
                 var archive = Path.Combine(dir, c.Files[0].RelativePath);
-                if (Verified(target, entry.Size, entry.Sha256) || !Verified(archive, c.Files[0].Size, c.Files[0].Sha256))
-                    continue;
-                ExtractVerified(archive, entry, target);
+                var pending = extract.Where(e => !Verified(Path.Combine(dir, e.RelativePath), e.Size, e.Sha256)).ToList();
+                if (pending.Count > 0 && Verified(archive, c.Files[0].Size, c.Files[0].Sha256))
+                    ExtractVerified(archive, pending, dir);
             }
 
             missing.AddRange(c.Installed
