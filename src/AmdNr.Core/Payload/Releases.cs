@@ -187,7 +187,11 @@ public static class AddonReleases
             {
                 var json = await response.Content.ReadAsStringAsync(cancel);
                 try { await File.WriteAllTextAsync(CachePath, json, cancel); }
-                catch (IOException) { /* The list still works for this run. */ }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                {
+                    // The list still works for this run. A read-only copy was the whole start
+                    // failing: this escaped, and detection and the update check never ran.
+                }
                 return json;
             }
         }
@@ -197,7 +201,7 @@ public static class AddonReleases
         }
 
         try { return File.Exists(CachePath) ? await File.ReadAllTextAsync(CachePath, cancel) : null; }
-        catch (IOException) { return null; }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return null; }
     }
 
     /// <summary>The releases worth offering, each with the address of the file that pins it.</summary>

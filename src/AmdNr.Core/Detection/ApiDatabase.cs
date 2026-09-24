@@ -118,9 +118,10 @@ public sealed class ApiDatabase
                 var json = await response.Content.ReadAsStringAsync(cancel);
                 var db = Parse(json);
                 try { await File.WriteAllTextAsync(CachePath, json, cancel); }
-                catch (IOException)
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                 {
-                    // Not caching only costs the next offline launch.
+                    // Not caching only costs the next offline launch. A read-only copy escaped here
+                    // and took the rest of the start with it.
                 }
                 return db;
             }
@@ -136,7 +137,7 @@ public sealed class ApiDatabase
             {
                 if (File.Exists(path)) return Parse(await File.ReadAllTextAsync(path, cancel));
             }
-            catch (Exception e) when (e is IOException or InstallException)
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InstallException)
             {
                 // Try the next one.
             }

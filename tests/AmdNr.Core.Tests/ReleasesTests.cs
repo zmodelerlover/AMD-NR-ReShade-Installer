@@ -281,6 +281,33 @@ public class ReleasesTests
         }
     }
 
+    /// <summary>A cached list somebody's backup tool or antivirus left read-only is not a reason for
+    /// the start to fail. It was: the write threw a type nobody caught, and detection, the update
+    /// check and the first scan never ran.</summary>
+    [Fact]
+    public async Task AReadOnlyCachedListIsNotAFailedStart()
+    {
+        var releases = Path.Combine(AppPaths.Cache, "releases.json");
+        File.WriteAllText(releases, "[]");
+        File.WriteAllText(ApiDatabase.CachePath, "{}");
+        File.SetAttributes(releases, FileAttributes.ReadOnly);
+        File.SetAttributes(ApiDatabase.CachePath, FileAttributes.ReadOnly);
+        try
+        {
+            using var http = new HttpClient(new ReleaseServer(ReleasesJson), disposeHandler: true);
+            Assert.NotEmpty(await AddonReleases.ListAsync(http, "o", "r"));
+            using var api = new HttpClient(new ReleaseServer("{\"games\":[]}"));
+            await ApiDatabase.LoadAsync(api, "o", "r", url: "https://api.github.com/api-db.json");
+        }
+        finally
+        {
+            File.SetAttributes(releases, FileAttributes.Normal);
+            File.SetAttributes(ApiDatabase.CachePath, FileAttributes.Normal);
+            File.Delete(releases);
+            File.Delete(ApiDatabase.CachePath);
+        }
+    }
+
     /// <summary>The releases list and every sums file, or nothing at all when <see cref="Offline"/>
     /// -- which is what an unplugged cable looks like to <c>HttpClient</c>.</summary>
     private sealed class ReleaseServer(string releasesJson) : HttpMessageHandler
