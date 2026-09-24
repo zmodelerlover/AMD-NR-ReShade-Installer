@@ -52,6 +52,7 @@
 
   <sys:String x:Key="Str.LogSaved">O log completo foi gravado ao lado deste app.</sys:String>
   <sys:String x:Key="Str.Working">Trabalhando…</sys:String>
+  <sys:String x:Key="Str.CloseWhileBusy">Ainda gravando na pasta de um jogo. Leva alguns segundos; feche a janela quando terminar.</sys:String>
   <sys:String x:Key="Str.FreeTitle">Isto é de graça. Se você pagou por isto, estão te enganando.</sys:String>
   <sys:String x:Key="Str.FreeBody">Ninguém vende nada disto — nem o instalador, nem o add-on, nem a runtime, nem os pesos. Se te cobraram por isto, ou por uma "chave", ou por uma "versão pro", peça seu dinheiro de volta: o que te venderam está nesta página de graça.</sys:String>
   <sys:String x:Key="Str.OpenSourceBody">É open source e vai continuar sendo: leia, modifique, compile a sua versão, passe pros amigos. A única coisa que a gente pede é que ninguém transforme numa versão paga.</sys:String>

@@ -146,6 +146,20 @@ public partial class MainWindow : Window
         WindowFit.ToScreen(this);
     }
 
+    /// <summary>Not while something writes to a game. Closing ends the process, and an install or an
+    /// uninstall cut off inside its transaction leaves a folder that can be neither reinstalled nor
+    /// uninstalled without deleting the manifest by hand. It takes seconds; the corner says to wait.
+    /// Windows shutting down is not stopped: that is not a question this app gets to answer.</summary>
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        if (Session.Busy && e.CloseReason != WindowCloseReason.OSShutdown)
+        {
+            e.Cancel = true;
+            Toast(Ui.Text("Str.CloseWhileBusy"), Level.Warn);
+        }
+        base.OnClosing(e);
+    }
+
     /// <summary>Everything written in code in the old language, written again in the new one.</summary>
     public void Relabel()
     {
