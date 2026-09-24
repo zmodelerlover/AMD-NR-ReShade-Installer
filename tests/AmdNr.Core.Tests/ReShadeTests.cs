@@ -163,6 +163,35 @@ public class ReShadeTests
     }
 
     [Fact]
+    public void AnEffectWithNothingToCompileAgainstIsTakenOutOnReinstall()
+    {
+        // Red Dead Redemption: an earlier install put the effect in with no ReShade.fxh beside it,
+        // and ReShade reported a compile error in every launch. Installing again has to take it out.
+        var game = Fixture.Temp("effect-stale");
+        var shaders = Path.Combine(game, "reshade-shaders", "Shaders");
+        Directory.CreateDirectory(shaders);
+        File.WriteAllText(Path.Combine(shaders, "ReShade.fxh"), "// header");
+        var (src, pins) = Fixture.Payloads("effect-stale");
+        var effect = System.Text.Encoding.UTF8.GetBytes("// AMD_Neural_Feed");
+        File.WriteAllBytes(Path.Combine(Work.PayloadDir(src), Work.ShaderName), effect);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ShaderSha = Engine.Sha(effect), ShaderSize = (ulong)effect.Length,
+        };
+        Assert.False(Work.Install(game, src, Preset.Dx11, pins).Failed);
+        Assert.True(File.Exists(Path.Combine(shaders, Work.ShaderName)));
+
+        File.Delete(Path.Combine(shaders, "ReShade.fxh"));
+        var again = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(again.Failed, again.ToLog("reinstall"));
+        Assert.False(File.Exists(Path.Combine(shaders, Work.ShaderName)), "the effect stayed with nothing to compile against");
+        Assert.Contains(again.Lines, l => l.Text.Contains("was left out", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void TheCompanionEffectLandsWhereReShadeLooksForIt()
     {
         // The effect is the only file this installs outside the game's root, and if it lands
@@ -170,6 +199,9 @@ public class ReShadeTests
         // silently falls back to its own motion estimator and the whole point of shipping it
         // is lost, with nothing in any log saying so.
         var game = Fixture.Temp("with-shader");
+        // ReShade's standard shaders, which a motion-vector shader brings and the effect includes.
+        Directory.CreateDirectory(Path.Combine(game, "reshade-shaders", "Shaders"));
+        File.WriteAllText(Path.Combine(game, "reshade-shaders", "Shaders", "ReShade.fxh"), "// header");
         var (src, pins) = Fixture.Payloads("with-shader");
         var effect = System.Text.Encoding.UTF8.GetBytes("// AMD_Neural_Feed");
         File.WriteAllBytes(Path.Combine(Work.PayloadDir(src), Work.ShaderName), effect);

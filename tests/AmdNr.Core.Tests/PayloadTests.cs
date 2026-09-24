@@ -427,8 +427,15 @@ public class PayloadTests
             var bytes = System.Text.Encoding.UTF8.GetBytes("// AMD_Neural_Feed");
             File.WriteAllBytes(Path.Combine(into, Work.ShaderName), bytes);
 
+            // A game with ReShade's standard shaders, which the effect includes; without them it
+            // is left out, because ReShade would compile it and fail in every game.
+            var game = Fixture.Temp($"effect-game-{(layout.Length == 0 ? "flat" : layout)}");
             var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
-            Work.AddCompanionEffect(files, dir);
+            Assert.False(Work.AddCompanionEffect(files, dir, game), "planned with no ReShade.fxh to compile against");
+            Assert.Empty(files);
+            Directory.CreateDirectory(Path.Combine(game, "reshade-shaders", "Shaders"));
+            File.WriteAllText(Path.Combine(game, "reshade-shaders", "Shaders", "ReShade.fxh"), "// header");
+            Assert.True(Work.AddCompanionEffect(files, dir, game));
             Assert.True(files.ContainsKey(Work.ShaderPath), $"not planned from the {layout} layout");
             Assert.Equal(bytes, files[Work.ShaderPath]);
             Assert.True(Engine.Allowed.Contains(Work.ShaderPath),
@@ -438,7 +445,7 @@ public class PayloadTests
         // A payload without one is skipped, not an error: manifests published before the effect
         // was installable have no shader component.
         var empty = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
-        Work.AddCompanionEffect(empty, Fixture.Temp("effect-none"));
+        Work.AddCompanionEffect(empty, Fixture.Temp("effect-none"), Fixture.Temp("effect-none-game"));
         Assert.Empty(empty);
 
         // And both routes have to ask for the component, or there is nothing on disk to plan.

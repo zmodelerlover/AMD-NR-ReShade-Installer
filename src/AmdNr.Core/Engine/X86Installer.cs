@@ -133,7 +133,7 @@ public sealed class X86Installer(string release)
         if (!File.Exists(tuning)) p["amd-nr.ini"] = Encoding.UTF8.GetBytes(Engine.FreshIni());
 
         // The companion effect, the same way the other route does it.
-        Work.AddCompanionEffect(p, Release);
+        Work.AddCompanionEffect(p, Release, dir);
 
         var ini = Path.Combine(dir, "ReShade.ini");
         Engine.SafePath(ini);

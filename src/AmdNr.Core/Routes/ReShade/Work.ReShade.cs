@@ -197,9 +197,11 @@ public static partial class Work
         // The companion effect. Shared with the 32-bit route; see AddCompanionEffect.
         if (pins.ShaderSha.Length > 0)
         {
-            var before = files.Count;
-            AddCompanionEffect(files, payloads);
-            if (files.Count > before)
+            if (!AddCompanionEffect(files, payloads, dir))
+            {
+                if (!HasStandardShaders(dir)) LeaveOutEffect(dir, report);
+            }
+            else
                 report.Info(
                     $"{ShaderName} goes in reshade-shaders\\Shaders. Enable it in ReShade, under a "
                     + "motion-vector shader such as iMMERSE Launchpad, and the add-on gets real "

@@ -32,16 +32,53 @@ public static partial class Work
     /// layout the payload came in. Both routes call this and neither has its own copy: v0.3.0
     /// shipped the effect on the 64-bit route only, because that was the only place the lines
     /// existed, and a 32-bit install went without it in silence. One implementation is the only
-    /// version of that invariant a future change cannot forget half of.</summary>
-    public static void AddCompanionEffect(IDictionary<string, byte[]> files, string payloadDir)
+    /// version of that invariant a future change cannot forget half of.
+    ///
+    /// It goes in only beside ReShade's standard shaders. The effect includes ReShade.fxh, which
+    /// comes with those and not with the DLL this installs, and ReShade compiles every .fx it finds:
+    /// alone it was a compile error in ReShade's log and overlay, in every game. It reads a
+    /// motion-vector shader such as iMMERSE Launchpad and does nothing without one, and each of
+    /// those brings ReShade.fxh -- so the header is the sign the effect has something to read.
+    /// Returns whether it was added.</summary>
+    public static bool AddCompanionEffect(IDictionary<string, byte[]> files, string payloadDir, string gameDir)
     {
         var nested = Path.Combine(payloadDir, "files", ShaderName);
         var flat = Path.Combine(payloadDir, ShaderName);
         var from = File.Exists(nested) ? nested : flat;
         // Absent is not an error: a payload manifest published before the effect was installable
         // has no shader component, and the add-on works without it.
-        if (File.Exists(from)) files[ShaderPath] = Engine.Read(from);
+        if (!File.Exists(from) || !HasStandardShaders(gameDir)) return false;
+        files[ShaderPath] = Engine.Read(from);
+        return true;
     }
+
+    public static bool HasStandardShaders(string gameDir) =>
+        File.Exists(Path.Combine(gameDir, "reshade-shaders", "Shaders", "ReShade.fxh"));
+
+    /// <summary>Says the effect was left out, and takes out one an earlier install put there with
+    /// nothing to compile against: that copy is the compile error in ReShade's log on every launch.
+    /// The name is this project's alone, so it is never somebody else's file.</summary>
+    public static void LeaveOutEffect(string gameDir, Report report)
+    {
+        report.Info(EffectLeftOut);
+        var stale = Path.Combine(gameDir, "reshade-shaders", "Shaders", ShaderName);
+        if (!File.Exists(stale)) return;
+        try
+        {
+            Engine.SafePath(stale);
+            File.Delete(stale);
+            report.Ok($"removed the {ShaderName} an earlier install left without ReShade.fxh");
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InstallException)
+        {
+            report.Warn($"{ShaderName} could not be removed ({e.Message}); ReShade will keep reporting it until it goes.");
+        }
+    }
+
+    public const string EffectLeftOut =
+        ShaderName + " was left out: it needs ReShade's standard shaders (ReShade.fxh), which come "
+        + "with a motion-vector shader such as iMMERSE Launchpad. Install one, then Reinstall here, "
+        + "and the add-on gets real motion vectors in a game that has none of its own.";
 
     /// <summary>Whether a ReShade DisabledAddons entry names this add-on, under either the
     /// name it uses now or the one it used before v0.6.5. A folder upgraded in place can

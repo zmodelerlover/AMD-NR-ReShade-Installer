@@ -75,6 +75,7 @@ public static partial class Work
         {
             app.Install(target, preset.ManifestPreset(), proxyName);
             foreach (var line in app.Log) Narrate(line, report);
+            if (!HasStandardShaders(installDir)) LeaveOutEffect(installDir, report);
             report.Info(preset.Note());
             report.Info(
                 "It starts switched off. Open the overlay with Home, or press Ctrl+End. StartOn=1 in "
