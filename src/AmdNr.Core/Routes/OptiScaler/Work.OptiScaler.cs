@@ -87,24 +87,10 @@ public static partial class Work
 
     /// <summary>Whether another route's install is still in this folder. What is left once a
     /// ReShade install has been taken back is its manifest holding only the configuration it keeps
-    /// on purpose, and that is not an install: <see cref="AdoptLeftoverManifest"/> carries it over.</summary>
+    /// on purpose, and that is not an install: Transaction.Apply carries it over.</summary>
     private static bool OtherRouteInstalled(Manifest? m, string dir) =>
         m is not null && m.Preset != Preset.OptiScaler.ManifestPreset()
         && m.Entries.Any(e => e.Owned && !e.Configuration && File.Exists(Path.Combine(dir, e.Name)));
-
-    /// <summary>A manifest another route left behind with nothing in it but configuration it chose
-    /// to keep. Transaction.Apply refuses to change presets over any manifest, so without this a
-    /// folder that ever had the ReShade route could never take this one, uninstalled or not. The
-    /// entries stay as they are: uninstall keeps configuration either way.</summary>
-    private static void AdoptLeftoverManifest(string dir, Manifest? m)
-    {
-        // "installing" is an interrupted transaction, which uninstall has to recover, not this.
-        if (m is null || m.State != "installed" || m.Preset == Preset.OptiScaler.ManifestPreset()
-            || OtherRouteInstalled(m, dir)) return;
-        m.Preset = Preset.OptiScaler.ManifestPreset();
-        m.State = "installed";
-        Manifest.WriteAtomic(dir, m);
-    }
 
     private static void CheckRuntimeAsVersionDll(string dir, Report report)
     {
@@ -319,7 +305,6 @@ public static partial class Work
         var log = new List<string>();
         try
         {
-            AdoptLeftoverManifest(dir, manifest);
             Transaction.Apply(dir, Preset.OptiScaler.ManifestPreset(), Route.X64, files, log);
             foreach (var line in log) Narrate(line, report);
         }

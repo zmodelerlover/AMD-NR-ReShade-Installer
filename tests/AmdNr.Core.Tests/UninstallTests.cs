@@ -87,6 +87,34 @@ public class UninstallTests
             "the folder must stop reporting itself installed once uninstall has run");
     }
 
+    /// <summary>What uninstall keeps -- the configuration, in a manifest that still names the preset
+    /// it came from -- is not an install, and must not stop another one. It did: a folder that had
+    /// OptiScaler taken out refused every ReShade route with "Uninstall previous preset before
+    /// changing API", with nothing left to uninstall and no Uninstall button to press.</summary>
+    [Fact]
+    public void WhatUninstallKeepsDoesNotStopAnotherRouteOrApiFromInstalling()
+    {
+        var game = Fixture.Temp("route-after-route");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
+        var (optiSrc, optiPins) = OptiScalerRouteTests.Payloads("route-after-route");
+        Assert.False(Work.Install(game, optiSrc, Preset.OptiScaler, optiPins).Failed);
+        Assert.False(Work.Uninstall(game, Preset.OptiScaler).Failed);
+        Assert.True(File.Exists(Path.Combine(game, Work.OptiScalerIni)), "OptiScaler.ini is kept as configuration");
+
+        var (src, pins) = Fixture.Payloads("route-after-route");
+        var dx11 = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(dx11.Failed, dx11.ToLog("ReShade after OptiScaler"));
+        Assert.Equal(RouteFamily.ReShade, GameScanner.InstalledAs(game));
+
+        // Inside one route too: D3D11 taken out, D3D12 put in.
+        Assert.False(Work.Uninstall(game, Preset.Dx11).Failed);
+        var dx12 = Work.Install(game, src, Preset.Dx12, pins);
+        Assert.False(dx12.Failed, dx12.ToLog("D3D12 after D3D11"));
+
+        // A live install is still not changed under itself.
+        Assert.True(Work.Install(game, src, Preset.Dx11, pins).Failed);
+    }
+
     /// <summary>The other way a folder stays installed after an uninstall, and the one that brought
     /// the complaint back: a file that no longer hashes to what the install wrote belongs to whoever
     /// changed it, so the transaction keeps it -- and the badge, which is only "is one of our files

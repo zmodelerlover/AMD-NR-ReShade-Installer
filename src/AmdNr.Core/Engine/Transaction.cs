@@ -100,6 +100,13 @@ public static class Transaction
             m.BridgeProtocol = Manifest.Current;
             Engine.Require(m.State == "installed",
                 "Interrupted transaction: run uninstall/recovery before reinstall");
+            // What uninstall leaves is this manifest holding only the configuration it keeps on
+            // purpose, still named after the preset it came from. That is not an install, so any
+            // preset may take it over, and the kept entries ride along for the next uninstall to
+            // keep again. Refusing it left a folder that ever had one route or API unable to take
+            // another -- with nothing installed to uninstall first.
+            if (!m.Entries.Any(e => e.Owned && !e.Configuration && File.Exists(Path.Combine(dir, e.Name))))
+                m.Preset = preset;
             Engine.Require(m.Preset == preset, "Uninstall previous preset before changing API");
             Engine.Require(m.Route == route,
                 "That folder already has an install for the other architecture; uninstall it first");
