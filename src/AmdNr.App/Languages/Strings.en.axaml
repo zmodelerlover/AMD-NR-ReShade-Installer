@@ -82,7 +82,7 @@
   <sys:String x:Key="Str.NotDownloaded">not downloaded yet</sys:String>
   <sys:String x:Key="Str.WillDownload">The files are downloaded and verified when you install.</sys:String>
   <sys:String x:Key="Str.NoRoute">Nothing this game renders with has a route: the add-on works on D3D11, D3D12, Vulkan and OpenGL, and on D3D8, D3D9 and D3D11 for 32-bit games. A 32-bit OpenGL game, a 64-bit D3D9 one and a software renderer have none.</sys:String>
-  <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings -- that is the route picked here, and on another API the add-on sees a different game.</sys:String>
+  <sys:String x:Key="Str.SwitchRenderer">This game can run on {1}. Set it to {0} in its own graphics settings — that is the route picked here, and on another API the add-on sees a different game.</sys:String>
   <sys:String x:Key="Str.SwitchRendererUnreal">This is an Unreal game: add -{0} to its launch options.</sys:String>
   <sys:String x:Key="Str.CheckApiTitle">Check the API before you install</sys:String>
   <sys:String x:Key="Str.CheckApiBody">{0} was read out of this game's own files, and files say what they link against, not what the game runs on. One folder can hold a D3D11 and a D3D12 executable; one game can start on D3D10 from an executable that will also do D3D9. Both answers are true and only one of them is the route you want — and a wrong route installs perfectly and then does nothing in the game.</sys:String>
@@ -101,15 +101,15 @@
   <sys:String x:Key="Str.ExeChoose">Choose…</sys:String>
   <sys:String x:Key="Str.ExeUseDetected">Use the detected one</sys:String>
   <sys:String x:Key="Str.ExeNone">No executable found in this folder.</sys:String>
-  <sys:String x:Key="Str.ExeNote">The width and the API are read off this file, and the routes below follow from it. A game that keeps a small launcher in the root and the real thing in Bin64 is the case this gets wrong -- if the bitness here is not the one you expect, point it at the right file.</sys:String>
-  <sys:String x:Key="Str.ExeNoteChosen">You chose this file, so detection leaves it alone -- including after a re-scan.</sys:String>
+  <sys:String x:Key="Str.ExeNote">The width and the API are read off this file, and the routes below follow from it. A game that keeps a small launcher in the root and the real thing in Bin64 is the case this gets wrong — if the bitness here is not the one you expect, point it at the right file.</sys:String>
+  <sys:String x:Key="Str.ExeNoteChosen">You chose this file, so detection leaves it alone — including after a re-scan.</sys:String>
   <sys:String x:Key="Str.ExeNotHere">That file is not inside this game's folder.</sys:String>
   <sys:String x:Key="Str.ExeUnreadable">That file is not a Windows executable this can read.</sys:String>
   <sys:String x:Key="Str.RouteSection">Route</sys:String>
-  <sys:String x:Key="Str.RouteMismatch">This route is for {0} games and the executable above is {1}. Nothing stops you -- the detection may have read the wrong file -- but if it read the right one, this will not load.</sys:String>
+  <sys:String x:Key="Str.RouteMismatch">This route is for {0} games and the executable above is {1}. Nothing stops you — the detection may have read the wrong file — but if it read the right one, this will not load.</sys:String>
   <sys:String x:Key="Str.VersionSection">Add-on version</sys:String>
   <sys:String x:Key="Str.ProxySection">ReShade loads as</sys:String>
-  <sys:String x:Key="Str.ProxyNote">Automatic picks dxgi.dll, which serves every Direct3D. Choose another only when a game refuses to load that one -- some load d3d12.dll and nothing else.</sys:String>
+  <sys:String x:Key="Str.ProxyNote">Automatic picks dxgi.dll, which serves every Direct3D. Choose another only when a game refuses to load that one — some load d3d12.dll and nothing else.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler loads as</sys:String>
   <sys:String x:Key="Str.ProxyNoteOpti">Automatic picks dxgi.dll. Choose winmm.dll when dxgi.dll has to stay something else's, such as a ReShade you keep.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">Automatic</sys:String>
@@ -117,7 +117,7 @@
   <sys:String x:Key="Str.ClearCache">Clear the cache</sys:String>
   <sys:String x:Key="Str.ClearCacheBody">Deletes the downloaded files, the covers and the version list. Nothing installed in a game is touched; the next install downloads what it needs again.</sys:String>
   <sys:String x:Key="Str.ClearCacheYes">Clear it</sys:String>
-  <sys:String x:Key="Str.ClearCacheYesBody">About 165 MB has to be downloaded again the next time you install.</sys:String>
+  <sys:String x:Key="Str.ClearCacheYesBody">Everything in it is downloaded again the next time you install.</sys:String>
   <sys:String x:Key="Str.ClearCacheNoBody">Leave the cache as it is.</sys:String>
   <sys:String x:Key="Str.CacheCleared">Cache emptied — {0} freed.</sys:String>
   <sys:String x:Key="Str.PayloadsAllReady">{0} of {1} components ready — {2} in the cache</sys:String>
@@ -218,7 +218,7 @@
   <sys:String x:Key="Str.SetupMachineOk">This machine has everything the add-on needs.</sys:String>
   <sys:String x:Key="Str.SetupMachineBad">Something is missing. You can continue and fix it later, but it will not work in game until you do.</sys:String>
 
-  <sys:String x:Key="Str.SetupFilesBody">The same files serve every game: downloaded once, checked against a pinned hash, and reused. About 165 MB in total.</sys:String>
+  <sys:String x:Key="Str.SetupFilesBody">The same files serve every game: downloaded once, checked against a pinned hash, and reused.</sys:String>
   <sys:String x:Key="Str.SetupFilesCheck">Checking what is already here…</sys:String>
   <sys:String x:Key="Str.SetupFilesAllReady">Every file is here and verified.</sys:String>
   <sys:String x:Key="Str.SetupFilesMissing">{0} of {1} components are still missing.</sys:String>
@@ -326,7 +326,7 @@
   <sys:String x:Key="Str.ImportPick">Pick the folder with the files you downloaded</sys:String>
   <sys:String x:Key="Str.ImportAll">Every file is here now and verified.</sys:String>
   <sys:String x:Key="Str.ImportNothing">Nothing in that folder matched a file this needs.</sys:String>
-  <sys:String x:Key="Str.ImportSome">{0} file(s) taken; {1} still missing.</sys:String>
+  <sys:String x:Key="Str.ImportSome">Taken: {0}. Still missing: {1}.</sys:String>
   <sys:String x:Key="Str.Component.addon">Add-on</sys:String>
   <sys:String x:Key="Str.Component.runtime">Neural runtime and weights</sys:String>
   <sys:String x:Key="Str.Component.reshade">ReShade</sys:String>
