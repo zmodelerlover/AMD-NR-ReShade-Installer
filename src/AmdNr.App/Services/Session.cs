@@ -102,14 +102,24 @@ public sealed class Session
     /// when the new executable is starting and this one should close.</summary>
     public async Task<bool> ApplyUpdateAsync(IProgress<double> progress)
     {
-        if (Update.Release is not { } release) return false;
+        if (Update.Release is not { } release || Busy) return false;
         if (!release.CanSelfUpdate)
         {
             AppUpdate.OpenInBrowser(release.Url);
             return false;
         }
-        var staged = await AppUpdate.FetchAsync(Http, release, progress);
-        AppUpdate.ApplyAndRestart(staged);
-        return true;
+        // Busy for all of it: the window closes the moment the new executable starts, and an install
+        // begun during the download would be cut off inside its transaction.
+        Busy = true;
+        try
+        {
+            var staged = await AppUpdate.FetchAsync(Http, release, progress);
+            AppUpdate.ApplyAndRestart(staged);
+            return true;
+        }
+        finally
+        {
+            Busy = false;
+        }
     }
 }

@@ -214,7 +214,11 @@ public partial class MainWindow : Window
     /// leaves this executable exactly where it was, and says why.</summary>
     public async Task ApplyUpdateAsync(Action<double> report)
     {
-        if (Session.Busy) return;
+        if (Session.Busy)
+        {
+            Toast(Ui.Text("Str.Working"), Level.Info);
+            return;
+        }
         try
         {
             if (await Session.ApplyUpdateAsync(new Progress<double>(report))) Close();

@@ -107,20 +107,34 @@ public static class AppUpdate
 
         var sums = await http.GetStringAsync(release.Assets[SumsAsset], cancel);
 
-        using var response = await http.GetAsync(release.Assets[ExeAsset],
-            HttpCompletionOption.ResponseHeadersRead, cancel);
-        response.EnsureSuccessStatusCode();
-        var total = response.Content.Headers.ContentLength;
-        await using var body = await response.Content.ReadAsStreamAsync(cancel);
-        using var buffer = new MemoryStream();
-        var chunk = new byte[81920];
-        int read;
-        while ((read = await body.ReadAsync(chunk, cancel)) > 0)
+        // The client's timeout ends at the headers, so a body that goes quiet is ended by this, re-armed
+        // by every read -- the same minute the payload downloads get. Without it the button sat at
+        // "Updating… 40%" for good.
+        using var stall = CancellationTokenSource.CreateLinkedTokenSource(cancel);
+        stall.CancelAfter(TimeSpan.FromMinutes(1));
+        byte[] bytes;
+        try
         {
-            buffer.Write(chunk, 0, read);
-            if (total is > 0) progress?.Report((double)buffer.Length / total.Value);
+            using var response = await http.GetAsync(release.Assets[ExeAsset],
+                HttpCompletionOption.ResponseHeadersRead, stall.Token);
+            response.EnsureSuccessStatusCode();
+            var total = response.Content.Headers.ContentLength;
+            await using var body = await response.Content.ReadAsStreamAsync(stall.Token);
+            using var buffer = new MemoryStream();
+            var chunk = new byte[81920];
+            int read;
+            while ((read = await body.ReadAsync(chunk, stall.Token)) > 0)
+            {
+                stall.CancelAfter(TimeSpan.FromMinutes(1));
+                buffer.Write(chunk, 0, read);
+                if (total is > 0) progress?.Report((double)buffer.Length / total.Value);
+            }
+            bytes = buffer.ToArray();
         }
-        var bytes = buffer.ToArray();
+        catch (OperationCanceledException) when (!cancel.IsCancellationRequested)
+        {
+            throw new InstallException("The update download stopped answering. Nothing was replaced; try again.");
+        }
 
         Engine.Require(AppUpdater.Verify(bytes, sums, ExeAsset),
             "The update downloaded, but it does not match the SHA-256 the release publishes. "
@@ -138,8 +152,20 @@ public static class AppUpdate
     {
         var current = Environment.ProcessPath
                       ?? throw new InstallException("Cannot tell which file this app is running from.");
-        AppUpdater.Swap(current, staged);
-        Process.Start(new ProcessStartInfo(current) { UseShellExecute = true });
+        var parked = AppUpdater.Swap(current, staged);
+        try { Process.Start(new ProcessStartInfo(current) { UseShellExecute = true }); }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or FileNotFoundException
+                                      or InvalidOperationException)
+        {
+            // In place and would not start: an antivirus that took the new, unsigned file, or blocked
+            // it. The one that runs goes back, or closing this window would leave no app at all --
+            // only the parked copy, which the next start would have swept.
+            try { File.Move(parked, current, overwrite: true); }
+            catch (Exception e2) when (e2 is IOException or UnauthorizedAccessException) { }
+            throw new InstallException(
+                $"The update was put in place but would not start ({e.Message}). That is almost always an "
+                + "antivirus; the version you had is back where it was.");
+        }
     }
 
     public static void OpenInBrowser(string url)

@@ -104,9 +104,12 @@ public sealed partial class PayloadCache
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),
         })
         {
-            // The whole of a 141 MB download, on a slow line. What ends a dead one is the stall
-            // timer, not this.
-            Timeout = TimeSpan.FromMinutes(30),
+            // Up to the headers, for the downloads: they read their body as a stream, which this does
+            // not cover, and a stall timer re-armed by every read ends a dead one. For everything read
+            // whole -- the payload list, the API list, the sums, a cover -- it is the whole request.
+            // It was 30 minutes, which a host that accepted and never answered turned into 30 minutes
+            // of a window waiting on the payload list before it detected a single game.
+            Timeout = TimeSpan.FromSeconds(100),
         };
         client.DefaultRequestHeaders.UserAgent.ParseAdd($"AMD-NR-ReShade-Installer/{version}");
         return client;
