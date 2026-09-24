@@ -162,6 +162,8 @@
   <sys:String x:Key="Str.PreflightErr">{0} problem found in this folder</sys:String>
   <sys:String x:Key="Str.PreflightInstalled">Installed in this game</sys:String>
   <sys:String x:Key="Str.PreflightInstalledDetail">Start the game to use it. Install again to refresh the files, or uninstall to remove them.</sys:String>
+  <sys:String x:Key="Str.PreflightOutdated">Installed, and an update is ready</sys:String>
+  <sys:String x:Key="Str.PreflightOutdatedDetail">The files in this game are older than the ones this app installs now. Update replaces them; your settings stay.</sys:String>
   <sys:String x:Key="Str.SeeDetails">Open Details below to see what was found.</sys:String>
   <sys:String x:Key="Str.SystemSubtitle">What the add-on needs from this PC, checked when the app starts.</sys:String>
   <sys:String x:Key="Str.SystemReady">This PC has what the add-on needs</sys:String>

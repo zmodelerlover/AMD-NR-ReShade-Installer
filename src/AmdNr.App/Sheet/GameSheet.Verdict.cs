@@ -65,6 +65,10 @@ public partial class GameSheet
         var errors = report.Lines.Count(l => l.Level == Level.Err);
         if (errors > 0)
             SetVerdict(Level.Err, Ui.Count("Str.PreflightErr", errors), Ui.Text("Str.SeeDetails"), details: true);
+        // The same amber the tile and the button already say it in; a green "installed" under an
+        // Update button read as two answers to one question.
+        else if (card.Outdated)
+            SetVerdict(Level.Warn, Ui.Text("Str.PreflightOutdated"), Ui.Text("Str.PreflightOutdatedDetail"));
         else if (card.Installed)
             SetVerdict(Level.Ok, Ui.Text("Str.PreflightInstalled"), Ui.Text("Str.PreflightInstalledDetail"));
         else if (warnings > 0)
