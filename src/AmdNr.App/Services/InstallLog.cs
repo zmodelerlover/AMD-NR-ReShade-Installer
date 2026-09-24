@@ -23,9 +23,11 @@ public static class InstallLog
             File.AppendAllText(Path.Combine(AppPaths.Logs, "amd-nr-installer.log"),
                 text + Environment.NewLine);
         }
-        catch (IOException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            // Nothing to do about it, and the failure it describes is already on screen.
+            // Nothing to do about it, and the failure it describes is already on screen. Access
+            // denied included: this is called from inside catch blocks of async void handlers,
+            // where anything escaping closes the app.
         }
     }
 

@@ -35,7 +35,7 @@ public partial class GameSheet
 
     private void OnOpenFolder(object? sender, RoutedEventArgs e)
     {
-        if (_card is { } card) AppUpdate.OpenFolder(card.Path);
+        if (_card is { } card) AppUpdate.OpenFolder(card.Path, create: false);
     }
 
     /// <summary>The game's page on PCGamingWiki, which is where the API question is actually

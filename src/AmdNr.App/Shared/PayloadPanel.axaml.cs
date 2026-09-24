@@ -165,8 +165,14 @@ public partial class PayloadPanel : UserControl
         var current = "";
         try
         {
+            // One component whose folder cannot be read is skipped, as it always was, rather than
+            // taking every other download down with it.
             var pending = await Task.Run(() => manifest.Everyday.Select(p => p.Key)
-                .Where(name => !PayloadCache.IsComplete(manifest, name)).ToList());
+                .Where(name =>
+                {
+                    try { return !PayloadCache.IsComplete(manifest, name); }
+                    catch (Exception e) when (e is InstallException or IOException or UnauthorizedAccessException) { return false; }
+                }).ToList());
             if (pending.Count == 0)
             {
                 Toast(Ui.Text("Str.PayloadsAlreadyThere"), Level.Ok);

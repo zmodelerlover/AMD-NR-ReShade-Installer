@@ -183,12 +183,15 @@ public static class AppUpdate
         }
     }
 
-    /// <summary>A folder in Explorer. Nobody is interrupted when there is no shell to do it.</summary>
-    public static void OpenFolder(string path)
+    /// <summary>A folder in Explorer. Nobody is interrupted when there is no shell to do it. The app's
+    /// own folders are made if missing; a game's is not, or opening a game on a drive letter that
+    /// now belongs to another disk would plant an empty copy of its folder there.</summary>
+    public static void OpenFolder(string path, bool create = true)
     {
         try
         {
-            Directory.CreateDirectory(path);
+            if (create) Directory.CreateDirectory(path);
+            else if (!Directory.Exists(path)) return;
             Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or IOException
