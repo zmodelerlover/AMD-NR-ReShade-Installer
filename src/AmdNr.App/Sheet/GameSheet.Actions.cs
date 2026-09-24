@@ -102,7 +102,7 @@ public partial class GameSheet
             Status(Ui.Text("Str.Working"));
             var target = TargetFor(card);
             Report report;
-            try { report = await Task.Run(() => Work.Install(target, folder, preset, pins, proxy)); }
+            try { report = await WritingAsync(() => Work.Install(target, folder, preset, pins, proxy)); }
             catch (Exception ex)
             {
                 // The engine turns everything it expects into a report line, and rolls back before
@@ -196,7 +196,7 @@ public partial class GameSheet
     {
         var target = TargetFor(card);
         Report report;
-        try { report = await Task.Run(() => Work.Uninstall(target, preset, force)); }
+        try { report = await WritingAsync(() => Work.Uninstall(target, preset, force)); }
         catch (Exception ex) { report = Failure(ex); }
         Show(report);
         var what = force ? "uninstall (forced)" : "uninstall";
@@ -204,6 +204,15 @@ public partial class GameSheet
         InstallLog.Write(what, card, target, report, Selected(), Pins(), null);
         card.RefreshInstalled();
         return report;
+    }
+
+    /// <summary>Work inside the game folder, off the UI thread and marked for as long as it runs, so
+    /// the window is not closed on it: see <see cref="Session.Writing"/>.</summary>
+    private async Task<Report> WritingAsync(Func<Report> work)
+    {
+        Session.Writing = true;
+        try { return await Task.Run(work); }
+        finally { Session.Writing = false; }
     }
 
     /// <summary>Asks before deleting a file this app did not write. The answer is the whole point:

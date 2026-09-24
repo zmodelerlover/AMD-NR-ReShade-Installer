@@ -43,6 +43,11 @@ public sealed class Session
         }
     }
 
+    /// <summary>True only while an install or an uninstall is inside a game folder: the seconds a
+    /// closed window would cut a transaction in half. A download is not this -- whatever arrived
+    /// is kept and picked up again -- so closing during one is left alone.</summary>
+    public bool Writing { get; set; }
+
     /// <summary>A cache that looks beside the app and in Downloads before it downloads anything.</summary>
     public PayloadCache Cache() => new(Http, PayloadCache.NearbyFolders());
 

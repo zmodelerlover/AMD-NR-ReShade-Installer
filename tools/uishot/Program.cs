@@ -319,7 +319,16 @@ void Flows()
     Click(main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card")));
     Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
         "nothing is left busy: a sheet opened afterwards can install");
+
+    // Closed while a game folder is being written: refused, and said. Any other time: closed.
+    session.Writing = true;
     main.Close();
+    Settle(2);
+    Check(main.IsVisible, "the window stays open while a game folder is being written");
+    session.Writing = false;
+    main.Close();
+    Settle(2);
+    Check(!main.IsVisible, "and closes once it is not");
 
     // A list written by a version with a route this one does not know: kept aside, not saved over by
     // the scan an empty list starts on its own.
