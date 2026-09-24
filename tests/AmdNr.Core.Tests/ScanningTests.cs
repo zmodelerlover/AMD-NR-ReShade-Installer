@@ -226,12 +226,19 @@ public class ScanningTests
         Exe(root, Path.Combine("Euro Truck Simulator 2", "bin", "win_x64"), "eurotrucks2.exe");
         // Anti-cheat on its own is not a game, however large its setup.
         Exe(root, "EasyAntiCheat", "EasyAntiCheat_EOS_Setup.exe");
+        // A series folder: each game named like the folder, and still two games, not one "Fallout".
+        Exe(root, Path.Combine("Fallout", "Fallout 3"), "Fallout3.exe");
+        Exe(root, Path.Combine("Fallout", "Fallout 4"), "Fallout4.exe");
+        // A game whose own name holds a word the tool list refuses -- crash, agent -- is still a game.
+        Exe(root, "Crash Bandicoot N. Sane Trilogy", "CrashBandicootNSaneTrilogy.exe");
+        Exe(root, "Agents of Mayhem", "AgentsOfMayhem.exe");
 
         var found = GameScanner.UnderFolder(root);
         var paths = found.Select(g => Path.GetRelativePath(root, g.InstallPath)).OrderBy(p => p).ToList();
 
-        Assert.Equal(["Alpha", "Euro Truck Simulator 2", "Grand Theft Auto IV", "Kappa", "Omega",
-            Path.Combine("Publisher", "Beta"), "Sigma", Path.Combine("Studio", "Lambda")], paths);
+        Assert.Equal(["Agents of Mayhem", "Alpha", "Crash Bandicoot N. Sane Trilogy", "Euro Truck Simulator 2",
+            Path.Combine("Fallout", "Fallout 3"), Path.Combine("Fallout", "Fallout 4"), "Grand Theft Auto IV",
+            "Kappa", "Omega", Path.Combine("Publisher", "Beta"), "Sigma", Path.Combine("Studio", "Lambda")], paths);
         Assert.All(found, g => Assert.Equal(GamePlatform.Manual, g.Platform));
         Assert.Equal("Beta", found.Single(g => g.InstallPath.EndsWith("Beta", StringComparison.Ordinal)).Name);
     }

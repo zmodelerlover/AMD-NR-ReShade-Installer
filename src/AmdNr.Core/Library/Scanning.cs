@@ -37,6 +37,8 @@ public static partial class GameScanner
     [
         "wallpaper_engine", "Steamworks Shared", "GameSave", "SteamVR", "SteamLinuxRuntime",
         "Proton ", "Proton Hotfix", "Proton EasyAntiCheat Runtime", "Proton BattlEye Runtime",
+        // Named like their own setup, so a game-named executable does not tell them apart.
+        "EasyAntiCheat", "BattlEye", "_CommonRedist", "Redistributables",
     ];
 
     private static bool IsExcluded(string path) =>
@@ -395,8 +397,13 @@ public static partial class GameScanner
                 // Only an executable that looks like a game makes its folder one. The detection's
                 // last resort takes the largest executable of any kind, which is right for a game it
                 // already knows is one and wrong here: EasyAntiCheat's setup made a game of its folder.
+                // A name on the tool list still counts when it is the folder's own: that list
+                // matches words like "crash" and "agent", and Crash Bandicoot and Agents of Mayhem
+                // are games. Anti-cheat's folder, which is named like its setup too, is excluded.
                 var exe = GraphicsDetector.FindExecutable(child);
-                if (exe is not null && GraphicsDetector.LooksLikeTheGame(exe) && !IsContainer(child, exe))
+                if (exe is not null
+                    && (GraphicsDetector.LooksLikeTheGame(exe) || GraphicsDetector.NamedLike(child, exe))
+                    && !IsContainer(child, exe))
                 {
                     found.Add(new ScannedGame(Path.GetFileName(child), child, GamePlatform.Manual));
                     continue;
@@ -424,8 +431,23 @@ public static partial class GameScanner
         if (segments.Length > 2 && EngineFolders.Contains(segments[1]) && Directory.Exists(Path.Combine(folder, "Engine")))
             return false;
         // The game's executable in a folder of its own name, GTAIV\GTAIV.exe under Grand Theft Auto
-        // IV, is the game again, not a second one inside it.
-        return !GraphicsDetector.NamedLike(folder, exe);
+        // IV, is the game again, not a second one inside it -- unless another game sits beside it:
+        // Fallout\Fallout 3 is named like Fallout too, and Fallout 4 next to it makes it a series.
+        return !GraphicsDetector.NamedLike(folder, exe) || AnotherGameBeside(folder, segments[0]);
+    }
+
+    private static bool AnotherGameBeside(string folder, string taken)
+    {
+        try
+        {
+            return Directory.EnumerateDirectories(folder)
+                .Where(d => !string.Equals(Path.GetFileName(d), taken, StringComparison.OrdinalIgnoreCase) && !IsExcluded(d))
+                .Any(d => GraphicsDetector.FindExecutable(d) is { } other && GraphicsDetector.LooksLikeTheGame(other));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Where an engine puts its executable, as the first segment under the game's root.
