@@ -100,3 +100,13 @@ Feito na ordem de sempre: instalador (exe, `SHA256SUMS.txt`) primeiro, depois
 `publish-payload.ps1` (com `-From` apontando para uma pasta só com `native-game-tiled-assets.zip`),
 depois o `payload.json` novo copiado para `publish-v0.5.0\` e o `.7z` montado e anexado. O
 `config.json` que o script reescreve foi revertido. O Extras recebeu o `payload.json` novo.
+
+- O `.7z` leva uma pasta `AMD-NR-ReShade-Installer-v0.5.0\` com o exe, os três json e um
+  `LEIA-ME.txt`/`README.txt` reescritos para a v0.5.0 (os da v0.4.0 ainda eram do beta de 15/09).
+- `tools/check-release.ps1` tem que rodar no PowerShell 7: no 5.1 o `Get-FileHash` não carrega
+  quando o `PSModulePath` aponta para os módulos do 7. Deu "Versions agree".
+- Depois de publicado, o harness rodou de novo com o cache vazio e o manifesto lido do HF: baixou
+  o zip da 0.2.0 do GitHub e os pesos do HF, conferiu tudo, instalou a 0.1.1, atualizou para a
+  0.2.0 e desinstalou.
+- Falta a prova no jogo pela janela, como a da v0.4.0 no Cyberpunk. Lá a pasta tem uma
+  instalação manual de teste; `opti/exports/cyberpunk-test/remove-test.ps1` a desfaz antes.
