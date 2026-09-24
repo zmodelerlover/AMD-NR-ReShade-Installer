@@ -41,8 +41,8 @@ are NVIDIA-derived and the runtime comes from a third-party project with its own
 
 ## D3D12 games: the OptiScaler route
 
-On D3D12 a ReShade add-on is shown only the finished frame, so the network gets colour and guesses
-the rest. A D3D12 game that offers DLSS, FSR or XeSS has a better way in: the
+On D3D12 a ReShade add-on finds the game's depth but not its motion vectors, so the network gets
+colour and depth and estimates the motion. A D3D12 game that offers DLSS, FSR or XeSS has a better way in: the
 [OptiScaler AMD neural rendering build](https://github.com/MatheusFerreiraS/neural-amd-opti), which
 takes over the game's upscaler call and runs the same network inside it, with the game's own depth
 and motion vectors. For a game detected as D3D12, and for one that runs both D3D11 and D3D12 and

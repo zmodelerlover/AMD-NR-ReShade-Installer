@@ -5,8 +5,7 @@ hash to**. It replaces the constants the Rust installer compiled in.
 
 ## Where it all lives
 
-The binaries are **not on GitHub**, by decision. They are published in a **Hugging Face dataset
-repository**, because it is the one free host that gives an address that is both *stable* and
+The binaries are published **first** in a **Hugging Face dataset repository**, because it is the one free host that gives an address that is both *stable* and
 *overwritable*:
 
 ```
@@ -59,7 +58,7 @@ has none as of the v0.3.0 runtime, while the weights, which did not change, keep
 `owner`/`repo`/`tag` are still understood and are tried last, after `url` and every mirror, so a
 GitHub release asset remains a valid place to put one of these without any code change.
 
-## The five components
+## The components
 
 | | what it is | where it comes from |
 |---|---|---|
@@ -68,6 +67,13 @@ GitHub release asset remains a valid place to put one of these without any code 
 | `reshade` | the official 6.8.0 Addon setup, with `ReShade64.dll`/`ReShade32.dll` extracted from it | reshade.me |
 | `bridge` | the 32-bit pair and the `payload.sha256` that pins it | the dataset repo |
 | `x86-extras` | pinned ReShade 6.8.0.2156 x86 and d3d8to9 v1.15.1 | the dataset repo |
+| `shader` | `AMD_Neural_Feed.fx`, the companion effect | the dataset repo |
+| `optiscaler` | the neural-amd-opti release archive, with every file taken out of it pinned | its GitHub release |
+| `opti-runtime` | the runtime build OptiScaler drives | the dataset repo |
+
+Versions of OptiScaler past the one in `components` live under a top-level `releases` key, with
+the lmxxf weights (`lmxxf-weights`) inside the version that needs them. Older apps ignore that key.
+The add-on, bridge and shader files also carry the v0.6.6 GitHub release assets as `mirrors`.
 
 `path` puts a file somewhere other than the component's root. The bridge and x86-extras use it to
 rebuild the `files\` layout the 32-bit installer reads.
@@ -77,8 +83,9 @@ release asset remains a valid place to put one of these without any code change.
 
 ## Every hash here was verified against two sources
 
-The four in `runtime` and `x86-extras` match the constants in the add-on's own `installer/src/engine.rs`
-(`RUNTIME_SHA`, `WEIGHTS_SHA`, `RESHADE_SHA`, `D3D8TO9_SHA`). The `addon` and `bridge` ones match
+The four in `runtime` and `x86-extras` match the constants this app's engine pins
+(`Engine.RuntimeSha`, `WeightsSha`, `ReShadeSha`, `D3d8To9Sha`), and the runtime also matches the
+add-on's own pin (`kRuntimeSha256`). The `addon` and `bridge` ones match
 `SHA256SUMS.txt` and `payload.sha256` published in the v0.5.0 release. All eight were then
 downloaded back from their published addresses and re-hashed.
 
@@ -111,20 +118,19 @@ All of them **loose, beside the archive** -- not only inside it. That is what le
 a version contains, and pin each file's size and hash, without downloading anything first: the size
 comes from the API's record of the asset and the hash from `SHA256SUMS.txt`.
 
-v0.5.0 published the bridge pair only inside `dlss5-neural-amd-v0.5.0.zip`, so it is offered for a
-64-bit route from GitHub and for a 32-bit one from this manifest, which pins those two files itself.
-From v0.5.1 the four assets go up loose and a new version needs no change here at all.
+v0.5.0 published the bridge pair only inside `dlss5-neural-amd-v0.5.0.zip`, so the menu starts at
+v0.5.1 (`AddonReleases.Earliest`), the first release with the four assets loose. From there a new
+version needs no change here at all.
 
-Cutting a release, then, ends with:
+Cutting a release, then, ends with the add-on's own script, which gathers the loose files and writes
+the sums that pin them:
 
 ```powershell
-gh release upload v0.5.1 `
-  build\amd-nr.addon64 `
-  build-x86bridge\amd-nr.addon32 `
-  build-x86bridge\amd-nr-host64.exe `
-  release\payload.sha256 `
-  SHA256SUMS.txt
+.\tools\release-assets.ps1
+gh release upload <tag> (Get-Content release\upload.txt)
 ```
+
+It does not gather `AMD_Neural_Feed.fx`; v0.6.6 carried it because it was added by hand.
 
 The runtime, the weights, ReShade and `d3d8to9` are not versioned with the add-on and are not in a
 release: whichever version is chosen, those still come from this manifest.

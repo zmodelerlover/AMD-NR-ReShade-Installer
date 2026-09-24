@@ -129,20 +129,22 @@ public static class Presets
     public static string Note(this Preset p) => p switch
     {
         Preset.Pcsx2 =>
-            "Set the renderer to Direct3D 11 -- it is the only one where the emulator's depth reaches "
-            + "the network. Watch for a per-game override: it beats the global setting silently, and it "
-            + "is the most common way this looks broken when it is not.",
+            "Set the renderer to Direct3D 11 -- it is the one where the network gets the most: the "
+            + "emulator's depth, and motion from the companion effect when it is installed. Watch for a "
+            + "per-game override: it beats the global setting silently, and it is the most common way "
+            + "this looks broken when it is not.",
         Preset.Rpcs3 =>
             "EXPERIMENTAL. ReShade on Vulkan is a global layer, not a proxy DLL: run the ReShade "
             + "installer against rpcs3.exe and pick Vulkan, or nothing will load. The network gets "
             + "colour and estimated motion only -- there is no depth on Vulkan.",
         Preset.Dx11 =>
-            "The best case. D3D11 is the only route where the game's own depth and motion vectors "
-            + "reach the network.",
+            "The best case. D3D11 is the only route where the game's own motion vectors reach the "
+            + "network, together with its depth.",
         Preset.Dx12 =>
-            "The degraded case. On D3D12 an add-on is shown nothing but the swapchain, so the network "
-            + "gets colour and guesses at the rest. It works; expect less from it. A game with DLSS, "
-            + "FSR or XeSS in its settings is better served by the OptiScaler route.",
+            "The degraded case. On D3D12 the add-on finds the game's depth but not its motion "
+            + "vectors, so the network gets colour and depth and estimates the motion. It works; "
+            + "expect less from it. A game with DLSS, FSR or XeSS in its settings is better served by "
+            + "the OptiScaler route.",
         Preset.OptiScaler =>
             "The route for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over "
             + "the game's DLSS, FSR or XeSS call and runs the network inside it, with the game's own "
