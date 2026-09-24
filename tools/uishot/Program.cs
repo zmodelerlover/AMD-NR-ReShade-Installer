@@ -298,6 +298,17 @@ void Flows()
     Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
         "nothing is left busy: a sheet opened afterwards can install");
     main.Close();
+
+    // A list written by a version with a route this one does not know: kept aside, not saved over by
+    // the scan an empty list starts on its own.
+    File.WriteAllText(AppPaths.GamesFile, """[{ "Path": "C:\\Games\\X", "Preset": "NotARouteYet" }]""");
+    var fresh = new MainWindow { Width = 1240, Height = 820 };
+    fresh.Show();
+    Check(Until(() => Directory.GetFiles(AppPaths.Root, "games.json.unreadable-*").Length == 1, 10)
+          && File.ReadAllText(Directory.GetFiles(AppPaths.Root, "games.json.unreadable-*")[0]).Contains("NotARouteYet"),
+        "an unreadable games.json is kept aside, word for word");
+    Until(() => !fresh.Session.Busy);
+    fresh.Close();
 }
 
 if (args.Length > 1 && args[1] == "flows")

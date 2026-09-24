@@ -63,6 +63,7 @@ public partial class MainWindow : Window
     {
         var gone = await Library.LoadAsync();
         if (gone.Count > 0) Toast(GoneMessage(gone), Level.Info);
+        if (GameStore.SetAside is { } aside) Toast(Ui.Format("Str.GamesUnreadable", Path.GetFileName(aside)), Level.Warn);
         _lastPrune = DateTime.Now;
 
         var machine = await Session.ReadMachineAsync();

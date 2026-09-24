@@ -51,29 +51,55 @@ public sealed class GameEntry
 /// <summary>games.json. Written whole every time -- it is a list of folders, not a database.</summary>
 public static class GameStore
 {
+    /// <summary>Where the last Load moved a list it could not read; null when it read one, or there
+    /// was none.</summary>
+    public static string? SetAside { get; private set; }
+
+    /// <summary>Set when the list is there and could not be read at all: nothing is saved over it for
+    /// the rest of the session, because what would be saved is a list that starts from nothing.</summary>
+    private static bool _keepOff;
+
     public static List<GameEntry> Load()
     {
+        var file = AppPaths.GamesFile;
         try
         {
-            return File.Exists(AppPaths.GamesFile)
-                ? JsonSerializer.Deserialize(File.ReadAllText(AppPaths.GamesFile), AppJson.Default.ListGameEntry) ?? []
+            return File.Exists(file)
+                ? JsonSerializer.Deserialize(File.ReadAllText(file), AppJson.Default.ListGameEntry) ?? []
                 : [];
         }
-        catch (Exception e) when (e is JsonException or IOException or UnauthorizedAccessException)
+        catch (JsonException)
         {
+            // A hand edit, a power cut in the middle of a save, a list written by a newer version with
+            // a route this one does not know. It was read as no games at all and then saved over --
+            // by the scan an empty list starts on its own -- and every folder added by hand and every
+            // route chosen went with it. Moved aside instead, where whoever can read it still can.
+            SetAside = $"{file}.unreadable-{DateTime.Now:yyyyMMdd-HHmmss}";
+            try { File.Move(file, SetAside); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { _keepOff = true; }
+            return [];
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _keepOff = true;
             return [];
         }
     }
 
     /// <summary>Written to a temporary file and moved over the old one, so a crash or a full disk in
     /// the middle leaves the previous list rather than half of one -- which reads back as no games
-    /// at all.</summary>
+    /// at all. Flushed before the move, or a power cut can land the rename ahead of the bytes.</summary>
     public static void Save(IEnumerable<GameEntry> games)
     {
+        if (_keepOff) return;
         var temp = AppPaths.GamesFile + ".tmp";
         try
         {
-            File.WriteAllText(temp, JsonSerializer.Serialize(games.ToList(), AppJson.Default.ListGameEntry));
+            using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                JsonSerializer.Serialize(stream, games.ToList(), AppJson.Default.ListGameEntry);
+                stream.Flush(flushToDisk: true);
+            }
             File.Move(temp, AppPaths.GamesFile, overwrite: true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)

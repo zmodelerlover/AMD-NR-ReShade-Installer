@@ -55,6 +55,7 @@
 
   <sys:String x:Key="Str.LogSaved">The full log was written next to this app.</sys:String>
   <sys:String x:Key="Str.Working">Working…</sys:String>
+  <sys:String x:Key="Str.GamesUnreadable">The list of games could not be read. It was kept as {0} beside it, and a new list started.</sys:String>
   <sys:String x:Key="Str.CloseWhileBusy">Still writing to a game folder. It takes a few seconds; close the window once it is done.</sys:String>
   <sys:String x:Key="Str.FreeTitle">This is free. If you paid for it, you are being scammed.</sys:String>
   <sys:String x:Key="Str.FreeBody">Nobody sells any of this — not the installer, not the add-on, not the runtime, not the weights. If you were charged for it, or for a "key" or a "pro version", ask for your money back: what they sold you is on this page for nothing.</sys:String>
