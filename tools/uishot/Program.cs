@@ -293,7 +293,7 @@ void Flows()
     // Busy went on and off while the sheet was closed; a sheet opened afterwards has to work.
     main.ShowPage(MainWindow.Page.Games);
     Settle(6);
-    // Found again: relabelling rebuilt the grid, and the tile from before is no longer in it.
+    // Found again rather than trusted: the grid is free to replace a tile.
     Click(main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card")));
     Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
         "nothing is left busy: a sheet opened afterwards can install");
@@ -309,6 +309,43 @@ void Flows()
         "an unreadable games.json is kept aside, word for word");
     Until(() => !fresh.Session.Busy);
     fresh.Close();
+}
+
+// `uishot <out> perf`: how long a big library takes to open, from the window being built to every
+// tile laid out and the first frame drawn. Headless draws in software, so the numbers are for
+// comparing one build against another, not a promise about anybody's machine.
+if (args.Length > 1 && args[1] == "perf")
+{
+    SeedLibrary(300);
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var main = new MainWindow { Width = 1920, Height = 1040 };
+    var built = clock.ElapsedMilliseconds;
+    long listed = 0;
+    main.Library.Changed += () => listed = listed == 0 ? clock.ElapsedMilliseconds : listed;
+    main.Show();
+    while (main.GetVisualDescendants().OfType<Button>().Count(b => b.Classes.Contains("card")) < 300
+           && clock.Elapsed < TimeSpan.FromSeconds(60))
+    {
+        Dispatcher.UIThread.RunJobs();
+        AvaloniaHeadlessPlatform.ForceRenderTimerTick(1);
+    }
+    var tiles = clock.ElapsedMilliseconds;
+    using (main.CaptureRenderedFrame()) { }
+    Console.WriteLine($"300 games: window built {built} ms, list read {listed} ms, every tile laid out {tiles} ms, "
+                      + $"first frame {clock.ElapsedMilliseconds} ms");
+
+    // Typing in the search, a key at a time, then clearing it: what each key costs.
+    var search = main.GetVisualDescendants().OfType<TextBox>().First(t => t.Name == "SearchBox");
+    foreach (var text in new[] { "S", "So", "Som", "" })
+    {
+        clock.Restart();
+        search.Text = text;
+        Dispatcher.UIThread.RunJobs();
+        using (main.CaptureRenderedFrame()) { }
+        Console.WriteLine($"  search \"{text}\": {clock.ElapsedMilliseconds} ms");
+    }
+    main.Close();
+    return 0;
 }
 
 if (args.Length > 1 && args[1] == "flows")
