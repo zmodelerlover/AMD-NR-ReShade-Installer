@@ -154,18 +154,17 @@ public sealed class Library(Session session)
     {
         var pending = _cards.Where(c => c.Graphics is null).ToList();
         if (pending.Count == 0) return;
-        var db = session.ApiDb;
         using var gate = new SemaphoreSlim(4);
         await Task.WhenAll(pending.Select(async card =>
         {
             await gate.WaitAsync();
             try
             {
-                var detection = await Task.Run(() =>
-                    GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
-                        .With(db?.Lookup(card.Entry.AppId, card.Entry.Name)));
-                card.Graphics = detection;
-                if (!card.Entry.PresetChosen && detection.Preset is { } preset) card.Entry.Preset = preset;
+                var detection = await Task.Run(() => Detect(card));
+                // A sheet opened meanwhile read it already, and shows the route that came of it: a
+                // second answer landing under it changed the route the Install button would use
+                // while the sheet still showed the first.
+                if (card.Graphics is null) Apply(card, detection);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
             {
@@ -182,10 +181,22 @@ public sealed class Library(Session session)
     /// <summary>Detection again for one game, after the person pointed at another executable.</summary>
     public void Redetect(GameCard card)
     {
-        card.Graphics = GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
-            .With(session.ApiDb?.Lookup(card.Entry.AppId, card.Entry.Name));
-        if (!card.Entry.PresetChosen && card.Graphics.Preset is { } preset) card.Entry.Preset = preset;
+        Apply(card, Detect(card));
         Save();
+    }
+
+    /// <summary>What the game renders with: its own files first, then what the API database knows
+    /// about it. Only reads, so it runs on any thread.</summary>
+    public GraphicsDetection Detect(GameCard card) =>
+        GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
+            .With(session.ApiDb?.Lookup(card.Entry.AppId, card.Entry.Name));
+
+    /// <summary>A detection taken as the game's, and the route following it unless the person chose
+    /// one. Every reader goes through here, so the tile, the sheet and the install agree.</summary>
+    public static void Apply(GameCard card, GraphicsDetection detection)
+    {
+        card.Graphics = detection;
+        if (!card.Entry.PresetChosen && detection.Preset is { } preset) card.Entry.Preset = preset;
     }
 
     /// <summary>Cover art, a few at a time, and only for what has none yet. Steam publishes it on its

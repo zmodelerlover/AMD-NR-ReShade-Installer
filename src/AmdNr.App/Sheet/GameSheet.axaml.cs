@@ -105,8 +105,10 @@ public partial class GameSheet : UserControl
     public void Show(GameCard card)
     {
         if (_card != card) return;
-        var graphics = card.Graphics ?? GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable);
-        card.Graphics ??= graphics;
+        // Opened before the background detection got to it: read here, the same way it would have
+        // been, route included, so the sheet and what Install does are one answer.
+        if (card.Graphics is null) Library.Apply(card, Library.Detect(card));
+        var graphics = card.Graphics!;
 
         ApiTag.Text = graphics.All.Count == 0 ? Ui.Text("Str.UnknownApi") : graphics.Tag;
         DetectedLine.Text = graphics.Why;
