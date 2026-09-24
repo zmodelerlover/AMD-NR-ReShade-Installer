@@ -26,6 +26,7 @@ public sealed partial class PayloadCache
         IProgress<DownloadProgress>? progress, CancellationToken cancel)
     {
         var failures = new List<string>();
+        var network = false;
         for (var i = 0; i < urls.Count; i++)
         {
             for (var attempt = 1; ; attempt++)
@@ -45,6 +46,7 @@ public sealed partial class PayloadCache
                         continue;
                     }
                     failures.Add($"{urls[i].Host}: {Describe(e)}");
+                    network |= IsNetwork(e);
                     break;
                 }
             }
@@ -61,8 +63,17 @@ public sealed partial class PayloadCache
             }
         }
 
-        throw new InstallException($"Could not download {file.Name}.\n      " + string.Join("\n      ", failures));
+        throw new InstallException($"Could not download {file.Name}.\n      " + string.Join("\n      ", failures))
+        {
+            Network = network,
+        };
     }
+
+    /// <summary>No answer at all, as opposed to a wrong one: an HTTP failure with no status code is
+    /// a name, a connection or a timeout. Any address failing that way is enough, because the first
+    /// one is where nearly everything comes from.</summary>
+    public static bool IsNetwork(Exception e) =>
+        e is InstallException { Network: true } or HttpRequestException { StatusCode: null } or TaskCanceledException;
 
     /// <summary>Why one address did not work, as somebody who has to do something about it would
     /// put it. The cases are the ones that actually happen: no network, a name that cannot be
@@ -122,7 +133,7 @@ public sealed partial class PayloadCache
         {
             throw new InstallException(
                 "it stopped answering, or never started. Whatever arrived is kept, so trying again "
-                + "picks up where this left off.");
+                + "picks up where this left off.") { Network = true };
         }
     }
 

@@ -177,6 +177,29 @@ public class DownloadFallbackTests
         Assert.Contains("404", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Not reaching the server at all -- what a stale DNS cache causes, and clearing it can
+    /// fix -- is told apart from an answer that came back wrong, which it cannot. Only the first is
+    /// offered the fix.</summary>
+    [Fact]
+    public async Task AFailureToReachTheServerIsToldApartFromAWrongAnswer()
+    {
+        var unreachable = new PayloadCache(new HttpClient(new Refusing()));
+        var dns = await Assert.ThrowsAsync<InstallException>(() =>
+            unreachable.EnsureAsync(OneFile(Version("net"), Blob(12), "https://gone.example/f"), PayloadManifest.RuntimeComponent));
+        Assert.True(dns.Network);
+
+        var missing = new PayloadCache(new HttpClient(new Answers(_ => new HttpResponseMessage(HttpStatusCode.NotFound))));
+        var notFound = await Assert.ThrowsAsync<InstallException>(() =>
+            missing.EnsureAsync(OneFile(Version("404"), Blob(13), "https://here.example/f"), PayloadManifest.RuntimeComponent));
+        Assert.False(notFound.Network);
+
+        var list = await Assert.ThrowsAsync<InstallException>(() => unreachable.FetchManifestAsync(["https://gone.example/p.json"]));
+        Assert.True(list.Network);
+
+        // Clearing it is Windows' call: whatever Windows says is an answer, not an exception.
+        _ = PayloadCache.FlushDns();
+    }
+
     private sealed class Answers(Func<HttpRequestMessage, HttpResponseMessage> answer) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancel) =>

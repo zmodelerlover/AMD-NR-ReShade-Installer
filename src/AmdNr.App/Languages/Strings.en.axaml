@@ -308,6 +308,8 @@
   <sys:String x:Key="Str.SwitchNoBody">Nothing is changed; {0} stays installed.</sys:String>
   <sys:String x:Key="Str.DownloadFailedDetail">Why is under Details. Nothing was installed.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">The files can also be fetched with a browser and handed over: This machine &gt; Files &gt; Download manually, then Import files. Files in your Downloads folder are found on their own.</sys:String>
+  <sys:String x:Key="Str.DnsRetry">Clear DNS and try again</sys:String>
+  <sys:String x:Key="Str.DnsFlushFailed">Windows would not clear its DNS cache from here. Open a Command Prompt, run ipconfig /flushdns, and try again.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problems found in this folder</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Ready to install, with {0} notes to read</sys:String>
   <sys:String x:Key="Str.InstallWarn.Many">Installed on {0}, with {1} warnings to read below.</sys:String>

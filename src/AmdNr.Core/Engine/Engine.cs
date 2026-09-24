@@ -19,7 +19,13 @@ public enum Route
 }
 
 /// <summary>Every refusal carries the sentence the user sees.</summary>
-public sealed class InstallException(string message) : Exception(message);
+public sealed class InstallException(string message) : Exception(message)
+{
+    /// <summary>What failed was reaching the server at all -- a name that did not resolve, a
+    /// connection never made or gone quiet -- rather than what came back. Those are the failures a
+    /// stale DNS cache causes, and the ones clearing it can fix.</summary>
+    public bool Network { get; init; }
+}
 
 public static partial class Engine
 {

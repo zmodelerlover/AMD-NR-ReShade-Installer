@@ -38,6 +38,8 @@
             <TextBlock Text="{DynamicResource Str.DownloadFailedHelp}" Classes="muted" TextWrapping="Wrap" />
             <WrapPanel ItemSpacing="8" LineSpacing="8">
               <Button x:Name="RetryButton" Classes="primary" Click="OnDownload" Content="{DynamicResource Str.SetupFilesRetry}" />
+              <Button x:Name="DnsButton" Classes="ghost" Click="OnFlushDns" IsVisible="False"
+                      Content="{DynamicResource Str.DnsRetry}" />
               <Button x:Name="ManualButton" Classes="ghost" Click="OnManual">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <PathIcon Data="{StaticResource IconExternal}" />

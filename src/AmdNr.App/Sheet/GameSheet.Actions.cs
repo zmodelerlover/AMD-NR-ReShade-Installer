@@ -84,6 +84,7 @@ public partial class GameSheet
             {
                 ShowStep(StepDownload, failed: true);
                 ShowResult(Level.Err, Ui.Text("Str.DownloadFailed"), Ui.Text("Str.DownloadFailedDetail"));
+                DnsRetryButton.IsVisible = _unreachable;
                 return;
             }
 
@@ -209,11 +210,30 @@ public partial class GameSheet
                 ("keep", Ui.Text("Str.UninstallKeep"), Ui.Text("Str.UninstallKeepBody")),
             ]) == "force";
 
+    /// <summary>Clears Windows' DNS cache and runs the install again. Offered only when the download
+    /// never reached the server, which is the failure a stale cache causes.</summary>
+    private void OnFlushDns(object? sender, RoutedEventArgs e) => _shell.Run("flush dns", async () =>
+    {
+        if (Session.Busy) return;
+        var flushed = PayloadCache.FlushDns();
+        InstallLog.Append($"{DateTime.Now:s} flush dns: {(flushed ? "cleared" : "refused")}");
+        if (!flushed)
+        {
+            _shell.Toast(Ui.Text("Str.DnsFlushFailed"), Level.Warn);
+            return;
+        }
+        await InstallAsync();
+    });
+
+    /// <summary>The last download never reached the server: see <see cref="PayloadCache.IsNetwork"/>.</summary>
+    private bool _unreachable;
+
     /// <summary>Downloads whatever this route needs, then hands back the folder to install from --
     /// the same shape someone would have unzipped by hand, so the engine cannot tell the difference.
     /// A failure says why at every address it tried, in the Details, and opens them.</summary>
     private async Task<string?> EnsurePayloadsAsync(Preset preset)
     {
+        _unreachable = false;
         var manifest = Selected();
         if (manifest is null)
         {
@@ -248,6 +268,7 @@ public partial class GameSheet
                                       or UnauthorizedAccessException)
         {
             Progress.IsVisible = false;
+            _unreachable = PayloadCache.IsNetwork(e);
             _report.Add(new ReportLine(Ui.Glyph(Level.Err), e.Message, Ui.Brush("Err")));
             _report.Add(new ReportLine(Ui.Glyph(Level.Info), Ui.Text("Str.DownloadFailedHelp"), Ui.Brush("Muted")));
             Status(Ui.Text("Str.DownloadFailed"));

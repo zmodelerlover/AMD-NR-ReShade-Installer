@@ -131,6 +131,7 @@ public partial class GameSheet
         ResultDetail.IsVisible = detail.Length > 0 && !details;
         // "See the details below" pointed five hundred pixels away; this goes there.
         ShowDetailsButton.IsVisible = details;
+        DnsRetryButton.IsVisible = false;
         // Off and on again, so the entrance plays even when the banner was already up.
         ResultBanner.IsVisible = false;
         ResultBanner.IsVisible = true;

@@ -323,6 +323,8 @@
   <sys:String x:Key="Str.SwitchNoBody">Nada muda; o {0} continua instalado.</sys:String>
   <sys:String x:Key="Str.DownloadFailedDetail">O motivo está em Detalhes. Nada foi instalado.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Os arquivos também podem ser baixados pelo navegador e entregues ao app: Esta máquina &gt; Arquivos &gt; Baixar manualmente, depois Importar arquivos. Arquivos na pasta Downloads são encontrados sozinhos.</sys:String>
+  <sys:String x:Key="Str.DnsRetry">Limpar o DNS e tentar de novo</sys:String>
+  <sys:String x:Key="Str.DnsFlushFailed">O Windows não deixou limpar o cache de DNS daqui. Abra o Prompt de Comando, rode ipconfig /flushdns e tente de novo.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problemas encontrados nesta pasta</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Pronto para instalar, com {0} avisos para ler</sys:String>
   <sys:String x:Key="Str.InstallWarn.Many">Instalado em {0}, com {1} avisos para ler abaixo.</sys:String>

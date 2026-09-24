@@ -32,6 +32,7 @@ public sealed partial class PayloadCache
     public async Task<PayloadManifest> FetchManifestAsync(IEnumerable<string> addresses, CancellationToken cancel = default)
     {
         var failures = new List<string>();
+        var network = false;
         foreach (var address in addresses.Where(a => a.Length > 0).Distinct(StringComparer.Ordinal))
         {
             try { return await FetchManifestAsync("", "", url: address, cancel: cancel); }
@@ -39,9 +40,13 @@ public sealed partial class PayloadCache
                                           or TaskCanceledException && !cancel.IsCancellationRequested)
             {
                 failures.Add($"{new Uri(address).Host}: {(e is TaskCanceledException ? "it did not answer in time." : Describe(e))}");
+                network |= IsNetwork(e);
             }
         }
-        throw new InstallException("Could not read the payload list.\n      " + string.Join("\n      ", failures));
+        throw new InstallException("Could not read the payload list.\n      " + string.Join("\n      ", failures))
+        {
+            Network = network,
+        };
     }
 
     /// <summary>The copy that ships beside the executable, or one the user dropped in the app's own
@@ -93,6 +98,10 @@ public sealed partial class PayloadCache
             // there until the timeout below, which is not a fall-through, it is a hang.
             ConnectTimeout = TimeSpan.FromSeconds(20),
             ConnectCallback = (context, cancel) => ConnectAsync(context.DnsEndPoint, cancel),
+            // The files come off a CDN whose addresses move. A connection kept for the whole session
+            // is a session pinned to wherever the name pointed when the app opened, which is what
+            // clearing the DNS cache is meant to get away from; a new one looks the name up again.
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
         })
         {
             // The whole of a 141 MB download, on a slow line. What ends a dead one is the stall
@@ -102,6 +111,25 @@ public sealed partial class PayloadCache
         client.DefaultRequestHeaders.UserAgent.ParseAdd($"AMD-NR-ReShade-Installer/{version}");
         return client;
     }
+
+    /// <summary>Empties Windows' DNS cache, which is what ipconfig /flushdns does, without starting a
+    /// process to do it: a program that runs ipconfig is the kind of thing antivirus heuristics look
+    /// at twice. Windows keeps failed look-ups, and the old addresses of a CDN that has since moved,
+    /// for minutes; a browser with a resolver of its own goes on working meanwhile, and this app,
+    /// which asks Windows, does not. That is the "flush DNS fixed it" people report. False when
+    /// Windows would not do it, so the caller can say so instead of pretending.</summary>
+    public static bool FlushDns()
+    {
+        try { return DnsFlushResolverCache(); }
+        catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException)
+        {
+            return false;
+        }
+    }
+
+    [System.Runtime.InteropServices.DllImport("dnsapi.dll", EntryPoint = "DnsFlushResolverCache")]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool DnsFlushResolverCache();
 
     /// <summary>How long one address gets on its own before the next one is tried beside it.</summary>
     private static readonly TimeSpan Stagger = TimeSpan.FromMilliseconds(250);

@@ -50,6 +50,7 @@ public partial class PayloadPanel : UserControl
     {
         DownloadButton.IsEnabled = !busy && _session.Manifest is not null;
         RetryButton.IsEnabled = !busy;
+        DnsButton.IsEnabled = !busy;
         ImportButton.IsEnabled = !busy && _session.Manifest is not null;
         ImportFooterButton.IsEnabled = ImportButton.IsEnabled;
         ClearButton.IsEnabled = !busy;
@@ -206,6 +207,7 @@ public partial class PayloadPanel : UserControl
         {
             _failed = current;
             ShowError(Ui.Format("Str.DownloadFailedOne", Ui.Translated($"Str.Component.{current}", current)), ex.Message);
+            DnsButton.IsVisible = PayloadCache.IsNetwork(ex);
             InstallLog.Append($"{DateTime.Now:s} download {current}\n{ex.Message}");
         }
         finally
@@ -219,6 +221,21 @@ public partial class PayloadPanel : UserControl
             Changed?.Invoke();
         }
     }
+
+    /// <summary>Clears Windows' DNS cache and downloads again. Offered only when the download never
+    /// reached the server, which is the failure a stale cache causes.</summary>
+    private void OnFlushDns(object? sender, RoutedEventArgs e) => Run(async () =>
+    {
+        if (_session.Busy) return;
+        var flushed = PayloadCache.FlushDns();
+        InstallLog.Append($"{DateTime.Now:s} flush dns: {(flushed ? "cleared" : "refused")}");
+        if (!flushed)
+        {
+            Toast(Ui.Text("Str.DnsFlushFailed"), Level.Warn);
+            return;
+        }
+        await DownloadAsync();
+    });
 
     private void OnManual(object? sender, RoutedEventArgs e) => ManualBox.IsVisible = !ManualBox.IsVisible;
 

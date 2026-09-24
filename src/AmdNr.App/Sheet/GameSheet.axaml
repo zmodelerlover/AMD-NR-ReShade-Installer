@@ -122,6 +122,8 @@
                         <TextBlock x:Name="ResultDetail" Classes="muted" TextWrapping="Wrap" />
                         <Button x:Name="ShowDetailsButton" Classes="link" Click="OnShowDetails" IsVisible="False"
                                 Content="{DynamicResource Str.ShowDetails}" />
+                        <Button x:Name="DnsRetryButton" Classes="link" Click="OnFlushDns" IsVisible="False"
+                                Content="{DynamicResource Str.DnsRetry}" />
                       </StackPanel>
                     </Grid>
                   </Border>
