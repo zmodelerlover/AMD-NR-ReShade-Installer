@@ -110,7 +110,7 @@ public static class Transaction
 
         foreach (var (name, data) in desired)
         {
-            Engine.Require(Engine.Allowed.Contains(name),
+            Engine.Require(Engine.IsAllowed(name),
                 $"Refusing to install an unmanaged filename: {name}");
             var dst = Path.Combine(dir, name);
             Engine.SafePath(dst);

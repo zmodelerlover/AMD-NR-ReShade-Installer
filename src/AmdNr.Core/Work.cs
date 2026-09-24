@@ -102,7 +102,8 @@ public static partial class Work
             foreach (var entry in manifest.Entries)
             {
                 if (!entry.Owned || entry.Configuration) continue;
-                if (pinned.TryGetValue(Path.GetFileName(entry.Name), out var want)
+                if ((pinned.TryGetValue(entry.Name, out var want)
+                     || pinned.TryGetValue(Path.GetFileName(entry.Name), out want))
                     && Engine.Lower(entry.Hash) != want)
                     return true;
             }

@@ -441,7 +441,7 @@
 
                         <!-- Which release of the add-on goes in -->
                         <StackPanel x:Name="VersionSection" Spacing="8" IsVisible="False">
-                          <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
+                          <TextBlock x:Name="VersionTitle" Text="{DynamicResource Str.VersionSection}" Classes="section" />
                           <ComboBox x:Name="AddonVersionBox" HorizontalAlignment="Stretch"
                                     SelectionChanged="OnAddonVersionChanged"
                                     AutomationProperties.Name="{DynamicResource Str.VersionSection}" />

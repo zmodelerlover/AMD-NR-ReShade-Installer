@@ -151,7 +151,7 @@ public sealed class Manifest(string preset, Route route)
             };
 
             Engine.Require(Engine.IsHex(e.Hash, 64), "Unsafe/duplicate manifest entry");
-            Engine.Require(Engine.Allowed.Contains(e.Name) && seen.Add(e.Name),
+            Engine.Require(Engine.IsAllowed(e.Name) && seen.Add(e.Name),
                 "Unsafe/duplicate manifest entry");
             Engine.Require(e.Configuration == Engine.IsConfig(e.Name), "Manifest config mismatch");
 
@@ -181,7 +181,7 @@ public sealed class Manifest(string preset, Route route)
         }
 
         var nameCount = Count(s, "\"name\":");
-        Engine.Require(nameCount == m.Entries.Count && nameCount <= Engine.Allowed.Count,
+        Engine.Require(nameCount == m.Entries.Count && nameCount <= Engine.MaxManifestEntries,
             "Malformed manifest entries");
 
         var canonical = Encode(m);

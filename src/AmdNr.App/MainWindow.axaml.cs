@@ -19,9 +19,10 @@ public sealed record ReportLine(Geometry? Glyph, string Text, IBrush Brush);
 /// <summary>One downloadable component as the System page lists it.</summary>
 public sealed record PayloadRow(string Name, string Version, string Size, bool Ready);
 
-/// <summary>One installable version of the add-on, as the sheet offers it. A null release means
-/// the version the payload manifest pins, which is the one this build was published with.</summary>
-public sealed record VersionChoice(Version Version, string Label, AddonRelease? Release);
+/// <summary>One installable version, as the sheet offers it. For the add-on, a null release means
+/// the version the payload manifest pins, which is the one this build was published with. For the
+/// OptiScaler route, Opti is the version of it the payload manifest lists.</summary>
+public sealed record VersionChoice(Version Version, string Label, AddonRelease? Release, ComponentRelease? Opti = null);
 
 public partial class MainWindow : Window
 {
@@ -1119,11 +1120,11 @@ public partial class MainWindow : Window
     {
         var route = preset.Route();
         _versions.Clear();
-        // The OptiScaler route installs no add-on, so there is no add-on release to pick.
+        // The OptiScaler route installs no add-on: what it picks is the OptiScaler version.
+        Localize(VersionTitle, preset.IsOptiScaler() ? "Str.VersionSectionOpti" : "Str.VersionSection");
         if (preset.IsOptiScaler())
         {
-            _version = null;
-            VersionSection.IsVisible = false;
+            ShowOptiScalerVersions();
             return;
         }
         foreach (var release in _releases.Where(r => r.Covers(route)))
@@ -1153,7 +1154,33 @@ public partial class MainWindow : Window
         // which one I chose" is the loudest complaint about the tool this one is modelled on, and
         // "does a new release actually become the default" is not a question to answer by reading.
         var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
-            _selected?.Entry.AddonVersion, _version?.Version);
+            _selected?.Entry.AddonVersion, _version?.Opti is null ? _version?.Version : null);
+        _settingVersion = true;
+        AddonVersionBox.ItemsSource = _versions.Select(v => v.Label).ToList();
+        AddonVersionBox.SelectedIndex = index;
+        _settingVersion = false;
+
+        _version = AddonVersionBox.SelectedIndex >= 0 ? _versions[AddonVersionBox.SelectedIndex] : null;
+        VersionSection.IsVisible = _versions.Count > 0;
+        VersionNote.Text = VersionNoteText();
+    }
+
+    /// <summary>The OptiScaler versions the payload manifest lists, newest first. They come from
+    /// the manifest rather than from GitHub, because each one is pinned file by file inside its
+    /// archive, and a release's own sums cannot say where each file goes.</summary>
+    private void ShowOptiScalerVersions()
+    {
+        foreach (var release in _manifest?.Offered(PayloadManifest.OptiScalerComponent) ?? [])
+        {
+            if (AddonReleases.Version(release.Version) is not { } version) continue;
+            var published = release.Components[PayloadManifest.OptiScalerComponent].Published;
+            _versions.Add(new VersionChoice(version,
+                $"v{release.Version}" + (published is null ? "" : $" - {published}"), null, release));
+        }
+
+        // Same rule as the add-on: this game's last version, then the session's, then the newest.
+        var index = AddonReleases.Preferred(_versions.Select(v => v.Version).ToList(),
+            _selected?.Entry.OptiScalerVersion, _version?.Opti is null ? null : _version.Version);
         _settingVersion = true;
         AddonVersionBox.ItemsSource = _versions.Select(v => v.Label).ToList();
         AddonVersionBox.SelectedIndex = index;
@@ -1166,9 +1193,12 @@ public partial class MainWindow : Window
 
     private string VersionNoteText() => _version is null
         ? string.Empty
-        : _version.Release is null
-            ? Text("Str.VersionNoteShipped")
-            : string.Format(Text("Str.VersionNoteRelease"), _version.Version);
+        : _version.Opti is { } opti
+            ? string.Format(Text("Str.VersionNoteOpti"), opti.Version)
+              + (opti.Components.ContainsKey(PayloadManifest.LmxxfWeightsComponent) ? " " + Text("Str.VersionNoteOptiLmxxf") : "")
+            : _version.Release is null
+                ? Text("Str.VersionNoteShipped")
+                : string.Format(Text("Str.VersionNoteRelease"), _version.Version);
 
     private async void OnAddonVersionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -1176,12 +1206,19 @@ public partial class MainWindow : Window
         if (AddonVersionBox.SelectedIndex < 0 || AddonVersionBox.SelectedIndex >= _versions.Count) return;
 
         _version = _versions[AddonVersionBox.SelectedIndex];
-        _selected.Entry.AddonVersion = _version.Version.ToString();
+        Remember(_selected, _version);
         Save();
         VersionNote.Text = VersionNoteText();
         // A different version is a different pair of hashes, so the pre-flight has to be redone:
         // "already installed" is only true of the version that is actually in the folder.
         await RefreshAsync();
+    }
+
+    /// <summary>Records a chosen version on the game, in the field for the kind of version it is.</summary>
+    private static void Remember(GameCard card, VersionChoice choice)
+    {
+        if (choice.Opti is { } opti) card.Entry.OptiScalerVersion = opti.Version;
+        else card.Entry.AddonVersion = choice.Version.ToString();
     }
 
     private async void OnInstall(object? sender, RoutedEventArgs e)
@@ -1223,7 +1260,7 @@ public partial class MainWindow : Window
             // for somebody who never opened that menu -- which is nearly everybody.
             if (!report.Failed && _version is { } installed)
             {
-                card.Entry.AddonVersion = installed.Version.ToString();
+                Remember(card, installed);
                 Save();
             }
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
@@ -1355,7 +1392,7 @@ public partial class MainWindow : Window
             ?
             [
                 PayloadManifest.OptiScalerComponent, PayloadManifest.OptiRuntimeComponent,
-                PayloadManifest.RuntimeComponent,
+                PayloadManifest.RuntimeComponent, PayloadManifest.LmxxfWeightsComponent,
             ]
         : preset.Route() == Route.X86
         ?
@@ -1388,10 +1425,13 @@ public partial class MainWindow : Window
     }
 
     /// <summary>The manifest this sheet installs from: the published one, with the chosen
-    /// release's add-on swapped in when that is not the version the manifest already pins.</summary>
-    private PayloadManifest? Selected() => _manifest is null || _version?.Release is null
-        ? _manifest
-        : AddonReleases.With(_manifest, _version.Release);
+    /// release's add-on swapped in when that is not the version the manifest already pins, or the
+    /// chosen OptiScaler version's components in place of the ones it pins.</summary>
+    private PayloadManifest? Selected() =>
+        _manifest is null ? null
+        : _version?.Opti is { } opti ? _manifest.With(opti)
+        : _version?.Release is { } release ? AddonReleases.With(_manifest, release)
+        : _manifest;
 
     private PayloadPins Pins()
     {

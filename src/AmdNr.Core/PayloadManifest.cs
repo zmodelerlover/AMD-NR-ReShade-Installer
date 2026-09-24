@@ -65,10 +65,22 @@ public sealed class PayloadComponent
     /// is only the envelope: what gets installed is what is listed here.</summary>
     public List<PayloadFile>? Extract { get; init; }
 
+    /// <summary>When this version was published, as yyyy-MM-dd, for the version menu. Optional.</summary>
+    public string? Published { get; init; }
+
     /// <summary>What an install reads from this component: the extracted files when there are any,
     /// otherwise the downloaded ones.</summary>
     [JsonIgnore]
     public IReadOnlyList<PayloadFile> Installed => Extract is { Count: > 0 } ? Extract : Files;
+}
+
+/// <summary>Another version of a component, with whatever else that version needs to install. The
+/// components listed here take the place of the manifest's own for as long as this version is the
+/// one chosen.</summary>
+public sealed class ComponentRelease
+{
+    public required string Version { get; init; }
+    public required Dictionary<string, PayloadComponent> Components { get; init; }
 }
 
 public sealed class PayloadManifest
@@ -78,6 +90,12 @@ public sealed class PayloadManifest
     public string? Repo { get; init; }
     public string? Tag { get; init; }
     public required Dictionary<string, PayloadComponent> Components { get; init; }
+
+    /// <summary>Further versions of a component, keyed by that component's name. Kept out of
+    /// <see cref="Components"/> on purpose: an app from before this list downloads every component
+    /// it finds there in its first-run wizard and installs the one version it knows, so what only a
+    /// newer app can install lives here, where an older one never looks.</summary>
+    public Dictionary<string, List<ComponentRelease>>? Releases { get; init; }
 
     public const string AddonComponent = "addon";
     public const string RuntimeComponent = "runtime";
@@ -91,11 +109,15 @@ public sealed class PayloadManifest
     public const string OptiScalerComponent = "optiscaler";
     public const string OptiRuntimeComponent = "opti-runtime";
 
+    /// <summary>The lmxxf runtime's weights, which OptiScaler 0.2.0 and later can drive instead of
+    /// the danielblnc runtime. Only ever inside a release: no version listed in Components uses them.</summary>
+    public const string LmxxfWeightsComponent = "lmxxf-weights";
+
     /// <summary>Components fetched only when a route that uses them is installed. The OptiScaler
     /// archive alone is 132 MB, so downloading it in the first-run wizard for everybody, most of
     /// whom run the ReShade route, would be the largest download the app makes, spent on nothing.</summary>
     public static readonly IReadOnlySet<string> OnDemand =
-        new HashSet<string>(StringComparer.Ordinal) { OptiScalerComponent, OptiRuntimeComponent };
+        new HashSet<string>(StringComparer.Ordinal) { OptiScalerComponent, OptiRuntimeComponent, LmxxfWeightsComponent };
 
     /// <summary>The components worth having before anybody asks: everything but <see cref="OnDemand"/>.</summary>
     public IEnumerable<KeyValuePair<string, PayloadComponent>> Everyday =>
@@ -118,29 +140,81 @@ public sealed class PayloadManifest
         Engine.Require(m!.Schema == 1, $"Payload manifest schema {m.Schema} is newer than this app understands. Update it.");
         Engine.Require(m.Components.Count > 0, "The payload manifest lists no components.");
 
-        foreach (var (name, component) in m.Components)
-        {
-            Engine.Require(component.Files.Count > 0, $"Component {name} lists no files.");
-            foreach (var file in component.Files.Concat(component.Extract ?? []))
+        foreach (var (name, component) in m.Components) Check(name, component);
+
+        foreach (var (name, releases) in m.Releases ?? new Dictionary<string, List<ComponentRelease>>())
+            foreach (var release in releases)
             {
-                Engine.Require(file.Url is null || file.Url.StartsWith("https://", StringComparison.Ordinal),
-                    $"Component {name} gives {file.Name} an address that is not https.");
-                foreach (var mirror in file.Mirrors ?? [])
-                    Engine.Require(mirror.StartsWith("https://", StringComparison.Ordinal),
-                        $"Component {name} gives {file.Name} a mirror that is not https.");
-                // The manifest is remote data and it names the path this writes to, so the path is
-                // checked here. Whether a file may be copied into a *game* folder is a separate
-                // question, answered by Transaction.Apply against Engine.Allowed -- the cache also
-                // holds files that are only ever read, like the bridge's payload.sha256.
-                CheckRelativePath(name, file.RelativePath);
-                CheckPlainName(name, file.AssetName);
-                Engine.Require(Engine.IsHex(file.Sha256, 64),
-                    $"Component {name} has no usable SHA-256 for {file.Name}");
-                Engine.Require(file.Size > 0, $"Component {name} gives {file.Name} a size of zero");
+                Engine.Require(AddonReleases.Version(release.Version) is not null,
+                    $"A release of {name} has an unusable version: '{release.Version}'");
+                Engine.Require(release.Components.TryGetValue(name, out var own) && own.Version == release.Version,
+                    $"Release {release.Version} of {name} does not carry {name} {release.Version} itself.");
+                foreach (var (inner, component) in release.Components) Check(inner, component);
             }
-        }
         return m;
     }
+
+    private static void Check(string name, PayloadComponent component)
+    {
+        Engine.Require(component.Files.Count > 0, $"Component {name} lists no files.");
+        foreach (var file in component.Files.Concat(component.Extract ?? []))
+        {
+            Engine.Require(file.Url is null || file.Url.StartsWith("https://", StringComparison.Ordinal),
+                $"Component {name} gives {file.Name} an address that is not https.");
+            foreach (var mirror in file.Mirrors ?? [])
+                Engine.Require(mirror.StartsWith("https://", StringComparison.Ordinal),
+                    $"Component {name} gives {file.Name} a mirror that is not https.");
+            // The manifest is remote data and it names the path this writes to, so the path is
+            // checked here. Whether a file may be copied into a *game* folder is a separate
+            // question, answered by Transaction.Apply against Engine.IsAllowed -- the cache also
+            // holds files that are only ever read, like the bridge's payload.sha256.
+            CheckRelativePath(name, file.RelativePath);
+            CheckPlainName(name, file.AssetName);
+            Engine.Require(Engine.IsHex(file.Sha256, 64),
+                $"Component {name} has no usable SHA-256 for {file.Name}");
+            Engine.Require(file.Size > 0, $"Component {name} gives {file.Name} a size of zero");
+        }
+    }
+
+    /// <summary>Every version of a component this manifest can install, newest first: the one
+    /// <see cref="Components"/> pins, and each one in <see cref="Releases"/>. Empty when the
+    /// manifest has no such component at all.</summary>
+    public IReadOnlyList<ComponentRelease> Offered(string component)
+    {
+        var offered = new List<ComponentRelease>();
+        if (Components.TryGetValue(component, out var own))
+            offered.Add(new ComponentRelease
+            {
+                Version = own.Version,
+                Components = new Dictionary<string, PayloadComponent>(StringComparer.Ordinal) { [component] = own },
+            });
+        if (Releases?.TryGetValue(component, out var more) == true)
+            offered.AddRange(more.Where(r => offered.All(o => o.Version != r.Version)));
+        offered.Sort((a, b) => (AddonReleases.Version(b.Version) ?? new Version()).CompareTo(
+            AddonReleases.Version(a.Version) ?? new Version()));
+        return offered;
+    }
+
+    /// <summary>This manifest with one release's components in place of its own.</summary>
+    public PayloadManifest With(ComponentRelease release)
+    {
+        var components = new Dictionary<string, PayloadComponent>(Components, StringComparer.Ordinal);
+        foreach (var (name, component) in release.Components) components[name] = component;
+        return new PayloadManifest
+        {
+            Schema = Schema,
+            Owner = Owner,
+            Repo = Repo,
+            Tag = Tag,
+            Components = components,
+            Releases = Releases,
+        };
+    }
+
+    /// <summary>This manifest at the newest version of a component: what an install gets when
+    /// nobody picked a version, and what "out of date" is measured against.</summary>
+    public PayloadManifest Newest(string component) =>
+        Offered(component) is { Count: > 0 } offered ? With(offered[0]) : this;
 
     /// <summary>One or two plain segments, forward slashes only, nothing that climbs.</summary>
     private static void CheckRelativePath(string component, string path)
@@ -209,9 +283,12 @@ public sealed class PayloadManifest
             : null;
         // Optional like the shader: a manifest published before the OptiScaler route has neither,
         // and the other routes must keep installing from it.
-        var optiFiles = Components.TryGetValue(OptiScalerComponent, out var opti)
-            ? opti.Installed.ToDictionary(f => f.RelativePath, f => Engine.Lower(f.Sha256), StringComparer.Ordinal)
-            : new Dictionary<string, string>(StringComparer.Ordinal);
+        // The lmxxf weights go in with OptiScaler itself, so they are pinned the same way.
+        var optiFiles = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var name in new[] { OptiScalerComponent, LmxxfWeightsComponent })
+            if (Components.TryGetValue(name, out var component))
+                foreach (var f in component.Installed)
+                    optiFiles[f.RelativePath] = Engine.Lower(f.Sha256);
         var optiRuntime = Components.TryGetValue(OptiRuntimeComponent, out var optiRt) ? optiRt.Files.FirstOrDefault() : null;
         return new PayloadPins
         {

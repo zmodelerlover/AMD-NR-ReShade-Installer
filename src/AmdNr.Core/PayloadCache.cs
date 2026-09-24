@@ -141,12 +141,17 @@ public sealed class PayloadCache(HttpClient http)
             await FetchAnyAsync(manifest.DownloadUrls(component, file), path, file, progress, cancel);
         }
 
-        foreach (var entry in c.Extract ?? [])
+        // Only what is missing or wrong, and the archive opened once for all of it: the lmxxf
+        // weights are some 460 entries, and opening a 228 MB archive per entry is minutes of disk.
+        var pending = (c.Extract ?? []).Where(entry =>
         {
             var target = Path.Combine(dir, entry.RelativePath);
-            if (Engine.SizeOf(target) == entry.Size && Engine.HashFile(target) == entry.Sha256) continue;
+            return !(Engine.SizeOf(target) == entry.Size && Engine.HashFile(target) == entry.Sha256);
+        }).ToList();
+        if (pending.Count > 0)
+        {
             var archive = Path.Combine(dir, c.Files[0].RelativePath);
-            await Task.Run(() => ExtractVerified(archive, entry, target), cancel);
+            await Task.Run(() => ExtractVerified(archive, pending, dir), cancel);
         }
         return dir;
     }
@@ -158,41 +163,101 @@ public sealed class PayloadCache(HttpClient http)
     internal static void ExtractVerified(string archive, PayloadFile entry, string target)
     {
         using var zip = OpenAppendedZip(archive);
-        var item = zip.Entries.FirstOrDefault(e =>
-            string.Equals(e.FullName.Replace('\\', '/'), entry.Name, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(e.Name, entry.Name, StringComparison.OrdinalIgnoreCase));
+        ExtractOne(zip, archive, entry, target);
+    }
+
+    /// <summary>Several entries out of one archive, each to its RelativePath under
+    /// <paramref name="dir"/>, each kept only if it hashes to its pin.</summary>
+    internal static void ExtractVerified(string archive, IEnumerable<PayloadFile> entries, string dir)
+    {
+        using var zip = OpenAppendedZip(archive);
+        foreach (var entry in entries) ExtractOne(zip, archive, entry, Path.Combine(dir, entry.RelativePath));
+    }
+
+    /// <summary>The entry is found by the path it is kept under first, then by its name as a full
+    /// path, and only then by its bare name in any folder. The OptiScaler package holds README.md
+    /// both at its root and in lmxxf-modules, and a bare-name match took whichever came first.
+    ///
+    /// It streams to a .part file and is hashed on the way, rather than held in memory: one lmxxf
+    /// weight is 201 MB.</summary>
+    private static void ExtractOne(System.IO.Compression.ZipArchive zip, string archive, PayloadFile entry, string target)
+    {
+        static string Slashed(string s) => s.Replace('\\', '/');
+        var item = zip.Entries.FirstOrDefault(e => string.Equals(Slashed(e.FullName), entry.RelativePath, StringComparison.OrdinalIgnoreCase))
+                   ?? zip.Entries.FirstOrDefault(e => string.Equals(Slashed(e.FullName), entry.Name, StringComparison.OrdinalIgnoreCase))
+                   ?? zip.Entries.FirstOrDefault(e => string.Equals(e.Name, entry.Name, StringComparison.OrdinalIgnoreCase));
         Engine.Require(item is not null, $"{entry.Name} is not inside {Path.GetFileName(archive)}.");
 
-        using var buffer = new MemoryStream();
-        using (var source = item!.Open()) source.CopyTo(buffer);
-        var bytes = buffer.ToArray();
-        var got = Engine.Sha(bytes);
-        Engine.Require(got == entry.Sha256,
-            $"{entry.Name} inside {Path.GetFileName(archive)} does not match its pinned SHA-256."
-            + $"\n      expected {entry.Sha256}\n      got      {got}");
-
         Engine.MakeParent(target);
-        File.WriteAllBytes(target, bytes);
+        var part = target + ".part";
+        string got;
+        using (var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
+        {
+            using (var source = item!.Open())
+            using (var sink = new FileStream(part, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                var buffer = new byte[128 * 1024];
+                int read;
+                while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    sha.AppendData(buffer, 0, read);
+                    sink.Write(buffer, 0, read);
+                }
+            }
+            got = Convert.ToHexStringLower(sha.GetHashAndReset());
+        }
+
+        if (got != entry.Sha256)
+        {
+            File.Delete(part);
+            throw new InstallException(
+                $"{entry.Name} inside {Path.GetFileName(archive)} does not match its pinned SHA-256."
+                + $"\n      expected {entry.Sha256}\n      got      {got}");
+        }
+        File.Move(part, target, overwrite: true);
     }
 
     internal static System.IO.Compression.ZipArchive OpenAppendedZip(string path)
     {
-        var bytes = File.ReadAllBytes(path);
         // End of central directory: signature 50 4B 05 06, somewhere in the last 64 KB (the comment
         // field is at most 65535 bytes). It records the directory's size and its offset from the
         // zip's own start, and the directory itself sits right before it -- so the zip starts at
         // (end-of-directory position) - (directory size) - (directory offset).
-        for (var at = bytes.Length - 22; at >= Math.Max(0, bytes.Length - 22 - 65535); at--)
+        var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        try
         {
-            if (bytes[at] != 0x50 || bytes[at + 1] != 0x4b || bytes[at + 2] != 0x05 || bytes[at + 3] != 0x06) continue;
-            var size = BitConverter.ToUInt32(bytes, at + 12);
-            var offset = BitConverter.ToUInt32(bytes, at + 16);
-            var start = (long)at - size - offset;
-            Engine.Require(start >= 0, $"{Path.GetFileName(path)} has a damaged archive directory.");
-            return new System.IO.Compression.ZipArchive(
-                new MemoryStream(bytes, (int)start, bytes.Length - (int)start, writable: false),
-                System.IO.Compression.ZipArchiveMode.Read);
+            var tailLength = (int)Math.Min(file.Length, 22 + 65535);
+            var tail = new byte[tailLength];
+            file.Seek(-tailLength, SeekOrigin.End);
+            file.ReadExactly(tail);
+            for (var at = tail.Length - 22; at >= 0; at--)
+            {
+                if (tail[at] != 0x50 || tail[at + 1] != 0x4b || tail[at + 2] != 0x05 || tail[at + 3] != 0x06) continue;
+                var size = BitConverter.ToUInt32(tail, at + 12);
+                var offset = BitConverter.ToUInt32(tail, at + 16);
+                var start = file.Length - tailLength + at - size - offset;
+                Engine.Require(start >= 0, $"{Path.GetFileName(path)} has a damaged archive directory.");
+                // A plain zip is read from disk as it is. Only a zip behind something else, like
+                // the few MB of ReShade's setup, is re-based in memory.
+                if (start == 0)
+                {
+                    file.Seek(0, SeekOrigin.Begin);
+                    return new System.IO.Compression.ZipArchive(file, System.IO.Compression.ZipArchiveMode.Read);
+                }
+                var bytes = new byte[file.Length - start];
+                file.Seek(start, SeekOrigin.Begin);
+                file.ReadExactly(bytes);
+                file.Dispose();
+                return new System.IO.Compression.ZipArchive(new MemoryStream(bytes, writable: false),
+                    System.IO.Compression.ZipArchiveMode.Read);
+            }
         }
+        catch
+        {
+            file.Dispose();
+            throw;
+        }
+        file.Dispose();
         throw new InstallException($"{Path.GetFileName(path)} carries no archive to extract from.");
     }
 
