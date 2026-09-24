@@ -153,7 +153,7 @@ public static class AppUpdate
         var current = Environment.ProcessPath
                       ?? throw new InstallException("Cannot tell which file this app is running from.");
         var parked = AppUpdater.Swap(current, staged);
-        try { Process.Start(new ProcessStartInfo(current) { UseShellExecute = true }); }
+        try { Process.Start(new ProcessStartInfo(current, Program.AfterUpdate) { UseShellExecute = true }); }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or FileNotFoundException
                                       or InvalidOperationException)
         {
