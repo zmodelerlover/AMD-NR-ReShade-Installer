@@ -40,6 +40,13 @@ public sealed partial class PayloadCache
                 catch (Exception e) when (e is HttpRequestException or InstallException or IOException
                                               or UnauthorizedAccessException && !cancel.IsCancellationRequested)
                 {
+                    // Not this address's fault, and not one the next can fix: it would be thrown away
+                    // and fetched again into the same full disk. What arrived stays for the retry.
+                    if (IsDiskFull(e))
+                        throw new InstallException(
+                            $"The drive holding {AppPaths.Cache} is full: {file.Name} needs "
+                            + $"{file.Size / 1_048_576 + 1} MB. Free some space there and try again; what "
+                            + "already arrived is kept.");
                     if ((Engine.SizeOf(path + ".part") ?? 0) > before && attempt <= Resumes)
                     {
                         await Task.Delay(TimeSpan.FromSeconds(attempt), cancel);
@@ -73,7 +80,16 @@ public sealed partial class PayloadCache
     /// a name, a connection or a timeout. Any address failing that way is enough, because the first
     /// one is where nearly everything comes from.</summary>
     public static bool IsNetwork(Exception e) =>
-        e is InstallException { Network: true } or HttpRequestException { StatusCode: null } or TaskCanceledException;
+        e is InstallException { Network: true } or HttpRequestException { StatusCode: null } or TaskCanceledException
+            or HttpIOException or IOException { InnerException: SocketException };
+
+    private const string Cut =
+        "the connection was cut. An antivirus or a firewall that inspects downloads can do this; "
+        + "trying again picks up where it stopped.";
+
+    /// <summary>ERROR_DISK_FULL and ERROR_HANDLE_DISK_FULL, as the HResult an IOException carries.</summary>
+    private static bool IsDiskFull(Exception e) =>
+        e is IOException { HResult: unchecked((int)0x80070070) or unchecked((int)0x80070027) };
 
     /// <summary>Why one address did not work, as somebody who has to do something about it would
     /// put it. The cases are the ones that actually happen: no network, a name that cannot be
@@ -92,13 +108,17 @@ public sealed partial class PayloadCache
             SocketError.ConnectionRefused => "it refused the connection.",
             SocketError.NetworkUnreachable or SocketError.HostUnreachable or SocketError.NetworkDown =>
                 "the network could not reach it.",
-            SocketError.ConnectionReset or SocketError.ConnectionAborted =>
-                "the connection was cut. An antivirus or a firewall that inspects downloads can do this.",
+            SocketError.ConnectionReset or SocketError.ConnectionAborted => Cut,
             _ => s.Message,
         },
-        HttpRequestException { InnerException: AuthenticationException } =>
+        HttpRequestException { HttpRequestError: HttpRequestError.SecureConnectionError }
+            or HttpRequestException { InnerException: AuthenticationException } =>
             "the secure connection was refused. An antivirus or proxy that inspects HTTPS, or a wrong "
             + "date and time on this PC, causes this.",
+        // Cut before or during the body. The body's own is an IOException, the type a write that
+        // failed is too, and it read as "could not be written -- an antivirus": the wrong fix.
+        HttpRequestException { InnerException: IOException } or HttpIOException
+            or IOException { InnerException: SocketException } => Cut,
         HttpRequestException h => h.InnerException?.Message ?? h.Message,
         UnauthorizedAccessException or IOException =>
             $"the file could not be written: {e.Message} An antivirus, or Windows' controlled folder "

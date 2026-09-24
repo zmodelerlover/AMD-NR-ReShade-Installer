@@ -200,6 +200,49 @@ public class DownloadFallbackTests
         _ = PayloadCache.FlushDns();
     }
 
+    /// <summary>A connection cut part way is the network, not the disk: it read as "the file could not
+    /// be written -- an antivirus can block this", which sent people to the wrong fix. .NET hands it
+    /// over as an IOException, the same type a write that failed is.</summary>
+    [Fact]
+    public void AConnectionCutPartWayIsNotAFileThatCouldNotBeWritten()
+    {
+        var reset = new IOException("Unable to read data", new SocketException((int)SocketError.ConnectionReset));
+        var ended = new HttpIOException(HttpRequestError.ResponseEnded, "The response ended prematurely.");
+        var early = new HttpRequestException("reset", new IOException("x", new SocketException((int)SocketError.ConnectionReset)));
+        foreach (var cut in new Exception[] { reset, ended, early })
+        {
+            Assert.Contains("connection was cut", PayloadCache.Describe(cut), StringComparison.Ordinal);
+            Assert.True(PayloadCache.IsNetwork(cut));
+        }
+        var tls = new HttpRequestException(HttpRequestError.SecureConnectionError, "tls", new IOException("x"));
+        Assert.Contains("secure connection", PayloadCache.Describe(tls), StringComparison.Ordinal);
+        Assert.Contains("could not be written", PayloadCache.Describe(new IOException("denied")), StringComparison.Ordinal);
+    }
+
+    /// <summary>A full disk is not the server's fault. It was taken for one: the part was thrown away
+    /// and the mirror downloaded it again, into the same full disk, and the message blamed an
+    /// antivirus. It stops at once, keeps what arrived, and says which drive.</summary>
+    [Fact]
+    public async Task AFullDiskStopsAtOnceAndSaysSo()
+    {
+        var requests = 0;
+        var manifest = OneFile(Version("full"), Blob(15), "https://primary.example/f", "https://mirror.example/f");
+        var cache = new PayloadCache(new HttpClient(new Answers(_ =>
+        {
+            requests++;
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(new DiskFull()) };
+        })));
+        var error = await Assert.ThrowsAsync<InstallException>(() => cache.EnsureAsync(manifest, PayloadManifest.RuntimeComponent));
+        Assert.Contains("full", error.Message, StringComparison.Ordinal);
+        Assert.Equal(1, requests);
+    }
+
+    private sealed class DiskFull : MemoryStream
+    {
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancel = default) =>
+            throw new IOException("There is not enough space on the disk.", unchecked((int)0x80070070));
+    }
+
     /// <summary>A verified file gone by the time the install stages it is an antivirus, and says so,
     /// rather than "Could not find file" and a cache path.</summary>
     [Fact]
