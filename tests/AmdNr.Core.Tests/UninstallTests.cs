@@ -115,6 +115,27 @@ public class UninstallTests
         Assert.True(Work.Install(game, src, Preset.Dx11, pins).Failed);
     }
 
+    /// <summary>A file marked read-only -- an old CD install copies everything that way -- is not one
+    /// the game has open. It read as "open by another program, close the game", which never went
+    /// away however many times the game was closed.</summary>
+    [Fact]
+    public void AReadOnlyFileIsReplacedAndPutBackNotReportedAsHeldOpen()
+    {
+        var game = Fixture.Temp("read-only");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
+        var existing = Path.Combine(game, Work.RuntimeName);
+        File.WriteAllText(existing, "an old copy");
+        File.SetAttributes(existing, FileAttributes.ReadOnly);
+        Assert.False(Engine.IsLocked(existing));
+
+        var (src, pins) = Fixture.Payloads("read-only");
+        var install = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(install.Failed, install.ToLog("install over a read-only file"));
+        var uninstall = Work.Uninstall(game, Preset.Dx11);
+        Assert.False(uninstall.Failed, uninstall.ToLog("uninstall"));
+        Assert.Equal("an old copy", File.ReadAllText(existing));
+    }
+
     /// <summary>The other way a folder stays installed after an uninstall, and the one that brought
     /// the complaint back: a file that no longer hashes to what the install wrote belongs to whoever
     /// changed it, so the transaction keeps it -- and the badge, which is only "is one of our files

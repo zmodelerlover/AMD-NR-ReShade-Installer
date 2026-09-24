@@ -374,6 +374,7 @@ public static class Transaction
     {
         try
         {
+            Engine.Writable(path);
             File.Delete(path);
             return true;
         }

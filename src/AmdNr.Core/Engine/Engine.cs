@@ -96,8 +96,20 @@ public static partial class Engine
 
     public static void Write(string path, byte[] bytes)
     {
-        try { File.WriteAllBytes(path, bytes); }
+        try
+        {
+            Writable(path);
+            File.WriteAllBytes(path, bytes);
+        }
         catch (Exception e) { throw new InstallException($"Cannot write {path}: {e.Message}"); }
+    }
+
+    /// <summary>Clears read-only on a file about to be replaced or removed. Every file this writes
+    /// over has been backed up first, and the flag is how old CD installs mark everything.</summary>
+    public static void Writable(string path)
+    {
+        if (File.Exists(path) && File.GetAttributes(path) is var a && a.HasFlag(FileAttributes.ReadOnly))
+            File.SetAttributes(path, a & ~FileAttributes.ReadOnly);
     }
 
     /// <summary>Streams rather than reading whole: the weights are 141 MB and this runs per file

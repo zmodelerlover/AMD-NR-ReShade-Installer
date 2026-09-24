@@ -126,6 +126,9 @@ public static partial class Engine
         if (!File.Exists(path)) return false;
         try
         {
+            // Read-only is a flag on the file, not a program holding it -- an old CD install marks
+            // everything that way -- and it read as "close the game" for ever. The write clears it.
+            if (File.GetAttributes(path).HasFlag(FileAttributes.ReadOnly)) return false;
             using var _ = File.Open(path, FileMode.Open, FileAccess.Write, FileShare.None);
             return false;
         }
