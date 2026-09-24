@@ -209,10 +209,14 @@ public class WorkTests
         Assert.True(Directory.Exists(backups), "the displaced file must be kept");
         Assert.Contains(Fixture.Walk(backups), p => File.ReadAllText(p) == "a different add-on");
 
-        // And uninstall puts it back rather than deleting what was not ours to delete.
+        // Under a name only this project writes, what it displaced was an older copy of this
+        // project's own file: uninstall takes both, rather than put back a folder that still says
+        // installed. A file under anybody else's name is put back; see the dxgi.dll tests.
         var removed = Work.Uninstall(game, Preset.Dx11);
         Assert.False(removed.Failed, removed.ToLog("restore"));
-        Assert.Equal("a different add-on", File.ReadAllText(Path.Combine(game, Work.AddonName)));
+        Assert.False(File.Exists(Path.Combine(game, Work.AddonName)));
+        Assert.Empty(Fixture.Walk(backups));
+        Assert.False(GameScanner.IsInstalled(game));
     }
 
     [Fact]

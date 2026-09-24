@@ -341,9 +341,10 @@ public static partial class Work
         return report;
     }
 
-    /// <summary>The folders this route created, once uninstall has emptied them, and a word about the
-    /// configuration it keeps.</summary>
-    private static void AfterOptiScalerUninstall(string dir, Report report)
+    /// <summary>The folders this route created, once uninstall has emptied them, and a word about an
+    /// OptiScaler this app has no record of: its runtime passes and weights went by name, and the
+    /// rest of it is its own installer's to take.</summary>
+    private static void AfterOptiScalerUninstall(string dir, bool recorded, Report report)
     {
         var cache = Path.Combine(dir, ShaderCache);
         try
@@ -376,7 +377,9 @@ public static partial class Work
                 report.Warn($"could not remove {folder}: {e.Message}");
             }
         }
-        if (File.Exists(Path.Combine(dir, OptiScalerIni)))
-            report.Info($"{OptiScalerIni} was left in place: it is your configuration. Delete it by hand for a clean slate.");
+        if (!recorded && File.Exists(Path.Combine(dir, OptiScalerIni)))
+            report.Info(
+                "This OptiScaler was not installed by this app, so only this project's files came out of it. "
+                + "Its own uninstaller removes the rest: the release package puts Uninstall_OptiScaler_NR.bat in the game folder.");
     }
 }

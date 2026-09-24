@@ -123,12 +123,12 @@ public class UninstallTests
     {
         var game = Fixture.Temp("read-only");
         File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
-        var existing = Path.Combine(game, Work.RuntimeName);
+        var existing = Path.Combine(game, "dxgi.dll");
         File.WriteAllText(existing, "an old copy");
         File.SetAttributes(existing, FileAttributes.ReadOnly);
         Assert.False(Engine.IsLocked(existing));
 
-        var (src, pins) = Fixture.Payloads("read-only");
+        var (src, pins) = UninstallInvariantTests.ReShadePayloads("read-only");
         var install = Work.Install(game, src, Preset.Dx11, pins);
         Assert.False(install.Failed, install.ToLog("install over a read-only file"));
         var uninstall = Work.Uninstall(game, Preset.Dx11);
@@ -145,13 +145,13 @@ public class UninstallTests
     {
         var game = Fixture.Temp("cut-off");
         File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
-        var original = Path.Combine(game, Work.RuntimeName);
+        var original = Path.Combine(game, "dxgi.dll");
         File.WriteAllText(original, "the game's own copy");
-        var (src, pins) = Fixture.Payloads("cut-off");
+        var (src, pins) = UninstallInvariantTests.ReShadePayloads("cut-off");
         Assert.False(Work.Install(game, src, Preset.Dx11, pins).Failed);
 
         // What the cut-off uninstall had already done to that one file.
-        var backup = Fixture.Walk(Path.Combine(game, Engine.BackupDir)).Single(f => Path.GetFileName(f) == Work.RuntimeName);
+        var backup = Fixture.Walk(Path.Combine(game, Engine.BackupDir)).Single(f => Path.GetFileName(f) == "dxgi.dll");
         File.Copy(backup, original, overwrite: true);
         File.Delete(backup);
 
@@ -177,35 +177,83 @@ public class UninstallTests
         Assert.False(Work.Uninstall(game, Preset.Dx11).Failed);
     }
 
-    /// <summary>The other way a folder stays installed after an uninstall, and the one that brought
-    /// the complaint back: a file that no longer hashes to what the install wrote belongs to whoever
-    /// changed it, so the transaction keeps it -- and the badge, which is only "is one of our files
-    /// in here", goes on saying installed. Keeping it is right; saying "Removed" over the top of it
-    /// was not, and there has to be a way to take it out when that is what was meant.</summary>
+    /// <summary>The add-on in the game folder replaced by hand with a locally built one, so its hash
+    /// stopped being the manifest's. It was kept as "somebody else's work", the badge stayed, and only
+    /// a second, forced uninstall took it out. A file under a name only this project uses is this
+    /// project's whatever its bytes are, so one uninstall takes it.</summary>
     [Fact]
-    public void AFileChangedAfterTheInstallIsKeptUntilTheUninstallIsForced()
+    public void AFileOfOursChangedAfterTheInstallStillComesOut()
     {
         var game = Fixture.Temp("modified");
         var (src, pins) = Fixture.Payloads("modified");
         Assert.False(Work.Install(game, src, Preset.Dx11, pins).Failed);
 
-        // What actually happened on this machine: the add-on in the game folder was replaced by
-        // hand with a locally built one, so its hash stopped being the manifest's.
         var addon = Path.Combine(game, Work.AddonName);
         File.WriteAllBytes(addon, [.. File.ReadAllBytes(addon), 0x00, 0x99]);
         File.WriteAllText(Path.Combine(game, "amd-nr.ini"), "[amd-nr]\r\nScale=0.75\r\n");
 
-        var kept = Work.Uninstall(game, Preset.Dx11);
-        Assert.False(kept.Failed, kept.ToLog("uninstall"));
-        Assert.True(File.Exists(addon), "a file somebody else changed is not deleted behind their back");
-        Assert.True(GameScanner.IsInstalled(game), "so the folder is still installed, and has to keep saying so");
-
-        var forced = Work.Uninstall(game, Preset.Dx11, force: true);
-        Assert.False(forced.Failed, forced.ToLog("forced"));
+        var report = Work.Uninstall(game, Preset.Dx11);
+        Assert.False(report.Failed, report.ToLog("uninstall"));
         Assert.False(File.Exists(addon));
-        Assert.False(GameScanner.IsInstalled(game), "forcing it is what makes the badge go out");
-        Assert.True(File.Exists(Path.Combine(game, "amd-nr.ini")),
-            "forcing takes back our files, never the tuning: that has its own switch");
+        Assert.False(GameScanner.IsInstalled(game));
+        Assert.True(File.Exists(Path.Combine(game, "amd-nr.ini")), "the tuning is asked about, never taken silently");
+        Assert.Equal(["amd-nr.ini"], Work.KeptConfiguration(game, Preset.Dx11));
+    }
+
+    /// <summary>Castle Crashers, as it was found: the 32-bit pair, the runtime, the weights and the
+    /// pinned ReShade copied in by hand, beside a manifest listing only ReShade.ini and amd-nr.ini --
+    /// both changed since. The tile said "ReShade", and Uninstall, plain or forced, took out logs and
+    /// left the rest: "installed" for ever. The stand-in for the pinned ReShade 32-bit is passed as
+    /// a pin, because no test can make a file hash to the real one.</summary>
+    [Fact]
+    public void BinariesCopiedByHandBesideAManifestOfOnlyConfigurationAllComeOut()
+    {
+        var game = Fixture.Temp("castle-crashers");
+        var exe = Path.Combine(game, "castle.exe");
+        File.WriteAllBytes(exe, Fixture.Pe(false));
+        string[] binaries = [Work.Addon32Name, Work.Host64Name, Work.RuntimeName, Work.WeightsName];
+        foreach (var name in binaries) File.WriteAllText(Path.Combine(game, name), $"copied by hand: {name}");
+        var reShade = "stand-in for the pinned ReShade 32-bit"u8.ToArray();
+        File.WriteAllBytes(Path.Combine(game, "d3d9.dll"), reShade);
+        File.WriteAllText(Path.Combine(game, "ReShade.log"), "ReShade's own log");
+        var m = new Manifest("D3D9", Route.X86);
+        foreach (var ini in new[] { "ReShade.ini", "amd-nr.ini" })
+        {
+            m.Entries.Add(new Entry { Name = ini, Hash = Engine.Sha("as installed"u8), Owned = true, Configuration = true });
+            File.WriteAllText(Path.Combine(game, ini), "changed in the overlay since");
+        }
+        Manifest.WriteAtomic(game, m);
+        Assert.Equal(RouteFamily.ReShade, GameScanner.InstalledAs(game));
+
+        var report = Work.Uninstall(exe, Preset.X86Dx9, pinned: [Engine.Sha(reShade)]);
+        Assert.False(report.Failed, report.ToLog("uninstall"));
+        foreach (var name in binaries.Append("d3d9.dll"))
+            Assert.False(File.Exists(Path.Combine(game, name)), $"{name} is still there");
+        Assert.Null(GameScanner.InstalledAs(game));
+        Assert.Equal(["ReShade.ini", "amd-nr.ini"], Work.KeptConfiguration(exe, Preset.X86Dx9));
+
+        var clean = Work.Uninstall(exe, Preset.X86Dx9, removeConfig: true);
+        Assert.False(clean.Failed, clean.ToLog("settings too"));
+        Assert.Empty(Work.KeptConfiguration(exe, Preset.X86Dx9));
+        Assert.Equal(["ReShade.log", "castle.exe"],
+            Directory.EnumerateFileSystemEntries(game).Select(Path.GetFileName).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>The other half of the same rule: a ReShade is taken out only when it is a build this
+    /// app pins. Anybody else's, under any proxy name, stays.</summary>
+    [Fact]
+    public void AReShadeThisAppDoesNotPinStays()
+    {
+        var game = Fixture.Temp("their-reshade");
+        var exe = Path.Combine(game, "castle.exe");
+        File.WriteAllBytes(exe, Fixture.Pe(false));
+        File.WriteAllText(Path.Combine(game, Work.Addon32Name), "copied by hand");
+        File.WriteAllText(Path.Combine(game, "d3d9.dll"), "a ReShade built by somebody else");
+
+        var report = Work.Uninstall(exe, Preset.X86Dx9, pinned: [Engine.Sha("stand-in for the pinned ReShade 32-bit"u8)]);
+        Assert.False(report.Failed, report.ToLog("uninstall"));
+        Assert.False(File.Exists(Path.Combine(game, Work.Addon32Name)));
+        Assert.Equal("a ReShade built by somebody else", File.ReadAllText(Path.Combine(game, "d3d9.dll")));
     }
 
     /// <summary>The one that cost a real folder. A DLL the running game still has open cannot be

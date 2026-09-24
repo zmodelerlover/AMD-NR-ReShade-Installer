@@ -15,6 +15,14 @@ public sealed class X86Installer(string release)
     public uint Height { get; set; } = 1080;
     public List<string> Log { get; } = [];
 
+    /// <summary>The pins this route checks, the engine's own unless a caller says otherwise. The same
+    /// knob <see cref="PayloadPins"/> is for the 64-bit route: without it nothing but the genuine
+    /// 150 MB of payloads could ever be installed, and the round trip went untested.</summary>
+    public string RuntimeSha { get; init; } = Engine.RuntimeSha;
+    public string WeightsSha { get; init; } = Engine.WeightsSha;
+    public string ReShadeSha { get; init; } = Engine.ReShadeSha;
+    public string D3d8To9Sha { get; init; } = Engine.D3d8To9Sha;
+
     public void Note(string s) => Log.Add(s);
 
     /// <summary>The release zip keeps every payload under files\; a staged folder built out of the
@@ -73,17 +81,17 @@ public sealed class X86Installer(string release)
             p[name] = bytes;
         }
 
-        p["dlssnr_amd_pass1.dll"] = Payload("dlssnr_amd_pass1.dll", Engine.RuntimeSha);
-        p["dlssnr_on_amd_weights.bin"] = Payload("dlssnr_on_amd_weights.bin", Engine.WeightsSha);
+        p["dlssnr_amd_pass1.dll"] = Payload("dlssnr_amd_pass1.dll", RuntimeSha);
+        p["dlssnr_on_amd_weights.bin"] = Payload("dlssnr_on_amd_weights.bin", WeightsSha);
 
         if (preset == "D3D8")
         {
-            var translator = Payload("d3d8to9.dll", Engine.D3d8To9Sha);
+            var translator = Payload("d3d8to9.dll", D3d8To9Sha);
             Engine.Require(Engine.Machine(translator) == Engine.MachineX86, "d3d8to9 must be x86");
             var name = "d3d8.dll";
             var existing = Path.Combine(dir, name);
             Engine.SafePath(existing);
-            if (File.Exists(existing) && Engine.HashFile(existing) != Engine.D3d8To9Sha)
+            if (File.Exists(existing) && Engine.HashFile(existing) != D3d8To9Sha)
             {
                 Engine.Require(Engine.AdvertisesD3d8Sidecar(Engine.Read(existing)),
                     "Existing d3d8.dll does not advertise d3d8R.dll chaining; preserved");
@@ -100,7 +108,7 @@ public sealed class X86Installer(string release)
         byte[] reShade;
         if (File.Exists(Path.Combine(Release, "files", "dxgi.dll")))
         {
-            reShade = Payload("dxgi.dll", Engine.ReShadeSha);
+            reShade = Payload("dxgi.dll", ReShadeSha);
         }
         else
         {
@@ -112,7 +120,7 @@ public sealed class X86Installer(string release)
             reShade = Engine.Read(existing);
             // Having *a* ReShade is not the same as having the one this was tested against, and the
             // difference is invisible unless it is said out loud.
-            Engine.Require(Engine.Sha(reShade) == Engine.ReShadeSha,
+            Engine.Require(Engine.Sha(reShade) == ReShadeSha,
                 $"The {reShadeName} already in the game folder is a different build from the one this "
                 + "was tested with. It has to be ReShade 6.8.0.2156 with full add-on support, 32-bit "
                 + "-- a newer version is refused too, not just an older one.");

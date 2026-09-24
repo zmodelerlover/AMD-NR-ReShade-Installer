@@ -97,7 +97,7 @@ public partial class GameSheet
         {
             if (switching)
             {
-                var removed = await RunUninstallAsync(card, InstalledPreset(card), force: false);
+                var removed = await RunUninstallAsync(card, InstalledPreset(card), removeConfig: false);
                 if (removed.Failed || card.Installed)
                 {
                     ShowOutcome(removed, "Str.Uninstall", card.Name);
@@ -172,17 +172,11 @@ public partial class GameSheet
         try
         {
             var preset = InstalledPreset(card);
-            var report = await RunUninstallAsync(card, preset, force: false);
+            var report = await RunUninstallAsync(card, preset, removeConfig: false);
 
-            // An uninstall can finish cleanly and leave the add-on exactly where it was: a file that
-            // no longer hashes to what the install wrote belongs to whoever changed it, so the
-            // transaction keeps it, and the folder goes on counting as installed. Only when forcing
-            // would actually get somewhere: a file the running game still has open is retained
-            // too, and against that one the answer is "close the game", not "delete it harder".
-            var changed = report.Lines.Any(l => l.Text.Contains(Work.ModifiedMarker, StringComparison.Ordinal));
-            if (!report.Failed && card.Installed && changed && await AskRemoveAnywayAsync(card))
-                report = await RunUninstallAsync(card, preset, force: true);
-
+            // Everything of this app's goes by name or by pinned hash, so the one thing that leaves
+            // a folder installed now is a file the running game still has open -- and against that
+            // the answer is "close the game", which the line in Details says.
             if (!report.Failed && card.Installed)
                 ShowResult(Level.Warn, Ui.Format("Str.UninstallLeft", card.Name), Ui.Text("Str.SeeDetails"));
             else
@@ -210,14 +204,17 @@ public partial class GameSheet
             : Preset.Dx11;
     }
 
-    private async Task<Report> RunUninstallAsync(GameCard card, Preset preset, bool force)
+    private async Task<Report> RunUninstallAsync(GameCard card, Preset preset, bool removeConfig)
     {
         var target = TargetFor(card);
+        // The ReShade this payload pins, besides the builds the engine knows: a ReShade copied in by
+        // hand is taken out only when it is one of those.
+        var pinned = new[] { Pins().ReShade64Sha };
         Report report;
-        try { report = await WritingAsync(() => Work.Uninstall(target, preset, force)); }
+        try { report = await WritingAsync(() => Work.Uninstall(target, preset, removeConfig, pinned)); }
         catch (Exception ex) { report = Failure(ex); }
         Show(report);
-        var what = force ? "uninstall (forced)" : "uninstall";
+        var what = removeConfig ? "uninstall (settings too)" : "uninstall";
         WriteLog(report, $"{what} {preset.Label()} -> {card.Path}");
         InstallLog.Write(what, card, target, report, Selected(), Pins(), null);
         card.RefreshInstalled();
@@ -232,17 +229,6 @@ public partial class GameSheet
         try { return await Task.Run(work); }
         finally { Session.Writing = false; }
     }
-
-    /// <summary>Asks before deleting a file this app did not write. The answer is the whole point:
-    /// the pair in a game folder is sometimes replaced by hand -- a locally built add-on, another
-    /// tool's copy -- and deleting that without asking is worse than leaving it.</summary>
-    private async Task<bool> AskRemoveAnywayAsync(GameCard card) =>
-        await ChoiceDialog.ShowAsync(_shell, Ui.Text("Str.UninstallLeftTitle"),
-            Ui.Format("Str.UninstallLeftBody", card.Name),
-            [
-                ("force", Ui.Text("Str.UninstallForce"), Ui.Text("Str.UninstallForceBody")),
-                ("keep", Ui.Text("Str.UninstallKeep"), Ui.Text("Str.UninstallKeepBody")),
-            ]) == "force";
 
     /// <summary>Clears Windows' DNS cache and runs the install again. Offered only when the download
     /// never reached the server, which is the failure a stale cache causes.</summary>

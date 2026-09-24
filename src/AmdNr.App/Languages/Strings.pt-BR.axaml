@@ -121,13 +121,7 @@
   <sys:String x:Key="Str.InstallFail">A instalação em {0} não terminou.</sys:String>
   <sys:String x:Key="Str.UninstallOk">Removido de {0}.</sys:String>
   <sys:String x:Key="Str.UninstallWarn">Removido de {0}, com {1} aviso para ler abaixo.</sys:String>
-  <sys:String x:Key="Str.UninstallLeft">{0} ainda conta como instalado: arquivos que mudaram depois da instalação foram deixados no lugar.</sys:String>
-  <sys:String x:Key="Str.UninstallLeftTitle">Alguns arquivos ficaram no lugar</sys:String>
-  <sys:String x:Key="Str.UninstallLeftBody">Arquivos em {0} não são os que este instalador escreveu — mudaram depois da instalação, então o desinstalar preferiu mantê-los a apagar o trabalho de outra pessoa. É por isso que o jogo continua aparecendo como instalado. A lista está em Detalhes.</sys:String>
-  <sys:String x:Key="Str.UninstallForce">Tirar mesmo assim</sys:String>
-  <sys:String x:Key="Str.UninstallForceBody">Apaga esses arquivos e devolve o que eles substituíram. O seu dlss5-neural.ini fica de qualquer jeito.</sys:String>
-  <sys:String x:Key="Str.UninstallKeep">Deixar como está</sys:String>
-  <sys:String x:Key="Str.UninstallKeepBody">Nada mais é tocado, e o jogo segue contando como instalado.</sys:String>
+  <sys:String x:Key="Str.UninstallLeft">{0} ainda conta como instalado: um arquivo deste app não pôde ser removido. Feche o jogo e desinstale de novo.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Não deu pra remover tudo de {0}.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problema listado abaixo.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">Não deu pra baixar os arquivos, então nada foi instalado.</sys:String>

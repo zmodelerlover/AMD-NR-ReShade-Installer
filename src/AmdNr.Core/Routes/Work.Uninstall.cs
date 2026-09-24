@@ -1,5 +1,7 @@
-﻿// Taking an install back, on every route: through its manifest when there is one, by name when the
-// install predates the manifest, and the add-on's own droppings either way.
+// Taking an install back, on every route: through its manifest when there is one, and then by name
+// and by pinned hash, because what counts a folder as installed is the files in it, not the record.
+
+using System.Text;
 
 namespace AmdNr.Core;
 
@@ -7,86 +9,165 @@ public static partial class Work
 {
     // -- Uninstall -------------------------------------------------------------------------------
 
-    /// <summary>The words a retained-because-it-changed line carries. The window reads it to know
-    /// whether offering to remove the file anyway would achieve anything: forcing gets past a file
-    /// somebody edited, and gets nowhere against one the running game still has open.</summary>
-    public const string ModifiedMarker = "modified after install";
+    /// <summary>Every name only this project writes: the markers detection reads, the companion
+    /// effect, and what older layouts left. Whatever is under one of these is ours, whether a manifest
+    /// lists it or somebody copied it in by hand, and uninstall takes it. Nothing with a name anybody
+    /// else uses is here.</summary>
+    internal static IEnumerable<string> OurNames => InstalledMarkers.Append(ShaderPath).Concat(DeadFiles());
 
-    /// <summary><paramref name="force"/> takes back the files that changed after the install as
-    /// well. Off by default, because a file that is not the one written here belongs to whatever
-    /// changed it; on only when somebody has been shown that list and asked for it anyway.</summary>
-    public static Report Uninstall(string gameDir, Preset preset, bool force = false)
+    /// <summary>The tuning files, by names only this project uses. Settings, so they are asked about
+    /// rather than taken.</summary>
+    private static readonly string[] OurSettings = ["amd-nr.ini", "dlss5-neural.ini"];
+
+    /// <summary>Takes back everything of this app's in the folder, and puts back what it displaced.
+    /// The settings -- a configuration entry in a manifest, or the tuning by name -- stay unless
+    /// <paramref name="removeConfig"/>; <see cref="KeptConfiguration"/> says which stayed, so the
+    /// person can be asked.
+    ///
+    /// Every manifest in the folder is undone, whichever route the preset names, and then every
+    /// file under <see cref="OurNames"/> goes by name, and a proxy goes when it is a build this app
+    /// pins: the engine's own, or one in <paramref name="pinned"/>. That half is the fix for a folder
+    /// whose binaries were copied in by hand beside a manifest listing only settings, which counted
+    /// as installed and could not be uninstalled at all. A proxy a manifest records as the person's
+    /// own, or put back from a backup, stays whatever it hashes to.</summary>
+    public static Report Uninstall(string gameDir, Preset preset, bool removeConfig = false, IEnumerable<string>? pinned = null)
     {
-        if (preset.Route() == Route.X86) return UninstallX86(gameDir, force);
-
         var report = new Report();
-        var dir = ResolveSource(gameDir);
-        if (dir.Length == 0)
-        {
-            report.Err("No game folder given.");
-            return report;
-        }
-        if (!Directory.Exists(dir))
-        {
-            report.Err($"{dir} is not a folder.");
-            return report;
-        }
+        if (UninstallFolder(gameDir, preset, report) is not { } dir) return report;
         report.Info($"target: {dir}");
 
-        var gone = 0;
+        var builds = new HashSet<string>([Engine.ReShadeSha, Engine.ReShade64Sha, Engine.D3d8To9Sha, .. pinned ?? []],
+            StringComparer.OrdinalIgnoreCase);
+        var proxies = Proxies.Append("d3d8R.dll").ToArray();
+        bool Ours(string name, string sha) => OurNames.Contains(name) || proxies.Contains(name) && builds.Contains(sha);
 
-        // An install written by this version has a manifest, so it knows what it owned, what it
-        // displaced and what the user has changed since. Installs from before the manifest existed
-        // have none, and the name sweep below is the only way to take those back.
-        var manifest = Path.Combine(dir, Route.X64.ManifestFileName());
-        if (File.Exists(manifest))
+        var gone = 0;
+        var recorded = Manifests(dir, migrate: true);
+        var opti = preset.IsOptiScaler() || recorded.Any(m => m.Preset == Preset.OptiScaler.ManifestPreset());
+        foreach (var route in recorded.Select(m => m.Route))
         {
             var log = new List<string>();
             try
             {
-                Transaction.Uninstall(dir, Route.X64, false, log, force);
-                foreach (var line in log) Narrate(line, report);
+                Transaction.Uninstall(dir, route, removeConfig, log, Ours);
                 gone++;
             }
             catch (InstallException e)
             {
                 report.Err($"could not undo the recorded install: {e.Message}");
             }
+            foreach (var line in log) Narrate(line, report);
         }
-        else if (preset.IsOptiScaler())
+
+        // What a manifest still holds is something it kept on purpose -- a file the game has open, one
+        // somebody else changed -- and it has already said why. What it held before is the person's
+        // or put back from a backup, and a proxy under one of those names is not taken on its hash.
+        var before = recorded.SelectMany(m => m.Entries).Select(e => e.Name).ToHashSet();
+        var still = Manifests(dir, migrate: false).SelectMany(m => m.Entries).Select(e => e.Name).ToHashSet();
+        foreach (var name in OurNames.Where(n => !still.Contains(n))) gone += RemoveFile(dir, name, report);
+        foreach (var name in proxies.Where(n => !before.Contains(n)))
         {
-            // No manifest means this app never installed OptiScaler here. The by-name sweep below
-            // would take the runtime passes and the weights out from under an OptiScaler that some
-            // other installer put there, and leave it broken.
-            report.Warn(
-                "No install record for OptiScaler here, so it was not installed by this app and nothing is "
-                + "removed. Use the uninstaller that came with it: the release package puts "
-                + "Uninstall_OptiScaler_NR.bat in the game folder.");
-            return report;
+            var path = Path.Combine(dir, name);
+            if (File.Exists(path) && builds.Contains(Engine.HashFile(path))) gone += RemoveFile(dir, name, report);
         }
-        else
-        {
-            // Everything the add-on installs. The ini is deliberately not in this list.
-            var names = new List<string> { AddonName, RuntimeName, WeightsName };
-            names.AddRange(DeadFiles());
-            foreach (var name in names) gone += RemoveFile(dir, name, report);
-        }
+        if (removeConfig)
+            foreach (var name in OurSettings.Where(n => !still.Contains(n))) gone += RemoveFile(dir, name, report);
 
         gone += SweepDroppings(dir, report);
-        if (preset.IsOptiScaler()) AfterOptiScalerUninstall(dir, report);
+        PruneEmpty(dir, [Engine.BackupDir, Engine.LegacyBackupDir, ShaderFolder, "reshade-shaders"], report);
+        if (opti) AfterOptiScalerUninstall(dir, recorded.Count > 0, report);
 
         if (gone == 0) report.Warn("Nothing of ours was in that folder.");
-        if (File.Exists(Path.Combine(dir, "amd-nr.ini")))
-        {
-            report.Info(
-                "amd-nr.ini was left in place: it is your tuning, not ours. Delete it by hand if "
-                + "you want a clean slate.");
-        }
-
-        // Only true when a ReShade proxy is still there: one this app installed came back out above.
-        if (Proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
-            report.Info("ReShade itself was left alone. Use its own installer to remove it.");
+        if (KeptConfigurationIn(dir) is { Count: > 0 } kept)
+            report.Info($"Kept your settings: {string.Join(", ", kept)}. Uninstall again to take them too.");
+        if (proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
+            report.Info("A ReShade this app did not install was left alone. Use its own installer to remove it.");
         return report;
+    }
+
+    /// <summary>The settings files an uninstall left in the folder: what a manifest still records as
+    /// configuration, and the tuning by name. Empty when nothing of the person's is left to ask about.</summary>
+    public static IReadOnlyList<string> KeptConfiguration(string gameDir, Preset preset) =>
+        UninstallFolder(gameDir, preset, new Report()) is { } dir ? KeptConfigurationIn(dir) : [];
+
+    private static List<string> KeptConfigurationIn(string dir) =>
+        Manifests(dir, migrate: false).SelectMany(m => m.Entries).Where(e => e.Owned && e.Configuration)
+            .Select(e => e.Name).Concat(OurSettings)
+            .Where(n => File.Exists(Path.Combine(dir, n))).Distinct().ToList();
+
+    /// <summary>Where the install being taken back was written. The 32-bit route installs where
+    /// ReShade.ini's BasePath points, the others beside the executable; a folder is itself.</summary>
+    private static string? UninstallFolder(string gameDir, Preset preset, Report report)
+    {
+        var path = ResolveTarget(gameDir);
+        if (path.Length == 0)
+        {
+            report.Err("No game folder given.");
+            return null;
+        }
+        if (File.Exists(path))
+        {
+            if (preset.Route() != Route.X86) return ResolveSource(path);
+            try { return Engine.InstallDirectory(path); }
+            catch (InstallException e)
+            {
+                report.Err(e.Message);
+                return null;
+            }
+        }
+        if (Directory.Exists(path)) return path;
+        report.Err($"{path} is not a folder.");
+        return null;
+    }
+
+    /// <summary>The manifests in this folder that this build can read, the 64-bit one first. One it
+    /// cannot read is left for <see cref="Transaction.Uninstall"/> to refuse in words.</summary>
+    private static List<Manifest> Manifests(string dir, bool migrate)
+    {
+        var found = new List<Manifest>();
+        foreach (var route in new[] { Route.X64, Route.X86 })
+        {
+            try
+            {
+                if (migrate) Transaction.MigrateLegacyManifest(dir, route);
+                var path = Path.Combine(dir, route.ManifestFileName());
+                if (File.Exists(path)) found.Add(Manifest.Decode(Encoding.UTF8.GetString(Engine.Read(path))));
+            }
+            catch (InstallException)
+            {
+                if (File.Exists(Path.Combine(dir, route.ManifestFileName()))) found.Add(new Manifest("", route));
+            }
+        }
+        return found;
+    }
+
+    private const string ShaderFolder = "reshade-shaders/Shaders";
+
+    /// <summary>Folders an install made or filled, once nothing is left in them: the backups whose
+    /// every original went back, and where the companion effect went. One that still holds anything
+    /// is left, because that is somebody else's.</summary>
+    private static void PruneEmpty(string dir, IEnumerable<string> folders, Report report)
+    {
+        foreach (var folder in folders)
+        {
+            var path = Path.Combine(dir, folder);
+            try
+            {
+                if (!Directory.Exists(path)) continue;
+                // A backup folder holds one folder per install, each empty once its originals are back.
+                if (folder is Engine.BackupDir or Engine.LegacyBackupDir)
+                    foreach (var stamp in Directory.GetDirectories(path))
+                        if (!Directory.EnumerateFileSystemEntries(stamp, "*", SearchOption.AllDirectories).Any(File.Exists))
+                            Directory.Delete(stamp, recursive: true);
+                if (Directory.EnumerateFileSystemEntries(path).Any()) continue;
+                Directory.Delete(path);
+                if (folder is not (Engine.BackupDir or Engine.LegacyBackupDir)) report.Ok($"removed {folder.Replace('/', '\\')}\\");
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                report.Warn($"could not remove {folder}: {e.Message}");
+            }
+        }
     }
 
     internal static readonly string[] Droppings =
@@ -132,6 +213,7 @@ public static partial class Work
         if (!File.Exists(p)) return 0;
         try
         {
+            Engine.Writable(p);
             File.Delete(p);
             report.Ok($"removed {name}");
             return 1;

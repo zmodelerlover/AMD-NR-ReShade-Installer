@@ -37,7 +37,7 @@ public class OptiScalerVersionTests
 
     /// <summary>A payload manifest shaped like the live one: 0.1.1 in the components, the way v0.4.0
     /// reads it, and 0.2.0 with the lmxxf weights under releases.</summary>
-    private static PayloadManifest Payload(string releases = "") => PayloadManifest.Parse($$$"""
+    internal static PayloadManifest Payload(string releases = "") => PayloadManifest.Parse($$$"""
         {"schema":1,"components":{
           "addon":{"version":"1","files":[{"name":"amd-nr.addon64","size":1,"sha256":"{{{new string('1', 64)}}}","url":"https://x/a"}]},
           "runtime":{"version":"1","files":[
@@ -49,7 +49,7 @@ public class OptiScalerVersionTests
         }{{{releases}}}}
         """);
 
-    private static string Releases020 => $$$"""
+    internal static string Releases020 => $$$"""
         ,"releases":{"optiscaler":[{"version":"0.2.0-amd-nr","components":{
           "optiscaler":{"version":"0.2.0-amd-nr","published":"2026-09-23","files":[{"name":"o20.zip","size":1,"sha256":"{{{new string('4', 64)}}}","url":"https://x/o20"}],
             "extract":[{{{Extract(OptiPaths.Concat(LmxxfPaths))}}}]},
@@ -59,7 +59,7 @@ public class OptiScalerVersionTests
         """;
 
     /// <summary>A staging folder holding every file the manifest pins, with the bytes it pins.</summary>
-    private static string Stage(string tag, PayloadManifest manifest, params string[] components)
+    internal static string Stage(string tag, PayloadManifest manifest, params string[] components)
     {
         var dir = Fixture.Temp($"opti-versions-{tag}");
         foreach (var name in components)

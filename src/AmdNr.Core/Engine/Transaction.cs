@@ -259,10 +259,11 @@ public static class Transaction
     }
 
     /// <summary>Undo an install using its own manifest. Files the installer did not own are left
-    /// alone, files the user changed afterwards are kept with a warning, and anything displaced at
-    /// install time is put back from its backup.</summary>
+    /// alone, files changed afterwards are kept with a warning, and anything displaced at install
+    /// time is put back from its backup. <paramref name="ours"/> is asked about a changed file, by
+    /// name and current hash: when it says the file is this app's anyway, it goes too.</summary>
     public static void Uninstall(string dir, Route route, bool removeConfigs, List<string> log,
-        bool force = false)
+        Func<string, string, bool>? ours = null)
     {
         dir = Engine.Absolute(dir);
         Engine.SafePath(dir);
@@ -286,7 +287,13 @@ public static class Transaction
             }
 
             var backupPath = Path.Combine(dir, e.Backup);
-            if (e.Backup.Length > 0)
+            // What the install displaced was this app's own too -- an older copy of a file under a
+            // name only this project writes. There is nobody else's file to put back, and putting it
+            // back left the folder counting as installed after the uninstall said it was done.
+            var discard = e.Backup.Length > 0 && ours?.Invoke(e.Name, e.BackupHash) == true;
+            var restore = e.Backup.Length > 0 && !discard;
+            if (discard) Engine.SafePath(backupPath);
+            if (restore)
             {
                 Engine.SafePath(backupPath);
                 // Put back already, by an uninstall cut off before it could rewrite this manifest --
@@ -306,26 +313,31 @@ public static class Transaction
                 var current = Engine.HashFile(dst);
                 if (current != e.Hash)
                 {
-                    if (m.State == "installing" && e.Backup.Length > 0 && current == e.BackupHash)
+                    if (m.State == "installing" && restore && current == e.BackupHash)
                     {
                         TryDelete(backupPath);
                         continue;
                     }
-                    // A file that no longer hashes to what was written is somebody else's work
-                    // now, so it is kept and the folder goes on counting as installed. Forced only
-                    // by a caller that has been told exactly that and asked again -- and never for
-                    // personal configuration, which has its own switch in removeConfigs.
-                    if (!force || e.Configuration)
+                    // A file that no longer hashes to what was written is somebody else's work now --
+                    // unless it is under a name only this project uses, or a build this app pins.
+                    // Keeping one of those was a folder that said installed for ever: Castle
+                    // Crashers, with the pair replaced by hand. Configuration is the person's
+                    // either way, and goes only when they say so.
+                    var take = e.Configuration ? removeConfigs : ours?.Invoke(e.Name, current) == true;
+                    if (!take)
                     {
-                        log.Add($"WARNING modified after install; retained with backup: {e.Name}");
+                        log.Add(e.Configuration
+                            ? $"PRESERVED personal/default configuration: {e.Name}"
+                            : $"WARNING modified after install; retained with backup: {e.Name}");
                         keep.Add(e.Clone());
                         continue;
                     }
-                    log.Add($"FORCED: {e.Name}");
+                    if (!e.Configuration) log.Add($"CHANGED: {e.Name}");
                 }
             }
-            else if (e.Backup.Length == 0)
+            else if (!restore)
             {
+                if (discard) TryDelete(backupPath);
                 continue;
             }
 
@@ -336,7 +348,7 @@ public static class Transaction
                 continue;
             }
 
-            if (e.Backup.Length > 0)
+            if (restore)
             {
                 Engine.Write(dst, Engine.Read(backupPath));
                 TryDelete(backupPath);
@@ -344,6 +356,7 @@ public static class Transaction
             }
             else if (TryDelete(dst))
             {
+                if (discard) TryDelete(backupPath);
                 log.Add($"REMOVED: {e.Name}");
             }
             else

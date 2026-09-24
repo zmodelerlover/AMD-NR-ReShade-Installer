@@ -70,10 +70,11 @@ public static partial class Work
     public const string Addon32Name = "amd-nr.addon32";
     public const string Host64Name = "amd-nr-host64.exe";
 
-    /// <summary>The files whose presence means "this folder has an install of ours", and exactly the
-    /// ones uninstall takes back. Deliberately no manifest and no ini: uninstall keeps the manifest
-    /// whenever it preserves a configuration entry, so "a manifest is here" is true long after
-    /// everything has been removed.</summary>
+    /// <summary>The files whose presence means "this folder has an install of ours". Uninstall takes
+    /// every one of them by name, in or out of a manifest (see <see cref="OurNames"/>), which is what
+    /// keeps the badge and the uninstall agreeing. Deliberately no manifest and no ini: uninstall keeps
+    /// the manifest whenever it preserves a configuration entry, so "a manifest is here" is true long
+    /// after everything has been removed.</summary>
     public static readonly string[] InstalledMarkers =
         [AddonName, Addon32Name, Host64Name, RuntimeName, WeightsName];
 
@@ -293,8 +294,8 @@ public static partial class Work
         else if (Strip(line, "RESTORED: ") is { } restored) report.Ok($"restored {restored} from its backup");
         else if (Strip(line, "REMOVED: ") is { } removed) report.Ok($"removed {removed}");
         else if (Strip(line, "WARNING ") is { } warning) report.Warn(warning);
-        else if (Strip(line, "FORCED: ") is { } forced)
-            report.Warn($"{forced} had changed since the install and was removed anyway, as asked.");
+        else if (Strip(line, "CHANGED: ") is { } changed)
+            report.Ok($"{changed} had changed since the install; it is still this app's, so it went too.");
         else report.Info(line); // PRESERVED lines and anything the engine adds later read fine as they are.
 
         static string? Strip(string s, string prefix) =>

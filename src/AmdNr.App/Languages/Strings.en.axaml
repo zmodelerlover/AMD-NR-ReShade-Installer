@@ -125,13 +125,7 @@
   <sys:String x:Key="Str.UninstallOk">Removed from {0}.</sys:String>
   <sys:String x:Key="Str.UninstallWarn">Removed from {0}, with {1} warning to read below.</sys:String>
   <sys:String x:Key="Str.UninstallFail">Could not remove everything from {0}.</sys:String>
-  <sys:String x:Key="Str.UninstallLeft">{0} still counts as installed: files that changed after the install were left in place.</sys:String>
-  <sys:String x:Key="Str.UninstallLeftTitle">Some files were left in place</sys:String>
-  <sys:String x:Key="Str.UninstallLeftBody">Files in {0} are not the ones this installer wrote — they changed after the install, so the uninstall kept them rather than deleting somebody else's work. That is why the game still shows as installed. The list is under Details.</sys:String>
-  <sys:String x:Key="Str.UninstallForce">Remove them anyway</sys:String>
-  <sys:String x:Key="Str.UninstallForceBody">Deletes them and puts back whatever they replaced. Your dlss5-neural.ini is kept either way.</sys:String>
-  <sys:String x:Key="Str.UninstallKeep">Leave them</sys:String>
-  <sys:String x:Key="Str.UninstallKeepBody">Nothing more is touched, and the game goes on counting as installed.</sys:String>
+  <sys:String x:Key="Str.UninstallLeft">{0} still counts as installed: a file of this app could not be removed. Close the game and uninstall again.</sys:String>
   <sys:String x:Key="Str.ResultErrors">{0} problem listed below.</sys:String>
   <sys:String x:Key="Str.DownloadFailed">The files could not be downloaded, so nothing was installed.</sys:String>
   <sys:String x:Key="Str.Folder">Folder</sys:String>
