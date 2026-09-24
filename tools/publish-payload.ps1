@@ -166,6 +166,26 @@ foreach ($entry in Get-AllComponents) {
     $component = $entry.Component
     $changed = $false
 
+    # payload.sha256 pins the 32-bit pair on its own, and the installer checks each binary against
+    # its line there: a new pair sent up beside the old sums file breaks every 32-bit install, and
+    # payload.json would not show it. Checked before anything is uploaded.
+    if ($componentName -eq 'bridge' -and $From) {
+        $pair = @($component.files | Where-Object { $_.name -ne 'payload.sha256' })
+        if ($pair | Where-Object { Test-Path -LiteralPath (Join-Path $From $_.name) }) {
+            $sums = Join-Path $From 'payload.sha256'
+            if (-not (Test-Path -LiteralPath $sums)) { Fail "-From has part of the 32-bit pair but no payload.sha256 for it" }
+            $pinned = @{}
+            foreach ($line in Get-Content -LiteralPath $sums) {
+                if ($line -match '^([0-9a-fA-F]{64})\s+\*?(.+)$') { $pinned[$Matches[2].Trim()] = $Matches[1].ToLowerInvariant() }
+            }
+            foreach ($f in $pair) {
+                $given = Join-Path $From $f.name
+                $expect = if (Test-Path -LiteralPath $given) { Sha256 $given } else { $f.sha256 }
+                if ($pinned[$f.name] -ne $expect) { Fail "payload.sha256 does not pin the $($f.name) being published" }
+            }
+        }
+    }
+
     foreach ($f in $component.files) {
         # ReShade is fetched from reshade.me exactly as a person would download it, and never mirrored.
         if ($f.url -and $f.url -notlike "*huggingface.co*" -and $f.url -notlike "*catbox.moe*") {
@@ -196,8 +216,14 @@ foreach ($entry in Get-AllComponents) {
 
         # Keep the immutable copy as a mirror: it costs nothing and it is a second address that
         # already works. Nothing is trusted past its hash, so a mirror can be anywhere.
+        # Every mirror the file already had stays too while the bytes are the same ones: the GitHub
+        # release copies were being dropped by a re-upload that changed nothing.
         $mirrors = @()
-        if ($f.url -and $f.url -like "*catbox.moe*" -and $sha -eq $f.sha256) { $mirrors = @($f.url) }
+        if ($sha -eq $f.sha256) {
+            if ($f.url -and $f.url -like "*catbox.moe*") { $mirrors += $f.url }
+            if ($f.PSObject.Properties['mirrors']) { $mirrors += @($f.mirrors) }
+            $mirrors = @($mirrors | Select-Object -Unique)
+        }
 
         $f.size   = $size
         $f.sha256 = $sha
