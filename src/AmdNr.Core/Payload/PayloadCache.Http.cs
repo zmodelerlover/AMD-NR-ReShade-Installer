@@ -56,8 +56,9 @@ public sealed partial class PayloadCache
     ///
     /// The one built into the executable comes last. It is what the app was published with, which
     /// the files beside it are too, unless somebody put newer ones there -- and a lone executable
-    /// copied to the desktop, which is how this app is most often run, has no files beside it.</summary>
-    public static PayloadManifest? LoadLocalManifest(string fileName = "payload.json")
+    /// copied to the desktop, which is how this app is most often run, has no files beside it.
+    /// <paramref name="from"/> says which one it was, for the download log.</summary>
+    public static PayloadManifest? LoadLocalManifest(out string from, string fileName = "payload.json")
     {
         foreach (var path in new[]
                  {
@@ -67,6 +68,7 @@ public sealed partial class PayloadCache
         {
             try
             {
+                from = path;
                 if (File.Exists(path)) return PayloadManifest.Parse(File.ReadAllText(path));
             }
             catch (Exception e) when (e is IOException or InstallException or UnauthorizedAccessException)
@@ -75,8 +77,17 @@ public sealed partial class PayloadCache
             }
         }
 
-        try { return Embedded(fileName) is { } json ? PayloadManifest.Parse(json) : null; }
-        catch (InstallException) { return null; }
+        from = "the copy built into the executable";
+        try
+        {
+            if (Embedded(fileName) is { } json) return PayloadManifest.Parse(json);
+        }
+        catch (InstallException)
+        {
+            // Said below, like no copy at all.
+        }
+        from = "none: no copy could be read";
+        return null;
     }
 
     /// <summary>A file built into this assembly, by name, or null when this build carries none.</summary>

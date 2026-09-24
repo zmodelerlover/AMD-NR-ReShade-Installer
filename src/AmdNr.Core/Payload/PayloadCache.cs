@@ -120,14 +120,27 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
         var c = manifest.Component(component);
         var dir = FolderFor(component, c.Version);
         CreateFolder(dir);
-        if (await Task.Run(() => IsComplete(manifest, component), cancel)) return dir;
+        if (await Task.Run(() => IsComplete(manifest, component), cancel))
+        {
+            Trace?.Files.Add(("*", "every file already in the cache and verified"));
+            return dir;
+        }
 
         foreach (var file in c.Files)
         {
             var path = Path.Combine(dir, file.RelativePath);
-            if (await Task.Run(() => Verified(path, file.Size, file.Sha256), cancel)) continue;
+            if (await Task.Run(() => Verified(path, file.Size, file.Sha256), cancel))
+            {
+                Trace?.Files.Add((file.Name, "already in the cache and verified"));
+                continue;
+            }
             Engine.MakeParent(path);
-            if (await Task.Run(() => Adopt(component, file, path), cancel)) continue;
+            if (await Task.Run(() => Adopt(component, file, path), cancel))
+            {
+                Trace?.Files.Add((file.Name, "taken from a verified copy already on this machine"));
+                continue;
+            }
+            Trace?.Files.Add((file.Name, "not on this machine, so fetched: see the attempts"));
             await FetchAnyAsync(manifest.DownloadUrls(component, file), path, file, progress, cancel);
         }
 
@@ -140,6 +153,7 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
         {
             var archive = Path.Combine(dir, c.Files[0].RelativePath);
             await Task.Run(() => ExtractVerified(archive, pending, dir), cancel);
+            Trace?.Files.Add(($"{pending.Count} entries", $"taken out of {c.Files[0].Name}"));
         }
         return dir;
     }

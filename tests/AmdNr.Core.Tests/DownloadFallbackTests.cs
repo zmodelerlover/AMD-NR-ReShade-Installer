@@ -11,9 +11,9 @@ namespace AmdNr.Core.Tests;
 [Collection("AppCache")]
 public class DownloadFallbackTests
 {
-    private static byte[] Blob(int seed) => Enumerable.Range(0, 4096).Select(i => (byte)((i + seed) % 251)).ToArray();
+    internal static byte[] Blob(int seed) => Enumerable.Range(0, 4096).Select(i => (byte)((i + seed) % 251)).ToArray();
 
-    private static PayloadManifest OneFile(string version, byte[] blob, string? url = null, string? mirror = null) =>
+    internal static PayloadManifest OneFile(string version, byte[] blob, string? url = null, string? mirror = null) =>
         PayloadManifest.Parse($$"""
             {
               "schema": 1, "owner": "someone", "repo": "Extras", "tag": "{{version}}",
@@ -24,7 +24,7 @@ public class DownloadFallbackTests
             }
             """);
 
-    private static string Version(string tag) => $"{tag}-{Guid.NewGuid():N}"[..14];
+    internal static string Version(string tag) => $"{tag}-{Guid.NewGuid():N}"[..14];
 
     /// <summary>Counts requests, and fails every one: a test that passes with this never went to
     /// the network.</summary>
@@ -290,14 +290,14 @@ public class DownloadFallbackTests
         Assert.Contains("antivirus", error.Message, StringComparison.Ordinal);
     }
 
-    private sealed class Answers(Func<HttpRequestMessage, HttpResponseMessage> answer) : HttpMessageHandler
+    internal sealed class Answers(Func<HttpRequestMessage, HttpResponseMessage> answer) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancel) =>
             Task.FromResult(answer(request));
     }
 
     /// <summary>Sends the first half and then drops the connection, once; after that, honours Range.</summary>
-    private sealed class DropsOnce(byte[] blob) : HttpMessageHandler
+    internal sealed class DropsOnce(byte[] blob) : HttpMessageHandler
     {
         public int Requests { get; private set; }
 

@@ -47,19 +47,8 @@ public static class InstallLog
             var path = Path.Combine(AppPaths.Logs, name);
 
             var o = new StringBuilder();
-            Head(o, "AMD-NR ReShade Installer");
-            Line(o, "when", DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz"));
-            Line(o, "action", action);
-            Line(o, "app", $"v{App.Version}  (language {App.CurrentLanguage})");
-            Line(o, "result", report.Failed ? "FAILED" : "completed");
-
-            var machine = GpuService.Read();
-            Head(o, "This machine");
-            Line(o, "os", Environment.OSVersion.VersionString);
-            Line(o, "gpu", machine.Gpu);
-            Line(o, "driver", machine.Driver);
-            Line(o, "hip 7", GpuService.FindHip7() ?? "not found");
-            Line(o, "radeon", machine.LooksLikeRadeon ? "yes" : "no");
+            Header(o, action, report.Failed);
+            Machine(o);
 
             Head(o, "Target");
             Line(o, "game", card.Name);
@@ -187,7 +176,7 @@ public static class InstallLog
 
     /// <summary>Keeps the newest hundred. Logs exist to be read after something went wrong, and a
     /// folder nobody ever empties is its own small bug.</summary>
-    private static void Prune(int keep = 100)
+    internal static void Prune(int keep = 100)
     {
         try
         {
@@ -203,14 +192,36 @@ public static class InstallLog
         }
     }
 
-    private static void Head(StringBuilder o, string title)
+    // -- Shared with DownloadLog, so every log reads alike -------------------------------------------
+
+    internal static void Header(StringBuilder o, string action, bool failed)
+    {
+        Head(o, "AMD-NR ReShade Installer");
+        Line(o, "when", DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz"));
+        Line(o, "action", action);
+        Line(o, "app", $"v{App.Version}  (language {App.CurrentLanguage})");
+        Line(o, "result", failed ? "FAILED" : "completed");
+    }
+
+    internal static void Machine(StringBuilder o)
+    {
+        var machine = GpuService.Read();
+        Head(o, "This machine");
+        Line(o, "os", Environment.OSVersion.VersionString);
+        Line(o, "gpu", machine.Gpu);
+        Line(o, "driver", machine.Driver);
+        Line(o, "hip 7", GpuService.FindHip7() ?? "not found");
+        Line(o, "radeon", machine.LooksLikeRadeon ? "yes" : "no");
+    }
+
+    internal static void Head(StringBuilder o, string title)
     {
         o.AppendLine();
         o.AppendLine(title);
         o.AppendLine(new string('-', 74));
     }
 
-    private static void Line(StringBuilder o, string key, string value) =>
+    internal static void Line(StringBuilder o, string key, string value) =>
         o.AppendLine($"  {key,-24} {value}");
 
     /// <summary>A game name as a filename. Everything awkward becomes a dash.</summary>

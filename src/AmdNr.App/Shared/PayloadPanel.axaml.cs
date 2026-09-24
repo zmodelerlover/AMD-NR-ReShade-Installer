@@ -162,7 +162,6 @@ public partial class PayloadPanel : UserControl
         ProgressText.Text = Ui.Text("Str.Verifying");
         DownloadIcon.IsVisible = false;
         DownloadSpin.IsVisible = true;
-        var cache = _session.Cache();
         var current = "";
         try
         {
@@ -197,7 +196,7 @@ public partial class PayloadPanel : UserControl
             foreach (var component in pending)
             {
                 current = component;
-                await cache.EnsureAsync(manifest, component, progress);
+                await DownloadLog.EnsureAsync(_session, manifest, component, progress);
             }
             _failed = null;
             Toast(Ui.Text("Str.PayloadsReady"), Level.Ok);
@@ -227,8 +226,7 @@ public partial class PayloadPanel : UserControl
     private void OnFlushDns(object? sender, RoutedEventArgs e) => Run(async () =>
     {
         if (_session.Busy) return;
-        var flushed = PayloadCache.FlushDns();
-        InstallLog.Append($"{DateTime.Now:s} flush dns: {(flushed ? "cleared" : "refused")}");
+        var flushed = DownloadLog.FlushDns();
         if (!flushed)
         {
             Toast(Ui.Text("Str.DnsFlushFailed"), Level.Warn);
@@ -263,7 +261,11 @@ public partial class PayloadPanel : UserControl
         try
         {
             var components = manifest.Everyday.Select(p => p.Key).ToList();
+            var clock = System.Diagnostics.Stopwatch.StartNew();
             var result = await Task.Run(() => PayloadCache.Import(manifest, components, folder));
+            await Task.Run(() => DownloadLog.Write("import", components, _session, manifest, null, null, clock.Elapsed,
+                ("folder", folder), ("taken", string.Join(", ", result.Taken)),
+                ("still missing", string.Join(", ", result.Missing))));
             Toast(result.Missing.Count == 0
                     ? Ui.Text("Str.ImportAll")
                     : result.Taken.Count == 0

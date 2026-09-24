@@ -231,8 +231,7 @@ public partial class GameSheet
     private void OnFlushDns(object? sender, RoutedEventArgs e) => _shell.Run("flush dns", async () =>
     {
         if (Session.Busy) return;
-        var flushed = PayloadCache.FlushDns();
-        InstallLog.Append($"{DateTime.Now:s} flush dns: {(flushed ? "cleared" : "refused")}");
+        var flushed = DownloadLog.FlushDns();
         if (!flushed)
         {
             _shell.Toast(Ui.Text("Str.DnsFlushFailed"), Level.Warn);
@@ -271,7 +270,7 @@ public partial class GameSheet
             // Filtered against the manifest: a manifest that predates a component skips it.
             var components = ComponentsFor(preset).Where(manifest.Has).ToArray();
             foreach (var component in components)
-                await cache.EnsureAsync(manifest, component, progress);
+                await DownloadLog.EnsureAsync(Session, manifest, component, progress);
 
             Progress.IsVisible = false;
             ShowStep(StepVerify);

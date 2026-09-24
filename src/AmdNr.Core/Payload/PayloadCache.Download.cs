@@ -32,14 +32,23 @@ public sealed partial class PayloadCache
             for (var attempt = 1; ; attempt++)
             {
                 var before = Engine.SizeOf(path + ".part") ?? 0;
+                var record = new DownloadAttempt
+                {
+                    File = file.Name, Url = urls[i], Expected = file.Size,
+                    Proxy = Trace is null ? "-" : ProxyFor(urls[i]),
+                };
+                Trace?.Attempts.Add(record);
+                var clock = System.Diagnostics.Stopwatch.StartNew();
                 try
                 {
-                    await FetchAsync(urls[i], path, file, progress, cancel);
+                    await FetchAsync(urls[i], path, file, progress, record, cancel);
                     return;
                 }
                 catch (Exception e) when (e is HttpRequestException or InstallException or IOException
                                               or UnauthorizedAccessException && !cancel.IsCancellationRequested)
                 {
+                    record.Error ??= e;
+                    record.Kind ??= Classify(e);
                     // Not this address's fault, and not one the next can fix: it would be thrown away
                     // and fetched again into the same full disk. What arrived stays for the retry.
                     if (IsDiskFull(e))
@@ -54,7 +63,13 @@ public sealed partial class PayloadCache
                     }
                     failures.Add($"{urls[i].Host}: {Describe(e)}");
                     network |= IsNetwork(e);
+                    record.FellThrough = i + 1 < urls.Count;
                     break;
+                }
+                finally
+                {
+                    record.Took = clock.Elapsed;
+                    record.Lookup = await LookUpOnceAsync(urls[i].Host);
                 }
             }
 
@@ -143,14 +158,16 @@ public sealed partial class PayloadCache
     /// that hung rather than refused never tried the mirror, and the exception went on to escape an
     /// async void handler. It is a download that failed, so it leaves here saying so.</summary>
     private async Task FetchAsync(Uri url, string path, PayloadFile file,
-        IProgress<DownloadProgress>? progress, CancellationToken cancel)
+        IProgress<DownloadProgress>? progress, DownloadAttempt record, CancellationToken cancel)
     {
         try
         {
-            await FetchOneAsync(url, path, file, progress, cancel);
+            await FetchOneAsync(url, path, file, progress, record, cancel);
         }
         catch (OperationCanceledException e) when (!cancel.IsCancellationRequested)
         {
+            record.Error = e;
+            record.Kind = Classify(e);
             // The client's own timeouts -- the connect one, the one up to the headers -- carry a
             // TimeoutException: nothing ever came back. The stall timer's does not: it went quiet.
             throw new InstallException(e.InnerException is TimeoutException
@@ -166,7 +183,7 @@ public sealed partial class PayloadCache
     /// to take the final name. A partial download can never be mistaken for a complete one, because
     /// the name only changes after the hash matches.</summary>
     private async Task FetchOneAsync(Uri url, string path, PayloadFile file,
-        IProgress<DownloadProgress>? progress, CancellationToken cancel)
+        IProgress<DownloadProgress>? progress, DownloadAttempt record, CancellationToken cancel)
     {
         // Re-armed by every byte that lands, so a slow connection has all the time it needs and a
         // silent one has a minute. The hash below is deliberately not under it: that is a second of
@@ -187,6 +204,7 @@ public sealed partial class PayloadCache
         if (have > 0) request.Headers.Range = new RangeHeaderValue((long)have, null);
 
         using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, live);
+        record.Status = (int)response.StatusCode;
         if (have > 0 && response.StatusCode == HttpStatusCode.OK)
         {
             // The server ignored the range and is sending the whole thing: take it from the top.
@@ -200,10 +218,13 @@ public sealed partial class PayloadCache
         }
         else
         {
+            if (!response.IsSuccessStatusCode) record.Kind = $"http {(int)response.StatusCode}";
             Engine.Require(response.IsSuccessStatusCode,
                 $"Could not download {file.Name}: the server answered {(int)response.StatusCode} {response.ReasonPhrase}.");
         }
 
+        record.ResumedFrom = have;
+        record.Received = (long)have;
         if (response.StatusCode != HttpStatusCode.RequestedRangeNotSatisfiable)
         {
             var total = (response.Content.Headers.ContentLength ?? 0) + (long)have;
@@ -219,6 +240,7 @@ public sealed partial class PayloadCache
                 stall.CancelAfter(Stall);
                 await target.WriteAsync(buffer.AsMemory(0, read), cancel);
                 received += read;
+                record.Received = received;
                 progress?.Report(new DownloadProgress(file.Name, received, total > 0 ? total : null));
             }
         }
@@ -226,6 +248,7 @@ public sealed partial class PayloadCache
         var got = await Task.Run(() => Engine.HashFile(part), cancel);
         if (got != file.Sha256)
         {
+            record.Kind = "sha mismatch";
             File.Delete(part);
             throw new InstallException(
                 $"{file.Name} downloaded, but it does not match the SHA-256 the manifest gives."
@@ -239,6 +262,8 @@ public sealed partial class PayloadCache
             // Verified a moment ago and gone or locked now: that is an antivirus taking the file,
             // which is the one explanation worth giving -- the add-on and ReShade are both DLLs that
             // hook into other programs, which is exactly what heuristics flag.
+            record.Kind = "antivirus (taken after it verified)";
+            record.Error = e;
             throw new InstallException(
                 $"{file.Name} downloaded and matched its hash, then something took it away ({e.Message}). "
                 + $"That is almost always an antivirus. Allow {AppPaths.Cache} in it, or restore the file "

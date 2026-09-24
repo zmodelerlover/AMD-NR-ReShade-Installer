@@ -18,6 +18,9 @@ public sealed class Session
     /// when it was read. With it set, <see cref="Manifest"/> is the copy beside or inside the app.</summary>
     public string? ManifestProblem { get; private set; }
 
+    /// <summary>Where <see cref="Manifest"/> was read from: the address that answered, or which local copy.</summary>
+    public string ManifestSource { get; private set; } = "not read yet";
+
     public IReadOnlyList<AddonRelease> Releases { get; private set; } = [];
     public ApiDatabase? ApiDb { get; private set; }
     public UpdateCheck Update { get; private set; } = new(UpdateState.Checking);
@@ -57,13 +60,15 @@ public sealed class Session
         {
             Manifest = await Cache().FetchManifestAsync(Config.ManifestAddresses());
             ManifestProblem = null;
+            ManifestSource = "the network, the first to answer of " + string.Join(", ", Config.ManifestAddresses());
         }
         catch (Exception e)
         {
             // Offline, or every address filtered: the copy beside the executable, or the one inside
             // it, pins the same hashes, so everything already cached still installs.
             ManifestProblem = e.Message;
-            Manifest = PayloadCache.LoadLocalManifest();
+            Manifest = PayloadCache.LoadLocalManifest(out var from);
+            ManifestSource = from;
         }
         ManifestChanged?.Invoke();
     }
