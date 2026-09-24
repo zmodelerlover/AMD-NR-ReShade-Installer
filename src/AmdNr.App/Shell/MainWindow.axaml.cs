@@ -35,6 +35,15 @@ public partial class MainWindow : Window
             ToastBox.Classes.Set("show", false);
         };
 
+        // What every tile compares its own install against, so a folder installed before the payload
+        // moved on says so by itself. On every read of the list, not only the first: after a start
+        // offline, the list read by Try again is the one that knows about the newer build. Ahead of
+        // the pages, so the sheet's own refresh already sees it.
+        Session.ManifestChanged += () =>
+        {
+            GameCard.Payload = Session.Manifest;
+            foreach (var card in Library.Cards) card.RefreshInstalled();
+        };
         GamesPage.Attach(this);
         SystemPage.Attach(this);
         SettingsPage.Attach(this);
@@ -62,11 +71,6 @@ public partial class MainWindow : Window
         SystemPage.Show(machine);
 
         await Session.LoadManifestAsync();
-        // What every tile compares its own install against, so a folder installed before the payload
-        // moved on says so by itself.
-        GameCard.Payload = Session.Manifest;
-        foreach (var card in Library.Cards) card.RefreshInstalled();
-
         await Task.WhenAll(Session.LoadReleasesAsync(), Session.LoadApiDbAsync());
         await Library.DetectAsync();
         _ = Library.LoadCoversAsync();
