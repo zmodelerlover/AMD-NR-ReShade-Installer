@@ -323,6 +323,7 @@ void Flows()
         "Download all now that reaches nothing says so, and it stays said");
     Check(files.FindControl<Button>("DnsButton")!.IsVisible, "and offers to clear DNS");
     Save(main, "flow-5-files-download-failed");
+    DownloadFlow.Run(main, Check, Until, Click);
 
     main.ShowPage(MainWindow.Page.Settings);
     var update = typeof(Session).GetProperty(nameof(Session.Update))!;
