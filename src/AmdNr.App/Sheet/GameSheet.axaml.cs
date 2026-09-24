@@ -104,9 +104,7 @@ public partial class GameSheet : UserControl
         ShowExecutable(graphics, card.Entry);
         ShowApiHint(graphics);
 
-        // Steam can always start it; anything else needs an executable we actually found.
-        PlayButton.IsEnabled = (card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 })
-                               || (graphics.Executable is { } exe && File.Exists(exe));
+        Lock(Session.Busy);
         Ui.Localize(PlayLabel, graphics.Emulator is not null ? "Str.Launch" : "Str.Play");
 
         // The width comes from the executable the detection picked, so a folder holding a 32-bit
@@ -167,15 +165,22 @@ public partial class GameSheet : UserControl
     }
 
     /// <summary>While something runs, nothing that would change what it is doing can be touched: the
-    /// route, the name, the version, the executable, and the row itself.</summary>
+    /// route, the name, the version, the executable, and the row itself.
+    ///
+    /// Nothing here depends on which game is open. It did -- "and a game is open" -- and Busy going
+    /// off while the sheet was closed, a Download all on the next page, left Install disabled on
+    /// every sheet opened after it. The handlers check for a game themselves.</summary>
     private void Lock(bool busy)
     {
         Options.IsEnabled = !busy;
         RemoveButton.IsEnabled = !busy;
-        PlayButton.IsEnabled = !busy && _card is not null;
+        // Steam can always start it; anything else needs an executable we actually found.
+        PlayButton.IsEnabled = !busy && _card is { } card
+                               && ((card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 })
+                                   || (card.Graphics?.Executable is { } exe && File.Exists(exe)));
         ReportButton.IsEnabled = !busy;
-        InstallButton.IsEnabled = !busy && _card is not null;
-        UninstallButton.IsEnabled = !busy && _card is not null;
+        InstallButton.IsEnabled = !busy;
+        UninstallButton.IsEnabled = !busy;
         if (!busy) Progress.IsVisible = false;
     }
 }
