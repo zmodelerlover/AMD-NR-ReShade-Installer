@@ -256,6 +256,23 @@ void Flows()
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.ReShade && !card.Outdated,
         "Update brings it in line");
 
+    // A download with nowhere to come from: the sheet and the files panel both say so, stay saying
+    // so, and offer the DNS fix, because no answer ever came back.
+    Directory.Delete(PayloadCache.FolderFor("addon", "1.0.1"), recursive: true);
+    Click(install);
+    Check(Until(() => !session.Busy), "an install whose download fails finishes");
+    Check(verdict.Text == S("Str.DownloadFailed") && Named<Button>("DnsRetryButton").IsVisible,
+        "and says so, offering to clear DNS");
+    Save(main, "flow-5-sheet-download-failed");
+    main.ShowPage(MainWindow.Page.Machine);
+    Settle(10);
+    var files = main.GetVisualDescendants().OfType<PayloadPanel>().First(p => p.IsEffectivelyVisible);
+    Click(files.FindControl<Button>("DownloadButton")!);
+    Check(Until(() => !session.Busy && files.FindControl<Border>("ErrorBox")!.IsVisible),
+        "Download all now that reaches nothing says so, and it stays said");
+    Check(files.FindControl<Button>("DnsButton")!.IsVisible, "and offers to clear DNS");
+    Save(main, "flow-5-files-download-failed");
+
     main.ShowPage(MainWindow.Page.Settings);
     var update = typeof(Session).GetProperty(nameof(Session.Update))!;
     Check(Until(() => session.Update.State == UpdateState.Failed, 10), "an update check with nowhere to ask fails");
@@ -273,7 +290,13 @@ void Flows()
         Check(main.FindControl<Control>("UpdateDot")!.IsVisible == (check.State == UpdateState.Available),
             $"update {check.State}: the dot on the gear only when there is one");
     }
-    Check(!session.Busy && install.IsEnabled, "nothing is left busy");
+    // Busy went on and off while the sheet was closed; a sheet opened afterwards has to work.
+    main.ShowPage(MainWindow.Page.Games);
+    Settle(6);
+    // Found again: relabelling rebuilt the grid, and the tile from before is no longer in it.
+    Click(main.GetVisualDescendants().OfType<Button>().First(b => b.Classes.Contains("card")));
+    Check(Until(() => sheet.IsOpen, 10) && !session.Busy && install.IsEnabled,
+        "nothing is left busy: a sheet opened afterwards can install");
     main.Close();
 }
 
