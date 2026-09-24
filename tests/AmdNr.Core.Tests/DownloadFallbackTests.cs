@@ -200,6 +200,17 @@ public class DownloadFallbackTests
         _ = PayloadCache.FlushDns();
     }
 
+    /// <summary>A verified file gone by the time the install stages it is an antivirus, and says so,
+    /// rather than "Could not find file" and a cache path.</summary>
+    [Fact]
+    public void AFileTakenAfterItWasVerifiedIsPutDownToTheAntivirus()
+    {
+        var manifest = OneFile(Version("av"), Blob(14));
+        var error = Assert.Throws<InstallException>(() =>
+            new PayloadCache(new HttpClient(new Refusing())).Stage(manifest, PayloadManifest.RuntimeComponent));
+        Assert.Contains("antivirus", error.Message, StringComparison.Ordinal);
+    }
+
     private sealed class Answers(Func<HttpRequestMessage, HttpResponseMessage> answer) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancel) =>

@@ -205,6 +205,16 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
     /// staging 141 MB of weights costs no disk and no copy; a volume that refuses gets a copy.</summary>
     public string Stage(PayloadManifest manifest, params string[] components)
     {
+        // One at a time. The sheet's pre-flight stages in the background and Install stages right
+        // after it; two of these on one folder deleted each other's links, and the install read a
+        // folder with a file missing from it.
+        lock (Staging) return StageLocked(manifest, components);
+    }
+
+    private static readonly Lock Staging = new();
+
+    private static string StageLocked(PayloadManifest manifest, string[] components)
+    {
         var key = string.Join("-", components.Select(c => $"{Sanitise(c)}.{Sanitise(manifest.Component(c).Version)}"));
         var staging = Path.Combine(AppPaths.Cache, "staging", key.Length <= 120 ? key : key[..120]);
         Directory.CreateDirectory(staging);
@@ -217,6 +227,12 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
             {
                 var source = Path.Combine(from, file.RelativePath);
                 var target = Path.Combine(staging, file.RelativePath);
+                // Verified a moment ago and gone now: an antivirus took it. Said as that, rather than
+                // as "Could not find file" with a cache path nobody asked about.
+                Engine.Require(File.Exists(source),
+                    $"{file.Name} was downloaded and verified, then something took it out of {from}. That is "
+                    + "almost always an antivirus. Allow that folder in it, or restore the file from its "
+                    + "quarantine, and try again.");
                 // Remade every time, rather than skipped when the size matches. Size is not
                 // identity: a build re-cut and published under an unchanged version is the same
                 // number of bytes with different content, and the stale link then survived here
