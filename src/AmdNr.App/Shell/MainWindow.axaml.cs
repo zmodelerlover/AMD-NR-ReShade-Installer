@@ -97,6 +97,8 @@ public partial class MainWindow : Window
         {
             var gone = await Library.PruneAsync(Sheet.Card);
             if (gone.Count > 0) Toast(GoneMessage(gone), Level.Info);
+            // Games back from a drive that returned have not been read yet; nothing to do otherwise.
+            await Library.DetectAsync();
         });
     }
 

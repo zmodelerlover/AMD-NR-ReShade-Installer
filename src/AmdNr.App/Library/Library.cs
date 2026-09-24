@@ -57,9 +57,12 @@ public sealed class Library(Session session)
     /// go. The game whose sheet is open, and anything while work is running, is left alone.</summary>
     public async Task<IReadOnlyList<string>> PruneAsync(GameCard? open)
     {
-        if (session.Busy || _cards.Count == 0) return [];
+        if (session.Busy || _cards.Count + _away.Count == 0) return [];
         var cards = _cards.Where(c => c != open).ToList();
-        var presence = await Task.Run(() => cards.Select(c => GameScanner.PresenceOf(c.Path)).ToList());
+        var away = _away.ToList();
+        var (presence, back) = await Task.Run(() => (
+            cards.Select(c => GameScanner.PresenceOf(c.Path)).ToList(),
+            away.Select(e => GameScanner.PresenceOf(e.Path)).ToList()));
         if (session.Busy) return [];
 
         var gone = new List<string>();
@@ -71,8 +74,23 @@ public sealed class Library(Session session)
             if (presence[i] == Presence.Unreachable) _away.Add(cards[i].Entry);
             else gone.Add(cards[i].Name);
         }
+        // And the other way: a drive plugged back in while the app was open brings its games back
+        // now, with everything chosen for them, not on the next start.
+        for (var i = 0; i < away.Count; i++)
+        {
+            if (back[i] == Presence.Unreachable || !_away.Remove(away[i])) continue;
+            changed = true;
+            if (back[i] == Presence.Gone) gone.Add(away[i].Display);
+            else
+            {
+                var card = new GameCard(away[i]);
+                _cards.Add(card);
+                card.RefreshInstalled();
+            }
+        }
         if (changed)
         {
+            Sort();
             Save();
             Changed?.Invoke();
         }
