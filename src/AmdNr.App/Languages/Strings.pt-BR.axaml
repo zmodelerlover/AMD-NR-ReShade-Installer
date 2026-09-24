@@ -159,6 +159,8 @@
   <sys:String x:Key="Str.FilesHint">Baixados uma vez, conferidos contra um hash fixo e reaproveitados em todos os jogos.</sys:String>
   <sys:String x:Key="Str.PayloadReadyShort">Verificado</sys:String>
   <sys:String x:Key="Str.NotDownloadedShort">Não baixado</sys:String>
+  <sys:String x:Key="Str.DownloadingShort">Baixando…</sys:String>
+  <sys:String x:Key="Str.DownloadingPercent">Baixando {0}%</sys:String>
   <sys:String x:Key="Str.SettingsSubtitle">Idioma, atualizações e sobre este app.</sys:String>
   <sys:String x:Key="Str.LanguageHint">Todos os textos mudam na hora, sem reiniciar.</sys:String>
   <sys:String x:Key="Str.DataFolder">Pasta de dados</sys:String>

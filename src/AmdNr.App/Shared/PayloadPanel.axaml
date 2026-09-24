@@ -101,10 +101,13 @@
                   <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
                   <TextBlock Text="{Binding Caption}" Classes="caption" />
                 </StackPanel>
-                <Border Grid.Column="1" Classes="status" Classes.ok="{Binding Ready}" Classes.err="{Binding Failed}">
+                <Border Grid.Column="1" Classes="status" Classes.ok="{Binding Ready}" Classes.err="{Binding Failed}"
+                        VerticalAlignment="Center">
                   <StackPanel Orientation="Horizontal" Spacing="5">
                     <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding Ready}" />
-                    <PathIcon Data="{StaticResource IconDot}" IsVisible="{Binding !Ready}" />
+                    <PathIcon Data="{StaticResource IconErr}" IsVisible="{Binding Failed}" />
+                    <Arc Classes="spin" Width="11" Height="11" Stroke="{DynamicResource AccentHover}" IsVisible="{Binding Working}" />
+                    <PathIcon Data="{StaticResource IconDot}" IsVisible="{Binding Waiting}" />
                     <TextBlock Text="{Binding State}" />
                   </StackPanel>
                 </Border>

@@ -3,6 +3,7 @@
 // importing a folder of files fetched however somebody could. Shared by the first-run wizard and the
 // "This machine" page, which used to carry two copies of the same list with two different bugs.
 
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -11,8 +12,30 @@ using AmdNr.Core;
 
 namespace AmdNr.App;
 
-/// <summary>One downloadable component as the panel lists it.</summary>
-public sealed record PayloadRow(string Title, string Caption, string State, bool Ready, bool Failed);
+/// <summary>One downloadable component as the panel lists it. Its state changes in place while
+/// Download all runs, so each row says where it is -- waiting, downloading, verified, failed -- the
+/// moment that is true, rather than every row changing together when the whole set is done.</summary>
+public sealed class PayloadRow(string name, string title, string caption) : INotifyPropertyChanged
+{
+    public string Name { get; } = name;
+    public string Title { get; } = title;
+    public string Caption { get; } = caption;
+    public string State { get; private set; } = "";
+    public bool Ready { get; private set; }
+    public bool Failed { get; private set; }
+    public bool Working { get; private set; }
+    public bool Waiting => !Ready && !Failed && !Working;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public PayloadRow Set(string state, bool ready = false, bool failed = false, bool working = false)
+    {
+        (State, Ready, Failed, Working) = (state, ready, failed, working);
+        foreach (var property in new[] { nameof(State), nameof(Ready), nameof(Failed), nameof(Working), nameof(Waiting) })
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        return this;
+    }
+}
 
 /// <summary>One file somebody can fetch by hand, and every address it is published at.</summary>
 public sealed record ManualFile(string Name, string Caption, IReadOnlyList<ManualLink> Links);
@@ -86,12 +109,12 @@ public partial class PayloadPanel : UserControl
             return (Name: pair.Key, pair.Value, Ready: ready);
         }).ToList());
 
-        Rows.ItemsSource = rows.Select(r => new PayloadRow(
+        Rows.ItemsSource = rows.Select(r => new PayloadRow(r.Name,
             Ui.Translated($"Str.Component.{r.Name}", r.Name),
-            $"{r.Name} · {r.Value.Version} · {Ui.Megabytes(Bytes(r.Value))}",
+            $"{r.Name} · {r.Value.Version} · {Ui.Megabytes(Bytes(r.Value))}").Set(
             Ui.Text(r.Ready ? "Str.PayloadReadyShort" : r.Name == _failed ? "Str.FailedShort" : "Str.NotDownloadedShort"),
-            r.Ready,
-            !r.Ready && r.Name == _failed)).ToList();
+            ready: r.Ready,
+            failed: !r.Ready && r.Name == _failed)).ToList();
 
         Missing = rows.Count(r => !r.Ready);
         var missingBytes = rows.Where(r => !r.Ready).Aggregate(0UL, (sum, r) => sum + Bytes(r.Value));
@@ -187,6 +210,15 @@ public partial class PayloadPanel : UserControl
             var finished = 0UL;
             var seen = "";
             Progress.IsIndeterminate = false;
+
+            // And each row its own state, as it happens: the one downloading says how far it is,
+            // and one that is done turns green then, not when the last of the set is.
+            var rows = (Rows.ItemsSource as IEnumerable<PayloadRow>)?.ToDictionary(r => r.Name) ?? [];
+            PayloadRow? row = null;
+            var rowFiles = new HashSet<string>();
+            var rowSeen = "";
+            var rowFinished = 0UL;
+            var rowTotal = 0UL;
             var progress = new Progress<DownloadProgress>(p => Dispatcher.UIThread.Post(() =>
             {
                 if (p.File != seen)
@@ -197,12 +229,28 @@ public partial class PayloadPanel : UserControl
                 var received = finished + (ulong)Math.Max(0, p.Received);
                 Progress.Value = total == 0 ? 0 : Math.Min(100, 100.0 * received / total);
                 ProgressText.Text = $"{p.File} — {Ui.Megabytes(received)} / {Ui.Megabytes(total)}";
+
+                // Posted, so one can land after its component is done: only the row's own files count.
+                if (row is null || rowTotal == 0 || !rowFiles.Contains(p.File)) return;
+                if (p.File != rowSeen)
+                {
+                    if (rowSeen.Length > 0 && sizes.TryGetValue(rowSeen, out var rowDone)) rowFinished += rowDone;
+                    rowSeen = p.File;
+                }
+                var percent = (int)Math.Min(99, 100.0 * (rowFinished + (ulong)Math.Max(0, p.Received)) / rowTotal);
+                row.Set(Ui.Format("Str.DownloadingPercent", percent), working: true);
             }));
 
             foreach (var component in pending)
             {
                 current = component;
+                row = rows.GetValueOrDefault(component);
+                rowFiles = manifest.Component(component).Files.Select(f => f.Name).ToHashSet();
+                (rowSeen, rowFinished, rowTotal) = ("", 0UL, Bytes(manifest.Component(component)));
+                row?.Set(Ui.Text("Str.DownloadingShort"), working: true);
                 await DownloadLog.EnsureAsync(_session, manifest, component, progress);
+                row?.Set(Ui.Text("Str.PayloadReadyShort"), ready: true);
+                row = null;
             }
             _failed = null;
             Toast(Ui.Text("Str.PayloadsReady"), Level.Ok);
@@ -211,6 +259,8 @@ public partial class PayloadPanel : UserControl
                                        or UnauthorizedAccessException)
         {
             _failed = current;
+            if ((Rows.ItemsSource as IEnumerable<PayloadRow>)?.FirstOrDefault(r => r.Name == current) is { } failed)
+                failed.Set(Ui.Text("Str.FailedShort"), failed: true);
             ShowError(Ui.Format("Str.DownloadFailedOne", Ui.Translated($"Str.Component.{current}", current)), ex.Message);
             DnsButton.IsVisible = PayloadCache.IsNetwork(ex);
             InstallLog.Append($"{DateTime.Now:s} download {current}\n{ex.Message}");

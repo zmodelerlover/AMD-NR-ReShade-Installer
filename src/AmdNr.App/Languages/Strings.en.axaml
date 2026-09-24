@@ -162,6 +162,8 @@
   <sys:String x:Key="Str.FilesHint">Downloaded once, checked against a pinned hash, and reused for every game.</sys:String>
   <sys:String x:Key="Str.PayloadReadyShort">Verified</sys:String>
   <sys:String x:Key="Str.NotDownloadedShort">Not downloaded</sys:String>
+  <sys:String x:Key="Str.DownloadingShort">Downloading…</sys:String>
+  <sys:String x:Key="Str.DownloadingPercent">Downloading {0}%</sys:String>
   <sys:String x:Key="Str.SettingsSubtitle">Language, updates, and about this app.</sys:String>
   <sys:String x:Key="Str.LanguageHint">Every label switches right away; no restart needed.</sys:String>
   <sys:String x:Key="Str.DataFolder">Data folder</sys:String>
