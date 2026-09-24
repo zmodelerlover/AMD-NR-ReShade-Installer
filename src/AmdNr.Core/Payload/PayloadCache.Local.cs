@@ -215,7 +215,7 @@ public sealed partial class PayloadCache
             }
             foreach (var sub in dirs)
             {
-                if (new DirectoryInfo(sub).Attributes.HasFlag(FileAttributes.ReparsePoint)) continue;
+                if (Engine.IsLink(new DirectoryInfo(sub))) continue;
                 Walk(sub, level + 1);
             }
         }

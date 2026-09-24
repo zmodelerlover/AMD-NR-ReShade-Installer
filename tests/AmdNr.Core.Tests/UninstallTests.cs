@@ -136,6 +136,22 @@ public class UninstallTests
         Assert.Equal("an old copy", File.ReadAllText(existing));
     }
 
+    /// <summary>A game folder past 260 characters. .NET's own file calls take it; the one rename done
+    /// through Win32 directly did not, and the install failed with "Manifest commit failed" and no
+    /// reason, leaving its backups behind.</summary>
+    [Fact]
+    public void AGameFolderPastTheOldPathLimitInstallsAndUninstalls()
+    {
+        var game = Fixture.Temp("long");
+        while (game.Length < 280) game = Path.Combine(game, "a folder with a long name");
+        Directory.CreateDirectory(game);
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
+        var (src, pins) = Fixture.Payloads("long");
+        var install = Work.Install(game, src, Preset.Dx11, pins);
+        Assert.False(install.Failed, install.ToLog("long path"));
+        Assert.False(Work.Uninstall(game, Preset.Dx11).Failed);
+    }
+
     /// <summary>The other way a folder stays installed after an uninstall, and the one that brought
     /// the complaint back: a file that no longer hashes to what the install wrote belongs to whoever
     /// changed it, so the transaction keeps it -- and the badge, which is only "is one of our files

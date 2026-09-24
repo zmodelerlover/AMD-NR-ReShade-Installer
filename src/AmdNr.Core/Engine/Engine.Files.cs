@@ -10,9 +10,9 @@ public static partial class Engine
 {
     // -- Paths ---------------------------------------------------------------------------------
 
-    /// <summary>Walk every prefix of the path and refuse links. A reparse point anywhere in the
-    /// chain could put a write outside the directory the user chose, so this is checked before
-    /// each write, not once.</summary>
+    /// <summary>Walk every prefix of the path and refuse links. A link anywhere in the chain could
+    /// put a write outside the directory the user chose, so this is checked before each write, not
+    /// once.</summary>
     public static void SafePath(string p)
     {
         var absolute = Absolute(p);
@@ -23,7 +23,21 @@ public static partial class Engine
             FileAttributes attributes;
             try { attributes = File.GetAttributes(walk); }
             catch { continue; } // Does not exist yet: nothing to impersonate.
-            Require((attributes & FileAttributes.ReparsePoint) == 0, $"Reparse path refused: {walk}");
+            Require(!IsLink(attributes.HasFlag(FileAttributes.Directory) ? new DirectoryInfo(walk) : new FileInfo(walk)),
+                $"Reparse path refused: {walk}");
+        }
+    }
+
+    /// <summary>A symlink or a junction: a path that leads somewhere else. Not every reparse point
+    /// is one -- OneDrive marks its own folders that way, as cloud placeholders that lead nowhere --
+    /// and refusing the flag refused every game kept in Documents or on the desktop. One whose
+    /// target cannot be read is taken for a link: refusing is the safe way to be wrong here.</summary>
+    public static bool IsLink(FileSystemInfo info)
+    {
+        try { return info.Attributes.HasFlag(FileAttributes.ReparsePoint) && info.LinkTarget is not null; }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return true;
         }
     }
 
@@ -138,23 +152,28 @@ public static partial class Engine
         }
     }
 
-    /// <summary>Free bytes available to this user, quota included.</summary>
+    /// <summary>Free bytes available to this user, quota included. Asked of the folder itself, which
+    /// is what a network share and a volume mounted in a folder need: DriveInfo only takes a drive
+    /// letter, threw on a share, and the room checks then said nothing at all.</summary>
     public static ulong? FreeBytes(string dir)
     {
         try
         {
-            // ponytail: DriveInfo covers local volumes, which is every case a game folder has had
-            // so far. It throws on a UNC path; swap in GetDiskFreeSpaceExW if that ever shows up.
-            var root = Path.GetPathRoot(Absolute(dir));
-            if (string.IsNullOrEmpty(root)) return null;
-            var available = new DriveInfo(root).AvailableFreeSpace;
-            return available >= 0 ? (ulong)available : null;
+            var folder = Absolute(dir);
+            while (!Directory.Exists(folder) && Path.GetDirectoryName(folder) is { } parent) folder = parent;
+            return GetDiskFreeSpaceExW(folder.EndsWith('\\') ? folder : folder + '\\', out var available, out _, out _)
+                ? available
+                : null;
         }
         catch
         {
             return null;
         }
     }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetDiskFreeSpaceExW(string directory, out ulong available, out ulong total, out ulong free);
 
     /// <summary>Same file, same bytes? Only the length is compared, which is what keeps the guard
     /// cheap.</summary>
@@ -173,8 +192,8 @@ public static partial class Engine
 
     // -- Commit --------------------------------------------------------------------------------
 
-    // DllImport rather than LibraryImport: the generated marshalling needs AllowUnsafeBlocks on the
-    // whole assembly, and this is the only P/Invoke in it.
+    // DllImport rather than LibraryImport, like every P/Invoke in this assembly: the generated
+    // marshalling needs AllowUnsafeBlocks on the whole of it.
     [DllImport("kernel32.dll", EntryPoint = "MoveFileExW", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool MoveFileExW(string from, string to, uint flags);
@@ -186,8 +205,19 @@ public static partial class Engine
     /// journal only means anything if it is on the disk before the writes it describes.</summary>
     internal static void CommitRename(string from, string to)
     {
-        var ok = MoveFileExW(from, to, MoveFileReplaceExisting | MoveFileWriteThrough);
-        Require(ok, "Manifest commit failed");
+        var ok = MoveFileExW(Long(from), Long(to), MoveFileReplaceExisting | MoveFileWriteThrough);
+        Require(ok, $"Manifest commit failed: {Marshal.GetLastPInvokeErrorMessage()}");
+    }
+
+    /// <summary>The \\?\ form, which Win32 takes at any length whatever the machine's settings. .NET
+    /// adds it to its own calls; a P/Invoke gets the path as given, and past 260 characters the
+    /// rename failed with no reason, on a machine that had not turned long paths on.</summary>
+    private static string Long(string path)
+    {
+        var full = Path.GetFullPath(path);
+        return full.StartsWith(@"\\?\", StringComparison.Ordinal) ? full
+            : full.StartsWith(@"\\", StringComparison.Ordinal) ? @"\\?\UNC\" + full[2..]
+            : @"\\?\" + full;
     }
 
     public static void MakeParent(string p)

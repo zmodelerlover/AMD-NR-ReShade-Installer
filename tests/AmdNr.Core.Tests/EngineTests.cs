@@ -396,4 +396,26 @@ public class EngineTests
         Assert.Throws<InstallException>(() => Manifest.Decode(
             CapturedManifest().Replace(Engine.BackupDir, "elsewhere", StringComparison.Ordinal)));
     }
+
+    /// <summary>A junction inside a game folder still stops a write -- it can lead anywhere -- now
+    /// that a reparse point is only refused when it is a link, and not for OneDrive's flag. Free
+    /// space is asked of the folder, so one that is not there yet still has an answer.</summary>
+    [Fact]
+    public void ALinkStillStopsAWriteAndFreeSpaceIsAskedOfTheFolder()
+    {
+        var game = Fixture.Temp("junction");
+        var elsewhere = Fixture.Temp("junction-target");
+        var link = Path.Combine(game, "linked");
+        using (var mklink = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                   "cmd.exe", $"/c mklink /J \"{link}\" \"{elsewhere}\"") { CreateNoWindow = true, UseShellExecute = false }))
+            mklink!.WaitForExit();
+        Assert.True(Directory.Exists(link));
+
+        Assert.True(Engine.IsLink(new DirectoryInfo(link)));
+        Assert.Throws<InstallException>(() => Engine.SafePath(Path.Combine(link, "dxgi.dll")));
+        Engine.SafePath(Path.Combine(game, "dxgi.dll"));
+        Assert.False(Engine.IsLink(new DirectoryInfo(game)));
+
+        Assert.NotNull(Engine.FreeBytes(Path.Combine(game, "not there yet")));
+    }
 }
