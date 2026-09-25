@@ -136,6 +136,19 @@ if ($Verify) {
 }
 
 # --- Preconditions ----------------------------------------------------------------------------
+# A pin of 64 zeros stands for bytes that do not exist yet (a release being prepared: see
+# tools/pin-optiscaler.ps1 and tools/pin-mochizuki.ps1). This app hides such a release, but the
+# installers already out there do not know the rule: published, it would be offered to all of them
+# and fail every install.
+Step "Checking for placeholder pins"
+$placeholders = foreach ($entry in Get-AllComponents) {
+    foreach ($f in @($entry.Component.files) + @($entry.Component.extract)) {
+        if ($f -and $f.sha256 -eq ('0' * 64)) { "$($entry.Name)$(if ($entry.Release) { " in $($entry.Release)" })" }
+    }
+}
+if ($placeholders) { Fail "placeholder pins left in: $(($placeholders | Select-Object -Unique) -join ', '). Pin them first" }
+Good "no placeholder pins"
+
 Step "Checking the Hugging Face login"
 $previousPreference = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
@@ -210,8 +223,11 @@ foreach ($entry in Get-AllComponents) {
         $sha  = Sha256 $local
         if ($sha -ne $f.sha256) { $changed = $true }
 
-        Step "Uploading $($f.name)  ($([math]::Round($size/1MB,2)) MB)"
-        Invoke-Hf upload $Repo $local $f.name --repo-type dataset --commit-message "payload: $($f.name)"
+        # Where it goes in the dataset: where its address already points, when that is this dataset --
+        # the mochizuki files live under mochizuki/<version>/ -- and otherwise its name at the root.
+        $inRepo = if ($f.url -and $f.url.StartsWith("$base/")) { $f.url.Substring($base.Length + 1) } else { $f.name }
+        Step "Uploading $($f.name) as $inRepo  ($([math]::Round($size/1MB,2)) MB)"
+        Invoke-Hf upload $Repo $local $inRepo --repo-type dataset --commit-message "payload: $inRepo"
         if ($LASTEXITCODE -ne 0) { Fail "upload of $($f.name) failed" }
 
         # Keep the immutable copy as a mirror: it costs nothing and it is a second address that
@@ -227,7 +243,7 @@ foreach ($entry in Get-AllComponents) {
 
         $f.size   = $size
         $f.sha256 = $sha
-        $f | Add-Member -NotePropertyName url -NotePropertyValue "$base/$($f.name)" -Force
+        $f | Add-Member -NotePropertyName url -NotePropertyValue "$base/$inRepo" -Force
         if ($mirrors.Count -gt 0) { $f | Add-Member -NotePropertyName mirrors -NotePropertyValue $mirrors -Force }
         else { $f.PSObject.Properties.Remove('mirrors') }
         $uploaded.Add("$componentName/$($f.name)")

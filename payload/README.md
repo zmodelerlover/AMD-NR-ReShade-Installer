@@ -70,10 +70,52 @@ GitHub release asset remains a valid place to put one of these without any code 
 | `shader` | `AMD_Neural_Feed.fx`, the companion effect | the dataset repo |
 | `optiscaler` | the neural-amd-opti release archive, with every file taken out of it pinned | its GitHub release |
 | `opti-runtime` | the runtime build OptiScaler drives | the dataset repo |
+| `lmxxf-weights` | `native-game-tiled-assets.zip`, the lmxxf runtime's weights (0.2.0 and later) | the dataset repo |
+| `mochizuki` | `mochizuki-<version>.zip`: `MochizukiNrRuntime.dll`, its shaders, its prewarm list and DLSSNR-AMD's licence (`dlssnr-amd/LICENSE-DLSSNR-AMD.txt`), every file pinned (0.4.0 and later) | its `url` |
+| `mochizuki-model` | `dlssnr.bin`, the mochizuki runtime's model, one version per model | its `url` |
 
 Versions of OptiScaler past the one in `components` live under a top-level `releases` key, with
-the lmxxf weights (`lmxxf-weights`) inside the version that needs them. Older apps ignore that key.
-The add-on, bridge and shader files also carry the v0.6.6 GitHub release assets as `mirrors`.
+the lmxxf weights (`lmxxf-weights`) and the mochizuki runtime inside the version that needs them.
+Older apps ignore that key. The add-on, bridge and shader files also carry the v0.6.6 GitHub release
+assets as `mirrors`.
+
+### mochizuki: paths two levels deep for files three levels down
+
+The runtime reads `dlssnr-amd\shaders\runtime\x.spv`, and every app already published refuses a
+whole manifest that has a path deeper than two levels -- inside `releases` too, which v0.5.x reads. So
+the payload spells the folders under `dlssnr-amd` with dots: `dlssnr-amd.shaders.runtime/x.spv` in
+the archive and in the cache, `dlssnr-amd\shaders\runtime\x.spv` in the game
+(`Work.MochizukiDestination`). The model needs no spelling: `dlssnr-amd/dlssnr.bin`.
+
+Both components are installed only when somebody ticks mochizuki in the sheet, and they are
+`OnDemand`: never in the first-run wizard or in Download all. v0.5.x never downloads them, since it
+does not know their names. An install with the box unticked takes out, in the same transaction,
+what an earlier install put in of them (`Transaction.PlanRetire`).
+
+### A version being prepared: placeholder pins
+
+A pin of 64 zeros (`PayloadManifest.PlaceholderSha`) stands for bytes that do not exist yet. A release
+with one anywhere in it is **not offered** by v0.6.0 and later, so `payload.json` can carry the next
+OptiScaler with its layout written out while its archive is still being built.
+`tools/publish-payload.ps1` refuses to publish a manifest with a placeholder, and
+`tools/check-release.ps1` refuses a build that carries one: an older app does not know the rule and
+would offer that version and fail it.
+
+The pins come from the files themselves:
+
+```powershell
+# the OptiScaler archive, downloaded back from its GitHub release
+.\tools\pin-optiscaler.ps1 -Zip <OptiScaler-X.Y.Z-amd-nr.zip> -Published yyyy-MM-dd
+# the mochizuki files, laid out as the game gets them; builds mochizuki-X.Y.Z-amd-nr.zip too
+.\tools\pin-mochizuki.ps1 -From <folder with MochizukiNrRuntime.dll and dlssnr-amd\> -License <DLSSNR-AMD's LICENSE> -Version X.Y.Z-amd-nr
+```
+
+`pin-optiscaler.ps1` checks the archive's own `SHA256SUMS.txt` and refuses a file name v0.5.0 and
+v0.5.1 would refuse to install. `pin-mochizuki.ps1` refuses what the runtime writes while a game runs
+(`pipeline.cache`, `*.tmp`, logs), checks the prewarm list was made for these shaders, puts
+DLSSNR-AMD's MIT notice in the archive beside the shaders (never among them: the prewarm list is
+checked against every file in `shaders\`), and builds the same archive from the same files on any
+machine.
 
 `path` puts a file somewhere other than the component's root. The bridge and x86-extras use it to
 rebuild the `files\` layout the 32-bit installer reads.
@@ -93,7 +135,8 @@ downloaded back from their published addresses and re-hashed.
 
 `.\tools\publish-payload.ps1` does all of it; see **Publishing** above. By hand it is: upload the
 file under its own name, update `size`, `sha256` and the component `version` here, upload this file,
-and download both back to check them.
+and download both back to check them. A file whose address already names a folder is uploaded back
+to that same path.
 
 Never change what an existing `version` points at. The cache is keyed by version and trusts the
 hash, so different bytes under an unchanged version read as corruption to everyone who already has

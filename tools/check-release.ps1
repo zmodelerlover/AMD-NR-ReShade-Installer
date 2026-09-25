@@ -46,6 +46,15 @@ if (Test-Path $Exe) {
     Write-Host "  skip  no exe at $Exe; run dotnet publish first" -ForegroundColor Yellow
 }
 
+# 2b. the payload list built into the exe and shipped beside it: no pin still a placeholder (64 zeros).
+#     That is a release being prepared; this build hides it, the installers already out there would not.
+foreach ($list in @((Join-Path $root 'payload/payload.json'), (Join-Path (Split-Path $Exe -Parent) 'payload.json'))) {
+    if (-not (Test-Path $list)) { continue }
+    $zeros = [regex]::Matches((Get-Content $list -Raw), '"sha256":\s*"0{64}"').Count
+    if ($zeros -gt 0) { Bad "$list still has $zeros placeholder pin(s); run tools/pin-optiscaler.ps1 and tools/pin-mochizuki.ps1" }
+    else { Ok "$list has no placeholder pins" }
+}
+
 # 3. what the newest release is tagged, and what is actually attached to it
 $latest = gh api "repos/$Repo/releases/latest" --jq '.tag_name' 2>$null
 if (-not $latest) {
