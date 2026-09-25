@@ -34,6 +34,8 @@ public static class SupportReport
         // The 32-bit bridge does not use the name above: it writes one log per half of the pair,
         // and those two are what said which hotkey the add-on was actually running with.
         "amd-nr-x86.log", "amd-nr-x86-host.log",
+        // The mochizuki runtime's own, beside it: why its network was not built is only said there.
+        "mochizuki_nr.log",
     ];
 
     /// <summary>A single file this big is taken in full; past it, the tail is taken and the cut is
@@ -203,6 +205,7 @@ public static class SupportReport
         o.AppendLine($"driver          {state.Driver}");
         o.AppendLine($"hip 7           {GpuService.FindHip7() ?? "not found"}");
         o.AppendLine($"looks radeon    {state.LooksLikeRadeon}");
+        o.AppendLine($"rdna4           {state.Rdna4?.ToString() ?? "unknown"}");
         o.AppendLine($"ready           {state.Ready}");
         o.AppendLine();
         o.AppendLine($"data folder     {AppPaths.Root}");

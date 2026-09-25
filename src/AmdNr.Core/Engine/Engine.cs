@@ -204,6 +204,8 @@ public static partial class Engine
         // OptiScaler 0.2.0's second runtime. Its modules, shaders and weights are matched by
         // IsAllowed below rather than listed.
         "LmxxfNrRuntime.dll",
+        // OptiScaler 0.4.0's third runtime, mochizuki. Its dlssnr-amd folder is matched by rule.
+        "MochizukiNrRuntime.dll",
     };
 
     /// <summary>Folders whose every plain file is ours: the lmxxf runtime's HIP modules and its
@@ -214,11 +216,13 @@ public static partial class Engine
 
     /// <summary>Whether this installer may create, back up or remove a file under this name:
     /// everything in <see cref="Allowed"/>, one plain file directly inside an
-    /// <see cref="OwnedFolders"/> folder, and the lmxxf runtime's own shaders. "shaders" is a name
-    /// other software uses too, so only the native_*.hlsl the runtime ships are ours there.</summary>
+    /// <see cref="OwnedFolders"/> folder, the lmxxf runtime's own shaders, and the mochizuki runtime's
+    /// dlssnr-amd tree (<see cref="IsMochizukiData"/>). "shaders" is a name other software uses too,
+    /// so only the native_*.hlsl the runtime ships are ours there.</summary>
     public static bool IsAllowed(string name)
     {
         if (Allowed.Contains(name)) return true;
+        if (IsMochizukiData(name)) return true;
         var slash = name.IndexOf('/');
         if (slash <= 0 || name.IndexOf('/', slash + 1) >= 0) return false;
         var folder = name[..slash];
@@ -229,6 +233,29 @@ public static partial class Engine
                || folder == "shaders" && file.StartsWith("native_", StringComparison.Ordinal)
                                       && file.EndsWith(".hlsl", StringComparison.Ordinal);
     }
+
+    /// <summary>The folder the mochizuki runtime reads beside itself: its model, its shaders in
+    /// shaders\ and one level of subfolders there, and its prewarm list. The name is the runtime's
+    /// own (upstream DLSSNR-AMD's), and the names inside come from upstream and change with it.</summary>
+    public const string MochizukiFolder = "dlssnr-amd";
+
+    /// <summary>A plain file in dlssnr-amd\, or up to two folders below it: dlssnr-amd\dlssnr.bin,
+    /// dlssnr-amd\prewarm\manifest.txt, dlssnr-amd\shaders\runtime\x.spv. Nothing deeper, nothing
+    /// that climbs.</summary>
+    private static bool IsMochizukiData(string name)
+    {
+        var segments = name.Split('/');
+        if (segments.Length is < 2 or > 4 || segments[0] != MochizukiFolder) return false;
+        return segments.Skip(1).All(s => s.Length is > 0 and <= 96 && s is not ("." or "..")
+                                         && s.IndexOfAny(Path.GetInvalidFileNameChars()) < 0);
+    }
+
+    /// <summary>Files an install writes that the runtime rewrites on its own afterwards: the mochizuki
+    /// prewarm list, which the runtime replaces with one for this machine's driver the first time the
+    /// one shipped does not match it. Changed since the install, such a file is still this app's:
+    /// a reinstall of the same version keeps what the runtime made of it, a new version replaces it,
+    /// and uninstall takes it either way.</summary>
+    public static bool IsRuntimeMaintained(string name) => name == MochizukiFolder + "/prewarm/manifest.txt";
 
     /// <summary>The most entries a manifest may hold. A sanity bound only: the lmxxf weights alone
     /// are some 460 files.</summary>

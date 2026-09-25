@@ -3,7 +3,8 @@
 // sits where the game hands DLSS, FSR or XeSS its colour, depth and motion vectors, so the network
 // gets all three. What it installs is the OptiScaler AMD neural rendering build
 // (MatheusFerreiraS/neural-amd-opti), the runtime build that OptiScaler recognises, once per pass,
-// and the same weights the add-on uses.
+// and the same weights the add-on uses -- and, only when asked for, the mochizuki runtime
+// (Work.Mochizuki.cs).
 //
 // It goes through the same transaction as every other route (one manifest, a backup of whatever
 // it displaces, uninstall putting that back), and it shares the 64-bit manifest with the ReShade
@@ -90,6 +91,12 @@ public static partial class Work
         if (payload.Has(PayloadManifest.RuntimeComponent)
             && payload.Component(PayloadManifest.RuntimeComponent).Files.FirstOrDefault(f => f.Name == WeightsName) is { } weights)
             pinned[WeightsName] = Engine.Lower(weights.Sha256);
+        // Asked about only where an install has them: a folder installed without mochizuki has none
+        // of these names in its manifest.
+        if (payload.Has(PayloadManifest.MochizukiComponent) && payload.Has(PayloadManifest.MochizukiModelComponent))
+            foreach (var name in new[] { PayloadManifest.MochizukiComponent, PayloadManifest.MochizukiModelComponent })
+                foreach (var file in payload.Component(name).Installed)
+                    pinned[MochizukiDestination(file.RelativePath)] = Engine.Lower(file.Sha256);
         return pinned;
     }
 
@@ -179,7 +186,8 @@ public static partial class Work
             .Concat(OptiPasses.Select(p => (p, pins.OptiRuntimeSize)))
             .Append((WeightsName, pins.WeightsSize));
 
-    private static Report PreflightOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy)
+    private static Report PreflightOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
+        bool mochizuki)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -206,6 +214,7 @@ public static partial class Work
             else
                 report.Ok("Every OptiScaler file is there. Installing verifies the SHA-256 of each one.");
         }
+        if (mochizuki) CheckMochizukiPayload(src, pins, report);
 
         if (dir.Length == 0)
         {
@@ -223,8 +232,11 @@ public static partial class Work
                 + "administrator rights. Run this installer as administrator, or move the game.");
 
         var proxyName = OptiProxyFor(proxy);
+        var manifest = InstalledManifest(dir);
+        var retiring = !mochizuki && MochizukiRecorded(manifest).Count > 0;
         var held = new[] { proxyName, WeightsName }.Concat(OptiPasses)
-            .Where(n => Engine.IsLocked(Path.Combine(dir, n))).ToList();
+            .Where(n => Engine.IsLocked(Path.Combine(dir, n)))
+            .Concat(mochizuki || retiring ? MochizukiHeld(dir) : []).ToList();
         if (held.Count > 0)
             report.Err(
                 $"{string.Join(", ", held)} {(held.Count == 1 ? "is" : "are")} open by another program. "
@@ -234,16 +246,18 @@ public static partial class Work
         {
             var need = OptiPayloadSizes(src, pins)
                 .Where(f => Engine.SizeOf(Path.Combine(dir, OptiDestination(f.Name, proxyName))) != f.Size)
-                .Aggregate(0UL, (sum, f) => sum + f.Size);
+                .Aggregate(0UL, (sum, f) => sum + f.Size)
+                + (mochizuki ? MochizukiNeed(src, dir, pins) : 0);
             if (Engine.FreeBytes(dir) is { } free && need > 0 && free < need)
                 report.Err($"Not enough room: {free / 1_048_576} MB free, and this needs {need / 1_048_576} MB.");
         }
 
-        var manifest = InstalledManifest(dir);
         CheckOptiInTheWay(dir, proxyName, manifest, report);
         CheckRuntimeAsVersionDll(dir, report);
         CheckUpscaler(dir, report);
         CheckOptiRouteIsReachable(dir, report);
+        if (!mochizuki && manifest?.Entries.Any(e => e.Name == MochizukiRuntimeName && e.Owned) == true)
+            report.Info(MochizukiComesOut);
 
         if (File.Exists(Path.Combine(dir, OptiScalerIni)) && manifest?.Entries.Any(e => e.Name == OptiScalerIni) != true)
             report.Info($"{OptiScalerIni} is already here and stays as it is: it is your configuration.");
@@ -252,7 +266,8 @@ public static partial class Work
         return report;
     }
 
-    private static Report InstallOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy)
+    private static Report InstallOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
+        bool mochizuki)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -279,6 +294,12 @@ public static partial class Work
         if (src.Length == 0 || !Directory.Exists(src))
         {
             report.Err("No payload folder given, and every file this installs comes out of one.");
+            return report;
+        }
+        if (mochizuki && pins.MochizukiFiles.Count == 0)
+        {
+            report.Err(NoMochizuki);
+            report.Info("Nothing was written: fix the problem above and run it again.");
             return report;
         }
 
@@ -312,6 +333,11 @@ public static partial class Work
                 files[pass] = runtime;
         if (VerifiedPayload(src, WeightsName, pins.WeightsSha, report) is { } weights)
             files[WeightsName] = weights;
+        if (mochizuki)
+        {
+            AddMochizuki(files, src, pins, report);
+            PickMochizukiInIni(files, dir, manifest, report);
+        }
 
         if (report.Failed)
         {
@@ -319,10 +345,13 @@ public static partial class Work
             return report;
         }
 
+        // What an earlier install put in of mochizuki and this one does not write again comes out in
+        // the same transaction: all of it when it was left off, what an older build had when it is on.
+        var recorded = MochizukiRecorded(manifest);
         var log = new List<string>();
         try
         {
-            Transaction.Apply(dir, Preset.OptiScaler.ManifestPreset(), Route.X64, files, log);
+            Transaction.Apply(dir, Preset.OptiScaler.ManifestPreset(), Route.X64, files, log, recorded);
             foreach (var line in log) Narrate(line, report);
         }
         catch (InstallException e)
@@ -337,6 +366,8 @@ public static partial class Work
             report.Info(
                 "The lmxxf runtime went in too, with its weights. It runs on RDNA4 (gfx1201) cards only: "
                 + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
+        if (mochizuki) report.Info(MochizukiInstalled);
+        else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);
         report.Info(Preset.OptiScaler.Note());
         return report;
     }
@@ -346,6 +377,7 @@ public static partial class Work
     /// rest of it is its own installer's to take.</summary>
     private static void AfterOptiScalerUninstall(string dir, bool recorded, Report report)
     {
+        AfterMochizukiUninstall(dir, report);
         var cache = Path.Combine(dir, ShaderCache);
         try
         {

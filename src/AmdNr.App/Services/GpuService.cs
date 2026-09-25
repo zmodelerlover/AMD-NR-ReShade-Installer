@@ -12,7 +12,9 @@ using System.Runtime.InteropServices;
 
 namespace AmdNr.App;
 
-public sealed record SystemState(string Gpu, string Driver, bool Hip7, bool LooksLikeRadeon)
+/// <param name="Rdna4">Whether the card is RDNA4 (RX 9000 series), which the mochizuki runtime needs:
+/// null when no adapter could be read, so nobody is told their card cannot do what it can.</param>
+public sealed record SystemState(string Gpu, string Driver, bool Hip7, bool LooksLikeRadeon, bool? Rdna4 = null)
 {
     public bool Ready => Hip7 && LooksLikeRadeon;
 }
@@ -27,6 +29,7 @@ public static unsafe class GpuService
         var name = "unknown";
         var driver = "unknown";
         var radeon = false;
+        bool? rdna4 = null;
         try
         {
             // A laptop reports the integrated adapter too; the Radeon is the one that matters, and
@@ -39,6 +42,7 @@ public static unsafe class GpuService
                 name = best.Name;
                 driver = best.Driver ?? driver;
                 radeon = best.Vendor == AmdVendor || best.Name.Contains("Radeon", StringComparison.OrdinalIgnoreCase);
+                rdna4 = IsRdna4(best.Vendor, best.Device, best.Name);
             }
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or COMException
@@ -46,8 +50,20 @@ public static unsafe class GpuService
         {
             // No DXGI is a machine this cannot run on anyway; say "unknown" rather than fall over.
         }
-        return new SystemState(name, driver, FindHip7() is not null, radeon);
+        return new SystemState(name, driver, FindHip7() is not null, radeon, rdna4);
     }
+
+    /// <summary>The Navi 48 and Navi 44 device ids: RX 9070 XT, 9070 and 9070 GRE, Radeon AI PRO R9700,
+    /// RX 9060 XT and 9060.</summary>
+    private static readonly uint[] Rdna4Devices = [0x7550, 0x7551, 0x7590, 0x7591];
+
+    /// <summary>RDNA4, by device id, or by the name every RDNA4 card has carried so far: RX 9000-something,
+    /// or AI PRO R9000-something. A card named after neither is taken for what it says it is.</summary>
+    public static bool IsRdna4(uint vendor, uint device, string name) =>
+        vendor == AmdVendor
+        && (Rdna4Devices.Contains(device)
+            || System.Text.RegularExpressions.Regex.IsMatch(name, @"\bRX\s*9\d{3}|\bAI\s*PRO\s*R9\d{3}",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase));
 
     /// <summary>amdhip64_7.dll on the search path. HIP 6 does not count, which is why the name is
     /// checked rather than "some HIP".</summary>
@@ -72,7 +88,7 @@ public static unsafe class GpuService
         return null;
     }
 
-    private sealed record Adapter(string Name, uint Vendor, ulong Memory, string? Driver);
+    private sealed record Adapter(string Name, uint Vendor, uint Device, ulong Memory, string? Driver);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct AdapterDesc1
@@ -125,7 +141,7 @@ public static unsafe class GpuService
                         : null;
 
                     found.Add(new Adapter(new string(desc.Description).TrimEnd('\0', ' '), desc.VendorId,
-                        desc.DedicatedVideoMemory, driver));
+                        desc.DeviceId, desc.DedicatedVideoMemory, driver));
                 }
                 finally
                 {

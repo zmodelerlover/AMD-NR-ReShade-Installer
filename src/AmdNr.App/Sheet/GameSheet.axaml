@@ -288,6 +288,16 @@
                             <TextBlock x:Name="OptiVersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                           </StackPanel>
                         </Grid>
+                        <!-- The third runtime, only where the version chosen carries it. Off until
+                             ticked: experimental, RDNA4 only, and a 141 MB model to download. -->
+                        <StackPanel x:Name="MochizukiSection" Spacing="6" IsVisible="False">
+                          <TextBlock Text="{DynamicResource Str.MochizukiSection}" Classes="section" />
+                          <CheckBox x:Name="MochizukiBox" IsCheckedChanged="OnMochizukiChanged"
+                                    AutomationProperties.Name="{DynamicResource Str.MochizukiCheck}">
+                            <TextBlock Text="{DynamicResource Str.MochizukiCheck}" TextWrapping="Wrap" />
+                          </CheckBox>
+                          <TextBlock x:Name="MochizukiNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                        </StackPanel>
                         <StackPanel Spacing="8">
                           <TextBlock Text="{DynamicResource Str.InGame}" Classes="section" />
                           <Grid ColumnDefinitions="22,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">

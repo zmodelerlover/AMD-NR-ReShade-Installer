@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AmdNr.Core;
 
-public static class Transaction
+public static partial class Transaction
 {
     /// <summary>Everything about the folder that would make the transaction fail halfway, checked
     /// before the journal is written so a refusal costs nothing and says why.
@@ -51,7 +51,8 @@ public static class Transaction
     {
         public required string Name { get; init; }
         public required byte[] Before { get; init; }
-        public required byte[] After { get; init; }
+        /// <summary>What goes there, or null when the file comes out (see <see cref="PlanRetire"/>).</summary>
+        public required byte[]? After { get; init; }
         public required bool Existed { get; init; }
     }
 
@@ -83,9 +84,11 @@ public static class Transaction
         try { File.Delete(was); } catch (IOException) { /* the new one is authoritative either way */ }
     }
     /// <summary><paramref name="desired"/> is whatever the route's own planner decided to write;
-    /// this function is deliberately ignorant of what those files mean.</summary>
+    /// this function is deliberately ignorant of what those files mean. <paramref name="retire"/>
+    /// names recorded files the route no longer wants here, taken out in the same transaction
+    /// (<see cref="PlanRetire"/>); a name that is also in <paramref name="desired"/> is not one.</summary>
     public static void Apply(string dir, string preset, Route route,
-        SortedDictionary<string, byte[]> desired, List<string> log)
+        SortedDictionary<string, byte[]> desired, List<string> log, IEnumerable<string>? retire = null)
     {
         Guard(dir, desired);
         MigrateLegacyManifest(dir, route);
@@ -149,7 +152,19 @@ public static class Transaction
                     log.Add($"PRESERVED user-modified config: {name}");
                     continue;
                 }
-                throw new InstallException($"File changed since install; preserved: {name}");
+                // What the runtime made of a file an install recorded: kept while the version is the
+                // same one, and replaced by the new version's. The entry says what was there when it
+                // was recorded -- written by this app, or an identical copy somebody had put in by
+                // hand -- and either way those were the bytes this app pinned, so there is nothing of
+                // anybody's to back up: the new list is this app's from here on.
+                if (!Engine.IsRuntimeMaintained(name))
+                    throw new InstallException($"File changed since install; preserved: {name}");
+                if (m.Entries[index].Hash == wanted)
+                {
+                    log.Add($"KEPT as the runtime updated it: {name}");
+                    continue;
+                }
+                m.Entries[index].Owned = true;
             }
 
             var before = exists ? Engine.Read(dst) : [];
@@ -199,7 +214,11 @@ public static class Transaction
             changes.Add(new Change { Name = name, Before = before, After = data, Existed = exists });
         }
 
+        var (retired, spent) = PlanRetire(dir, m, desired, retire ?? [], changes, log);
+
         // Journal precedes target writes. Uninstall can recover interrupted installs using hashes.
+        // The journal still lists what is being taken out, so an uninstall after a crash here
+        // finds it whether or not it went already.
         var hadManifest = File.Exists(manifestPath);
         var oldManifest = hadManifest ? Engine.Read(manifestPath) : [];
         m.State = "installing";
@@ -213,6 +232,11 @@ public static class Transaction
                 // Not every destination is in the game's root any more: the companion effect
                 // goes into reshade-shaders\Shaders, which may not exist yet.
                 var dst = Path.Combine(dir, c.Name);
+                if (c.After is null)
+                {
+                    Remove(dst);
+                    continue;
+                }
                 Engine.MakeParent(dst);
                 Engine.Write(dst, c.After);
             }
@@ -225,12 +249,18 @@ public static class Transaction
 
         if (failure is null)
         {
+            m.Entries.RemoveAll(retired.Contains);
             m.State = "installed";
             try { Manifest.WriteAtomic(dir, m); }
             catch (InstallException e) { failure = e; }
         }
 
-        if (failure is null) return;
+        if (failure is null)
+        {
+            // The originals are back where they were; their copies are not needed any more.
+            foreach (var backup in spent) TryDelete(backup);
+            return;
+        }
 
         for (var i = changes.Count - 1; i >= 0; i--)
         {

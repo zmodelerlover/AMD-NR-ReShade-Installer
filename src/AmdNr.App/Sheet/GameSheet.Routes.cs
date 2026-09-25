@@ -121,6 +121,7 @@ public partial class GameSheet
         }
         ShowProxies(preset);
         ShowVersions(preset);
+        ShowMochizuki();
         ShowInstallLabel();
     }
 
@@ -261,7 +262,8 @@ public partial class GameSheet
     {
         null => "",
         { Opti: { } opti } => Ui.Format("Str.VersionNoteOpti", opti.Version)
-            + (opti.Components.ContainsKey(PayloadManifest.LmxxfWeightsComponent) ? " " + Ui.Text("Str.VersionNoteOptiLmxxf") : ""),
+            + (opti.Components.ContainsKey(PayloadManifest.LmxxfWeightsComponent) ? " " + Ui.Text("Str.VersionNoteOptiLmxxf") : "")
+            + (CarriesMochizuki(opti) ? " " + Ui.Text("Str.VersionNoteOptiMochizuki") : ""),
         { Release: null } => Ui.Text("Str.VersionNoteShipped"),
         _ => Ui.Format("Str.VersionNoteRelease", _version.Version),
     };
@@ -274,9 +276,61 @@ public partial class GameSheet
         Remember(card, _version);
         Library.Save();
         (box == OptiVersionBox ? OptiVersionNote : VersionNote).Text = VersionNoteText();
+        ShowMochizuki();
         ShowInstallLabel();
         // A different version is a different pair of hashes, so the pre-flight has to be redone:
         // "already installed" is only true of the version that is actually in the folder.
+        _ = RefreshAsync();
+    }
+
+    /// <summary>Whether this OptiScaler version brings the mochizuki runtime: its runtime and its model.</summary>
+    private static bool CarriesMochizuki(ComponentRelease opti) =>
+        opti.Components.ContainsKey(PayloadManifest.MochizukiComponent)
+        && opti.Components.ContainsKey(PayloadManifest.MochizukiModelComponent);
+
+    /// <summary>The mochizuki choice: shown when the OptiScaler version chosen carries it, remembered
+    /// per game, and not offered on a card known not to be RDNA4 -- where it could only stay off in
+    /// game. A card this app could not read is given the benefit of the doubt, and the note says so.</summary>
+    private void ShowMochizuki()
+    {
+        if (_card is not { } card) return;
+        var machine = Session.Machine;
+        MochizukiSection.IsVisible = card.Entry.Preset.IsOptiScaler() && _version?.Opti is { } opti && CarriesMochizuki(opti);
+        _setting = true;
+        MochizukiBox.IsEnabled = machine?.Rdna4 != false;
+        MochizukiBox.IsChecked = ChoseMochizuki(card) && machine?.Rdna4 != false;
+        _setting = false;
+        MochizukiNote.Text = machine?.Rdna4 switch
+        {
+            false => Ui.Format("Str.MochizukiNotRdna4", machine!.Gpu),
+            null => Ui.Text("Str.MochizukiNote") + " " + Ui.Text("Str.MochizukiUnknownGpu"),
+            _ => Ui.Text("Str.MochizukiNote"),
+        };
+    }
+
+    /// <summary>Whether an install from this sheet brings mochizuki: the OptiScaler route, a version
+    /// that carries it, ticked for this game, and not a card known not to be RDNA4. An install without
+    /// it takes out what an earlier one put in, so this is also what stays in the folder.</summary>
+    private bool WantsMochizuki(GameCard card) =>
+        card.Entry.Preset.IsOptiScaler() && ChoseMochizuki(card) && Session.Machine?.Rdna4 != false
+        && _version?.Opti is { } opti && CarriesMochizuki(opti);
+
+    /// <summary>The box as the person last set it for this game, or, until they touch it, what the
+    /// folder has: on where this app installed mochizuki. Read off the folder's manifest, like the
+    /// tile's out-of-date badge, and wrapped the same way: a folder that cannot be read is "no".</summary>
+    private static bool ChoseMochizuki(GameCard card)
+    {
+        if (card.Entry.Mochizuki is { } chosen) return chosen;
+        try { return Work.HasMochizuki(TargetFor(card)); }
+        catch (Exception) { return false; }
+    }
+
+    private void OnMochizukiChanged(object? sender, RoutedEventArgs e)
+    {
+        if (_setting || _card is not { } card) return;
+        card.Entry.Mochizuki = MochizukiBox.IsChecked == true;
+        Library.Save();
+        // A different set of files to download and to install: the pre-flight says so again.
         _ = RefreshAsync();
     }
 

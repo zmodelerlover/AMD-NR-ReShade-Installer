@@ -56,10 +56,20 @@ ships an upscaler, that route is the one selected. Every ReShade route stays in 
 | `dlssnr_on_amd_weights.bin` | the same weights as the add-on |
 | `LmxxfNrRuntime.dll`, `lmxxf-modules\`, `shaders\` | the second runtime OptiScaler 0.2.0 can drive, lmxxf's open-source port (RDNA4) |
 | `native-game-tiled-assets\` | its weights, about 590 MB |
+| `MochizukiNrRuntime.dll`, `dlssnr-amd\` | only when ticked: the third runtime OptiScaler 0.4.0 can drive, mochizuki's Vulkan port (RDNA4, experimental), with its shaders, prewarm list and model (`dlssnr.bin`, about 141 MB) |
 
 The game's OptiScaler panel has an **OptiScaler version** menu, beside the name it loads as, like the
 add-on's on the ReShade side: every version the payload list carries, newest first, remembered per
 game. The lmxxf files come with 0.2.0 and later only.
+
+A version that carries mochizuki shows **NR runtime** under it: a box, off by default and remembered
+per game, that installs mochizuki too and sets `[DlssNr] NrBackend=mochizuki` in `OptiScaler.ini`
+(the one key the app writes there, in place). Unticked, the next install takes back out what the app
+put in of it; with no choice on record (a game added again, another PC) the box follows the folder.
+It is offered only on an RDNA4 card when the app can tell which card it is, and says so when it
+cannot. An `OptiScaler.ini` that holds your own settings is left alone; the report then says to pick
+mochizuki in OptiScaler's Neural tab. mochizuki files copied in by hand before are recorded as yours
+and stay yours.
 
 No ReShade is installed on this route. Its files are downloaded when the route is installed, not
 in the first-run wizard, and the install goes through the same transaction, manifest and backups as
@@ -138,7 +148,10 @@ The OptiScaler route installs [neural-amd-opti](https://github.com/MatheusFerrei
 an OptiScaler fork (GPL-3.0) that carries the bridge into the same runtime. Its release archive is
 downloaded as published; none of its code is part of this app. The lmxxf runtime it ships is
 [lmxxf/dlss5-on-amd-9070xt-porting](https://github.com/lmxxf/dlss5-on-amd-9070xt-porting) (MIT);
-its weights are NVIDIA-derived and, like the others, are not in this repository.
+its weights are NVIDIA-derived and, like the others, are not in this repository. The mochizuki
+runtime is neural-amd-opti's build of [mochizuki0323/DLSSNR-AMD](https://github.com/mochizuki0323/DLSSNR-AMD)
+(MIT), and its licence goes into the game folder with it, as `dlssnr-amd\LICENSE-DLSSNR-AMD.txt`;
+its model is NVIDIA-derived too, and is not in this repository either.
 
 The install engine is ported from the Rust installer in
 [dlss5-neural-amd](https://github.com/zmodelerlover/dlss5-neural-amd) (MIT).

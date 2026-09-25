@@ -39,6 +39,11 @@ public sealed class PayloadPins
     public string OptiRuntimeName { get; init; } = string.Empty;
     public string OptiRuntimeSha { get; init; } = string.Empty;
     public ulong OptiRuntimeSize { get; init; }
+
+    /// <summary>The mochizuki runtime's files -- the runtime, its shaders, its prewarm list and its
+    /// model -- by their path in the payload folder. Empty when the OptiScaler version chosen does
+    /// not carry it; installed only when it is asked for.</summary>
+    public IReadOnlyDictionary<string, string> MochizukiFiles { get; init; } = new Dictionary<string, string>();
 }
 
 /// <summary>What the target says about which route applies. A folder can hold a 32-bit launcher
@@ -296,6 +301,8 @@ public static partial class Work
         else if (Strip(line, "WARNING ") is { } warning) report.Warn(warning);
         else if (Strip(line, "CHANGED: ") is { } changed)
             report.Ok($"{changed} had changed since the install; it is still this app's, so it went too.");
+        else if (Strip(line, "KEPT as the runtime updated it: ") is { } kept)
+            report.Ok($"{kept} kept as the runtime rewrote it for this machine.");
         else report.Info(line); // PRESERVED lines and anything the engine adds later read fine as they are.
 
         static string? Strip(string s, string prefix) =>
@@ -335,17 +342,20 @@ public static partial class Work
     // Everything that can be known before a single byte is written, and cheap enough to redo while
     // a path is still being pasted: metadata, one open(), one free-space call.
 
+    /// <param name="mochizuki">The OptiScaler route only: install the mochizuki runtime as well, and
+    /// make it the NR runtime. Every other route ignores it.</param>
     public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
-        string? proxy = null) =>
+        string? proxy = null, bool mochizuki = false) =>
         preset.IsOptiScaler()
-            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy)
+            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki)
             : PreflightReShade(gameDir, payloadDir, preset, pins, proxy);
 
     // -- Install ---------------------------------------------------------------------------------
 
+    /// <param name="mochizuki">See <see cref="Preflight"/>.</param>
     public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
-        string? proxy = null) =>
+        string? proxy = null, bool mochizuki = false) =>
         preset.Route() == Route.X86 ? InstallX86(gameDir, payloadDir, preset, proxy)
-        : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy)
+        : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki)
         : InstallReShade(gameDir, payloadDir, preset, pins, proxy);
 }

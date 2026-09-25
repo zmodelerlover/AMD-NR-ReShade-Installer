@@ -39,7 +39,10 @@ public static partial class Work
         var builds = new HashSet<string>([Engine.ReShadeSha, Engine.ReShade64Sha, Engine.D3d8To9Sha, .. pinned ?? []],
             StringComparer.OrdinalIgnoreCase);
         var proxies = Proxies.Append("d3d8R.dll").ToArray();
-        bool Ours(string name, string sha) => OurNames.Contains(name) || proxies.Contains(name) && builds.Contains(sha);
+        // A file the runtime rewrites on its own (the mochizuki prewarm list) is changed by design,
+        // and still this app's.
+        bool Ours(string name, string sha) => OurNames.Contains(name) || Engine.IsRuntimeMaintained(name)
+                                              || proxies.Contains(name) && builds.Contains(sha);
 
         var gone = 0;
         var recorded = Manifests(dir, migrate: true);
@@ -176,6 +179,8 @@ public static partial class Work
         "amd-nr-x86-host.log", "dlssnr_on_amd.log", "dlssnr_on_amd.ini",
         // What OptiScaler and its bridge into the runtime write while a game runs.
         "OptiScaler.log", "amd_bridge.log", "amd_presr.log",
+        // And the mochizuki runtime, beside itself.
+        MochizukiLog,
     ];
 
     internal static readonly string[] DroppingFolders = ["amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures"];

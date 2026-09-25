@@ -286,7 +286,9 @@ void Flows()
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated
           && card.Entry.OptiScalerVersion == "1.0.2", $"Update installs the newer one ({verdict.Text})");
 
+    MochizukiFlow.Run(main, sheet, card, game, Check, Until, Click, (w, n) => Save(w, n)); // leaves 1.0.3 with mochizuki
     UninstallFlow.Run(main, sheet, card, game, TileSays, Check, Until, Click, (w, n) => Save(w, n)); // the installed route, whatever is selected
+    Check(!Directory.Exists(Path.Combine(game, "dlssnr-amd")) && !File.Exists(Path.Combine(game, "MochizukiNrRuntime.dll")), "and mochizuki went with it");
 
     Named<RadioButton>("RouteReShade").IsChecked = true;
     Settle(6);

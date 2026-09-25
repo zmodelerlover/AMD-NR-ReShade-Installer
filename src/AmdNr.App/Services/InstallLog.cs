@@ -146,6 +146,7 @@ public static class InstallLog
         [
             .. Work.InstalledMarkers,
             "amd-nr.ini", "ReShade.ini", "ReShade.log",
+            "MochizukiNrRuntime.dll", "dlssnr-amd/dlssnr.bin",
             "dxgi.dll", "d3d11.dll", "d3d12.dll", "d3d9.dll", "d3d8.dll", "d3d8R.dll", "opengl32.dll",
             Route.X64.ManifestFileName(), Engine.ManifestName,
         ];
@@ -214,6 +215,7 @@ public static class InstallLog
         Line(o, "driver", machine.Driver);
         Line(o, "hip 7", GpuService.FindHip7() ?? "not found");
         Line(o, "radeon", machine.LooksLikeRadeon ? "yes" : "no");
+        Line(o, "rdna4", machine.Rdna4 switch { true => "yes", false => "no", null => "unknown" });
     }
 
     internal static void Head(StringBuilder o, string title)

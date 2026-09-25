@@ -109,6 +109,12 @@
   <sys:String x:Key="Str.VersionSectionOpti">Versão do OptiScaler</sys:String>
   <sys:String x:Key="Str.VersionNoteOpti">OptiScaler {0}, do release no GitHub. Cada arquivo dele é conferido contra o hash que a lista do payload dá a ele.</sys:String>
   <sys:String x:Key="Str.VersionNoteOptiLmxxf">Instala também os pesos do runtime lmxxf, cerca de 590 MB, que só placas RDNA4 usam.</sys:String>
+  <sys:String x:Key="Str.VersionNoteOptiMochizuki">Pode levar também o runtime mochizuki: veja Runtime de NR abaixo.</sys:String>
+  <sys:String x:Key="Str.MochizukiSection">Runtime de NR</sys:String>
+  <sys:String x:Key="Str.MochizukiCheck">Instalar também o mochizuki e usá-lo como runtime de NR (experimental)</sys:String>
+  <sys:String x:Key="Str.MochizukiNote">A rede do DLSS 5 portada para Vulkan por mochizuki0323. Só RDNA4: série RX 9000, driver AMD 25.10 ou mais novo. Acrescenta MochizukiNrRuntime.dll e uma pasta dlssnr-amd com o modelo, cerca de 141 MB para baixar, e põe NrBackend=mochizuki no OptiScaler.ini. A primeira abertura de cada jogo compila a rede por alguns segundos. Desmarcado, a próxima instalação tira o que este app pôs dele.</sys:String>
+  <sys:String x:Key="Str.MochizukiNotRdna4">Não oferecido nesta placa ({0}): o mochizuki precisa das instruções de matriz FP8 da RDNA4, a série RX 9000.</sys:String>
+  <sys:String x:Key="Str.MochizukiUnknownGpu">Não deu para saber qual é esta placa; em qualquer uma fora da série RX 9000, o mochizuki fica desligado no jogo.</sys:String>
   <sys:String x:Key="Str.Checking">Conferindo esta pasta…</sys:String>
   <sys:String x:Key="Str.StepDownload">Baixar</sys:String>
   <sys:String x:Key="Str.StepVerify">Conferir</sys:String>

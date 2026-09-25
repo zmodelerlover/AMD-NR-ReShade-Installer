@@ -244,6 +244,3495 @@
   "releases": {
     "optiscaler": [
       {
+        "version": "0.4.0-amd-nr",
+        "components": {
+          "lmxxf-weights": {
+            "version": "1",
+            "files": [
+              {
+                "name": "native-game-tiled-assets.zip",
+                "size": 227971528,
+                "sha256": "7f6cdd1c34ffff8f8ecf95521cd7aa8880a1618bf07123a453356ad3235f800f",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/native-game-tiled-assets.zip"
+              }
+            ],
+            "extract": [
+              {
+                "name": "block0-attention.f32",
+                "path": "native-game-tiled-assets/block0-attention.f32",
+                "size": 32900,
+                "sha256": "2863026814bad0f2475f6ec03d35e7f5cd5ff9ea30355f3dad37145b509e9004"
+              },
+              {
+                "name": "block0-ffn.f16",
+                "path": "native-game-tiled-assets/block0-ffn.f16",
+                "size": 17472,
+                "sha256": "4a7f02e41da6ad46dda1947b2da7820f0766865d209ba60e013ce799cc8f6ced"
+              },
+              {
+                "name": "block1-attention.f32",
+                "path": "native-game-tiled-assets/block1-attention.f32",
+                "size": 32900,
+                "sha256": "3b5212fa9ac96296e02d1efc1a005fdb6a6abdf49d82cf7a6eb664f1b7d66bbd"
+              },
+              {
+                "name": "block1-ffn.f16",
+                "path": "native-game-tiled-assets/block1-ffn.f16",
+                "size": 17472,
+                "sha256": "41611e8e09d09b842f5fd61fe6531f42b05a2b38f74e19353152f44dc3cba1e7"
+              },
+              {
+                "name": "block10-attention.f32",
+                "path": "native-game-tiled-assets/block10-attention.f32",
+                "size": 328208,
+                "sha256": "00a1eea55845263e1ee1216d0d3fe98278227094dadd1aef3bc58e1bcffd2089"
+              },
+              {
+                "name": "block10-ffn.f16",
+                "path": "native-game-tiled-assets/block10-ffn.f16",
+                "size": 295168,
+                "sha256": "1e434a5a20a2bf0080feda71b04adbb0fb01fb40f2ca7e58a7bcccf53e501acc"
+              },
+              {
+                "name": "block11-attention.f32",
+                "path": "native-game-tiled-assets/block11-attention.f32",
+                "size": 328208,
+                "sha256": "4b9109ae8caab45532f2d6dbb9db2c995b7cb765863b36e5f6d95a7c1f2ea1a3"
+              },
+              {
+                "name": "block11-ffn.f16",
+                "path": "native-game-tiled-assets/block11-ffn.f16",
+                "size": 295168,
+                "sha256": "c4687b6f089fa59a411de48e81ffdb650141efdf61e6c9693c1b88bf09696086"
+              },
+              {
+                "name": "block12-attention.f32",
+                "path": "native-game-tiled-assets/block12-attention.f32",
+                "size": 328208,
+                "sha256": "dfb2e254bb811a745cdc9e09f8c645c3212c51984c4cf9e8c558f185e2e45596"
+              },
+              {
+                "name": "block12-ffn.f16",
+                "path": "native-game-tiled-assets/block12-ffn.f16",
+                "size": 295168,
+                "sha256": "08eecaea7da6052941a3e86a061300c3c8ccfadf6d6dc909a88999500135d0b7"
+              },
+              {
+                "name": "block13-attention.f32",
+                "path": "native-game-tiled-assets/block13-attention.f32",
+                "size": 328208,
+                "sha256": "26f53766da41e623c2169dcc06d68113ee8876775a3c76e528c57cdd07a1b3b2"
+              },
+              {
+                "name": "block13-ffn.f16",
+                "path": "native-game-tiled-assets/block13-ffn.f16",
+                "size": 295168,
+                "sha256": "c6352c980fceb21d06a4a0c1786b444b70684f6c815bed0b012625d763f79a9a"
+              },
+              {
+                "name": "block14-attention.f32",
+                "path": "native-game-tiled-assets/block14-attention.f32",
+                "size": 328208,
+                "sha256": "f0d728b707c5b74e9a3a133d49a4c12c4d5f20389cd24c360b42e64aee221255"
+              },
+              {
+                "name": "block14-ds.f16",
+                "path": "native-game-tiled-assets/block14-ds.f16",
+                "size": 65536,
+                "sha256": "5d41b5b5d72a32b675dae50f09896bff9f2f4ee95cfae3a036aaeb7d1a8329fd"
+              },
+              {
+                "name": "block14-ffn.f16",
+                "path": "native-game-tiled-assets/block14-ffn.f16",
+                "size": 295168,
+                "sha256": "13e60841a2d56eecb1ff937df3b7c6615a6cb185b0a41e2e3b1de5de57312b05"
+              },
+              {
+                "name": "block15-attention.f32",
+                "path": "native-game-tiled-assets/block15-attention.f32",
+                "size": 1180704,
+                "sha256": "4acc6d6f124b7541f63dc99b556d2c08d8ab740849c4872b55ae997fceb265b5"
+              },
+              {
+                "name": "block15-ffn.f16",
+                "path": "native-game-tiled-assets/block15-ffn.f16",
+                "size": 1180160,
+                "sha256": "819a777450c5e8631820f7fdbc0219bbe7fa4a9f08ebe365cffecb7d962f4acc"
+              },
+              {
+                "name": "block16-attention.f32",
+                "path": "native-game-tiled-assets/block16-attention.f32",
+                "size": 1180704,
+                "sha256": "2420a5e3376e4174d7c3b06de75f357bcdc3139c85a8f6765e79c94ce8cdcaf5"
+              },
+              {
+                "name": "block16-ffn.f16",
+                "path": "native-game-tiled-assets/block16-ffn.f16",
+                "size": 1180160,
+                "sha256": "d9ff25fa10f6f576912a8055af4d31352aa11d20c49cbd0f7842c98302aa83f3"
+              },
+              {
+                "name": "block17-attention.f32",
+                "path": "native-game-tiled-assets/block17-attention.f32",
+                "size": 1180704,
+                "sha256": "654e49b5b647b541a8cb422ca6f75dac0651cab9d51b9b42684c6a761dc4144f"
+              },
+              {
+                "name": "block17-ffn.f16",
+                "path": "native-game-tiled-assets/block17-ffn.f16",
+                "size": 1180160,
+                "sha256": "364b50893418e4664ada9050793bffdcc00ca1dc8e941fa82432355a80a68d8a"
+              },
+              {
+                "name": "block18-attention.f32",
+                "path": "native-game-tiled-assets/block18-attention.f32",
+                "size": 1180704,
+                "sha256": "1fab3b45fede1f46d27b2424b5b3030a7bd2e299243f200119f08afe1c1a3d83"
+              },
+              {
+                "name": "block18-ffn.f16",
+                "path": "native-game-tiled-assets/block18-ffn.f16",
+                "size": 1180160,
+                "sha256": "f9fb9ca6347bea216a92edfd323253d91248b9bd8d7d3432f73b6f2b6001ebe3"
+              },
+              {
+                "name": "block19-attention.f32",
+                "path": "native-game-tiled-assets/block19-attention.f32",
+                "size": 1180704,
+                "sha256": "b198481983e00876232dbf7aed83cab8f801b021df196aa305a1bdc625f1607f"
+              },
+              {
+                "name": "block19-ffn.f16",
+                "path": "native-game-tiled-assets/block19-ffn.f16",
+                "size": 1180160,
+                "sha256": "21cd0b47cac78d4cbcbb8bb987fc9c2670eecf4eb754b190532a232cdbc40187"
+              },
+              {
+                "name": "block2-attention.f32",
+                "path": "native-game-tiled-assets/block2-attention.f32",
+                "size": 32900,
+                "sha256": "65dcf4e6b0138c708523622460541d000b15a35fe900fa3bbaa6b730c9fb93de"
+              },
+              {
+                "name": "block2-ffn.f16",
+                "path": "native-game-tiled-assets/block2-ffn.f16",
+                "size": 17472,
+                "sha256": "037649fc3ad6c4b87ec17dce002c7fcf677bb55fa30eba495158914411a63d28"
+              },
+              {
+                "name": "block20-attention.f32",
+                "path": "native-game-tiled-assets/block20-attention.f32",
+                "size": 1180704,
+                "sha256": "e1b505775b972b9f314480fcd63a3d0a0aa9c73e1c730bcdcb54d8f534825e35"
+              },
+              {
+                "name": "block20-ffn.f16",
+                "path": "native-game-tiled-assets/block20-ffn.f16",
+                "size": 1180160,
+                "sha256": "50247f9ad8fb92973f6181a6ecdbc55b8b2771dca4809caf48479f526a5bc849"
+              },
+              {
+                "name": "block21-attention.f32",
+                "path": "native-game-tiled-assets/block21-attention.f32",
+                "size": 1180704,
+                "sha256": "2db95107ad4b4255fbb9ea046b7355db5a739a16aaa37eb5d6de601d2c90de4e"
+              },
+              {
+                "name": "block21-ffn.f16",
+                "path": "native-game-tiled-assets/block21-ffn.f16",
+                "size": 1180160,
+                "sha256": "c159d4a3a96f5eae92e4bedf739f8022d4a4dd1dbc3a2782a8064d6d236d2006"
+              },
+              {
+                "name": "block22-attention.f32",
+                "path": "native-game-tiled-assets/block22-attention.f32",
+                "size": 1180704,
+                "sha256": "6d52f6d588348943c62e653fa7390bf8c616f9b02f124cacb56f82122d2aacb5"
+              },
+              {
+                "name": "block22-ds.f16",
+                "path": "native-game-tiled-assets/block22-ds.f16",
+                "size": 262144,
+                "sha256": "dec9c2e15a83203242045be50eb75bd5933df445fae71f5abb92ec26be4d8b08"
+              },
+              {
+                "name": "block22-ffn.f16",
+                "path": "native-game-tiled-assets/block22-ffn.f16",
+                "size": 1180160,
+                "sha256": "ad4460e682e856d84b002d35462b4225ff3811aab63219b0d518624a3cc3e0da"
+              },
+              {
+                "name": "block23-attention.f32",
+                "path": "native-game-tiled-assets/block23-attention.f32",
+                "size": 4458560,
+                "sha256": "38ed0b4dd766c7e8180617623bab1b8b41de4ba9fc7e2f35a92b9fcede7492a9"
+              },
+              {
+                "name": "block23-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block23-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "3c106fc821f7200eeab41f6bc7db40c25c8bb45e9f16429756161a5540de4ffd"
+              },
+              {
+                "name": "block23-ffwd.f16",
+                "path": "native-game-tiled-assets/block23-ffwd.f16",
+                "size": 1048576,
+                "sha256": "8a2ddc670d85f5ce32f2c749610c22e855f3876b2a673b0f5fdf91d3662e09ee"
+              },
+              {
+                "name": "block24-attention.f32",
+                "path": "native-game-tiled-assets/block24-attention.f32",
+                "size": 4458560,
+                "sha256": "610d709842dd5c73c961345f2d78bab7a2c0a79f5dc92ab3825ef7aec74a41b0"
+              },
+              {
+                "name": "block24-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block24-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "d328dd6384669c4bd6af26d7316fcf044bd599d20e696f09616620167a198343"
+              },
+              {
+                "name": "block24-ffwd.f16",
+                "path": "native-game-tiled-assets/block24-ffwd.f16",
+                "size": 1048576,
+                "sha256": "bdd2a4ece4142511a564fc6a6313501ec2e8a0f69ac23ee43390db028749e777"
+              },
+              {
+                "name": "block25-attention.f32",
+                "path": "native-game-tiled-assets/block25-attention.f32",
+                "size": 4458560,
+                "sha256": "6578415952042c5d2e036a3cb4bc524cb89da02cf2a9f3a8ad4c2affc50f573f"
+              },
+              {
+                "name": "block25-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block25-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "9633cb19d3057e3118a5b295ab49dddda46b7c07cd5a04464c9ee00d9fc4464c"
+              },
+              {
+                "name": "block25-ffwd.f16",
+                "path": "native-game-tiled-assets/block25-ffwd.f16",
+                "size": 1048576,
+                "sha256": "7434d51d436d01816c477ce622a9384ab2dac6f0d6007804326dce358feefe0e"
+              },
+              {
+                "name": "block26-attention.f32",
+                "path": "native-game-tiled-assets/block26-attention.f32",
+                "size": 4458560,
+                "sha256": "14ecf9615cb8c5dea60103934ad30906740374bd806be20f974904f1f1fa29dc"
+              },
+              {
+                "name": "block26-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block26-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "0d6de74c8735adf48aae2ae72098fce283ef55cdcd698970a6f808e2c6271f21"
+              },
+              {
+                "name": "block26-ffwd.f16",
+                "path": "native-game-tiled-assets/block26-ffwd.f16",
+                "size": 1048576,
+                "sha256": "8d465c6c37969d074068dbfce89b1a8cb4dc8f3b481bbd984b69929c26521106"
+              },
+              {
+                "name": "block27-attention.f32",
+                "path": "native-game-tiled-assets/block27-attention.f32",
+                "size": 4458560,
+                "sha256": "e509694d1e2107cb4206ee2f8dec7434642c144d75fb53e5b7b1d023a2f99fba"
+              },
+              {
+                "name": "block27-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block27-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "a26044145d4f21200c56c8f113b679a8e137b8a7e095da9e12a2586f0e5d393d"
+              },
+              {
+                "name": "block27-ffwd.f16",
+                "path": "native-game-tiled-assets/block27-ffwd.f16",
+                "size": 1048576,
+                "sha256": "be2cc1c7c3dfd315a8717460e333ebcef01eec6387358b298ab5ac38d5720f64"
+              },
+              {
+                "name": "block28-attention.f32",
+                "path": "native-game-tiled-assets/block28-attention.f32",
+                "size": 4458560,
+                "sha256": "e31d69d01237862df094c29f63a43c48beca7a471f8f26bb54f9a50845313a3a"
+              },
+              {
+                "name": "block28-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block28-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "62a976498380d69938d52b17e084b1233651379f240dd0f50483f3e6e4cde65e"
+              },
+              {
+                "name": "block28-ffwd.f16",
+                "path": "native-game-tiled-assets/block28-ffwd.f16",
+                "size": 1048576,
+                "sha256": "5c4997b12dacc100066514dcde620832a31dd6ca4fb01543b763dab366422a40"
+              },
+              {
+                "name": "block29-attention.f32",
+                "path": "native-game-tiled-assets/block29-attention.f32",
+                "size": 4458560,
+                "sha256": "d1798913270d3766b4218a0471489203c90913a31087df1c963b423643d53558"
+              },
+              {
+                "name": "block29-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block29-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "de10060cf3a3a04ec495f4d58c644e6e3c4cd55d11e676004a4f83fca7bc5865"
+              },
+              {
+                "name": "block29-ffwd.f16",
+                "path": "native-game-tiled-assets/block29-ffwd.f16",
+                "size": 1048576,
+                "sha256": "eb0df4e10e053c9ce336bc37d568cfd6c1a566d1da3604f42d12d7afbeaae478"
+              },
+              {
+                "name": "block3-attention.f32",
+                "path": "native-game-tiled-assets/block3-attention.f32",
+                "size": 32900,
+                "sha256": "39abd426b69df7b8b382e61c122c4c4c499cd006475d260e13d36992a6d66c92"
+              },
+              {
+                "name": "block3-ffn.f16",
+                "path": "native-game-tiled-assets/block3-ffn.f16",
+                "size": 17472,
+                "sha256": "e669a241d6597a29ada896451bf7612d8434c57e87f3b5963536fface848668c"
+              },
+              {
+                "name": "block30-attention.f32",
+                "path": "native-game-tiled-assets/block30-attention.f32",
+                "size": 4458560,
+                "sha256": "2064a9393a177c1f09577861cfc11725ee5adb3d67313d9a7577aaabe05bfbbc"
+              },
+              {
+                "name": "block30-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block30-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "2863a96a245b85ebb8a20dd6d186a69fc89f26490923dec8f67bffef98708fe0"
+              },
+              {
+                "name": "block30-ffwd.f16",
+                "path": "native-game-tiled-assets/block30-ffwd.f16",
+                "size": 1048576,
+                "sha256": "673e9b1878b6daef1c6fc6f1026d12d9bc0025823070f2f95ee6c5c48fc422b1"
+              },
+              {
+                "name": "block31-contract.f16",
+                "path": "native-game-tiled-assets/block31-contract.f16",
+                "size": 8390656,
+                "sha256": "e89f848aa5874c02feeb313c4ff0d953d82be3b0ddfd8fe7d8482eeaea85515e"
+              },
+              {
+                "name": "block31-expand.f16",
+                "path": "native-game-tiled-assets/block31-expand.f16",
+                "size": 8388608,
+                "sha256": "ee20133146ae0410282390f8883451d0975adfcf95d02f0e2e671a92a97d396a"
+              },
+              {
+                "name": "block31-projection.f16",
+                "path": "native-game-tiled-assets/block31-projection.f16",
+                "size": 2099200,
+                "sha256": "7399e57373dd927b2d2d6ab7948cb4278fd7b73901486374dda0516ad5d6c0e2"
+              },
+              {
+                "name": "block31-qkv.f16",
+                "path": "native-game-tiled-assets/block31-qkv.f16",
+                "size": 6291520,
+                "sha256": "0a98b968119392138726eb355cb5a0554cd491528597b3b9ad7024eedbba8e2e"
+              },
+              {
+                "name": "block32-contract.f16",
+                "path": "native-game-tiled-assets/block32-contract.f16",
+                "size": 8390656,
+                "sha256": "6937677a359a20302570ecbadf08f65ffb6501cf4b05d97cc0d72f30b51fd374"
+              },
+              {
+                "name": "block32-expand.f16",
+                "path": "native-game-tiled-assets/block32-expand.f16",
+                "size": 8388608,
+                "sha256": "bc938271655cff7920afb506e26f138da948ee2bdef6a911962a0dc7148b149b"
+              },
+              {
+                "name": "block32-projection.f16",
+                "path": "native-game-tiled-assets/block32-projection.f16",
+                "size": 2099200,
+                "sha256": "171c81730c032e62582923a45ddd399c1c2261df95a6ce2d45d41e9aee7ed801"
+              },
+              {
+                "name": "block32-qkv.f16",
+                "path": "native-game-tiled-assets/block32-qkv.f16",
+                "size": 6291520,
+                "sha256": "b25e700cd37e0b3539bfd4a63b8a29a683319614d98a93464a2d81703b6c1f09"
+              },
+              {
+                "name": "block33-contract.f16",
+                "path": "native-game-tiled-assets/block33-contract.f16",
+                "size": 8390656,
+                "sha256": "7bd2a61634eeedc8aba20a9f63bc6537b5891bbf0d73e7a39f509c7efba7832a"
+              },
+              {
+                "name": "block33-expand.f16",
+                "path": "native-game-tiled-assets/block33-expand.f16",
+                "size": 8388608,
+                "sha256": "41f9634c2e6d72435cd1836ec9bcafd8837bec213232777bda0523d9e00eccdf"
+              },
+              {
+                "name": "block33-projection.f16",
+                "path": "native-game-tiled-assets/block33-projection.f16",
+                "size": 2099200,
+                "sha256": "949f9fed4f5bbcc0b76e52baf508f9dfa93bf6969ad75fc4ea2097ec78e4deee"
+              },
+              {
+                "name": "block33-qkv.f16",
+                "path": "native-game-tiled-assets/block33-qkv.f16",
+                "size": 6291520,
+                "sha256": "e09d8eff5ffd8aacb393fa5697b07b35daafdc60ab4094443eb7214be7182b89"
+              },
+              {
+                "name": "block34-contract.f16",
+                "path": "native-game-tiled-assets/block34-contract.f16",
+                "size": 8390656,
+                "sha256": "4822783eab47947b75f80c3b76ee375b3048b6d2a3187c76f9d28eac8e3740ec"
+              },
+              {
+                "name": "block34-expand.f16",
+                "path": "native-game-tiled-assets/block34-expand.f16",
+                "size": 8388608,
+                "sha256": "9e9b956f0cee19344cb30389c0295b2c87b44e6386df8664398cb8ec384ceb18"
+              },
+              {
+                "name": "block34-projection.f16",
+                "path": "native-game-tiled-assets/block34-projection.f16",
+                "size": 2099200,
+                "sha256": "8dc7c691d8a2726caafbee4b693b25a2d60133bf7c5fc3039e1bd8dd0a4471d5"
+              },
+              {
+                "name": "block34-qkv.f16",
+                "path": "native-game-tiled-assets/block34-qkv.f16",
+                "size": 6291520,
+                "sha256": "9b74615099c88b0042083c9e0556d275d995b8dd97982073d65f83074761d772"
+              },
+              {
+                "name": "block35-contract.f16",
+                "path": "native-game-tiled-assets/block35-contract.f16",
+                "size": 8390656,
+                "sha256": "ef0bda0a2db0a057d2c54d1090bff22ef4e1ca9cbf0183391057d0e02be44a69"
+              },
+              {
+                "name": "block35-expand.f16",
+                "path": "native-game-tiled-assets/block35-expand.f16",
+                "size": 8388608,
+                "sha256": "2b76dcbf5ab8fb289c0f5ee10350462f3e09b0de99c9f28546ad42f7a4850b82"
+              },
+              {
+                "name": "block35-projection.f16",
+                "path": "native-game-tiled-assets/block35-projection.f16",
+                "size": 2099200,
+                "sha256": "295fa777e4833bc56c2afb5345def1ea042b156e00c2eaaa53fd27b28fd85625"
+              },
+              {
+                "name": "block35-qkv.f16",
+                "path": "native-game-tiled-assets/block35-qkv.f16",
+                "size": 6291520,
+                "sha256": "95e755734d9a3fa8766fc8388446333bb923196de0b3f95a32b3afd41222c77e"
+              },
+              {
+                "name": "block36-contract.f16",
+                "path": "native-game-tiled-assets/block36-contract.f16",
+                "size": 8390656,
+                "sha256": "7e289d70d28d5a1518fc63311c43c4c1014a3b0e3eec11e801022e75063e0f31"
+              },
+              {
+                "name": "block36-expand.f16",
+                "path": "native-game-tiled-assets/block36-expand.f16",
+                "size": 8388608,
+                "sha256": "920f08090225fbb84a37e948910b7d8358561a6226cac1730833557da2c8f709"
+              },
+              {
+                "name": "block36-projection.f16",
+                "path": "native-game-tiled-assets/block36-projection.f16",
+                "size": 2099200,
+                "sha256": "95fe0447d0d0b4888f1de17319b766e5cd3c908d9475dd93da071e146c882013"
+              },
+              {
+                "name": "block36-qkv.f16",
+                "path": "native-game-tiled-assets/block36-qkv.f16",
+                "size": 6291520,
+                "sha256": "0cfc8fb01b9fa9de617955a62e26b5d6d35da3fcde798fb1138e33a57eb2b830"
+              },
+              {
+                "name": "block37-contract.f16",
+                "path": "native-game-tiled-assets/block37-contract.f16",
+                "size": 8390656,
+                "sha256": "c07a2386d50611c7bf814337a01c8aae11d50338fc325d3406b3658488499f0a"
+              },
+              {
+                "name": "block37-expand.f16",
+                "path": "native-game-tiled-assets/block37-expand.f16",
+                "size": 8388608,
+                "sha256": "297b76e31d887712525dee55f5b617cb642a0c46ce1b0917016388f0906ec09e"
+              },
+              {
+                "name": "block37-projection.f16",
+                "path": "native-game-tiled-assets/block37-projection.f16",
+                "size": 2099200,
+                "sha256": "426cae678d0216dde0de7da94224ffbbf9b2da69075b41a099cb9000e68afca3"
+              },
+              {
+                "name": "block37-qkv.f16",
+                "path": "native-game-tiled-assets/block37-qkv.f16",
+                "size": 6291520,
+                "sha256": "0dccd8f226727b82f34b24cb4e1b6927d7a42ad79a616e2c0e8726063992e387"
+              },
+              {
+                "name": "block38-contract.f16",
+                "path": "native-game-tiled-assets/block38-contract.f16",
+                "size": 8390656,
+                "sha256": "9c51b8f1aaf0e5e9e6447ee63d35edfff750070f2f0b59c7cb20911fe45d75f7"
+              },
+              {
+                "name": "block38-expand.f16",
+                "path": "native-game-tiled-assets/block38-expand.f16",
+                "size": 8388608,
+                "sha256": "e8c3e47b70db459c00547bff56b1929d611b9874cef55855602c543de3ee2f32"
+              },
+              {
+                "name": "block38-projection.f16",
+                "path": "native-game-tiled-assets/block38-projection.f16",
+                "size": 2099200,
+                "sha256": "87b6f72b0c1f5e274e2a90ffd90db6d3df2dd3d5c232a611acbb29c5916be00f"
+              },
+              {
+                "name": "block38-qkv.f16",
+                "path": "native-game-tiled-assets/block38-qkv.f16",
+                "size": 6291520,
+                "sha256": "3d10a47a9270449dcc020465dde7a11381c76d645b67d0fc74b041168124b67a"
+              },
+              {
+                "name": "block4-attention.f32",
+                "path": "native-game-tiled-assets/block4-attention.f32",
+                "size": 32900,
+                "sha256": "efacdaff9c9b36ef0e5eaeb368e1014c05a4621943a64d68aeb9bba5d0945877"
+              },
+              {
+                "name": "block4-ds.f16",
+                "path": "native-game-tiled-assets/block4-ds.f16",
+                "size": 4096,
+                "sha256": "c922d8046a1b5bc6cc5f3ca16791a905e84c675aae9efc09024ead6a8e037ae6"
+              },
+              {
+                "name": "block4-ffn.f16",
+                "path": "native-game-tiled-assets/block4-ffn.f16",
+                "size": 17472,
+                "sha256": "dd1f42ad43241536bf6d49f033a9b23f31e12df39dd74a921a8487378f84ce1c"
+              },
+              {
+                "name": "block40-attention.f32",
+                "path": "native-game-tiled-assets/block40-attention.f32",
+                "size": 4458560,
+                "sha256": "932a7fd566d3b21567472d4453dc98ca697a00d148f40f94db72a683c4da6220"
+              },
+              {
+                "name": "block40-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block40-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "470470d65e3d2e71619de016e5d73e6cc2aef73375e64f612cd2f756e36a25ee"
+              },
+              {
+                "name": "block40-ffwd.f16",
+                "path": "native-game-tiled-assets/block40-ffwd.f16",
+                "size": 1048576,
+                "sha256": "8407c0ad3bebba3f4ceecd03e8abbc310956ed9f88a96ef6c865ece197ceb2b5"
+              },
+              {
+                "name": "block41-attention.f32",
+                "path": "native-game-tiled-assets/block41-attention.f32",
+                "size": 4458560,
+                "sha256": "5c26e2087a4c0b7e67ce1be665cdbfdf89af60348ce6f88c35175707ab782e83"
+              },
+              {
+                "name": "block41-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block41-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "17b3517ad7c40f0d43d2aa799fc4106dc59ebd0884b254a5e8e3fb0eb906ab1d"
+              },
+              {
+                "name": "block41-ffwd.f16",
+                "path": "native-game-tiled-assets/block41-ffwd.f16",
+                "size": 1048576,
+                "sha256": "cb056aad381ddad412b7b062249291f984b6c18590ed0dac212186f6e8793573"
+              },
+              {
+                "name": "block42-attention.f32",
+                "path": "native-game-tiled-assets/block42-attention.f32",
+                "size": 4458560,
+                "sha256": "20229ef899f0b492e149fc3df825a7cc1aca7494f0e6e7db3f5a0c50b24d9bea"
+              },
+              {
+                "name": "block42-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block42-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "8ccd0aea3cdd15b307bd2ecbe3997f48cb64fe553fb60463c5e62b7ed2596341"
+              },
+              {
+                "name": "block42-ffwd.f16",
+                "path": "native-game-tiled-assets/block42-ffwd.f16",
+                "size": 1048576,
+                "sha256": "816591f4861de97d5646be06a4984e9be200e039e7394995aaf91d32439af860"
+              },
+              {
+                "name": "block43-attention.f32",
+                "path": "native-game-tiled-assets/block43-attention.f32",
+                "size": 4458560,
+                "sha256": "513a0f6d16249755402f6c256f903523e25bf2c56a46e26b6f44ae79b52ac49b"
+              },
+              {
+                "name": "block43-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block43-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "2994519d8f81227f719fc0c1e67871cd7482b66ef2262c0ea4cb185b5015e04b"
+              },
+              {
+                "name": "block43-ffwd.f16",
+                "path": "native-game-tiled-assets/block43-ffwd.f16",
+                "size": 1048576,
+                "sha256": "d3e09d6ba3b28e619aff0bd08fdd9cf75688993898d2e9ce87f131036eb66614"
+              },
+              {
+                "name": "block44-attention.f32",
+                "path": "native-game-tiled-assets/block44-attention.f32",
+                "size": 4458560,
+                "sha256": "cd4e3bf6c24182be7be0eae2fc4f7c2b50439dfc01f83eac8706f6060ae7c5aa"
+              },
+              {
+                "name": "block44-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block44-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "f1effc6f54651e3c7fe22c67e1394cdef08262866042a79a1a3773f15b9167fd"
+              },
+              {
+                "name": "block44-ffwd.f16",
+                "path": "native-game-tiled-assets/block44-ffwd.f16",
+                "size": 1048576,
+                "sha256": "dd842e9c4fd672ad222ad112636406462ccf3a86b162d955a8c3f22f0232311e"
+              },
+              {
+                "name": "block45-attention.f32",
+                "path": "native-game-tiled-assets/block45-attention.f32",
+                "size": 4458560,
+                "sha256": "d1553f9932a8ab0f14b3eec2f6f1a997709e733f7b60df83168798b52c9980b3"
+              },
+              {
+                "name": "block45-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block45-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "eda328fd0105093caccbcee26defc3ad38afe76d32053decdf042b48f843f783"
+              },
+              {
+                "name": "block45-ffwd.f16",
+                "path": "native-game-tiled-assets/block45-ffwd.f16",
+                "size": 1048576,
+                "sha256": "8f693006b3cdd24f8d09043d5311a54f846dfba2600d64edd9cf1f75cffecabf"
+              },
+              {
+                "name": "block46-attention.f32",
+                "path": "native-game-tiled-assets/block46-attention.f32",
+                "size": 4458560,
+                "sha256": "292102ee452dd70b563eb3c4b320910eafb5dae39bcb6d046947b25bbe2439f7"
+              },
+              {
+                "name": "block46-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block46-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "4b02e6a15d551b981336ea335f71bd5f3e3fa751e0697eec63ff81b8aa94d529"
+              },
+              {
+                "name": "block46-ffwd.f16",
+                "path": "native-game-tiled-assets/block46-ffwd.f16",
+                "size": 1048576,
+                "sha256": "47ca875fc6a4d0e933d4659588eeb9946d0c04c5472b0112ef4edeeccfea5cec"
+              },
+              {
+                "name": "block47-attention.f32",
+                "path": "native-game-tiled-assets/block47-attention.f32",
+                "size": 4458560,
+                "sha256": "9aef5ec1e84785271c702f49a280cc25a155783864ecbcd0e133c43cd148a4cb"
+              },
+              {
+                "name": "block47-ffwd-projection.f16",
+                "path": "native-game-tiled-assets/block47-ffwd-projection.f16",
+                "size": 525312,
+                "sha256": "468bced86f3b2efa224a88e23e94cd3e51ed11d5aebf7daf11bf55353479798c"
+              },
+              {
+                "name": "block47-ffwd.f16",
+                "path": "native-game-tiled-assets/block47-ffwd.f16",
+                "size": 1048576,
+                "sha256": "86e03e9b45bf420f48677140cca3f77dcbb468f178e12628d72f1fcb27fe9483"
+              },
+              {
+                "name": "block48-attention.f32",
+                "path": "native-game-tiled-assets/block48-attention.f32",
+                "size": 1180704,
+                "sha256": "f41b5d423524c5732668c7d401d59f216f20497b40b5f2469cc1d31e3c0a5d33"
+              },
+              {
+                "name": "block48-ffn.f16",
+                "path": "native-game-tiled-assets/block48-ffn.f16",
+                "size": 1180160,
+                "sha256": "b5d58ff9c5ca47c462bc948365d4e12abed3f391d61d68c0d5530c82f8189c40"
+              },
+              {
+                "name": "block48-weights.f16",
+                "path": "native-game-tiled-assets/block48-weights.f16",
+                "size": 262656,
+                "sha256": "9748d7b545421dd73a0793179300574c5b31324f30170ec949b76294dfe28cd2"
+              },
+              {
+                "name": "block49-attention.f32",
+                "path": "native-game-tiled-assets/block49-attention.f32",
+                "size": 1180704,
+                "sha256": "53abc334b988378f6357e923f1d781924639c4b88aca91adc5bb7158154f5b3d"
+              },
+              {
+                "name": "block49-ffn.f16",
+                "path": "native-game-tiled-assets/block49-ffn.f16",
+                "size": 1180160,
+                "sha256": "cb3b104f4e4a406e870d5c3b762074101430e54a6587f37127f41b76473c0c25"
+              },
+              {
+                "name": "block5-attention.f32",
+                "path": "native-game-tiled-assets/block5-attention.f32",
+                "size": 98568,
+                "sha256": "d46975c02312d7518d447cc803e468d744f330640662554df17946e155775a86"
+              },
+              {
+                "name": "block5-ffn.f16",
+                "path": "native-game-tiled-assets/block5-ffn.f16",
+                "size": 73856,
+                "sha256": "a995f976a33277221aa59e310dd822c2edfadf88ddf4927892a19cac39944431"
+              },
+              {
+                "name": "block50-attention.f32",
+                "path": "native-game-tiled-assets/block50-attention.f32",
+                "size": 1180704,
+                "sha256": "cef06e3cd0828783eb4cbb7118d27ebfb2666094e4a632defbbc9a63ddf78604"
+              },
+              {
+                "name": "block50-ffn.f16",
+                "path": "native-game-tiled-assets/block50-ffn.f16",
+                "size": 1180160,
+                "sha256": "59185d84ccdf6b050d90a66166d1665e0871c4d6f1ea9181c44c696ac2991dfa"
+              },
+              {
+                "name": "block51-attention.f32",
+                "path": "native-game-tiled-assets/block51-attention.f32",
+                "size": 1180704,
+                "sha256": "9649336e74f67304005cf1b92654358638e6cacfbba27c22ce182aabc34e35e6"
+              },
+              {
+                "name": "block51-ffn.f16",
+                "path": "native-game-tiled-assets/block51-ffn.f16",
+                "size": 1180160,
+                "sha256": "f52df0dd3fcf9c5c695f295fd39e89dc3259f67aa8cdfa3d13356ac95eafff48"
+              },
+              {
+                "name": "block52-attention.f32",
+                "path": "native-game-tiled-assets/block52-attention.f32",
+                "size": 1180704,
+                "sha256": "aca58ccc9104f08b515c8b35e8c5c6bf6b0c464ab0e62f85c6d9c01b200ddda9"
+              },
+              {
+                "name": "block52-ffn.f16",
+                "path": "native-game-tiled-assets/block52-ffn.f16",
+                "size": 1180160,
+                "sha256": "5e3c67d4fdf075f8b06b19403b5a129084337bd8965763566e639a7aaaa327ea"
+              },
+              {
+                "name": "block53-attention.f32",
+                "path": "native-game-tiled-assets/block53-attention.f32",
+                "size": 1180704,
+                "sha256": "0aeb23ec47942c39ece88fb1ea5b8282552178fd9e553fc9b152707606336582"
+              },
+              {
+                "name": "block53-ffn.f16",
+                "path": "native-game-tiled-assets/block53-ffn.f16",
+                "size": 1180160,
+                "sha256": "111793e9de4d8e3c6fdc2b5167d2f45d261a198a472105f95065f38d9a944e40"
+              },
+              {
+                "name": "block54-attention.f32",
+                "path": "native-game-tiled-assets/block54-attention.f32",
+                "size": 1180704,
+                "sha256": "a8ce8361df50ccbbe29fd8c0c582410c26c778fb6f18cc8cc0eadfac855666b7"
+              },
+              {
+                "name": "block54-ffn.f16",
+                "path": "native-game-tiled-assets/block54-ffn.f16",
+                "size": 1180160,
+                "sha256": "7c70ffaa721a9030f9c2f7d6be544ebcccc0570aa4440c913205738f0553b5f6"
+              },
+              {
+                "name": "block55-attention.f32",
+                "path": "native-game-tiled-assets/block55-attention.f32",
+                "size": 1180704,
+                "sha256": "bfab933bc5bdb035adbe6088e9ca5dc9fa26da1c5762b7166e6c525d39beb249"
+              },
+              {
+                "name": "block55-ffn.f16",
+                "path": "native-game-tiled-assets/block55-ffn.f16",
+                "size": 1180160,
+                "sha256": "87618f36092741591906b06d04563b96a0d185c675f951389bbd784ca99b607f"
+              },
+              {
+                "name": "block56-attention.f32",
+                "path": "native-game-tiled-assets/block56-attention.f32",
+                "size": 328208,
+                "sha256": "12d3fa30d4d561b3a35d4038d45c88063599d4aacc60b9878fec87f2a5fa074e"
+              },
+              {
+                "name": "block56-ffn.f16",
+                "path": "native-game-tiled-assets/block56-ffn.f16",
+                "size": 295168,
+                "sha256": "1677fe24418d9cf8576de10c6bed47821cffadc7942f5c629af5f2eee93e9ad5"
+              },
+              {
+                "name": "block56-weights.f16",
+                "path": "native-game-tiled-assets/block56-weights.f16",
+                "size": 65792,
+                "sha256": "34a9da1354b91803f0dd7cdf72c7b2a7b78d27243eae7f83d792ea5a98f550be"
+              },
+              {
+                "name": "block57-attention.f32",
+                "path": "native-game-tiled-assets/block57-attention.f32",
+                "size": 328208,
+                "sha256": "29cbd04dbaddf83a43f10f3afacbc6f20a561f0cd716d65aef7a225d88663c5b"
+              },
+              {
+                "name": "block57-ffn.f16",
+                "path": "native-game-tiled-assets/block57-ffn.f16",
+                "size": 295168,
+                "sha256": "96ab2be0ce671a761f2c59663558bca84176d452909ddeb561f86a6f6643a586"
+              },
+              {
+                "name": "block58-attention.f32",
+                "path": "native-game-tiled-assets/block58-attention.f32",
+                "size": 328208,
+                "sha256": "7cb0b87433a93a1f6a3a6f6d72c10e16ee97d734adf4108f5ba628044ca42346"
+              },
+              {
+                "name": "block58-ffn.f16",
+                "path": "native-game-tiled-assets/block58-ffn.f16",
+                "size": 295168,
+                "sha256": "5689b32eaf7afa62e50c899e07ba549ea3d3da92b78fbd2d92c56260f71191f5"
+              },
+              {
+                "name": "block59-attention.f32",
+                "path": "native-game-tiled-assets/block59-attention.f32",
+                "size": 328208,
+                "sha256": "c26ee8dc1d664981156655097d82d0ebe0ff16da3238041487a0c145a3f4feaa"
+              },
+              {
+                "name": "block59-ffn.f16",
+                "path": "native-game-tiled-assets/block59-ffn.f16",
+                "size": 295168,
+                "sha256": "a4d0ec1758bdde4d8afbea6c755c995b66ffebb947b7ae01a26bdc4ff5eaa7a3"
+              },
+              {
+                "name": "block6-attention.f32",
+                "path": "native-game-tiled-assets/block6-attention.f32",
+                "size": 98568,
+                "sha256": "c6e540bd61505c9830ab2b6eb6f04cdc2424e76491c66657d7b1573140b09e93"
+              },
+              {
+                "name": "block6-ffn.f16",
+                "path": "native-game-tiled-assets/block6-ffn.f16",
+                "size": 73856,
+                "sha256": "49a8a0b8d5e51a96d95d6fda4c8f38b7ee6ee7433f0133a00ced17b4231f756c"
+              },
+              {
+                "name": "block60-attention.f32",
+                "path": "native-game-tiled-assets/block60-attention.f32",
+                "size": 328208,
+                "sha256": "997cb5b3360cad6872b29c8db72c88f51994704df620a0a9880ed2a11a2d18b4"
+              },
+              {
+                "name": "block60-ffn.f16",
+                "path": "native-game-tiled-assets/block60-ffn.f16",
+                "size": 295168,
+                "sha256": "485a5bc5189e6d386d559e6e67b67ec7dd5da5264e305665f228f08826196c98"
+              },
+              {
+                "name": "block61-attention.f32",
+                "path": "native-game-tiled-assets/block61-attention.f32",
+                "size": 328208,
+                "sha256": "da74bac4308b8a1066f307bbb2a6c4081933243b04d8108256ac30c8033a8510"
+              },
+              {
+                "name": "block61-ffn.f16",
+                "path": "native-game-tiled-assets/block61-ffn.f16",
+                "size": 295168,
+                "sha256": "c294f75929b8cff2f3917dc88aacad8477a8a7f7fec996c8fa8232ec45720f26"
+              },
+              {
+                "name": "block62-attention.f32",
+                "path": "native-game-tiled-assets/block62-attention.f32",
+                "size": 98568,
+                "sha256": "6d5d0c3b87b4c19417993c485866136b297ce4830350082f8e269032be8a5352"
+              },
+              {
+                "name": "block62-ffn.f16",
+                "path": "native-game-tiled-assets/block62-ffn.f16",
+                "size": 73856,
+                "sha256": "fbb793ff422361bca89fc3517e53242c0afbb497eb2a965ccccb7a5554ebe824"
+              },
+              {
+                "name": "block62-weights.f16",
+                "path": "native-game-tiled-assets/block62-weights.f16",
+                "size": 16512,
+                "sha256": "ad78e3194fdcecbadf92ff6f69e65dd29cdde354080d085c9405e82a471a8e79"
+              },
+              {
+                "name": "block63-attention.f32",
+                "path": "native-game-tiled-assets/block63-attention.f32",
+                "size": 98568,
+                "sha256": "a99d8fb2ce215bc6f58d402e0d21063d772b931f25f7991f118d8318bcdd8bc8"
+              },
+              {
+                "name": "block63-ffn.f16",
+                "path": "native-game-tiled-assets/block63-ffn.f16",
+                "size": 73856,
+                "sha256": "918c2e238622761489e69f7d6216d058337db85d3c8c12d7bc78e549de9400ba"
+              },
+              {
+                "name": "block64-attention.f32",
+                "path": "native-game-tiled-assets/block64-attention.f32",
+                "size": 98568,
+                "sha256": "58628ac0b690d0fa031a5b15677ff3c89c93bd9f017cec68657ea0e79b8be642"
+              },
+              {
+                "name": "block64-ffn.f16",
+                "path": "native-game-tiled-assets/block64-ffn.f16",
+                "size": 73856,
+                "sha256": "d0dd50e82fbca66f16487006e7125c74178b9ff47c93c020aa3e34e25ad03dbd"
+              },
+              {
+                "name": "block65-attention.f32",
+                "path": "native-game-tiled-assets/block65-attention.f32",
+                "size": 98568,
+                "sha256": "d7896d758a867602e06ac74e78008b9e203a6e97fa51a14805a250fcbfea8def"
+              },
+              {
+                "name": "block65-ffn.f16",
+                "path": "native-game-tiled-assets/block65-ffn.f16",
+                "size": 73856,
+                "sha256": "776c674b9e6aaa366325672e8798049e2af4dc5afdd4b3c24be224655044e66a"
+              },
+              {
+                "name": "block66-attention.f32",
+                "path": "native-game-tiled-assets/block66-attention.f32",
+                "size": 32900,
+                "sha256": "2385f51193eddf5af20ae3e7ff6deae53e4f4721a94e09fcb5c3e95e8aa334f7"
+              },
+              {
+                "name": "block66-ffn.f16",
+                "path": "native-game-tiled-assets/block66-ffn.f16",
+                "size": 17472,
+                "sha256": "f71732656125e198cd87ae9bb4e7bd41a4f5e37d37e05dbf5fa9375a56091fc0"
+              },
+              {
+                "name": "block66-weights.f16",
+                "path": "native-game-tiled-assets/block66-weights.f16",
+                "size": 4160,
+                "sha256": "a357d6e59907fabbd17816bd2ad53c247ef46b9dd7ae790e0aac4f69ae69a01c"
+              },
+              {
+                "name": "block67-attention.f32",
+                "path": "native-game-tiled-assets/block67-attention.f32",
+                "size": 32900,
+                "sha256": "41e0c063a31c09969b9321caaf824afaf1c0e5de8622369e1ab3ca375b8afc8a"
+              },
+              {
+                "name": "block67-ffn.f16",
+                "path": "native-game-tiled-assets/block67-ffn.f16",
+                "size": 17472,
+                "sha256": "ec09f21103b05f6dd931f72a0f7d0ff554f6e470b3d7f9338ac35cfe1f2e2b44"
+              },
+              {
+                "name": "block68-attention.f32",
+                "path": "native-game-tiled-assets/block68-attention.f32",
+                "size": 32900,
+                "sha256": "8c6d66654b28abd2428bd79151ec56ff1a206502f96680ed34355668add02aa5"
+              },
+              {
+                "name": "block68-ffn.f16",
+                "path": "native-game-tiled-assets/block68-ffn.f16",
+                "size": 17472,
+                "sha256": "258262728c588edcc905de95fca2427e35f5ffa8698b7efc1f3777b5dc6ae677"
+              },
+              {
+                "name": "block69-attention.f32",
+                "path": "native-game-tiled-assets/block69-attention.f32",
+                "size": 32900,
+                "sha256": "d4730ff3474e05a11139b67f400058b65a836ba74e0671ad596cac029a335165"
+              },
+              {
+                "name": "block69-ffn.f16",
+                "path": "native-game-tiled-assets/block69-ffn.f16",
+                "size": 17472,
+                "sha256": "a4425dca34cab43c4ab18a954318c3157aeb57d763ae6ea3fc1eff1eaf989a4f"
+              },
+              {
+                "name": "block7-attention.f32",
+                "path": "native-game-tiled-assets/block7-attention.f32",
+                "size": 98568,
+                "sha256": "f33fa74ddca5601562ca0485f75b3e589c3e0c44f340eec269ff35ed11e0cfd9"
+              },
+              {
+                "name": "block7-ffn.f16",
+                "path": "native-game-tiled-assets/block7-ffn.f16",
+                "size": 73856,
+                "sha256": "20cf68aca082efa72cc8eeadbf9aeb1e194e3634d882e8567994b5ea6dd93fa5"
+              },
+              {
+                "name": "block8-attention.f32",
+                "path": "native-game-tiled-assets/block8-attention.f32",
+                "size": 98568,
+                "sha256": "ab772386063b7e8ff0628aa7edf59e0a88347ca40e1bacd1a1467171c9a50145"
+              },
+              {
+                "name": "block8-ds.f16",
+                "path": "native-game-tiled-assets/block8-ds.f16",
+                "size": 16384,
+                "sha256": "9acbc3bf906e72b7b054f0e1e121af8eddb2ac013c1863bf8de9aa6b95fbff9d"
+              },
+              {
+                "name": "block8-ffn.f16",
+                "path": "native-game-tiled-assets/block8-ffn.f16",
+                "size": 73856,
+                "sha256": "d4b1f5ba6aedc2bc7d460176fbd46d604f293cbb181b823e1262a31dc941417d"
+              },
+              {
+                "name": "block9-attention.f32",
+                "path": "native-game-tiled-assets/block9-attention.f32",
+                "size": 328208,
+                "sha256": "365d1e8128353829a2eb70f93eac658ccc6221a588055900cafb455533abc9b5"
+              },
+              {
+                "name": "block9-ffn.f16",
+                "path": "native-game-tiled-assets/block9-ffn.f16",
+                "size": 295168,
+                "sha256": "0a6d8bf7b87f54ac9cde9cacead3215677f5ecc29703f6145335888f9a4aa34f"
+              },
+              {
+                "name": "decoder39-weights.f16",
+                "path": "native-game-tiled-assets/decoder39-weights.f16",
+                "size": 1049600,
+                "sha256": "028e3361dc4d37d148af05f716c4ff89723f0c9d274cee31ae7708142150084e"
+              },
+              {
+                "name": "head-matrix.f16",
+                "path": "native-game-tiled-assets/head-matrix.f16",
+                "size": 1048576,
+                "sha256": "bed9c10e656b2bd06a5917877341b5c41ba7e14ce59e4cb90e2a2ee6e978498e"
+              },
+              {
+                "name": "hwc-to-vit.i32",
+                "path": "native-game-tiled-assets/hwc-to-vit.i32",
+                "size": 2621440,
+                "sha256": "c942210afd8ffc8a2a1e4ed81df546e5e08d4c70e20f74fdddc0fe564f224ab8"
+              },
+              {
+                "name": "native_black_probe.hlsl",
+                "path": "native-game-tiled-assets/native_black_probe.hlsl",
+                "size": 1335,
+                "sha256": "946c78f25c4ded8b75f39b0bbfb10e4da5e5a885d25225c8ac15b552df2ca85a"
+              },
+              {
+                "name": "native_c32_ds.hlsl",
+                "path": "native-game-tiled-assets/native_c32_ds.hlsl",
+                "size": 1012,
+                "sha256": "566fbc274c9d4fe9d6e094e186870f7642bce282686cb5f9039df902cba5756a"
+              },
+              {
+                "name": "native_c32_ffn_fused.hlsli",
+                "path": "native-game-tiled-assets/native_c32_ffn_fused.hlsli",
+                "size": 10033,
+                "sha256": "8398dd3cbfb4ab450e772dac561e94e5f7084daacac818b721509d28620f46b0"
+              },
+              {
+                "name": "native_c32_reframe.hlsl",
+                "path": "native-game-tiled-assets/native_c32_reframe.hlsl",
+                "size": 1102,
+                "sha256": "261edc63a479c05f794e4b8e288e166407e46c1572b81fa831781604d4621080"
+              },
+              {
+                "name": "native_c64.hlsl",
+                "path": "native-game-tiled-assets/native_c64.hlsl",
+                "size": 18387,
+                "sha256": "efb60cd42b882825ff6fd027d77d35cba90e93efe32c5e6efe49bbcd15a94d96"
+              },
+              {
+                "name": "native_c64_ds.hlsl",
+                "path": "native-game-tiled-assets/native_c64_ds.hlsl",
+                "size": 1603,
+                "sha256": "1d7087115a893aefab6500c1b61a142f02ae3c42d13fc0eb6d9d13d1921705fd"
+              },
+              {
+                "name": "native_c64_shift.hlsl",
+                "path": "native-game-tiled-assets/native_c64_shift.hlsl",
+                "size": 1850,
+                "sha256": "75c9e3982ac6bca504ac781badc16be7070ba62613e07abada668918e48c02e1"
+              },
+              {
+                "name": "native_codec_decode.hlsl",
+                "path": "native-game-tiled-assets/native_codec_decode.hlsl",
+                "size": 7119,
+                "sha256": "3762d2f18c1485e2548b5d7734f357bd8f5819e5ef7b2b8b196e2634b2c4b07d"
+              },
+              {
+                "name": "native_codec_encode.hlsl",
+                "path": "native-game-tiled-assets/native_codec_encode.hlsl",
+                "size": 3431,
+                "sha256": "e8fb25ab692a6834de220b2394728510379a280ca84d032831afc4a128dc2162"
+              },
+              {
+                "name": "native_fp8_fast.hlsli",
+                "path": "native-game-tiled-assets/native_fp8_fast.hlsli",
+                "size": 484,
+                "sha256": "dc04b0fac0ce3d80be147c5ff5c6c97fabee8691d25ac67ef033f66b91f7c5b7"
+              },
+              {
+                "name": "native_game_rgb_input.hlsl",
+                "path": "native-game-tiled-assets/native_game_rgb_input.hlsl",
+                "size": 1015,
+                "sha256": "db19ecf7cdcbd40fd68b7cf9ca5e022c1474dd16ce9aa09ee4783d5579f04654"
+              },
+              {
+                "name": "native_half_corrected.hlsli",
+                "path": "native-game-tiled-assets/native_half_corrected.hlsli",
+                "size": 598,
+                "sha256": "46d539d9b461a30f925893afc0e4a6dfad4c1ff0a66e36e677f2391b5516e05b"
+              },
+              {
+                "name": "native_half_square.hlsli",
+                "path": "native-game-tiled-assets/native_half_square.hlsli",
+                "size": 785,
+                "sha256": "e2b806fc8dc6934439db12219fe819b3912e88fa13ba8be2e72e0a615ad0e1d5"
+              },
+              {
+                "name": "native_head_pool.cso",
+                "path": "native-game-tiled-assets/native_head_pool.cso",
+                "size": 5248,
+                "sha256": "3eba707644e4f6824f8af4a4147f58d8b0fa8cd4e2b64fe31f6ca368d4e69056"
+              },
+              {
+                "name": "native_head_pool.hlsl",
+                "path": "native-game-tiled-assets/native_head_pool.hlsl",
+                "size": 1321,
+                "sha256": "85583b5509f4e19dbf40bfcac206517e7799a0f576fde7a03685c7bd018194e9"
+              },
+              {
+                "name": "native_head_pool_c128.cso",
+                "path": "native-game-tiled-assets/native_head_pool_c128.cso",
+                "size": 5248,
+                "sha256": "13a1a2a5ce5ccd3df4aac37440da736aff2b427ca24751f9f39e75c1beb7db0f"
+              },
+              {
+                "name": "native_head_pool_c256.cso",
+                "path": "native-game-tiled-assets/native_head_pool_c256.cso",
+                "size": 5248,
+                "sha256": "40750c8a1966775b60411c96190d2c7cf340ad10b652a0a71c4bf137d8f65109"
+              },
+              {
+                "name": "native_head_pool_c64.cso",
+                "path": "native-game-tiled-assets/native_head_pool_c64.cso",
+                "size": 5244,
+                "sha256": "aabf024af6873d3d22e98523a8d7f3d0f78cc3e830a8c61e36cfd37a758f49d9"
+              },
+              {
+                "name": "native_history_guard.hlsl",
+                "path": "native-game-tiled-assets/native_history_guard.hlsl",
+                "size": 923,
+                "sha256": "fdba45eaf94a170b79066f6e2878e365c3afd1da3862676bb0028e63dccc1368"
+              },
+              {
+                "name": "native_matrix_expand.hlsl",
+                "path": "native-game-tiled-assets/native_matrix_expand.hlsl",
+                "size": 1740,
+                "sha256": "5f731484ecbdfe0ad775bdc5fea7040325df36896944d55d3fa05891b7f0e4bc"
+              },
+              {
+                "name": "native_matrix_expand_packed.cso",
+                "path": "native-game-tiled-assets/native_matrix_expand_packed.cso",
+                "size": 33896,
+                "sha256": "44e2601986edc9756eff6ec2be4f24cb4958c4a343bd9b494268573af397ad58"
+              },
+              {
+                "name": "native_matrix_expand_packed_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_expand_packed_c128.cso",
+                "size": 33896,
+                "sha256": "a6ee6739bc6c242bb3e11a9c7b71acdee890364b81a6f24c07539fe7621f2976"
+              },
+              {
+                "name": "native_matrix_expand_packed_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_expand_packed_c64.cso",
+                "size": 33896,
+                "sha256": "1901497be62c7064ffa0325b38fc85601c67f6bef7819083eabad20e85ee2147"
+              },
+              {
+                "name": "native_matrix_pack.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack.cso",
+                "size": 4112,
+                "sha256": "74949e7e03d0ba45eb4b7e5061c03ea71e280796e4d701b786b532cc7780c00f"
+              },
+              {
+                "name": "native_matrix_pack.hlsl",
+                "path": "native-game-tiled-assets/native_matrix_pack.hlsl",
+                "size": 2656,
+                "sha256": "7c8029f75c8532d3d6289712a578004603bd183cee6f8d0f8778dca8ac3f926a"
+              },
+              {
+                "name": "native_matrix_pack_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_c128.cso",
+                "size": 4112,
+                "sha256": "0409b6b7dd9c9aff6f57f5c693016a8f0256c44cbd462d027fea18271a059ab7"
+              },
+              {
+                "name": "native_matrix_pack_c512.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_c512.cso",
+                "size": 4112,
+                "sha256": "76f07badacfca167f691b68bdc46a8d6115f0ade7e95d1b7e070c95059cede8a"
+              },
+              {
+                "name": "native_matrix_pack_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_c64.cso",
+                "size": 4112,
+                "sha256": "c198e59d80cac91c0dde2058fd6a6fafcfe0db18293b5191320f8f56962960f4"
+              },
+              {
+                "name": "native_matrix_pack_fp8.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8.cso",
+                "size": 4656,
+                "sha256": "31b9465ebe1f28c01ce36162e1fc18765b13f4ec0eb6e685e10d49a186bc19f0"
+              },
+              {
+                "name": "native_matrix_pack_fp8_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_c128.cso",
+                "size": 4660,
+                "sha256": "f4e2ef0800abb60c8d382453cb69a42fc9d3b940224487181750942cb8d725fe"
+              },
+              {
+                "name": "native_matrix_pack_fp8_c512.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_c512.cso",
+                "size": 4656,
+                "sha256": "227a5e2beede4bc2ace240776fcbc24fc84d9d8d865f85bd92562f41c035d071"
+              },
+              {
+                "name": "native_matrix_pack_fp8_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_c64.cso",
+                "size": 4656,
+                "sha256": "3d79ea6aba148dfe466c7b9aef0454a21a969055bd739cf588ae537786af07d1"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped.cso",
+                "size": 4880,
+                "sha256": "1fdce512d9d754356b10102567f99c0d757391fd6c43f51dcbc1efab3aa930a5"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_c128.cso",
+                "size": 4880,
+                "sha256": "37be8306a023783836b8b5086ad0fae1d17ff5bad459136340fae257f574d9dc"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_c64.cso",
+                "size": 4876,
+                "sha256": "086c80800a4c4da708d733418d266c5f0042522c14eb3965c2e9c0592d6fb521"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_src16_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_src16_c128.cso",
+                "size": 4860,
+                "sha256": "92a52caeea1002420c9a965c178f1e1b5774530efa1a944afdca3bd8e7eede2b"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_src16_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_src16_c64.cso",
+                "size": 4856,
+                "sha256": "196493257ad40d47e60ec52dd3c2c603fd3d51c534ca63378b0b42436e43b0af"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_src8.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_src8.cso",
+                "size": 4060,
+                "sha256": "2a80058b5815b8a5cbd38b7ec28132cbf53d0715bd8042f35efe21e2f744961d"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_src8_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_src8_c128.cso",
+                "size": 4064,
+                "sha256": "4b7fc2cae3cd7adb24b7087d75bfc09f19b59690b8ac2d01de0c376650a8fa76"
+              },
+              {
+                "name": "native_matrix_pack_fp8_mapped_src8_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_fp8_mapped_src8_c64.cso",
+                "size": 4060,
+                "sha256": "08f8f9822c3555ac56d3815c46ee8948d84ea487e3e1aeb596d2b09a5ab87e9e"
+              },
+              {
+                "name": "native_matrix_pack_mapped.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_mapped.cso",
+                "size": 4320,
+                "sha256": "b5e31a89d995b971617c0964cd80b07091b0c587e8cb3cbe1c97b5a6d8ed892d"
+              },
+              {
+                "name": "native_matrix_pack_mapped_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_mapped_c128.cso",
+                "size": 4320,
+                "sha256": "03363f35b46094eb8a25f43c6f53bea8b23f0a9dc59c49786a52c4080ba9e03f"
+              },
+              {
+                "name": "native_matrix_pack_mapped_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_pack_mapped_c64.cso",
+                "size": 4320,
+                "sha256": "f5bac58db08439d189e419231b6bd65b7369164d38f61a48e0ca646b6e35c0e2"
+              },
+              {
+                "name": "native_matrix_qkv.cso",
+                "path": "native-game-tiled-assets/native_matrix_qkv.cso",
+                "size": 11964,
+                "sha256": "2da1afbb869f54c4daf281eae539c8bbf957dc2f170ff17af6d3c505f6663b01"
+              },
+              {
+                "name": "native_matrix_qkv.hlsl",
+                "path": "native-game-tiled-assets/native_matrix_qkv.hlsl",
+                "size": 1461,
+                "sha256": "1300b10ffed96248455ebb4404aa40b7e45ad5e940e6763fdf0fca658e53085f"
+              },
+              {
+                "name": "native_matrix_qkv_c128.cso",
+                "path": "native-game-tiled-assets/native_matrix_qkv_c128.cso",
+                "size": 12012,
+                "sha256": "006086d0f9cea6ce3ce03069e67363d18cc4686837e1d90e3e9e5e633ad7c7d0"
+              },
+              {
+                "name": "native_matrix_qkv_c512.cso",
+                "path": "native-game-tiled-assets/native_matrix_qkv_c512.cso",
+                "size": 12012,
+                "sha256": "c4e40f667ab56aca35b9f591e1ebcc114712292dac9f2280d01a41529b2d8061"
+              },
+              {
+                "name": "native_matrix_qkv_c64.cso",
+                "path": "native-game-tiled-assets/native_matrix_qkv_c64.cso",
+                "size": 12012,
+                "sha256": "572c841b8e44b205e847c50d7b173d60778bdde0ff9e913df5062518cea3a70d"
+              },
+              {
+                "name": "native_output_smooth.hlsl",
+                "path": "native-game-tiled-assets/native_output_smooth.hlsl",
+                "size": 1051,
+                "sha256": "1f48b0ed344db708746a12a6c5c7c6d23ebc78944a2385cab28dfde0a3093fde"
+              },
+              {
+                "name": "native_post70.hlsl",
+                "path": "native-game-tiled-assets/native_post70.hlsl",
+                "size": 5136,
+                "sha256": "fc2d18f313de670d78750937060b4a57cc81ebb149a63dbe384c06b26cffad3c"
+              },
+              {
+                "name": "native_rgb_reflect.hlsl",
+                "path": "native-game-tiled-assets/native_rgb_reflect.hlsl",
+                "size": 797,
+                "sha256": "d6bd50976f44c4bbb5c1f2fbd42b95de0757e1c259b7e1ba8c872b2389a953b6"
+              },
+              {
+                "name": "native_rgb_texture.hlsl",
+                "path": "native-game-tiled-assets/native_rgb_texture.hlsl",
+                "size": 455,
+                "sha256": "7c6022375dfd944888c800af354b04f3b01d31bbe99b6fd405b65b3dbd2da6de"
+              },
+              {
+                "name": "native_sat_cast.hlsli",
+                "path": "native-game-tiled-assets/native_sat_cast.hlsli",
+                "size": 793,
+                "sha256": "c6b4cd56af79d3646082d06214aeb32bfba1160cceb17be2547134cb28a21fb2"
+              },
+              {
+                "name": "native_scaled_integer_half.hlsli",
+                "path": "native-game-tiled-assets/native_scaled_integer_half.hlsli",
+                "size": 731,
+                "sha256": "4ea8d0640b66cb506f60faf68ecf87513656b884149cb38f836b152a593eca41"
+              },
+              {
+                "name": "native_split.hlsl",
+                "path": "native-game-tiled-assets/native_split.hlsl",
+                "size": 3216,
+                "sha256": "84a422a8d2b92750de3241a6f859849c3840fbff3a30d85ff294c390f31d5c08"
+              },
+              {
+                "name": "native_split_window.hlsl",
+                "path": "native-game-tiled-assets/native_split_window.hlsl",
+                "size": 909,
+                "sha256": "1509a41b265367d824fde264fef5ef18a1409a73e9888eec7d218684c1ebb3ac"
+              },
+              {
+                "name": "native_temporal_coordinates.hlsl",
+                "path": "native-game-tiled-assets/native_temporal_coordinates.hlsl",
+                "size": 3657,
+                "sha256": "1c628f5c0c673c71e549b4c8e700e0ac0d26fba0e396bfd4be44d64e225b9b04"
+              },
+              {
+                "name": "native_temporal_feed.hlsl",
+                "path": "native-game-tiled-assets/native_temporal_feed.hlsl",
+                "size": 1387,
+                "sha256": "5ef04843e70a0a99d872c04bc90c687857c8470c4d0e0cfe195c7855a9a22816"
+              },
+              {
+                "name": "native_temporal_sample.hlsl",
+                "path": "native-game-tiled-assets/native_temporal_sample.hlsl",
+                "size": 7349,
+                "sha256": "18666e7b3d41b0b8f2d3758764fdf3c2bcf9c0b113982a66a339ec33715a3e7b"
+              },
+              {
+                "name": "native_text_overlay.hlsl",
+                "path": "native-game-tiled-assets/native_text_overlay.hlsl",
+                "size": 3938,
+                "sha256": "8d20c7f5d9c08d4cc50ad726c4e31ba1dbf0b7281f5ecafeec8196defc997423"
+              },
+              {
+                "name": "native_vit_attention.hlsl",
+                "path": "native-game-tiled-assets/native_vit_attention.hlsl",
+                "size": 2182,
+                "sha256": "1618c27f2a10d753941cbd1b8b0a5e3301fe6ec769ae9c130ce5a61feeabcaca"
+              },
+              {
+                "name": "native_vit_gather.hlsl",
+                "path": "native-game-tiled-assets/native_vit_gather.hlsl",
+                "size": 289,
+                "sha256": "9db00368be0e1120fd882199fbe32614dd82acff90839a16172a7b74878c9534"
+              },
+              {
+                "name": "native_vit_linear.hlsl",
+                "path": "native-game-tiled-assets/native_vit_linear.hlsl",
+                "size": 4122,
+                "sha256": "13c1ecd8737144975a850b5378fff97ad7ce2a97db99c0942f2e7c312fc4f631"
+              },
+              {
+                "name": "native_vit_pack.hlsl",
+                "path": "native-game-tiled-assets/native_vit_pack.hlsl",
+                "size": 1406,
+                "sha256": "b78a889afa5a7a851ae9c1ec5fbca141cc76ec9855856f82cf735acd0c0349dc"
+              },
+              {
+                "name": "native_vit_pack16.cso",
+                "path": "native-game-tiled-assets/native_vit_pack16.cso",
+                "size": 3968,
+                "sha256": "4f5c6d1363fc2f3f21a621459e5faf1468566c4870491e9be4b9039acdbf36e1"
+              },
+              {
+                "name": "native_vit_pack8.cso",
+                "path": "native-game-tiled-assets/native_vit_pack8.cso",
+                "size": 4520,
+                "sha256": "9aa30d3aa868c9273fc3a2ff9ec62eae9e7030345896aeb787b3440f7b181bfc"
+              },
+              {
+                "name": "native_vit_qkv.hlsl",
+                "path": "native-game-tiled-assets/native_vit_qkv.hlsl",
+                "size": 3032,
+                "sha256": "05f11f152db441466f6fb26eec4508022a97e683d559173c0bbce422034508f8"
+              },
+              {
+                "name": "native_wave_attention_direct.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct.cso",
+                "size": 8732,
+                "sha256": "ebe3fbd0897e8e2bb3c31c200275f9da202e7f35dba3bf3afa670f4c3a974ec7"
+              },
+              {
+                "name": "native_wave_attention_direct.hlsl",
+                "path": "native-game-tiled-assets/native_wave_attention_direct.hlsl",
+                "size": 14467,
+                "sha256": "30cdd2a9890b84d1989418bfe957ff6c239cc875f20e9f5f0128c512baa23280"
+              },
+              {
+                "name": "native_wave_attention_direct_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_c128.cso",
+                "size": 8728,
+                "sha256": "fdc9ff2e7c9e89522354717a4f4b0ae177b3f7384ef67f493b86af2e5f445a24"
+              },
+              {
+                "name": "native_wave_attention_direct_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_c64.cso",
+                "size": 8732,
+                "sha256": "f4737fc8e8c1d6ee0e5a7cd4f32d18381e306d8703f86d509cc7ea73f1085ddd"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8act.cso",
+                "size": 9032,
+                "sha256": "3e3c6c13012cae4cc31f8c3e3cd46768357ad0616ea02e7ebf8fd41f7f9486e5"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8act_c128.cso",
+                "size": 9028,
+                "sha256": "f06cb74d5232c9cdc50e89765f8593ecab2915fddec98f0fc8af015db591c79d"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8act_c64.cso",
+                "size": 9028,
+                "sha256": "1215aafc974f1914237e7f188f7aa74e3e0cdf11671977b4235b41584eaff939"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8qkv_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8qkv_fp8act.cso",
+                "size": 10132,
+                "sha256": "527a43baa7d99857498758f8f58242b7387f574ac4ded8f29809ddec895f0516"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8qkv_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8qkv_fp8act_c128.cso",
+                "size": 10132,
+                "sha256": "4894ae31ffacc06692243ff54fc880562b8a12a71781431042896a0c8dfcad09"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8qkv_fp8act_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8qkv_fp8act_c512.cso",
+                "size": 10136,
+                "sha256": "d729bd9e77c97649bbbee94b0d1eaa9825cd121d6921ced630fb12a14d4fc670"
+              },
+              {
+                "name": "native_wave_attention_direct_fp8qkv_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_direct_fp8qkv_fp8act_c64.cso",
+                "size": 10132,
+                "sha256": "8354c047d3a1867203780ce929594f24f8887465656623a8ea60d5f3f6ec93f0"
+              },
+              {
+                "name": "native_wave_attention_fused_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_fused_qkv.cso",
+                "size": 15564,
+                "sha256": "7d4704732fe4d7b453f75c8831a64981f6d6e59395a21f7b06789840b71a1d54"
+              },
+              {
+                "name": "native_wave_attention_fused_qkv.hlsl",
+                "path": "native-game-tiled-assets/native_wave_attention_fused_qkv.hlsl",
+                "size": 7258,
+                "sha256": "501492be980260678ad1d1d5111fffb8e38693f220abd05a5ebe3778edd722e3"
+              },
+              {
+                "name": "native_wave_attention_fused_qkv_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_fused_qkv_c128.cso",
+                "size": 15568,
+                "sha256": "c663e897702a65d0423410e981bdf0f916d2228173e2da8ff59da2c23d9eda4a"
+              },
+              {
+                "name": "native_wave_attention_fused_qkv_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_fused_qkv_c64.cso",
+                "size": 15560,
+                "sha256": "24070b467499a98391e8102751d45e2065e027fda5e330e3ba006e22d1e86e86"
+              },
+              {
+                "name": "native_wave_attention_normalize.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_normalize.cso",
+                "size": 5212,
+                "sha256": "43f3d34ad0dd39b98ae1e77ecabd75aafb64827e5213892d208e3ab7ebba1757"
+              },
+              {
+                "name": "native_wave_attention_normalize_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_normalize_c128.cso",
+                "size": 5212,
+                "sha256": "0a415109cf1ce76a93a8c2eed1ce0aef52ca6b7da18cf0f737986e1dfda942a2"
+              },
+              {
+                "name": "native_wave_attention_normalize_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_attention_normalize_c64.cso",
+                "size": 5212,
+                "sha256": "147202f3c2e4e6e2465722284ad5d786b93c662825d7d03acb97c7b00aad8a0d"
+              },
+              {
+                "name": "native_wave_av.cso",
+                "path": "native-game-tiled-assets/native_wave_av.cso",
+                "size": 46080,
+                "sha256": "ac98b8255f45e33d72f68acb10190083cc1cccf8d77457da85168615d6bcce92"
+              },
+              {
+                "name": "native_wave_av_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_av_c128.cso",
+                "size": 46084,
+                "sha256": "78fddef775bb8ce2565e76a656b3b7f02dcc273a445a581901d4dd62ab6af6df"
+              },
+              {
+                "name": "native_wave_av_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_av_c64.cso",
+                "size": 46084,
+                "sha256": "999ce73e44416f758be7c02ef5b6d77b38fe7226eda6f265ad5cec2d6521d4af"
+              },
+              {
+                "name": "native_wave_c32_av.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_av.cso",
+                "size": 46300,
+                "sha256": "4c40ed3f5a240f445c79e0d68b759a995c4b052236988f854a1a35a314c64e08"
+              },
+              {
+                "name": "native_wave_c32_ds.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_ds.cso",
+                "size": 8036,
+                "sha256": "fc200ed5c8b8db91ee94d90d91c13d90a1525a62501ee1c1ef201f820f86c1e8"
+              },
+              {
+                "name": "native_wave_c32_ds.hlsl",
+                "path": "native-game-tiled-assets/native_wave_c32_ds.hlsl",
+                "size": 2444,
+                "sha256": "87b49a034b6eeaea44603f98973e4a361eedb9b530891294692ee0cce0257d7d"
+              },
+              {
+                "name": "native_wave_c32_ffn_blocked.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_ffn_blocked.cso",
+                "size": 38452,
+                "sha256": "4b185e50dfb909c0c5078acfd9dc3f8208e5a0339b66f355b78a028ec86484b5"
+              },
+              {
+                "name": "native_wave_c32_ffn_blocked.hlsl",
+                "path": "native-game-tiled-assets/native_wave_c32_ffn_blocked.hlsl",
+                "size": 20070,
+                "sha256": "4aa4439a930a84008152a4d13df94758aa3503b37fc8342ec0bc0ca14896fb29"
+              },
+              {
+                "name": "native_wave_c32_ffn_local.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_ffn_local.cso",
+                "size": 8768,
+                "sha256": "94676009a171e68d67971c54ccac88e4443a92c2c799a1aacedac72d2a926719"
+              },
+              {
+                "name": "native_wave_c32_ffn_local.hlsl",
+                "path": "native-game-tiled-assets/native_wave_c32_ffn_local.hlsl",
+                "size": 2864,
+                "sha256": "a6ba3df867d13fdcd0372194e4a70a2d047d2382505e464ebd8eb5a7454809ee"
+              },
+              {
+                "name": "native_wave_c32_full_attention.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_full_attention.cso",
+                "size": 46852,
+                "sha256": "e55211c56378ebe2ddc6430417c955ff245756226d7808cec9676792b94d523c"
+              },
+              {
+                "name": "native_wave_c32_fused_attention.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_fused_attention.cso",
+                "size": 26456,
+                "sha256": "ca1a013e2deb6ed176a10d543fb7a64d4f6421d0a7042987ca0358848874e4a6"
+              },
+              {
+                "name": "native_wave_c32_fused_attention_ffn.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_fused_attention_ffn.cso",
+                "size": 46728,
+                "sha256": "0c10f1d6a6b09f935bdd7e879bfd3aa9b1aeb1e40d4529236abfd813ad5de257"
+              },
+              {
+                "name": "native_wave_c32_fused_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_fused_qkv.cso",
+                "size": 12388,
+                "sha256": "fb9af7545e50e5a6eacb8b071b76b4d6faf6193479b1858bd296ee19393c3503"
+              },
+              {
+                "name": "native_wave_c32_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_qkv.cso",
+                "size": 44420,
+                "sha256": "396a2c7d7070c9c5b15a0a0e3b559648464d2abe9afa32c0e5632cb614757c52"
+              },
+              {
+                "name": "native_wave_c32_scores.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_scores.cso",
+                "size": 53228,
+                "sha256": "6c547731af2d4f4083a6c680ad08bc2ebcc80ae00f707bc3bbe4f0e28a4ee76a"
+              },
+              {
+                "name": "native_wave_c32_split_attention.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_split_attention.cso",
+                "size": 9232,
+                "sha256": "484189dff737ba4174986c109103dba09045550afef32a2966e33d2bca2a4d9c"
+              },
+              {
+                "name": "native_wave_c32_split_attention.hlsl",
+                "path": "native-game-tiled-assets/native_wave_c32_split_attention.hlsl",
+                "size": 49170,
+                "sha256": "783d56fccd51345234ff49e465cadfae263b324ec71a097e6e76074601625efc"
+              },
+              {
+                "name": "native_wave_c32_split_normalize.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_split_normalize.cso",
+                "size": 5108,
+                "sha256": "e6cb11702a15c7e0837ab6a18939f48e1f429e57af5150bd3eb84dc7c4a753bd"
+              },
+              {
+                "name": "native_wave_c32_split_projection.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_split_projection.cso",
+                "size": 6856,
+                "sha256": "9014c94d7437f60387197941ff2e1563774049db4355e967d96cbde6802f0a5b"
+              },
+              {
+                "name": "native_wave_c32_split_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_c32_split_qkv.cso",
+                "size": 9808,
+                "sha256": "46ed1d5d953f7c0ef32ea5ffe540acdd3b6d7e0dc1f8a86f85c92fb631f5d6db"
+              },
+              {
+                "name": "native_wave_contract.cso",
+                "path": "native-game-tiled-assets/native_wave_contract.cso",
+                "size": 6812,
+                "sha256": "182df73d394844af887ebe47a8a81537ce59ecd8afaa03e6666ed108b793e1a8"
+              },
+              {
+                "name": "native_wave_contract.hlsl",
+                "path": "native-game-tiled-assets/native_wave_contract.hlsl",
+                "size": 2458,
+                "sha256": "e13f9f9b2564abca01068b1a95dc5973346765b4103d11c5316b029f229bd9f4"
+              },
+              {
+                "name": "native_wave_contract_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_contract_c128.cso",
+                "size": 6808,
+                "sha256": "f0eb17e0e09a1975df8995dc6d68f2f853a8793d8b6e3453cee2e97af5c02fc3"
+              },
+              {
+                "name": "native_wave_contract_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_contract_c64.cso",
+                "size": 6808,
+                "sha256": "c46fb7cda2c453108c96991520510d120c79298d310fbce8bd07b235c5c551a3"
+              },
+              {
+                "name": "native_wave_decoder_1024_512.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_1024_512.cso",
+                "size": 85424,
+                "sha256": "94036bc76f1b5db8a300bb955490c911eb3582f80dce2eddfce1f5b967cdd54c"
+              },
+              {
+                "name": "native_wave_decoder_128_64.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_128_64.cso",
+                "size": 84736,
+                "sha256": "237986908dfef322328b41b620e4ea1500fb90fbb0e4ef2b8ad0f7b439f6dfa7"
+              },
+              {
+                "name": "native_wave_decoder_128_64_out16.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_128_64_out16.cso",
+                "size": 86584,
+                "sha256": "28b6a7544ca574cc53febd1689bd7d3122d3e57a9b935ae0d784ba84b2e1f9b5"
+              },
+              {
+                "name": "native_wave_decoder_256_128.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_256_128.cso",
+                "size": 84744,
+                "sha256": "85c35fd8a4d80b8b28e2dba02c03a72324f7f01432a3e79ffd93146f109a588d"
+              },
+              {
+                "name": "native_wave_decoder_256_128_out16.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_256_128_out16.cso",
+                "size": 86592,
+                "sha256": "de333914114fc8d10f207637489bb9aa2997a1e6d43b35d1e9a36e19230c8065"
+              },
+              {
+                "name": "native_wave_decoder_512_256.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_512_256.cso",
+                "size": 84740,
+                "sha256": "b478f1bce6ddf5ddb9dd43af17e71ed1d884e36d86f850c627c9eb74f3262d96"
+              },
+              {
+                "name": "native_wave_decoder_64_32.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_64_32.cso",
+                "size": 34192,
+                "sha256": "4dd5a1ff93fcb9e1c6d041b83e08c3d385d8246fda4f7fdbc458b1e597e0408e"
+              },
+              {
+                "name": "native_wave_decoder_64_32_out16.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_64_32_out16.cso",
+                "size": 35160,
+                "sha256": "397294fee758647e053bc6e145fb108a56c58fd8995da260418793283a69cf3f"
+              },
+              {
+                "name": "native_wave_decoder_64_32_skip8.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_64_32_skip8.cso",
+                "size": 30168,
+                "sha256": "040f87e568eaa5d283ad444f7dcea473cf1a90c2ed2c9282c31158fd43a22f56"
+              },
+              {
+                "name": "native_wave_decoder_64_32_skip8_out16.cso",
+                "path": "native-game-tiled-assets/native_wave_decoder_64_32_skip8_out16.cso",
+                "size": 31148,
+                "sha256": "5a65611498a7470d72812edcffe724031f7df138f15686d87063cc9236227d5c"
+              },
+              {
+                "name": "native_wave_decoder_entry.hlsl",
+                "path": "native-game-tiled-assets/native_wave_decoder_entry.hlsl",
+                "size": 9142,
+                "sha256": "f8c63e707f0f5546561d53ad84a11d9d6e2afad1801bc16d090c8f8b736b3715"
+              },
+              {
+                "name": "native_wave_expand.cso",
+                "path": "native-game-tiled-assets/native_wave_expand.cso",
+                "size": 6528,
+                "sha256": "11c1a82aa85d04591d8dd0d8446893864a14a0c159dd0bd243e278f2b8ca7bd2"
+              },
+              {
+                "name": "native_wave_expand.hlsl",
+                "path": "native-game-tiled-assets/native_wave_expand.hlsl",
+                "size": 1963,
+                "sha256": "19045b550720a05ab44275ab0b9c95ec6aefc18e24243dbe27e2556b19c33a12"
+              },
+              {
+                "name": "native_wave_expand_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_expand_c128.cso",
+                "size": 6524,
+                "sha256": "45e1562e2a85a47b39e5c2da9c5acce6aef3afc816631310d571098bb1b4e9fb"
+              },
+              {
+                "name": "native_wave_expand_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_expand_c64.cso",
+                "size": 6524,
+                "sha256": "c06fc435a076d24aaa9010015a35858149ba5dbf6d46fcc3f05606c3402c1bc8"
+              },
+              {
+                "name": "native_wave_ffn_blocked.hlsl",
+                "path": "native-game-tiled-assets/native_wave_ffn_blocked.hlsl",
+                "size": 5607,
+                "sha256": "53265b59ebfa8dfb0705d12c6f6c78cc9e533658f48455f27ba998866fd853b0"
+              },
+              {
+                "name": "native_wave_ffn_contract_blocked.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_contract_blocked.cso",
+                "size": 7464,
+                "sha256": "d98d34918e658b8a592de40879d62111c55e9c97502e650e3bc8b8f40ad68cce"
+              },
+              {
+                "name": "native_wave_ffn_contract_blocked_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_contract_blocked_c128.cso",
+                "size": 7464,
+                "sha256": "fd04a7ff19d430cd04d394298436cc5894a4178fff097d1ceb22cdbf8d287525"
+              },
+              {
+                "name": "native_wave_ffn_contract_blocked_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_contract_blocked_c64.cso",
+                "size": 7464,
+                "sha256": "05d0549d1a77b2bb12b5b71c0d5a45ff9729665f7467fa3dc81e6c391389f2b7"
+              },
+              {
+                "name": "native_wave_ffn_expand_blocked.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_expand_blocked.cso",
+                "size": 7448,
+                "sha256": "cfac91c07cb36cb4c210299417887d27c49e38c59c8a1bf2592dc37305b6ecd1"
+              },
+              {
+                "name": "native_wave_ffn_expand_blocked_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_expand_blocked_c128.cso",
+                "size": 7444,
+                "sha256": "f3472d389711b3b776d26f00716755235a4ccb4351ce080f2c041245dc3761c5"
+              },
+              {
+                "name": "native_wave_ffn_expand_blocked_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_expand_blocked_c64.cso",
+                "size": 7444,
+                "sha256": "1966149c019b9c91b64560bf453d18e3e807ee3757bd4a5471e3ede6422dadd3"
+              },
+              {
+                "name": "native_wave_ffn_fused.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused.cso",
+                "size": 8696,
+                "sha256": "ed68bdbfda9da7ad7066d00a7b178bb6077d8d55523e5393198884e704263263"
+              },
+              {
+                "name": "native_wave_ffn_fused.hlsl",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused.hlsl",
+                "size": 5114,
+                "sha256": "329a63031874c6d039cc1e260b96799e14ab35d4804554edc7723b13875f7669"
+              },
+              {
+                "name": "native_wave_ffn_fused_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused_c128.cso",
+                "size": 8692,
+                "sha256": "f4384e89fe2d26fc211f3e2a0ae6c628fe92150133cb29b4e005541f98fdd033"
+              },
+              {
+                "name": "native_wave_ffn_fused_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused_c64.cso",
+                "size": 8692,
+                "sha256": "b8192d1ba8df69505c9744591d491712eedceeadc85624e50fa4ea39796e8b85"
+              },
+              {
+                "name": "native_wave_ffn_fused_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused_fp8act.cso",
+                "size": 8888,
+                "sha256": "49987fc139364fc47d0e3b234c4d0a6ec70f408b5e74edae301e8a8670844b07"
+              },
+              {
+                "name": "native_wave_ffn_fused_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused_fp8act_c128.cso",
+                "size": 8872,
+                "sha256": "95b7f51515a11f193cf770e72d56397963a3842c15e221398b6353bc77331880"
+              },
+              {
+                "name": "native_wave_ffn_fused_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_fused_fp8act_c64.cso",
+                "size": 8876,
+                "sha256": "03251fa35011721457c6449bd0dd6d028bf14bc7f62a1127f4ca6e18b0241a8b"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused.cso",
+                "size": 10308,
+                "sha256": "556de1e06a9d5a5e858d2aaf93dda9467845aad33e7b814652f411f0ddc8a72b"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused.hlsl",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused.hlsl",
+                "size": 6225,
+                "sha256": "145ff958b6055301fd9370cb8db5f870bc7790eedcd1daf6224ec426d3dd5168"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused_c128.cso",
+                "size": 10296,
+                "sha256": "826cd1c4caae896c7b570ec6c9a89c378b900ad456ff98e34ea68c8ac55399fe"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused_c64.cso",
+                "size": 10296,
+                "sha256": "4e8ba8183f876a0dabb3ca41ab05b9bc9387c462294c8630ff6962c287f5f1a7"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused_f8in.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused_f8in.cso",
+                "size": 10100,
+                "sha256": "3b9361c591dfd11c00ff55dbcbb7d5bfe43dd6be2ee393070d3fdc97299f76fe"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused_f8in_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused_f8in_c128.cso",
+                "size": 10084,
+                "sha256": "51b4959246a2d6fc71eeea4446a23a734cb37cdb8aed555567d55246846cd3ea"
+              },
+              {
+                "name": "native_wave_ffn_proj0_fused_f8in_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_ffn_proj0_fused_f8in_c64.cso",
+                "size": 10084,
+                "sha256": "398dba7b0c18800232f0e9335d43d4da03f43e22c85bc5da7a9cc9940f125845"
+              },
+              {
+                "name": "native_wave_head_project.cso",
+                "path": "native-game-tiled-assets/native_wave_head_project.cso",
+                "size": 5960,
+                "sha256": "950053a75661e002d4a3087e425f15271eef3a89a1b433c2b961379b849cc5a9"
+              },
+              {
+                "name": "native_wave_head_project.hlsl",
+                "path": "native-game-tiled-assets/native_wave_head_project.hlsl",
+                "size": 1834,
+                "sha256": "5c7b49867e55796a08536c7459c0777595629b278ebdc7a972021e2f3cb7299d"
+              },
+              {
+                "name": "native_wave_head_project_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_head_project_c128.cso",
+                "size": 5960,
+                "sha256": "68b90ddf5afb0648019926c4f54404d9bd0b8165d1a942667ece3ba40e0f3783"
+              },
+              {
+                "name": "native_wave_head_project_c256.cso",
+                "path": "native-game-tiled-assets/native_wave_head_project_c256.cso",
+                "size": 5960,
+                "sha256": "50f9b9a6ed3fce6de3e3aea906512fda72d692c1075ed875ca6b38e59a91dd7f"
+              },
+              {
+                "name": "native_wave_head_project_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_head_project_c64.cso",
+                "size": 5956,
+                "sha256": "dff3c3cb9c668e55cf938b95229ca01cdff9e0685023789319bd16143539be04"
+              },
+              {
+                "name": "native_wave_prefix.cso",
+                "path": "native-game-tiled-assets/native_wave_prefix.cso",
+                "size": 12812,
+                "sha256": "21bdfcd87c152f5d36e2e17e11ed4fa63d0901be913f19e697caffcf8a2db6f7"
+              },
+              {
+                "name": "native_wave_prefix.hlsl",
+                "path": "native-game-tiled-assets/native_wave_prefix.hlsl",
+                "size": 4373,
+                "sha256": "52be40d309975ac6de780758931a52f0ff1c38cdcfba7e32508600f380a93a24"
+              },
+              {
+                "name": "native_wave_project.cso",
+                "path": "native-game-tiled-assets/native_wave_project.cso",
+                "size": 10724,
+                "sha256": "f2e9fbfc03743028483ee0fd99cd1053387ea3f4999a2bbed7c023183691d2e7"
+              },
+              {
+                "name": "native_wave_project.hlsl",
+                "path": "native-game-tiled-assets/native_wave_project.hlsl",
+                "size": 11755,
+                "sha256": "fb26d68791407ee91e7f49d72f60a8720a59e377d6a326dcd875d7db4623d981"
+              },
+              {
+                "name": "native_wave_project_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_c128.cso",
+                "size": 10720,
+                "sha256": "e5b387f0b1979e309aa3d906e5e69e5318f5aa7f0a89d348a2a6f785a156162a"
+              },
+              {
+                "name": "native_wave_project_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_c512.cso",
+                "size": 9520,
+                "sha256": "796edee56184192e0a337e7caaabe69efa91d0910c5f2acccf35b1aad1660b3c"
+              },
+              {
+                "name": "native_wave_project_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_c64.cso",
+                "size": 10720,
+                "sha256": "4f4d2e670c734fa593cadef03d9c3c75940a12161a9de5025623ad88078a47ef"
+              },
+              {
+                "name": "native_wave_project_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_project_fp8act.cso",
+                "size": 8716,
+                "sha256": "7e5a9be658ee87d9cb40c720077dde4ff5d32cc6edf36dd00e04303377024499"
+              },
+              {
+                "name": "native_wave_project_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_fp8act_c128.cso",
+                "size": 8716,
+                "sha256": "51441623582085aafbb6c66af1244b8460c1657b7c8249ca28202b6071359df8"
+              },
+              {
+                "name": "native_wave_project_fp8act_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_fp8act_c512.cso",
+                "size": 8700,
+                "sha256": "761021fb6dd9f45708368a03528fd1e8f4f41fb9dbc33ea64d8c9a4318603893"
+              },
+              {
+                "name": "native_wave_project_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_fp8act_c64.cso",
+                "size": 8712,
+                "sha256": "294b96e6cf7cc118f3ea31437f6021ab0ff350b8dc6235b87a843a7ad44f5c14"
+              },
+              {
+                "name": "native_wave_project_mapfeature.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature.cso",
+                "size": 11224,
+                "sha256": "e4118bffa2cab86a7a992309ae9858f07f048a179975737b47a0508865aebf66"
+              },
+              {
+                "name": "native_wave_project_mapfeature_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_c128.cso",
+                "size": 11220,
+                "sha256": "891557fbb4f780dd26ee6a7170a2c2ca02a210b859d59c46714abdbea63786d2"
+              },
+              {
+                "name": "native_wave_project_mapfeature_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_c64.cso",
+                "size": 11220,
+                "sha256": "fae8924a0b4df84f651338503051d36356b0c1ebb8af7d7e1b775dbf6cb3bf50"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act.cso",
+                "size": 9228,
+                "sha256": "749a39dd3ef4244b7abbf9475f371a04003affea99617dd8ee959b193fec1afa"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_c128.cso",
+                "size": 9232,
+                "sha256": "abc5d57d26b7bcd723389f3dc493a117a83ce94a1e30b03692d80f1af0b76781"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_c64.cso",
+                "size": 9228,
+                "sha256": "aa069eaa2fb6c2592c9cd356c6efdfef3edbbe304de3f6ccd81bbae1891f126b"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f16in_f8out_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f16in_f8out_c128.cso",
+                "size": 8632,
+                "sha256": "4123a338930a98f34434fbf46d9dcd543f87c6a1e356702a338ec29b744aca2e"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f16in_f8out_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f16in_f8out_c64.cso",
+                "size": 8628,
+                "sha256": "e32c904da3ec36c423048d36e9cd5158e52159db12dd823406de5731d89c6661"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8in_f8out.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8in_f8out.cso",
+                "size": 8836,
+                "sha256": "0dcb6fc42aae62d53516edda3ca26d63f40b4619c7dc432450b2fed38e6cdead"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8in_f8out_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8in_f8out_c128.cso",
+                "size": 8832,
+                "sha256": "11476e29f9a91031655a343039ea00bc57dc1c7ee3b9924e3819c001b547c0cc"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8in_f8out_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8in_f8out_c64.cso",
+                "size": 8832,
+                "sha256": "502ded04c73523c22d558d7b86b2d06c4cc349c735b1f1ac0133e49ba57906a0"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8out.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8out.cso",
+                "size": 8784,
+                "sha256": "687be15e03ffdf5102d43276e9565eafe88e0d3e014df16d19d6ec8cd0299506"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8out_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8out_c128.cso",
+                "size": 8788,
+                "sha256": "ba76d20f035926db64f16d9ae7651542b6292d6746fc05c62bd58c45978124b8"
+              },
+              {
+                "name": "native_wave_project_mapfeature_fp8act_f8out_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapfeature_fp8act_f8out_c64.cso",
+                "size": 8784,
+                "sha256": "9e943d1fa9279978911e700fb58738360cfeb39f1e9ebcf8e8461ac12f009f77"
+              },
+              {
+                "name": "native_wave_project_mapoutput.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput.cso",
+                "size": 11596,
+                "sha256": "7f32a83aeae05f6387916d334d671360c5ecececfdc687d086de8b43cde15dea"
+              },
+              {
+                "name": "native_wave_project_mapoutput_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_c128.cso",
+                "size": 11592,
+                "sha256": "d8de0cd1ad5a1cd0a3df8bc48e86a081756d6dea9afe60f184650a0529ae50e5"
+              },
+              {
+                "name": "native_wave_project_mapoutput_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_c64.cso",
+                "size": 11592,
+                "sha256": "91731a1c664fa8f49748ed9cd787562e47205747a42f30373231c1471699beea"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act.cso",
+                "size": 9588,
+                "sha256": "06cff9a1dec9976c9e204f10c5dc71ef389a0e5fc65b88068f732dd83851e69d"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_c128.cso",
+                "size": 9592,
+                "sha256": "46632d0844cb5055b158b3ec538989c00cded2c58bd07a164de26f1a5977f1be"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_c64.cso",
+                "size": 9588,
+                "sha256": "562da7f9ef9291f059ea868eff94ae38006568802ebadcf31cb613924925188e"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in.cso",
+                "size": 9632,
+                "sha256": "d16404b83cf06b9a4f27c4ff6b74f38467b9ede3566db5a23a1d88c760aae04d"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in_c128.cso",
+                "size": 9636,
+                "sha256": "fa76a028faeca3ad2991f93c03ace1a779087e32d14b2917eec67ddaa41323a3"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in_c64.cso",
+                "size": 9628,
+                "sha256": "a6fe3d0168c5650559e83ca6d47a30814f6054085f52082fd64b1c410ad68a2a"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in_f8out.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in_f8out.cso",
+                "size": 10212,
+                "sha256": "a3f36aa8ab0bc8049e82cee838473b186ee292b509ba65aec7b08187003c797d"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in_f8out_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in_f8out_c128.cso",
+                "size": 10212,
+                "sha256": "d693917123f19414a039911b8613611359224cbedbaf43f6e2cdf98eb8c7b587"
+              },
+              {
+                "name": "native_wave_project_mapoutput_fp8act_f8in_f8out_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_mapoutput_fp8act_f8in_f8out_c64.cso",
+                "size": 10204,
+                "sha256": "2caa75c34870136db7b72e77ea59a72eecc057320f4652128a6087adfbb2b5a0"
+              },
+              {
+                "name": "native_wave_project_raw.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw.cso",
+                "size": 9856,
+                "sha256": "14ed64a85043f29b09dd9f00b87bf22c2adcf88e3b84dcf28f4268f2a44b998a"
+              },
+              {
+                "name": "native_wave_project_raw_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_c128.cso",
+                "size": 9852,
+                "sha256": "a79cea186d94d50ffe165f22b8b8151b23c5a5432b12db10664d027709ed3bfd"
+              },
+              {
+                "name": "native_wave_project_raw_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_c512.cso",
+                "size": 8644,
+                "sha256": "340b88ac789cdbdb935f608dd806a1ed4e55e1e1b55c0f785aa106d507061e8f"
+              },
+              {
+                "name": "native_wave_project_raw_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_c64.cso",
+                "size": 9852,
+                "sha256": "7037f354c3b8c3d2449d2710e0fbe69ae130e9fb4c55bc0648dd385047f1718b"
+              },
+              {
+                "name": "native_wave_project_raw_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_fp8act.cso",
+                "size": 7848,
+                "sha256": "be29071fadb4360c0627318d2d9c38e171f96e4de1b989c5936419ab7b386d06"
+              },
+              {
+                "name": "native_wave_project_raw_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_fp8act_c128.cso",
+                "size": 7848,
+                "sha256": "3df0bd84329910ea836efc1143bd788f141836cb33af624e9e610bef893b5d6d"
+              },
+              {
+                "name": "native_wave_project_raw_fp8act_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_fp8act_c512.cso",
+                "size": 7828,
+                "sha256": "cd4eeb9c58bf59b3dda35996fe3d940053e34dcf8c03c8c92ea9c2a770a98c62"
+              },
+              {
+                "name": "native_wave_project_raw_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_fp8act_c64.cso",
+                "size": 7848,
+                "sha256": "54b5486708e13fef68b19318e5a7b5412848fb96a01cf28c79b6d8f010e5e1a5"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput.cso",
+                "size": 10732,
+                "sha256": "96365001ae30e38f37a0e96dbede54b3c631f94ae67e88b63425f4ebe323cabc"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_c128.cso",
+                "size": 10728,
+                "sha256": "631f728da49893101019506f34ada6484efae69afcb2e6d62015ac4977db22f4"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_c64.cso",
+                "size": 10728,
+                "sha256": "fd6a640d20a3e81c48effd4664fe84d48d895c8cab9f8f7cf28e5eedeb8c0e49"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act.cso",
+                "size": 8716,
+                "sha256": "59af2bb05662a4790026a97e80c5f102a4ffed88607da228096e2c48e292dfd1"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act_c128.cso",
+                "size": 8716,
+                "sha256": "5595e7eef970e5702c493f88faa8c115e1195f236822736cab2e207e56e8a61d"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act_c64.cso",
+                "size": 8716,
+                "sha256": "414966901db133fddba05f6661d08c2fb2a034f6e08bfbaa7addf7a273a59cd5"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act_f8in.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act_f8in.cso",
+                "size": 8804,
+                "sha256": "03417b49c546fd06e0d0c57d3f871ef8796c09ec39a3ca3c44ec2cac06696a92"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act_f8in_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act_f8in_c128.cso",
+                "size": 8804,
+                "sha256": "68aacd07d93609199058a3c0cb01f5a053a7f5aab91d39c6d36872f994506f34"
+              },
+              {
+                "name": "native_wave_project_raw_mapoutput_fp8act_f8in_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_project_raw_mapoutput_fp8act_f8in_c64.cso",
+                "size": 8800,
+                "sha256": "d82b25370abf638aa00c68555d216f3354be0c94fed32a5269be6b5ebf6c777b"
+              },
+              {
+                "name": "native_wave_project_stream08_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_stream08_c512.cso",
+                "size": 10904,
+                "sha256": "a22fa9c830fbffd576e324a39e99b8ac791edb86db7adf4b08ae1fa2af973114"
+              },
+              {
+                "name": "native_wave_project_stream0f_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_stream0f_c512.cso",
+                "size": 10872,
+                "sha256": "d7e202281ee3965bdeb22239c21826dcbc4f5f0b2a21d5ad937a6b29522e3302"
+              },
+              {
+                "name": "native_wave_project_stream18_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_stream18_c512.cso",
+                "size": 11896,
+                "sha256": "eb51b0d6a303283f63f37ba4f0d190fffe7bb46b26e642339095c49722c8a2aa"
+              },
+              {
+                "name": "native_wave_project_stream1f_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_stream1f_c512.cso",
+                "size": 9740,
+                "sha256": "1feb7767bd39825d89897f65df484d88e51c035c5c7d28dd56d92d0ed9b85a5d"
+              },
+              {
+                "name": "native_wave_project_stream1raw_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_project_stream1raw_c512.cso",
+                "size": 8940,
+                "sha256": "d056f92713dc52de5e6ee1432c7f774f410d03cf64db515c0655675705b0560a"
+              },
+              {
+                "name": "native_wave_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv.cso",
+                "size": 6824,
+                "sha256": "44b620fa1c8a081b765eb43cf991f6c4839b097f140a2a981aa8136bf9e043e8"
+              },
+              {
+                "name": "native_wave_qkv.hlsl",
+                "path": "native-game-tiled-assets/native_wave_qkv.hlsl",
+                "size": 1950,
+                "sha256": "10700e73a63ea49caaa996292d29c13c05e05b72e88200d6f091222dda062358"
+              },
+              {
+                "name": "native_wave_qkv_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_c128.cso",
+                "size": 6824,
+                "sha256": "b5d73500e9b7e0974da40741b2fbbcb99f5b6c79fdc575839adaa5a38699256b"
+              },
+              {
+                "name": "native_wave_qkv_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_c64.cso",
+                "size": 6796,
+                "sha256": "5fc361a55dd894fded479484ed73ba7d82f70bdbe6e2358cfef357cb23806cee"
+              },
+              {
+                "name": "native_wave_qkv_normalize.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize.cso",
+                "size": 9648,
+                "sha256": "079a32e974b0d320fa9b908549588cdea0d7152e43d4004325e05907e5c54ae3"
+              },
+              {
+                "name": "native_wave_qkv_normalize.hlsl",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize.hlsl",
+                "size": 6525,
+                "sha256": "0e55894c268c4cadc45ff914767d6222b359e6ca829afafb00081fd465cc95ba"
+              },
+              {
+                "name": "native_wave_qkv_normalize_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_c128.cso",
+                "size": 9648,
+                "sha256": "b76b903cdbd181b24190ec6ae65b3b260f56fdffa0808e7285fd399f42d20a80"
+              },
+              {
+                "name": "native_wave_qkv_normalize_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_c64.cso",
+                "size": 9612,
+                "sha256": "3ff2473eab3bce5769f68b54ecefdc5446cb0037f3b25576318b5067a83b17d2"
+              },
+              {
+                "name": "native_wave_qkv_normalize_fp8qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_fp8qkv.cso",
+                "size": 10220,
+                "sha256": "a784821ef12ea9ec82f528144168d9e233ef9f7ca4376ee61f2c22b37a3e20d2"
+              },
+              {
+                "name": "native_wave_qkv_normalize_fp8qkv_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_fp8qkv_c128.cso",
+                "size": 10220,
+                "sha256": "c6974708b1535de24346d3e6a59945c6d4c41ea8ce5e9365a098b1c0d3a1ead4"
+              },
+              {
+                "name": "native_wave_qkv_normalize_fp8qkv_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_fp8qkv_c512.cso",
+                "size": 10216,
+                "sha256": "381d16121ef5def4b0e78f5ab220777535c4db94e2a0b119251775fe99e6fa8c"
+              },
+              {
+                "name": "native_wave_qkv_normalize_fp8qkv_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_fp8qkv_c64.cso",
+                "size": 10192,
+                "sha256": "9bd4f99dcb9e5520eac2bfd996277bd4d2922fdc040cfeb3d9def6c2e27be42a"
+              },
+              {
+                "name": "native_wave_qkv_normalize_fp8qkv_stream_c512.cso",
+                "path": "native-game-tiled-assets/native_wave_qkv_normalize_fp8qkv_stream_c512.cso",
+                "size": 10212,
+                "sha256": "071ba9f5800a4c8c7ba4508a22ade0179a07d6bc662ed090ff27d75842dc9b75"
+              },
+              {
+                "name": "native_wave_scores.cso",
+                "path": "native-game-tiled-assets/native_wave_scores.cso",
+                "size": 41352,
+                "sha256": "3349da08b020979dd66cacd7ea715b1ab315d55de4620667f01d55248485635b"
+              },
+              {
+                "name": "native_wave_scores_c128.cso",
+                "path": "native-game-tiled-assets/native_wave_scores_c128.cso",
+                "size": 41380,
+                "sha256": "30177b4cd601ce9e9e7473080b8b361046d0cdd8423665a4bcaeefd0d9435a21"
+              },
+              {
+                "name": "native_wave_scores_c64.cso",
+                "path": "native-game-tiled-assets/native_wave_scores_c64.cso",
+                "size": 41372,
+                "sha256": "62076a9bcef51fe2088502bb4e07a308623a993f990062e4d076bfcd4ddc6303"
+              },
+              {
+                "name": "native_wave_split_attention.cso",
+                "path": "native-game-tiled-assets/native_wave_split_attention.cso",
+                "size": 26044,
+                "sha256": "c74de630dbf5e2c052ef0add9fc522ed21463924dcd716afa585411007a48651"
+              },
+              {
+                "name": "native_wave_split_ffwd_parallel.cso",
+                "path": "native-game-tiled-assets/native_wave_split_ffwd_parallel.cso",
+                "size": 10904,
+                "sha256": "ff9ba5ba7ecdb4b21e9d7e75232146b93c5117ba6d63df1d3a401ad3860caa89"
+              },
+              {
+                "name": "native_wave_split_ffwd_parallel.hlsl",
+                "path": "native-game-tiled-assets/native_wave_split_ffwd_parallel.hlsl",
+                "size": 16272,
+                "sha256": "ee52271b114bb09672eecf97088e940f8b89745d50058737e741360be45aa1b9"
+              },
+              {
+                "name": "native_wave_split_ffwd_parallel_stream8.cso",
+                "path": "native-game-tiled-assets/native_wave_split_ffwd_parallel_stream8.cso",
+                "size": 11740,
+                "sha256": "7d1682cb54bdf795832a73545d7609751100da881c2ab96c73cdc79de2fa86e9"
+              },
+              {
+                "name": "native_wave_split_ffwd_parallel_streamf.cso",
+                "path": "native-game-tiled-assets/native_wave_split_ffwd_parallel_streamf.cso",
+                "size": 11540,
+                "sha256": "40bfec49355d6c31de39d35067c0e31a7381417865a7da482a40040978853b12"
+              },
+              {
+                "name": "native_wave_vit_attention.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_attention.cso",
+                "size": 12304,
+                "sha256": "c6195c6220937625b1ad18b5a86a78ba1f15fbac10567ee4b2d2f88267fc0795"
+              },
+              {
+                "name": "native_wave_vit_attention.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_attention.hlsl",
+                "size": 4064,
+                "sha256": "144c0260d6f2970dc493507d35899cf462f737f83a39ecb98611242fcaee7ef2"
+              },
+              {
+                "name": "native_wave_vit_attention_fp8.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_fp8.cso",
+                "size": 10696,
+                "sha256": "4a28227a27cb994d1cec5bbf59dbac59491740fd4e4c300b8b3b955b387b95bf"
+              },
+              {
+                "name": "native_wave_vit_attention_fp8.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_fp8.hlsl",
+                "size": 4917,
+                "sha256": "0e1c6f7272b973f4e64ecbe6bcb2503df80ecc69918ae6e4a3515413c9e328c0"
+              },
+              {
+                "name": "native_wave_vit_attention_half.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_half.cso",
+                "size": 8032,
+                "sha256": "64e1ad2d70e253d769b7493c5889a5019d815aefac94e1671e5bec9c2e22fb6a"
+              },
+              {
+                "name": "native_wave_vit_attention_half.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_half.hlsl",
+                "size": 5416,
+                "sha256": "11f7c7a9085ea166d7db8c65c465ad2fbe7a23666f0f8cf82743beddcf1db42e"
+              },
+              {
+                "name": "native_wave_vit_attention_pack.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_pack.cso",
+                "size": 3932,
+                "sha256": "84114aff84e20f5ac7ad2de82ae48bed37b67420e4c35a2afbf5370aaf42ae3c"
+              },
+              {
+                "name": "native_wave_vit_attention_pack8.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_attention_pack8.cso",
+                "size": 4500,
+                "sha256": "ed277da1774017af70056e1ccc5eaf5e1f7686dd94b427df371bfdfd2a0ca5f4"
+              },
+              {
+                "name": "native_wave_vit_blocked.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_blocked.hlsl",
+                "size": 13912,
+                "sha256": "3a97910e02b4a0c2eabc0f9075d4f8169f356b6b01bef5426c9998962209fed0"
+              },
+              {
+                "name": "native_wave_vit_combine.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_combine.cso",
+                "size": 7196,
+                "sha256": "5cce0b58f5af00fd9477a173bcc0af1a4d59aefa4ba001eb7b899f565ec637e4"
+              },
+              {
+                "name": "native_wave_vit_combine_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_combine_1024.cso",
+                "size": 7144,
+                "sha256": "7f728cd9ff2cc85394cffea7465a8a158f1cf5c6c5e38b5251cd33be7433434d"
+              },
+              {
+                "name": "native_wave_vit_combine_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_combine_m4.cso",
+                "size": 7196,
+                "sha256": "5cce0b58f5af00fd9477a173bcc0af1a4d59aefa4ba001eb7b899f565ec637e4"
+              },
+              {
+                "name": "native_wave_vit_combine_packed_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_combine_packed_1024.cso",
+                "size": 7192,
+                "sha256": "9c88c34dd83db895c9a7e3635bf6a6e79a168eb57269abfccf6315b9c3b5721b"
+              },
+              {
+                "name": "native_wave_vit_combine_packed_1024_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_combine_packed_1024_m4.cso",
+                "size": 7192,
+                "sha256": "9c88c34dd83db895c9a7e3635bf6a6e79a168eb57269abfccf6315b9c3b5721b"
+              },
+              {
+                "name": "native_wave_vit_expand.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_expand.cso",
+                "size": 7272,
+                "sha256": "6848e1191a5f808546981c63d642843516312f184ab2e3441666a55f51abfb9b"
+              },
+              {
+                "name": "native_wave_vit_expand.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_expand.hlsl",
+                "size": 1977,
+                "sha256": "636a1e750b840d87bc6ff386b50d3d905fe5b8eaf7142acff712c4d9afdc64c6"
+              },
+              {
+                "name": "native_wave_vit_expand_blocked.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_expand_blocked.cso",
+                "size": 8808,
+                "sha256": "a5e58de503bba4c9b33ccc68a96cd5272ac3be31d1f67160a4945910b250c02c"
+              },
+              {
+                "name": "native_wave_vit_expand_packed.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_expand_packed.cso",
+                "size": 7296,
+                "sha256": "af8578f018e61544de34b177417ef3863d430f7865c18bade78890b2aba3ba82"
+              },
+              {
+                "name": "native_wave_vit_expand_packed_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_expand_packed_m4.cso",
+                "size": 12164,
+                "sha256": "04d2f1408cff9cc13cb7d888285135818de905dca5cec5bd672d2cbb41a2dd69"
+              },
+              {
+                "name": "native_wave_vit_ffn_fused.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_ffn_fused.hlsl",
+                "size": 8165,
+                "sha256": "ccd244b842fb37bb1deef8a3eed53ac54cdf51153fef72135c2f0a2be4d37254"
+              },
+              {
+                "name": "native_wave_vit_qkv.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv.cso",
+                "size": 8144,
+                "sha256": "c0faa9d3d8fbbdaf8dd88fa6f928883cfd7596ea7c2d6e2d49b63896c3e6f362"
+              },
+              {
+                "name": "native_wave_vit_qkv.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv.hlsl",
+                "size": 7399,
+                "sha256": "73a2387a4f4962e0fcbf6bd13db568ca97348ffef3d8a73e2944d154710cb9b1"
+              },
+              {
+                "name": "native_wave_vit_qkv_fused_m1.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv_fused_m1.cso",
+                "size": 10276,
+                "sha256": "5ae1096cf002edd1f23041210695efd50eb830f8916c4922cbd52d11b7e8997e"
+              },
+              {
+                "name": "native_wave_vit_qkv_fused_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv_fused_m4.cso",
+                "size": 18656,
+                "sha256": "0b17fa81817758392ac454a084cb213c8f4070efed69c9d64cdb83f11b970fef"
+              },
+              {
+                "name": "native_wave_vit_qkv_packed.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv_packed.cso",
+                "size": 7280,
+                "sha256": "c51b3e18871bd6883167136f98daede63d43cea7f4bbe0c655921fe498931aa5"
+              },
+              {
+                "name": "native_wave_vit_qkv_packed_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_qkv_packed_m4.cso",
+                "size": 10836,
+                "sha256": "afd3e88d4b7773efb94d11535db165bbf522864e941f53efbf08661f7c15bb51"
+              },
+              {
+                "name": "native_wave_vit_reduce.hlsl",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce.hlsl",
+                "size": 2519,
+                "sha256": "3c4e7f53209c6c8391917d54cb8e6af5592536c6d27906f1bba5f9cdb9544bbe"
+              },
+              {
+                "name": "native_wave_vit_reduce_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_1024.cso",
+                "size": 7952,
+                "sha256": "522fcfe286cf5d2b00d6a2df2aff7c3906ccdad31d35a46f65baaac9c5acfb85"
+              },
+              {
+                "name": "native_wave_vit_reduce_4096.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_4096.cso",
+                "size": 7952,
+                "sha256": "a72d3964340ee085187c2958f9b9cd38adb273ac8406e85992c221e605ce61d6"
+              },
+              {
+                "name": "native_wave_vit_reduce_blocked.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_blocked.cso",
+                "size": 10120,
+                "sha256": "f95ca088ee0e5bd1b33e8343b603643078bb71f6856c2dbd75e36717fa9c0c69"
+              },
+              {
+                "name": "native_wave_vit_reduce_blocked_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_blocked_1024.cso",
+                "size": 11288,
+                "sha256": "897eeddbdce518f9b36ad70d17e8eb098f5d0f871968760964e5b6f1f1440961"
+              },
+              {
+                "name": "native_wave_vit_reduce_packed_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_packed_1024.cso",
+                "size": 10116,
+                "sha256": "40fc28abaeecdde7f3bd5ad1a0973e955136b0f354824662d61e9fc65eea6e83"
+              },
+              {
+                "name": "native_wave_vit_reduce_splitk.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_splitk.cso",
+                "size": 5348,
+                "sha256": "824fd03dd0db212303157e2406fa2cfe4af15cd015534354f8ac51d36eaca396"
+              },
+              {
+                "name": "native_wave_vit_reduce_splitk_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_splitk_1024.cso",
+                "size": 6880,
+                "sha256": "54c9acf44bda01f10cf1ec70ea5aa03329d9e0d08993db092a2c50a262761377"
+              },
+              {
+                "name": "native_wave_vit_reduce_splitk_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_splitk_m4.cso",
+                "size": 6760,
+                "sha256": "1c8d84f993373932cd5480cd0d82989273268ddebef0e3528b5796cba81e3982"
+              },
+              {
+                "name": "native_wave_vit_reduce_splitk_packed_1024.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_splitk_packed_1024.cso",
+                "size": 5344,
+                "sha256": "7bb902b64068e6e7e9ac8aae242edbfe427d39f5e64b1fa98aa892d8365297c3"
+              },
+              {
+                "name": "native_wave_vit_reduce_splitk_packed_1024_m4.cso",
+                "path": "native-game-tiled-assets/native_wave_vit_reduce_splitk_packed_1024_m4.cso",
+                "size": 6752,
+                "sha256": "f97b30f1a4b105b4274a8517decec4976bf118ac560a994ca34f63a0c1640f4a"
+              },
+              {
+                "name": "noise.f32",
+                "path": "native-game-tiled-assets/noise.f32",
+                "size": 201326592,
+                "sha256": "aa38f7e6c5f20227f90edcb223fb28c258006a9931941df1442494cf5d64ac7f"
+              },
+              {
+                "name": "normalized-output.f32",
+                "path": "native-game-tiled-assets/normalized-output.f32",
+                "size": 33554432,
+                "sha256": "c408381446132e07fa5581e930dc33fb790bea7ec4276ef3621e322df2492a55"
+              },
+              {
+                "name": "post70-attention.f32",
+                "path": "native-game-tiled-assets/post70-attention.f32",
+                "size": 32900,
+                "sha256": "c0db6b0cb7bf76a3bc2593885ea758697c2d76169533d9d92fb651c84f418fec"
+              },
+              {
+                "name": "post70-ffn.f16",
+                "path": "native-game-tiled-assets/post70-ffn.f16",
+                "size": 17472,
+                "sha256": "b0d323e29f4c36d8b3c0e040ce6db6adc173c1996a2ecf62e36b3b7ba3cba25b"
+              },
+              {
+                "name": "post70-head.f16",
+                "path": "native-game-tiled-assets/post70-head.f16",
+                "size": 192,
+                "sha256": "ba31b59d96b05a8e6e27e7ac950106cf7e52379abd5b40cf46fe91e3241827a9"
+              },
+              {
+                "name": "post70-scales.f16",
+                "path": "native-game-tiled-assets/post70-scales.f16",
+                "size": 128,
+                "sha256": "bcae0cd6659162d3d1b3128ec155cb147af1c79fd7a473a310629c59ad3c685c"
+              },
+              {
+                "name": "preblock_attention_core.hlsl",
+                "path": "native-game-tiled-assets/preblock_attention_core.hlsl",
+                "size": 9810,
+                "sha256": "e67915791df4a2011012d695b7bade70879095a69b38765a4b62e345f04386a0"
+              },
+              {
+                "name": "preblock_attention_four_wave.hlsl",
+                "path": "native-game-tiled-assets/preblock_attention_four_wave.hlsl",
+                "size": 12963,
+                "sha256": "ae97737ab877700f913f590f625bc95d3eb5950080d495ec7736c62347f68f44"
+              },
+              {
+                "name": "preblock_finish.hlsl",
+                "path": "native-game-tiled-assets/preblock_finish.hlsl",
+                "size": 3474,
+                "sha256": "55d689a19ec22a07688d307ffcd5d9e05e5578d844bcd205e7dc6b959ca1f6e6"
+              },
+              {
+                "name": "preblock_input_mix.hlsl",
+                "path": "native-game-tiled-assets/preblock_input_mix.hlsl",
+                "size": 8304,
+                "sha256": "64ef6ba687b1c61cd88328c6ae589aa2ba63c9e5b9e376ccce9e91cc915261a9"
+              },
+              {
+                "name": "vit-to-hwc.i32",
+                "path": "native-game-tiled-assets/vit-to-hwc.i32",
+                "size": 2621440,
+                "sha256": "cb950400c76a6a1602ead35a817c851e552b5a301bc8e94561ed26785d1e2754"
+              }
+            ]
+          },
+          "optiscaler": {
+            "version": "0.4.0-amd-nr",
+            "published": "2026-09-25",
+            "files": [
+              {
+                "name": "OptiScaler-0.4.0-amd-nr.zip",
+                "size": 141518665,
+                "sha256": "9c47e4991ce1fd9924d63834136345616a0b9662460fb9dd9bd022b4827a40a8",
+                "url": "https://github.com/MatheusFerreiraS/neural-amd-opti/releases/download/v0.4.0-amd-nr/OptiScaler-0.4.0-amd-nr.zip"
+              }
+            ],
+            "extract": [
+              {
+                "name": "D3D12Core.dll",
+                "path": "D3D12_OptiScaler/D3D12Core.dll",
+                "size": 3351064,
+                "sha256": "07d286c306f8117321422affd9e6388c12d0fb4be1c7fc689d9e899324feeb24"
+              },
+              {
+                "name": "GatherCS.cso",
+                "path": "experimental_lighting/GatherCS.cso",
+                "size": 8608,
+                "sha256": "2f7bfd42c78b1256ed56eb93e3d75e494369a90168c06c22486a4ac1011b31ee"
+              },
+              {
+                "name": "ResolveCS.cso",
+                "path": "experimental_lighting/ResolveCS.cso",
+                "size": 9308,
+                "sha256": "fe19e23f3ea2ca8a9fb2e4017e9d803a8cc9f0657890e0dd69b329d7f4e3f350"
+              },
+              {
+                "name": "boundary_reference.hsaco",
+                "path": "lmxxf-modules/boundary_reference.hsaco",
+                "size": 17832,
+                "sha256": "6158f119bf9db7cdf0acf37f8b4fb73e5eceba9f1fd6b24a84367f7682aecd8b"
+              },
+              {
+                "name": "boundary-fast.hsaco",
+                "path": "lmxxf-modules/boundary-fast.hsaco",
+                "size": 50904,
+                "sha256": "4e3d9d46e5b206a6db1eac92d1dd7ad18cebbcb42819a356fae9d0ed0a2189ea"
+              },
+              {
+                "name": "c32_fast_attention.hsaco",
+                "path": "lmxxf-modules/c32_fast_attention.hsaco",
+                "size": 29568,
+                "sha256": "a8ae4d4ba24e1da282789edda469ee8b46a822cac68e6e70cc2c1b7a3ed9a70d"
+              },
+              {
+                "name": "c32_fast.hsaco",
+                "path": "lmxxf-modules/c32_fast.hsaco",
+                "size": 38312,
+                "sha256": "eaf1f57520f847cadec237f716f1637013fafba5edad93ebe4011f6bdade6098"
+              },
+              {
+                "name": "c32_fused_attention.hsaco",
+                "path": "lmxxf-modules/c32_fused_attention.hsaco",
+                "size": 39472,
+                "sha256": "c31d964f641693945e453863c740f6c9016e7ef6f503c7cb5d13d438d879c694"
+              },
+              {
+                "name": "c32_fused_ffn_attention-packed.hsaco",
+                "path": "lmxxf-modules/c32_fused_ffn_attention-packed.hsaco",
+                "size": 223000,
+                "sha256": "4a7c9a4411c6cae9741352777d50eb41ddb381f40bf2969cfb08c64464fb8d88"
+              },
+              {
+                "name": "c32_fused_ffn_attention.hsaco",
+                "path": "lmxxf-modules/c32_fused_ffn_attention.hsaco",
+                "size": 295832,
+                "sha256": "e87f581d3e8b4fcf06acba4fa368818d1e34dd56e93882aa548ba9866051df99"
+              },
+              {
+                "name": "c32_prefix_reference.hsaco",
+                "path": "lmxxf-modules/c32_prefix_reference.hsaco",
+                "size": 35352,
+                "sha256": "7677f6c8fbe30dc8b65221731cfc80b2c3c1746ac469984e50532f9a8b2bc596"
+              },
+              {
+                "name": "c32_tiled.hsaco",
+                "path": "lmxxf-modules/c32_tiled.hsaco",
+                "size": 31536,
+                "sha256": "78e023640ff2ae96b42c7c1b1221bda67c5a02550bb5eb4e4ed761b71238b09b"
+              },
+              {
+                "name": "c32_wmma.hsaco",
+                "path": "lmxxf-modules/c32_wmma.hsaco",
+                "size": 66504,
+                "sha256": "e9ef0c1d31c1b2f12cdd2c86b5ed87251df5d2a4f93380f6434b3c9b80039de3"
+              },
+              {
+                "name": "deep_fast-packed.hsaco",
+                "path": "lmxxf-modules/deep_fast-packed.hsaco",
+                "size": 576424,
+                "sha256": "ca700a1b9bed80abb428f778ab4fba26c777a5088f4f6749aeb85719c8b4f341"
+              },
+              {
+                "name": "deep_fast.hsaco",
+                "path": "lmxxf-modules/deep_fast.hsaco",
+                "size": 581288,
+                "sha256": "ea2f78987a7f7f4ff6362ade5592eef40f8ddf12aa52e8050fd187119bbd32a8"
+              },
+              {
+                "name": "deep_reference.hsaco",
+                "path": "lmxxf-modules/deep_reference.hsaco",
+                "size": 70312,
+                "sha256": "068e95a68a165486ad90c429bbeba0035fe27bca2adc859dbabc9e14d4a54bb9"
+              },
+              {
+                "name": "deep_wmma.hsaco",
+                "path": "lmxxf-modules/deep_wmma.hsaco",
+                "size": 82616,
+                "sha256": "d05dddee0672f9d8ff6677afffc8a75eff9c8f2f9caeeaf7143e61ea52f2ca3f"
+              },
+              {
+                "name": "modules.json",
+                "path": "lmxxf-modules/modules.json",
+                "size": 6422,
+                "sha256": "bb2241763fddfea8e1329a0b0fe6a1213d0d83115ab7bc840e97ec31d51268bb"
+              },
+              {
+                "name": "multihead_fused_attention.hsaco",
+                "path": "lmxxf-modules/multihead_fused_attention.hsaco",
+                "size": 288552,
+                "sha256": "80f4208b412896af7a2b5728b9088c7dadf49735739deb04f8117a4f3850fc1a"
+              },
+              {
+                "name": "multihead-fast-packed.hsaco",
+                "path": "lmxxf-modules/multihead-fast-packed.hsaco",
+                "size": 104904,
+                "sha256": "026c838c6227304640cc6348ac58e400c051a070ff37d6d2ea2ce4fb6231673d"
+              },
+              {
+                "name": "multihead-fast-padded-wave-packed.hsaco",
+                "path": "lmxxf-modules/multihead-fast-padded-wave-packed.hsaco",
+                "size": 960120,
+                "sha256": "83ed33a58f623d6b262fd9e68cc187faefacdda61eda8143bf57fd04d267bfaf"
+              },
+              {
+                "name": "multihead-fast-padded-wave.hsaco",
+                "path": "lmxxf-modules/multihead-fast-padded-wave.hsaco",
+                "size": 963192,
+                "sha256": "d02fac831ee1abb428037a0d85676042527fd3c65a26aaa2ae731784775b39ba"
+              },
+              {
+                "name": "multihead-fast.hsaco",
+                "path": "lmxxf-modules/multihead-fast.hsaco",
+                "size": 107208,
+                "sha256": "4fb36828167fdc1608d23e9836f921be68b2b5b7a218722f540cb49c285b7403"
+              },
+              {
+                "name": "multihead-reference.hsaco",
+                "path": "lmxxf-modules/multihead-reference.hsaco",
+                "size": 66824,
+                "sha256": "5d07d107ca0b9ca747480f712de7c5b3bf0bf7cbd41c278862d2b745925745d9"
+              },
+              {
+                "name": "multihead-tiled.hsaco",
+                "path": "lmxxf-modules/multihead-tiled.hsaco",
+                "size": 49072,
+                "sha256": "1b10513f44737ddc047b4d150167d71d9d522e99c94b48d6ba899fb8ed4661a7"
+              },
+              {
+                "name": "multihead-wmma.hsaco",
+                "path": "lmxxf-modules/multihead-wmma.hsaco",
+                "size": 93264,
+                "sha256": "f5de6b6119babfdfb716613c415e4b900136a48645405c04adf55456fb210353"
+              },
+              {
+                "name": "prefix_fast.hsaco",
+                "path": "lmxxf-modules/prefix_fast.hsaco",
+                "size": 77456,
+                "sha256": "b0486956c61352345e15cd2b0c5685dc650739812318b75ac6fc2fce42c39267"
+              },
+              {
+                "name": "README.md",
+                "path": "lmxxf-modules/README.md",
+                "size": 1620,
+                "sha256": "66e693e21df1a7d8d77e4923cbfe0c623583f217820127edca57187197509348"
+              },
+              {
+                "name": "runtime-manifest.json",
+                "path": "lmxxf-modules/runtime-manifest.json",
+                "size": 938,
+                "sha256": "b5d84a910d6380560656ce7ad2d1a9d31d55325eba1a63d42bf9de04b7424092"
+              },
+              {
+                "name": "SHA256SUMS",
+                "path": "lmxxf-modules/SHA256SUMS",
+                "size": 2182,
+                "sha256": "16c3f878e8b289fb3a0a81aa44d9e2f1576643d83f0a6e47780c1033eaa32f67"
+              },
+              {
+                "name": "wave-pointwise.hsaco",
+                "path": "lmxxf-modules/wave-pointwise.hsaco",
+                "size": 46704,
+                "sha256": "eaf51807c04267796dc470556eb042391c6a76305374c6cc05f941e27b4f3bc2"
+              },
+              {
+                "name": "LmxxfNrRuntime.dll",
+                "path": "LmxxfNrRuntime.dll",
+                "size": 1029120,
+                "sha256": "e33cac3c396d08ace6335baa0b6937ab9df839bb29a340f3bcf624c889da7d91"
+              },
+              {
+                "name": "OptiScaler.dll",
+                "path": "OptiScaler.dll",
+                "size": 27010048,
+                "sha256": "771adf3878987812588381836711c16143f794c5c2289fb8a8873f8c2f9ff062"
+              },
+              {
+                "name": "OptiScaler.ini",
+                "path": "OptiScaler.ini",
+                "size": 62375,
+                "sha256": "349f17bbf49aeb7f7e6e0b9932ffe57e620b9dcc56ac00d4427dde9a8cbe9b21"
+              },
+              {
+                "name": "amd_fidelityfx_denoiser_dx12.dll",
+                "path": "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
+                "size": 13782280,
+                "sha256": "48f1e5888ba6a0a3d59a98b9751e37c392b0f7b8c223d0082d5c1f40642879d3"
+              },
+              {
+                "name": "amd_fidelityfx_framegeneration_dx12.dll",
+                "path": "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll",
+                "size": 40085776,
+                "sha256": "02297beedd285e822d3a64f314cf00faf378dcec0edc47ff0c4dd71b3a8c2f18"
+              },
+              {
+                "name": "amd_fidelityfx_loader_dx12.dll",
+                "path": "OptiScaler/amd_fidelityfx_loader_dx12.dll",
+                "size": 26376,
+                "sha256": "e2d85aa05a9bd9ed8b38935fdf5199372cca6f74c12015143bb6f945ee1608aa"
+              },
+              {
+                "name": "amd_fidelityfx_upscaler_dx12.dll",
+                "path": "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
+                "size": 28761864,
+                "sha256": "d0dcccc74a43c44ba435b7a369b456e0970d8a4464e4bd683119b374f2c9fb46"
+              },
+              {
+                "name": "amd_fidelityfx_vk.dll",
+                "path": "OptiScaler/amd_fidelityfx_vk.dll",
+                "size": 9332432,
+                "sha256": "a1624cc4238fef046f30c4d80ce3f47be63fc5f5373f49e3ee9edb9960f54c78"
+              },
+              {
+                "name": "libxell.dll",
+                "path": "OptiScaler/libxell.dll",
+                "size": 415368,
+                "sha256": "d2030dcd694fda8f2ec7e044b13e6db8f0b56d4ba9113a5efad334e3f3ded8c7"
+              },
+              {
+                "name": "libxess_dx11.dll",
+                "path": "OptiScaler/libxess_dx11.dll",
+                "size": 156016,
+                "sha256": "c7cfe86f0c9d94e4fb3696d3cd5035e2bbb6a8b1b0572f8b7395a4cdfd0c625e"
+              },
+              {
+                "name": "libxess_fg.dll",
+                "path": "OptiScaler/libxess_fg.dll",
+                "size": 22957432,
+                "sha256": "ec5e0c65e075570c6ede72618bb666d0be0c2e10b2ea9762c0fe8cb8e375ab27"
+              },
+              {
+                "name": "libxess.dll",
+                "path": "OptiScaler/libxess.dll",
+                "size": 77795704,
+                "sha256": "251659dd84a3e84de67c886a4186e01f3eca49b00641906fe38bb6b807e5d5b7"
+              },
+              {
+                "name": "native_black_probe.hlsl",
+                "path": "shaders/native_black_probe.hlsl",
+                "size": 1357,
+                "sha256": "629abdd90d2e7e0acfd3241f3cdf0dd00db8b5d94eebb3b8895b5ef3f5ad5869"
+              },
+              {
+                "name": "native_codec_decode.hlsl",
+                "path": "shaders/native_codec_decode.hlsl",
+                "size": 7305,
+                "sha256": "d561af2aae573553cb495e9a22e56d8fe1f79aa1477d0fbbb08570c7fa190de5"
+              },
+              {
+                "name": "native_codec_encode.hlsl",
+                "path": "shaders/native_codec_encode.hlsl",
+                "size": 3519,
+                "sha256": "9927ab23080dcf0d36ad87722dd53aaee490705eda0919e7dd81a403149b9161"
+              },
+              {
+                "name": "native_game_rgb_input.hlsl",
+                "path": "shaders/native_game_rgb_input.hlsl",
+                "size": 1035,
+                "sha256": "94656fcd71ebe860eed7350dec504b764a95479374f4713861a2b39666c26f76"
+              },
+              {
+                "name": "native_history_guard.hlsl",
+                "path": "shaders/native_history_guard.hlsl",
+                "size": 936,
+                "sha256": "afb45365ee5e481e3566026d4a51afebb7799752e29a161b70b6a3f35250704e"
+              },
+              {
+                "name": "native_output_smooth.hlsl",
+                "path": "shaders/native_output_smooth.hlsl",
+                "size": 1068,
+                "sha256": "2251d2b74286d00bafddd805bd910baafcd1485c253c68007908c5bbb1a5fea5"
+              },
+              {
+                "name": "native_rgb_reflect.hlsl",
+                "path": "shaders/native_rgb_reflect.hlsl",
+                "size": 815,
+                "sha256": "a716cb3a7dd7474dfcb1ad988ea7cd38483fb0ac6cb6605f41e22db3f12a7fc4"
+              },
+              {
+                "name": "native_rgb_texture.hlsl",
+                "path": "shaders/native_rgb_texture.hlsl",
+                "size": 466,
+                "sha256": "f6daf0facbe9fbaad64331ef546e90853bca2ec661ae406bac859b560bbd965e"
+              },
+              {
+                "name": "native_temporal_coordinates.hlsl",
+                "path": "shaders/native_temporal_coordinates.hlsl",
+                "size": 3730,
+                "sha256": "40a89e80ab4a3dd4b97b2c2a7af0ff1f68fceda5e9c0039b02fa2a8f13152d69"
+              },
+              {
+                "name": "native_temporal_feed.hlsl",
+                "path": "shaders/native_temporal_feed.hlsl",
+                "size": 1413,
+                "sha256": "54e3a779015aa7a78b4f7b407cbc754f1fdaad2ac8857f6e3c4c871da414ee48"
+              },
+              {
+                "name": "native_temporal_sample.hlsl",
+                "path": "shaders/native_temporal_sample.hlsl",
+                "size": 7503,
+                "sha256": "27f1d7b885ed2bd507d9250817099d87a0a6d83b288521eef4c11757460df1c8"
+              },
+              {
+                "name": "native_text_overlay.hlsl",
+                "path": "shaders/native_text_overlay.hlsl",
+                "size": 4034,
+                "sha256": "14e58c01d2a4ce7944e09addff501e57b96ede3a332f20627dce383d7d987d91"
+              }
+            ]
+          },
+          "mochizuki": {
+            "version": "0.4.0-amd-nr",
+            "files": [
+              {
+                "name": "mochizuki-0.4.0-amd-nr.zip",
+                "size": 6263288,
+                "sha256": "26170b9b80e0aae1f26d50e558bd07c6561f6ce8daca632ea7b4daf391166f95",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/mochizuki/0.4.0-amd-nr/mochizuki-0.4.0-amd-nr.zip"
+              }
+            ],
+            "extract": [
+              {
+                "name": "MochizukiNrRuntime.dll",
+                "path": "MochizukiNrRuntime.dll",
+                "size": 904704,
+                "sha256": "682f20877f8ef416f01205d1a4587af2d5acb375f6b437cc5caa4b3d6c5c712e"
+              },
+              {
+                "name": "manifest.txt",
+                "path": "dlssnr-amd.prewarm/manifest.txt",
+                "size": 4871,
+                "sha256": "ca2c00c45318eca549d4b1ece209baa073c6b5dcbd18408e5f7f8a4b0252ba80"
+              },
+              {
+                "name": "cascade_blur.spv",
+                "path": "dlssnr-amd.shaders.runtime/cascade_blur.spv",
+                "size": 2728,
+                "sha256": "e1fe1ea0461f67da4e6e9c57f69125f1a4a88599ba3deeea7a48e7f5e54d441a"
+              },
+              {
+                "name": "cascade_feed.spv",
+                "path": "dlssnr-amd.shaders.runtime/cascade_feed.spv",
+                "size": 4548,
+                "sha256": "0dae3eb0d4c95799704cbb47a926bcd5665a07b464e41f64e4c03466f484eecc"
+              },
+              {
+                "name": "cascade_lograt.spv",
+                "path": "dlssnr-amd.shaders.runtime/cascade_lograt.spv",
+                "size": 3720,
+                "sha256": "62e04181f5f469747365de9132ad4db7c1eec14366542d1e010a1de5ff471f67"
+              },
+              {
+                "name": "runtime_alpha.spv",
+                "path": "dlssnr-amd.shaders.runtime/runtime_alpha.spv",
+                "size": 2484,
+                "sha256": "389bd793e24d6c3a34c82f067d611c3ee190771882d1458dc57128a553523088"
+              },
+              {
+                "name": "runtime_encode.spv",
+                "path": "dlssnr-amd.shaders.runtime/runtime_encode.spv",
+                "size": 3740,
+                "sha256": "39dcd29e419b0fabd325b23c9ad4e10c5817577c0afa64e9dc1df1d56716ef01"
+              },
+              {
+                "name": "runtime_transfer.spv",
+                "path": "dlssnr-amd.shaders.runtime/runtime_transfer.spv",
+                "size": 22720,
+                "sha256": "efd839a430e302878651c77844df80a8a561701d0a510af61c4cf9686e8966b3"
+              },
+              {
+                "name": "motion_estimate.spv",
+                "path": "dlssnr-amd.shaders.temporal/motion_estimate.spv",
+                "size": 14004,
+                "sha256": "a8dcb31e12f305d24bda56c6e2af35c7184ee7cc16f839dd271f3aff042bfdf8"
+              },
+              {
+                "name": "motion_luma.spv",
+                "path": "dlssnr-amd.shaders.temporal/motion_luma.spv",
+                "size": 4144,
+                "sha256": "c447e242026ecaa04e79bd0255df31cd47844844f153f894c15f43909ee98b61"
+              },
+              {
+                "name": "shader-constants.txt",
+                "path": "dlssnr-amd.shaders.temporal/shader-constants.txt",
+                "size": 362,
+                "sha256": "0903090a8df2639de06535d9aadf28d84662e728f1a53dc7fc40c0b1604aab59"
+              },
+              {
+                "name": "temporal_post_fp32.spv",
+                "path": "dlssnr-amd.shaders.temporal/temporal_post_fp32.spv",
+                "size": 761340,
+                "sha256": "4f30d325661e7425b9ec05daf6311f85ac01a7a993f782766b8cbd8ee224b379"
+              },
+              {
+                "name": "temporal_pre_fp32.spv",
+                "path": "dlssnr-amd.shaders.temporal/temporal_pre_fp32.spv",
+                "size": 550808,
+                "sha256": "f20fe5cedf2fef8c627285cdbd0e872ea810eac540ff43ad2fa05679cdbc9f4a"
+              },
+              {
+                "name": "accumulation.txt",
+                "path": "dlssnr-amd.shaders/accumulation.txt",
+                "size": 6,
+                "sha256": "6f0ef2ee0e7ce4559e7a6741e5a16813f178d3a054ad0c1008c8d7f64eb47c96"
+              },
+              {
+                "name": "coherent-act.txt",
+                "path": "dlssnr-amd.shaders/coherent-act.txt",
+                "size": 3,
+                "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+              },
+              {
+                "name": "g_attn.spv",
+                "path": "dlssnr-amd.shaders/g_attn.spv",
+                "size": 194492,
+                "sha256": "03f473ad764810fe6d5ebe5c93feb34d76188fea1429b947f58f3aaa419551db"
+              },
+              {
+                "name": "g_decups.spv",
+                "path": "dlssnr-amd.shaders/g_decups.spv",
+                "size": 10772,
+                "sha256": "4c76d6b701942b709632dc35a671724a8ce0614e7cd442a4df06bfb4d63ea5c7"
+              },
+              {
+                "name": "g_ffwd3.spv",
+                "path": "dlssnr-amd.shaders/g_ffwd3.spv",
+                "size": 38692,
+                "sha256": "3fcb5330a2256420bef7906ecac84cf58586454a9248bc46d2d282e45a39e4bf"
+              },
+              {
+                "name": "g_fswin128.spv",
+                "path": "dlssnr-amd.shaders/g_fswin128.spv",
+                "size": 695428,
+                "sha256": "27c7e997c33cff25943e2f06ed0185ff12699c111047a93531280a4216b42138"
+              },
+              {
+                "name": "g_fswin256.spv",
+                "path": "dlssnr-amd.shaders/g_fswin256.spv",
+                "size": 977572,
+                "sha256": "fc0a526f2eb84f18a649bccb90dca46e87625538d984d5ed4c6ddbe9ae6de619"
+              },
+              {
+                "name": "g_fswin32.spv",
+                "path": "dlssnr-amd.shaders/g_fswin32.spv",
+                "size": 261576,
+                "sha256": "d7ace8044b2a2f5504bdb3f38976aa3baf14d0f7de236bdd1ab5ba674b64f2ec"
+              },
+              {
+                "name": "g_fswin64.spv",
+                "path": "dlssnr-amd.shaders/g_fswin64.spv",
+                "size": 561372,
+                "sha256": "90d72db425aae39df74da0bbdaf09cececd37192e0a0207f38a0ad4fd4e8a0f3"
+              },
+              {
+                "name": "g_fswinds128.spv",
+                "path": "dlssnr-amd.shaders/g_fswinds128.spv",
+                "size": 765056,
+                "sha256": "3d1366d4b957423ec82f04c2edea4740af27c5fa6f76bf09aa8d05f4d41a8a85"
+              },
+              {
+                "name": "g_fswinds256.spv",
+                "path": "dlssnr-amd.shaders/g_fswinds256.spv",
+                "size": 1074920,
+                "sha256": "b3d8ed6c6bff15fe7d6c6b12bfff832b889b257b5314352929b727f6307630e2"
+              },
+              {
+                "name": "g_fswinds32.spv",
+                "path": "dlssnr-amd.shaders/g_fswinds32.spv",
+                "size": 530104,
+                "sha256": "b010b9d0636bccedef5bd116630cc839be67be419bc9ffadf68e41b2372fb1ca"
+              },
+              {
+                "name": "g_fswinds64.spv",
+                "path": "dlssnr-amd.shaders/g_fswinds64.spv",
+                "size": 631000,
+                "sha256": "b81f28a1283c61772a96505f5029924de6b62c1a2e72b3422905d9e118b5b23d"
+              },
+              {
+                "name": "g_fswindsp128.spv",
+                "path": "dlssnr-amd.shaders/g_fswindsp128.spv",
+                "size": 825336,
+                "sha256": "7f5cf7e8ef70817387076b7a89b16148cb48de4dbd32b97505bd18ceb6b1122c"
+              },
+              {
+                "name": "g_fswindsp256.spv",
+                "path": "dlssnr-amd.shaders/g_fswindsp256.spv",
+                "size": 1157008,
+                "sha256": "bc37449b2fd295cd3e8f4fa3cffc9d1933d6de6437606e4968abbd8a51d394f3"
+              },
+              {
+                "name": "g_fswindsp32.spv",
+                "path": "dlssnr-amd.shaders/g_fswindsp32.spv",
+                "size": 568096,
+                "sha256": "e89dba41e8373c69fa6f9bc61942c95dc22560a3e9c7ebfc0822754cba193cba"
+              },
+              {
+                "name": "g_fswindsp64.spv",
+                "path": "dlssnr-amd.shaders/g_fswindsp64.spv",
+                "size": 680416,
+                "sha256": "aeb9c3d30c3c494dbe87c1fa8babef345e34edd08f762172c47f9192a493d01f"
+              },
+              {
+                "name": "g_fswinfusedup128.spv",
+                "path": "dlssnr-amd.shaders/g_fswinfusedup128.spv",
+                "size": 885004,
+                "sha256": "9c80d1b5b7ee44cbde5a6b79c4d05c4f73cb766f7d784127df1afd8e028d8f39"
+              },
+              {
+                "name": "g_fswinfusedup256.spv",
+                "path": "dlssnr-amd.shaders/g_fswinfusedup256.spv",
+                "size": 1220984,
+                "sha256": "d81e199331f1a22dfd7b0281b966f61b7cefbd58451d4f29b133d27f931db59d"
+              },
+              {
+                "name": "g_fswinfusedup32.spv",
+                "path": "dlssnr-amd.shaders/g_fswinfusedup32.spv",
+                "size": 589192,
+                "sha256": "1957a986842654753b4b4ecea714bd2ea1b2e38d9db574e672fc43581f3813f4"
+              },
+              {
+                "name": "g_fswinfusedup64.spv",
+                "path": "dlssnr-amd.shaders/g_fswinfusedup64.spv",
+                "size": 697476,
+                "sha256": "05919d3e0acc20b56810604225a6a5aad51d427abda7f654039fd1d2d142cf9f"
+              },
+              {
+                "name": "g_fswinimagepost32.spv",
+                "path": "dlssnr-amd.shaders/g_fswinimagepost32.spv",
+                "size": 722556,
+                "sha256": "c6149a6d7df520cb55c9c867d708ab153860cf6c24731b8ddf215d2f1fdf68ac"
+              },
+              {
+                "name": "g_fswinimagepreds32.spv",
+                "path": "dlssnr-amd.shaders/g_fswinimagepreds32.spv",
+                "size": 542772,
+                "sha256": "3256c37f8e494a666e1b497988e05841ff3d831ce25d4314b2f70d07b73bb72a"
+              },
+              {
+                "name": "g_fswinp128.spv",
+                "path": "dlssnr-amd.shaders/g_fswinp128.spv",
+                "size": 737264,
+                "sha256": "d2dfecbee25ed8035513a835dfdb4fd64b34b689a69e12dff4a43c6f2dad3b1e"
+              },
+              {
+                "name": "g_fswinp256.spv",
+                "path": "dlssnr-amd.shaders/g_fswinp256.spv",
+                "size": 1033248,
+                "sha256": "61f1080fcebc1d8faca03224f7f6f2694f0259998123e593088f46b35dc5fc25"
+              },
+              {
+                "name": "g_fswinp64.spv",
+                "path": "dlssnr-amd.shaders/g_fswinp64.spv",
+                "size": 589332,
+                "sha256": "43ea72f2557fc3c680915f64fe8e267b53ca997a205662f32dedf7ffe657f8b3"
+              },
+              {
+                "name": "g_fswinpds256.spv",
+                "path": "dlssnr-amd.shaders/g_fswinpds256.spv",
+                "size": 1159556,
+                "sha256": "e7a71527da5e743c5ba189d08d487fee8e60c932e300ad8666b328cc4084c68d"
+              },
+              {
+                "name": "g_fswinpup256.spv",
+                "path": "dlssnr-amd.shaders/g_fswinpup256.spv",
+                "size": 1292948,
+                "sha256": "451b6ee658ea2429c386a0c90ad3c85b94fc78b3b94e574a6d4c4d8e65de590e"
+              },
+              {
+                "name": "g_gemmnores.spv",
+                "path": "dlssnr-amd.shaders/g_gemmnores.spv",
+                "size": 55076,
+                "sha256": "d2aca3534a200e1fe1504513d9dee8cb28dfa010aa42e6493d52a8f36256aaf7"
+              },
+              {
+                "name": "g_gemmpool.spv",
+                "path": "dlssnr-amd.shaders/g_gemmpool.spv",
+                "size": 68044,
+                "sha256": "195b2c3442d782fab090b1415a5898e17cdad7238eec4a06f5b67df5523c0b35"
+              },
+              {
+                "name": "g_gemmproj.spv",
+                "path": "dlssnr-amd.shaders/g_gemmproj.spv",
+                "size": 167352,
+                "sha256": "1888f29cb703fc8646d984fd2311a42edb7fe6a22f23b9228d731564ad3500a8"
+              },
+              {
+                "name": "g_gemmprojw.spv",
+                "path": "dlssnr-amd.shaders/g_gemmprojw.spv",
+                "size": 182064,
+                "sha256": "fe711d1f424deda73fb9f9f7242b193f3e766ac298e3c84c16042c42799b43fd"
+              },
+              {
+                "name": "g_gemmvact.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvact.spv",
+                "size": 59652,
+                "sha256": "0ccebaca7bccaba38c4441518a07e1ccfb3c66909dcdb2ef87bf943076d197f0"
+              },
+              {
+                "name": "g_gemmvnores.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvnores.spv",
+                "size": 41692,
+                "sha256": "a190bd05ddd9504692729c1c558141f7869f264536ba63efcaf4fdeeeb18656c"
+              },
+              {
+                "name": "g_gemmvproj.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvproj.spv",
+                "size": 42328,
+                "sha256": "32ad0d10d9feb4975ef3e10052e68a182cd7dc970be763891887bdb4d690817f"
+              },
+              {
+                "name": "g_gemmvqkv.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvqkv.spv",
+                "size": 59052,
+                "sha256": "62acf59c7e55731e08d1430ac85911b5c540af22c153a4f75a1bbb475da74317"
+              },
+              {
+                "name": "g_gemmvqkvnorm.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvqkvnorm.spv",
+                "size": 65552,
+                "sha256": "19bbca25b477430a6b8af47f8adb583b5410dcbf9be76d96cbe4f04a060c9e4a"
+              },
+              {
+                "name": "g_gemmvqkvs.spv",
+                "path": "dlssnr-amd.shaders/g_gemmvqkvs.spv",
+                "size": 166668,
+                "sha256": "54f299c08604e2b6b44fb9985becc767e52dd00534ffc60701f2f3ccc0433ba7"
+              },
+              {
+                "name": "g_repack.spv",
+                "path": "dlssnr-amd.shaders/g_repack.spv",
+                "size": 3916,
+                "sha256": "aabb4fe82f5ffb2356ab18ccd6bdd261c65a1d9b863c4c4bbc77f9a5dc0bdb2c"
+              },
+              {
+                "name": "g_upsview.spv",
+                "path": "dlssnr-amd.shaders/g_upsview.spv",
+                "size": 6304,
+                "sha256": "885a4dfe29ae0c945acd20aa5ecf672354c1273ade603d572aa3c54ff994bd4d"
+              },
+              {
+                "name": "g_vitattn.spv",
+                "path": "dlssnr-amd.shaders/g_vitattn.spv",
+                "size": 29412,
+                "sha256": "a7dead3b919a6f9da1e75433a6af04311f3e29dd9e2cace2b45a0e482bdaf9ec"
+              },
+              {
+                "name": "shader-constants.txt",
+                "path": "dlssnr-amd.shaders/shader-constants.txt",
+                "size": 362,
+                "sha256": "0903090a8df2639de06535d9aadf28d84662e728f1a53dc7fc40c0b1604aab59"
+              },
+              {
+                "name": "swin-bias-storage.txt",
+                "path": "dlssnr-amd.shaders/swin-bias-storage.txt",
+                "size": 6,
+                "sha256": "6f0ef2ee0e7ce4559e7a6741e5a16813f178d3a054ad0c1008c8d7f64eb47c96"
+              },
+              {
+                "name": "LICENSE-DLSSNR-AMD.txt",
+                "path": "dlssnr-amd/LICENSE-DLSSNR-AMD.txt",
+                "size": 1091,
+                "sha256": "81eb5968d10a98b1b62a1681e017734a6da3028a2ea645b05c449b924c4cdb7b"
+              }
+            ]
+          },
+          "mochizuki-model": {
+            "version": "1",
+            "files": [
+              {
+                "name": "dlssnr.bin",
+                "path": "dlssnr-amd/dlssnr.bin",
+                "size": 147756560,
+                "sha256": "2b41c888cf4155b8958c665ba64018ab0bd25c85fc71a2b6db86d0d04d1f7fbd",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/mochizuki/model-1/dlssnr.bin"
+              }
+            ]
+          }
+        }
+      },
+      {
         "version": "0.3.0-amd-nr",
         "components": {
           "optiscaler": {

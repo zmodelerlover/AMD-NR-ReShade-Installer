@@ -40,6 +40,13 @@ public sealed class GameEntry
     /// a game can move between the routes.</summary>
     public string? OptiScalerVersion { get; set; }
 
+    /// <summary>Whether this game's OptiScaler goes in with the mochizuki runtime as its NR runtime,
+    /// as the person last set the box. Null until they touch it, and then it follows the folder: on
+    /// where this app installed mochizuki, off everywhere else, since it is experimental, RDNA4 only,
+    /// and 141 MB of model. Following the folder is what keeps a game added again, or this app on
+    /// another PC, from taking mochizuki out at the next update.</summary>
+    public bool? Mochizuki { get; set; }
+
     [JsonIgnore]
     public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
 

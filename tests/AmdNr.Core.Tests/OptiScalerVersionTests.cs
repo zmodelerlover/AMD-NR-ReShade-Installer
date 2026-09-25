@@ -110,7 +110,10 @@ public class OptiScalerVersionTests
     {
         var shipped = PayloadManifest.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "payload.json")));
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
-        Assert.Equal("0.3.0-amd-nr", offered[0].Version);
+        // 0.4.0 is listed from the start with its pins as placeholders, and offered once they are filled in.
+        var next = shipped.Releases!["optiscaler"].Single(r => r.Version == "0.4.0-amd-nr");
+        Assert.Equal(PayloadManifest.IsPlaceholder(next) ? "0.3.0-amd-nr" : "0.4.0-amd-nr", offered[0].Version);
+        Assert.Contains(offered, r => r.Version == "0.3.0-amd-nr");
         Assert.Contains(offered, r => r.Version == "0.2.0-amd-nr");
         Assert.Contains(offered, r => r.Version == "0.1.1-amd-nr");
         // What v0.4.0 reads stays the version it knows how to install.
@@ -128,6 +131,21 @@ public class OptiScalerVersionTests
             }
         }
         Assert.Contains("native-game-tiled-assets/block0-ffn.f16", shipped.With(offered[0]).Pins().OptiFiles.Keys);
+
+        // The mochizuki runtime rides in 0.4.0, placeholders or not: every file it lists lands under a
+        // name the transaction takes, and its model is the one the runtime was built against.
+        var mochizuki = shipped.With(next).Pins().MochizukiFiles;
+        Assert.Contains("MochizukiNrRuntime.dll", mochizuki.Keys);
+        Assert.Contains("dlssnr-amd.prewarm/manifest.txt", mochizuki.Keys);
+        Assert.Contains(mochizuki.Keys, k => k.StartsWith("dlssnr-amd.shaders.runtime/", StringComparison.Ordinal));
+        foreach (var path in mochizuki.Keys)
+            Assert.True(Engine.IsAllowed(Work.MochizukiDestination(path)), $"{path} would be refused");
+        var model = next.Components[PayloadManifest.MochizukiModelComponent].Files.Single();
+        Assert.Equal("dlssnr-amd/dlssnr.bin", model.RelativePath);
+        Assert.Equal(147_756_560UL, model.Size);
+        Assert.Equal("2b41c888cf4155b8958c665ba64018ab0bd25c85fc71a2b6db86d0d04d1f7fbd", model.Sha256);
+        foreach (var component in next.Components.Values)
+            Assert.All(component.Files, f => Assert.StartsWith("https://", f.Url));
     }
 
     [Fact]

@@ -113,11 +113,29 @@ public sealed class PayloadManifest
     /// the danielblnc runtime. Only ever inside a release: no version listed in Components uses them.</summary>
     public const string LmxxfWeightsComponent = "lmxxf-weights";
 
+    /// <summary>The mochizuki runtime, which OptiScaler 0.4.0 and later can drive: the runtime, its
+    /// shaders and its prewarm list in one archive, and its model on its own. Only ever inside a
+    /// release, and installed only when it is asked for.</summary>
+    public const string MochizukiComponent = "mochizuki";
+    public const string MochizukiModelComponent = "mochizuki-model";
+
     /// <summary>Components fetched only when a route that uses them is installed. The OptiScaler
     /// archive alone is 132 MB, so downloading it in the first-run wizard for everybody, most of
     /// whom run the ReShade route, would be the largest download the app makes, spent on nothing.</summary>
     public static readonly IReadOnlySet<string> OnDemand =
-        new HashSet<string>(StringComparer.Ordinal) { OptiScalerComponent, OptiRuntimeComponent, LmxxfWeightsComponent };
+        new HashSet<string>(StringComparer.Ordinal)
+        {
+            OptiScalerComponent, OptiRuntimeComponent, LmxxfWeightsComponent, MochizukiComponent, MochizukiModelComponent,
+        };
+
+    /// <summary>The SHA-256 a pin carries until the bytes it stands for exist: 64 zeros. A release
+    /// with one anywhere in it is being prepared -- its archive is not published yet -- and is not
+    /// offered; tools/publish-payload.ps1 refuses to publish a manifest that still has one.</summary>
+    public static readonly string PlaceholderSha = new('0', 64);
+
+    /// <summary>Whether any file of this release is still pinned to <see cref="PlaceholderSha"/>.</summary>
+    public static bool IsPlaceholder(ComponentRelease release) =>
+        release.Components.Values.Any(c => c.Files.Concat(c.Extract ?? []).Any(f => f.Sha256 == PlaceholderSha));
 
     /// <summary>The components worth having before anybody asks: everything but <see cref="OnDemand"/>.</summary>
     public IEnumerable<KeyValuePair<string, PayloadComponent>> Everyday =>
@@ -170,8 +188,8 @@ public sealed class PayloadManifest
     }
 
     /// <summary>Every version of a component this manifest can install, newest first: the one
-    /// <see cref="Components"/> pins, and each one in <see cref="Releases"/>. Empty when the
-    /// manifest has no such component at all.</summary>
+    /// <see cref="Components"/> pins, and each one in <see cref="Releases"/> that is not a
+    /// placeholder (<see cref="IsPlaceholder"/>). Empty when the manifest has no such component at all.</summary>
     public IReadOnlyList<ComponentRelease> Offered(string component)
     {
         var offered = new List<ComponentRelease>();
@@ -182,7 +200,7 @@ public sealed class PayloadManifest
                 Components = new Dictionary<string, PayloadComponent>(StringComparer.Ordinal) { [component] = own },
             });
         if (Releases?.TryGetValue(component, out var more) == true)
-            offered.AddRange(more.Where(r => offered.All(o => o.Version != r.Version)));
+            offered.AddRange(more.Where(r => !IsPlaceholder(r) && offered.All(o => o.Version != r.Version)));
         offered.Sort((a, b) => (AddonReleases.Version(b.Version) ?? new Version()).CompareTo(
             AddonReleases.Version(a.Version) ?? new Version()));
         return offered;
@@ -283,6 +301,12 @@ public sealed class PayloadManifest
                 foreach (var f in component.Installed)
                     optiFiles[f.RelativePath] = Engine.Lower(f.Sha256);
         var optiRuntime = Components.TryGetValue(OptiRuntimeComponent, out var optiRt) ? optiRt.Files.FirstOrDefault() : null;
+        // Both halves or neither: the runtime without its model, or the model without the runtime,
+        // is nothing OptiScaler can run.
+        var mochizuki = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (Components.TryGetValue(MochizukiComponent, out var mz) && Components.TryGetValue(MochizukiModelComponent, out var model))
+            foreach (var f in mz.Installed.Concat(model.Installed))
+                mochizuki[f.RelativePath] = Engine.Lower(f.Sha256);
         return new PayloadPins
         {
             AddonSha = addon.Sha256,
@@ -299,6 +323,7 @@ public sealed class PayloadManifest
             OptiRuntimeName = optiRuntime?.RelativePath ?? string.Empty,
             OptiRuntimeSha = optiRuntime is null ? string.Empty : Engine.Lower(optiRuntime.Sha256),
             OptiRuntimeSize = optiRuntime?.Size ?? 0,
+            MochizukiFiles = mochizuki,
         };
     }
 
