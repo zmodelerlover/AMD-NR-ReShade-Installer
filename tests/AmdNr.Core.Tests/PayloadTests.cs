@@ -17,8 +17,8 @@ public class PayloadTests
           "components": {
             "addon":   { "version": "0.5.0", "files": [
               { "name": "amd-nr.addon64", "size": 550400, "sha256": "203f0278b64c5786da2bb95e8635de86bf3b18a852f098c4c0378661e8b48cf7" } ] },
-            "runtime": { "version": "0.3.0", "files": [
-              { "name": "dlssnr_amd_pass1.dll", "size": 7290880, "sha256": "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6" },
+            "runtime": { "version": "0.4.0", "files": [
+              { "name": "dlssnr_amd_pass1.dll", "size": 10027008, "sha256": "ff6feffa41abccce98ddf0cb37ce5cafd525c1a5dc8c59d2434cb3da8b7a16a8" },
               { "name": "dlssnr_on_amd_weights.bin", "size": 147689451, "sha256": "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab" } ] }
           }
         }

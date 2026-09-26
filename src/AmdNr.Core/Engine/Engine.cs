@@ -32,7 +32,7 @@ public static partial class Engine
     public const string Notice =
         "Install official ReShade Full Add-on Support for the translated API. D3D8 uses the pinned d3d8to9 compatibility layer and the native D3D9 frontend.";
 
-    public const string RuntimeSha = "70af3fb757f83f71ec947ce461970fdecc9636864bc01d952abffb36ae310be6";
+    public const string RuntimeSha = "ff6feffa41abccce98ddf0cb37ce5cafd525c1a5dc8c59d2434cb3da8b7a16a8";
     public const string WeightsSha = "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab";
     public const string ReShadeSha = "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8";
 

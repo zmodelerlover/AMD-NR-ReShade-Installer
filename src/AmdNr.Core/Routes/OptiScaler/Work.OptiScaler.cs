@@ -42,12 +42,13 @@ public static partial class Work
     private const string ShaderCache = "shaders/shader-cache";
 
     /// <summary>The runtime builds this project has seen, by the start of their SHA-256: danielblnc's
-    /// 0.2.14, 0.2.17, 0.3.0 and 0.3.1, and the 0.3.0 the add-on pins. Any of them sitting in the
-    /// game folder as version.dll is the author's own way of loading the runtime.</summary>
+    /// 0.2.14, 0.2.17, 0.3.0, 0.3.1, 0.3.3 and 0.4.0, and the 0.3.0 and 0.4.0 the add-on pins. Any of
+    /// them sitting in the game folder as version.dll is the author's own way of loading the runtime.</summary>
     private static readonly string[] KnownRuntimePrefixes =
     [
         "e145ff963b1ef614", "ddd82d313aa74c2e", "bc97f3b06718e190",
         "8321cae728d28cb7", "70af3fb757f83f71", "b108d6407eb7f094",
+        "907b30a61644a6d7", "d62be3d8b9fbb3c6", "ff6feffa41abccce",
     ];
 
     /// <summary>Files whose presence says the game has an upscaler for OptiScaler to take over. The
