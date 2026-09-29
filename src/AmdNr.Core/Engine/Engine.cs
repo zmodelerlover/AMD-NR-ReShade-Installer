@@ -32,11 +32,11 @@ public static partial class Engine
     public const string Notice =
         "Install official ReShade Full Add-on Support for the translated API. D3D8 uses the pinned d3d8to9 compatibility layer and the native D3D9 frontend.";
 
-    /// <summary>danielblnc's v0.4.3 as patched for add-on v0.7.0 (12,749,824 bytes).</summary>
-    public const string RuntimeSha = "f3d9f2e53b775e4870917572f1f87a28c73068a4dc97252d6fb52360ddf8597a";
-    /// <summary>The builds add-on v0.7.0 still runs besides it, patched for earlier releases: v0.4.1 and
-    /// v0.4.2. An older install holds one, and so do the runtime copies the add-on made of it.</summary>
-    public static readonly string[] EarlierRuntimeShas = ["c8808716c286a34fe25b8cf5b41a6b0f40ac1e1237b3ac39b903f0a90cd4f2e9", "f9aa21a2fb56971895dbe4a35cd832074941cc8079069d03b44523250390949d"];
+    /// <summary>danielblnc's 0.5.0, public since 2026-09-29, as patched for add-on v0.7.0 (38,703,616 bytes).</summary>
+    public const string RuntimeSha = "c808cdb04b4cf99e806f2989bb5b258696a51c89c084c500c957b055a66479b6";
+    /// <summary>The builds add-on v0.7.0 still runs besides it, patched for earlier releases: v0.4.1, v0.4.2 and
+    /// v0.4.3. An older install holds one, and so do the runtime copies the add-on made of it.</summary>
+    public static readonly string[] EarlierRuntimeShas = ["c8808716c286a34fe25b8cf5b41a6b0f40ac1e1237b3ac39b903f0a90cd4f2e9", "f9aa21a2fb56971895dbe4a35cd832074941cc8079069d03b44523250390949d", "f3d9f2e53b775e4870917572f1f87a28c73068a4dc97252d6fb52360ddf8597a"];
     public const string WeightsSha = "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab";
     public const string ReShadeSha = "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8";
 

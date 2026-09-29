@@ -112,10 +112,10 @@ public class OptiScalerVersionTests
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
         // The newest release is offered first, with its own opti-runtime: 0.4.5, 0.4.4 and 0.4.3 take danielblnc's
         // public 0.4.3, which no earlier OptiScaler accepts, so 0.4.2 keeps 0.4.1 and 0.4.1 keeps 0.4.0.
-        Assert.Equal("0.4.5-amd-nr", offered[0].Version);
+        Assert.Equal("0.4.6-amd-nr", offered[0].Version);
         var newestRuntime = shipped.With(offered[0]).Component(PayloadManifest.OptiRuntimeComponent);
-        Assert.Equal("0.4.3", newestRuntime.Version);
-        Assert.Equal("d1e320862a8763ac39e7ce194536d4b6c55ba61bae9e8a92753cec32df67a457", newestRuntime.Files.Single().Sha256);
+        Assert.Equal("0.5.0", newestRuntime.Version);
+        Assert.Equal("cddfb09e019347957bf7b96c95c0e900e8d3062dfaed697a8a96b0a039aec31a", newestRuntime.Files.Single().Sha256);
         var r043 = offered.Single(r => r.Version == "0.4.3-amd-nr");
         Assert.Equal("0.4.3", shipped.With(r043).Component(PayloadManifest.OptiRuntimeComponent).Version);
         var r042 = offered.Single(r => r.Version == "0.4.2-amd-nr");

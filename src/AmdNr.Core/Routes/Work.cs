@@ -18,7 +18,7 @@ public sealed class PayloadPins
     public required string AddonSha { get; init; }
     public required ulong AddonSize { get; init; }
     public string RuntimeSha { get; init; } = Engine.RuntimeSha;
-    public ulong RuntimeSize { get; init; } = 12_749_824;
+    public ulong RuntimeSize { get; init; } = 38_703_616;
     public string WeightsSha { get; init; } = Engine.WeightsSha;
     public ulong WeightsSize { get; init; } = 147_689_451;
 

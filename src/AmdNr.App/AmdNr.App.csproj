@@ -8,7 +8,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>AMD-NR-ReShade-Installer</AssemblyName>
     <RootNamespace>AmdNr.App</RootNamespace>
-    <Version>0.6.8</Version>
+    <Version>0.6.9</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
 
