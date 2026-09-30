@@ -75,3 +75,38 @@ public partial class Pirate : ResourceDictionary
 {
     public Pirate() => AvaloniaXamlLoader.Load(this);
 }
+
+public partial class Polish : ResourceDictionary
+{
+    public Polish() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Romanian : ResourceDictionary
+{
+    public Romanian() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Hungarian : ResourceDictionary
+{
+    public Hungarian() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Croatian : ResourceDictionary
+{
+    public Croatian() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Lithuanian : ResourceDictionary
+{
+    public Lithuanian() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Ukrainian : ResourceDictionary
+{
+    public Ukrainian() => AvaloniaXamlLoader.Load(this);
+}
+
+public partial class Hindi : ResourceDictionary
+{
+    public Hindi() => AvaloniaXamlLoader.Load(this);
+}

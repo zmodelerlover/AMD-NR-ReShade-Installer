@@ -21,8 +21,15 @@ public partial class App : Application
         ("fr", "Français", () => new Languages.French()),
         ("de", "Deutsch", () => new Languages.German()),
         ("it", "Italiano", () => new Languages.Italian()),
+        ("pl", "Polski", () => new Languages.Polish()),
+        ("ro", "Română", () => new Languages.Romanian()),
+        ("hu", "Magyar", () => new Languages.Hungarian()),
+        ("hr", "Hrvatski", () => new Languages.Croatian()),
+        ("lt", "Lietuvių", () => new Languages.Lithuanian()),
         ("ru", "Русский", () => new Languages.Russian()),
+        ("uk", "Українська", () => new Languages.Ukrainian()),
         ("tr", "Türkçe", () => new Languages.Turkish()),
+        ("hi", "हिन्दी", () => new Languages.Hindi()),
         ("zh-CN", "简体中文", () => new Languages.ChineseSimplified()),
         ("ja", "日本語", () => new Languages.Japanese()),
         ("ko", "한국어", () => new Languages.Korean()),
@@ -122,13 +129,14 @@ public partial class App : Application
         CurrentLanguage = code;
 
         // Chinese, Japanese and Korean share characters that each draws its own way, so the font
-        // falling back behind Inter has to be the one made for the language on screen; Thai is in neither.
+        // falling back behind Inter has to be the one made for the language on screen; Thai and Hindi are in neither.
         Current!.Resources["UiFont"] = new FontFamily(code switch
         {
             "zh-CN" => "Inter, Microsoft YaHei UI, Segoe UI, sans-serif",
             "ja" => "Inter, Yu Gothic UI, Meiryo UI, Segoe UI, sans-serif",
             "ko" => "Inter, Malgun Gothic, Segoe UI, sans-serif",
             "th" => "Inter, Leelawadee UI, Segoe UI, sans-serif",
+            "hi" => "Inter, Nirmala UI, Segoe UI, sans-serif",
             _ => "Inter, Segoe UI, sans-serif",
         });
 
