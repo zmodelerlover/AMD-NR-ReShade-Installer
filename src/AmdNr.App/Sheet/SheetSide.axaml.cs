@@ -2,7 +2,6 @@
 
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 
 namespace AmdNr.App;
 
@@ -10,7 +9,9 @@ public partial class SheetSide : UserControl
 {
     public SheetSide() => InitializeComponent();
 
-    private GameSheet Sheet => this.FindAncestorOfType<GameSheet>()!;
+    /// <summary>Set by the sheet as it is built. Not looked up the visual tree: auto-update drives a sheet
+    /// that has never been laid out, where there is no tree yet, and the switch it sets fires at once.</summary>
+    internal GameSheet Sheet { get; set; } = null!;
 
     private void OnPlay(object? sender, RoutedEventArgs e) => Sheet.OnPlay(sender, e);
     private void OnOpenFolder(object? sender, RoutedEventArgs e) => Sheet.OnOpenFolder(sender, e);

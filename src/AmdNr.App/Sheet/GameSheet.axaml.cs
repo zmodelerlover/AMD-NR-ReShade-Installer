@@ -26,6 +26,7 @@ public partial class GameSheet : UserControl
     public GameSheet()
     {
         InitializeComponent();
+        Side.Sheet = this;
         ReportList.ItemsSource = _report;
         _report.CollectionChanged += (_, _) =>
         {

@@ -306,6 +306,7 @@ void Flows()
     main.Close();
     Settle(2);
     Check(!main.IsVisible, "and closes once it is not");
+    AutoUpdateFlow.Run(game, Check, Until);
 
     // A list written by a version with a route this one does not know: kept aside, not saved over by
     // the scan an empty list starts on its own.
