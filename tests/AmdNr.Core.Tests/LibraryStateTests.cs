@@ -27,6 +27,32 @@ public class LibraryStateTests
         Assert.Null(GameScanner.InstalledAs(opti));
     }
 
+    /// <summary>The runtime and the weights deleted by hand, OptiScaler's other files still there: the
+    /// install refuses another route until this one is uninstalled, so the sheet has to call it installed
+    /// and offer the way out.</summary>
+    [Fact]
+    public void AnInstallMissingItsRuntimeIsStillOneWhileItsOtherFilesAreThere()
+    {
+        var game = Fixture.Temp("as-half-deleted");
+        File.WriteAllBytes(Path.Combine(game, "game.exe"), Fixture.Pe(true));
+        var (optiSrc, optiPins) = OptiScalerRouteTests.Payloads("as-half-deleted");
+        Assert.False(Work.Install(game, optiSrc, Preset.OptiScaler, optiPins).Failed);
+        foreach (var name in Work.InstalledMarkers)
+            File.Delete(Path.Combine(game, name));
+        Assert.False(GameScanner.IsInstalled(game));
+
+        Assert.Equal(RouteFamily.OptiScaler, GameScanner.InstalledAs(game));
+        var (src, pins) = Fixture.Payloads("as-half-deleted-reshade");
+        Assert.True(Fixture.HasAny(Work.Install(game, src, Preset.Dx12, pins), "Uninstall previous preset"));
+
+        var removed = Work.Uninstall(game, Preset.OptiScaler);
+        Assert.False(removed.Failed, removed.ToLog("uninstall"));
+        Assert.Null(GameScanner.InstalledAs(game));
+        var reshade = Work.Install(game, src, Preset.Dx12, pins);
+        Assert.False(reshade.Failed, reshade.ToLog("reshade"));
+        Assert.Equal(RouteFamily.ReShade, GameScanner.InstalledAs(game));
+    }
+
     /// <summary>No manifest: an install from before it existed, or an OptiScaler another setup put
     /// there. The files still say which one it is.</summary>
     [Fact]

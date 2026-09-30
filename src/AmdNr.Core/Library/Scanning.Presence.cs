@@ -26,8 +26,10 @@ public static partial class GameScanner
     /// once per pass beside OptiScaler's ini is the OptiScaler one.</summary>
     public static RouteFamily? InstalledAs(string folder)
     {
-        if (!IsInstalled(folder)) return null;
-
+        // The manifest first, by the same rule the install goes by (Transaction.Apply): an install whose
+        // runtime and weights were deleted by hand, with its other files still there, is still an install.
+        // Asked about the runtime first, the sheet showed nothing installed -- no Uninstall, no switch --
+        // while every Install on another route was refused with "Uninstall previous preset".
         foreach (var name in new[] { Engine.ManifestNameX64, Engine.ManifestName })
         {
             var path = Path.Combine(folder, name);
@@ -40,6 +42,7 @@ public static partial class GameScanner
             return manifest.Preset == Preset.OptiScaler.ManifestPreset() ? RouteFamily.OptiScaler : RouteFamily.ReShade;
         }
 
+        if (!IsInstalled(folder)) return null;
         if (new[] { Work.AddonName, Work.Addon32Name, Work.Host64Name }.Any(n => File.Exists(Path.Combine(folder, n))))
             return RouteFamily.ReShade;
         return File.Exists(Path.Combine(folder, Work.OptiScalerIni)) || File.Exists(Path.Combine(folder, Work.OptiPasses[1]))
