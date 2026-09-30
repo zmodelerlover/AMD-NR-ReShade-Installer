@@ -151,6 +151,26 @@ Ported verbatim from the Rust engine, because these were paid for the hard way:
   match the detected width lead the list, and the rest stay reachable, because a list that hides
   every working route is a dead end exactly when the guess was wrong.
 
+## Around the install
+
+- **Last session**, on a game's page: whether NR ran the last time the game did, read from the logs
+  the add-on and the runtimes write beside it, however the game was started. It gives the frames
+  processed, the network's time per frame and the runtime, or else what went wrong: a crash (with the
+  runtime's own `CRASH:` line), a runtime that did not start and why, ReShade leaving the add-on out,
+  or a session where no frame went through the network.
+- **What's new**, under the version menus and on the Settings page: the release notes of the add-on,
+  OptiScaler or app version picked, shown once after the app updates itself.
+- **NR settings**: a game's NR settings out to one file and back in, to keep a tuning or take
+  someone else's. The ReShade route carries `amd-nr.ini` and `dlssnr_on_amd.ini`; the OptiScaler route
+  carries the fork's sections of `OptiScaler.ini` only, written back key by key, so nobody's frame
+  generation or spoofing comes with them. What an import replaces is kept in `backups\settings\` first.
+- **The library**: a grid of covers or a list beside the open game's page; filters (installed, with
+  an update, not installed, emulators) and three orders (name, recently played, recently added); a
+  name and cover art of your own per game; games taken out of the list stay out of the next scan
+  until Settings brings them back; and an auto-update switch per game, off until you turn it on.
+- **Twelve languages**: English, Português (Brasil), Español, Français, Deutsch, Italiano, Русский,
+  Türkçe, 简体中文, 日本語, 한국어 and العربية (right to left), plus Pirate English for fun.
+
 ## When something goes wrong
 
 - **A download that fails says why**: the address never answered, went quiet halfway, the disk is

@@ -2,15 +2,15 @@
   "schema": 1,
   "components": {
     "addon": {
-      "version": "0.7.2",
+      "version": "0.7.3",
       "files": [
         {
           "name": "amd-nr.addon64",
           "size": 860160,
-          "sha256": "8b025a2647e6b46289e6d63bb40bc147306d101961f7c7af79a665b0604c8f1c",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/addon/0.7.2/amd-nr.addon64",
+          "sha256": "4b5397c0e23cedbf6ce612e508b46cff51970d6dca5c4bcac0eee860dd88f1e1",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/addon/0.7.3/amd-nr.addon64",
           "mirrors": [
-            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.2/amd-nr.addon64"
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.3/amd-nr.addon64"
           ]
         }
       ]
