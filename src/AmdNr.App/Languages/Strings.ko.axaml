@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">게임 {0}개가 더 이상 설치되어 있지 않아 목록에서 빠졌습니다.</sys:String>
   <sys:String x:Key="Str.ShowDetails">세부 정보 보기</sys:String>
   <sys:String x:Key="Str.DetectedSection">감지 결과</sys:String>
+  <sys:String x:Key="Str.InstallsInto">설치 위치: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">추가한 폴더 밖입니다. 런처가 실행하는 빌드의 {0}가 여기에 있습니다. 다른 빌드로 플레이한다면 위에서 그 빌드의 {0}를 선택하세요.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">파일로 알 수 있는 것은 게임이 무엇과 링크되어 있는지이지, 실제로 무엇으로 실행되는지가 아닙니다. 한 폴더에 D3D11과 D3D12 실행 파일이 함께 있을 수 있습니다. 게임이 어느 쪽을 쓰는지는 위키에 나와 있습니다.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">게임 자체의 파일에서 읽었습니다.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">PCGamingWiki와 게임 파일에서.</sys:String>

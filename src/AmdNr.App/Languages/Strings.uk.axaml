@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">Більше не встановлені й прибрані зі списку ігри: {0}.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Показати подробиці</sys:String>
   <sys:String x:Key="Str.DetectedSection">Виявлено</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Встановлюється в: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Це поза доданою текою: тут лежить {0} — збірка, яку запускає лаунчер. Якщо ви граєте в іншій збірці, виберіть її {0} вище.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Файли кажуть, з чим гра зв’язана, а не на чому вона працює: одна папка може містити виконуваний файл D3D11 і D3D12. Вікі каже, що саме використовує гра.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Прочитано з власних файлів гри.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">З PCGamingWiki та файлів гри.</sys:String>

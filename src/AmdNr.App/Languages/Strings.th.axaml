@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} เกมไม่ได้ติดตั้งอยู่แล้ว จึงถูกนำออกจากรายการ</sys:String>
   <sys:String x:Key="Str.ShowDetails">แสดงรายละเอียด</sys:String>
   <sys:String x:Key="Str.DetectedSection">สิ่งที่ตรวจพบ</sys:String>
+  <sys:String x:Key="Str.InstallsInto">ติดตั้งที่: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">ตำแหน่งนี้อยู่นอกโฟลเดอร์ที่คุณเพิ่มไว้ เป็นที่อยู่ของ {0} ซึ่งเป็นบิลด์ที่ตัวเปิดเรียกใช้ ถ้าคุณเล่นบิลด์อื่น ให้เลือก {0} ของบิลด์นั้นด้านบน</sys:String>
   <sys:String x:Key="Str.CheckApiTip">ไฟล์บอกว่าเกมลิงก์กับอะไร ไม่ได้บอกว่ารันบนอะไร โฟลเดอร์เดียวอาจมีไฟล์ปฏิบัติการทั้ง D3D11 และ D3D12 วิกิจะบอกว่าเกมใช้ตัวไหน</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">อ่านจากไฟล์ของเกมเอง</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">จาก PCGamingWiki และไฟล์ของเกม</sys:String>

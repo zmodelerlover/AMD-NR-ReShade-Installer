@@ -128,6 +128,7 @@ public partial class GameSheet : UserControl
         ApiTag.Text = graphics.All.Count == 0 ? Ui.Text("Str.UnknownApi") : graphics.Tag;
         DetectedLine.Text = graphics.Why;
         ShowExecutable(graphics, card.Entry);
+        ShowInstallFolder(card, graphics);
         ShowApiHint(graphics);
 
         Lock(Session.Busy);
@@ -168,6 +169,23 @@ public partial class GameSheet : UserControl
 
         // The long explanation only where it is news: nothing was found, or the person chose the file.
         ExeNote.Text = exe is null ? Ui.Text("Str.ExeNote") : chosen ? Ui.Text("Str.ExeNoteChosen") : "";
+    }
+
+    /// <summary>The folder an install writes into, and FiveM's two. When an emulator's goes outside the
+    /// folder the card was added with -- a launcher's build under %APPDATA% -- that is said in a callout,
+    /// with how to pick another build, because installing beside the wrong one does nothing.</summary>
+    private void ShowInstallFolder(GameCard card, GraphicsDetection graphics)
+    {
+        var target = TargetFor(card);
+        string[] folders = card.Entry.Preset == Preset.FiveM && Work.FiveMApp(card.Path) is { } app
+            ? [Path.Combine(app, "plugins"), Path.Combine(app, "data", "cache", "subprocess")]
+            : [Directory.Exists(target) ? target : Path.GetDirectoryName(target) ?? card.Path];
+        InstallsInto.Text = Ui.Format("Str.InstallsInto", string.Join(Environment.NewLine, folders));
+
+        var outside = graphics.Emulator is not null && card.Entry.Preset != Preset.FiveM && graphics.Executable is { } exe
+                      && !Engine.IsInside(Engine.WeaklyCanonical(card.Path), Engine.WeaklyCanonical(exe));
+        ElsewhereBox.IsVisible = outside;
+        Elsewhere.Text = outside ? Ui.Format("Str.InstallsElsewhere", Path.GetFileName(graphics.Executable!)) : "";
     }
 
     private void ShowApiHint(GraphicsDetection graphics)

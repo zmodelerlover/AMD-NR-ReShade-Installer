@@ -325,6 +325,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} games are no longer installed, so they left the list.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Show the details</sys:String>
   <sys:String x:Key="Str.DetectedSection">Detected</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Installs into: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">This is outside the folder you added: it is where {0} is, the build the launcher starts. If you play another build, choose its {0} above.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Files say what a game links against, not what it runs on: one folder can hold a D3D11 and a D3D12 executable. The wiki says which the game uses.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Read from the game's own files.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">From PCGamingWiki and the game's files.</sys:String>

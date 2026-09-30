@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">Igre koje više nisu instalirane i uklonjene su s popisa: {0}.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Prikaži pojedinosti</sys:String>
   <sys:String x:Key="Str.DetectedSection">Otkriveno</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Instalira se u: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">To je izvan mape koju ste dodali: ondje je {0}, verzija koju pokreće launcher. Ako igrate drugu, gore odaberite njezin {0}.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Datoteke govore s čime je igra povezana, a ne na čemu radi: jedna mapa može sadržavati izvršnu datoteku za D3D11 i za D3D12. Wiki kaže što igra koristi.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Pročitano iz vlastitih datoteka igre.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Iz PCGamingWikija i datoteka igre.</sys:String>

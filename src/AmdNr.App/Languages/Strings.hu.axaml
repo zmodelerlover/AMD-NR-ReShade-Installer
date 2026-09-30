@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} játék már nincs telepítve, ezért lekerültek a listáról.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Részletek megjelenítése</sys:String>
   <sys:String x:Key="Str.DetectedSection">Észlelve</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Ide települ: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Ez a hozzáadott mappán kívül van: itt van a(z) {0}, az a build, amelyet a launcher indít. Ha másikkal játszol, fent válaszd annak a(z) {0} fájlját.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">A fájlok azt mondják meg, mihez linkel egy játék, nem azt, min fut: egy mappában lehet D3D11-es és D3D12-es futtatható fájl is. A wiki megmondja, melyiket használja a játék.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">A játék saját fájljaiból kiolvasva.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">A PCGamingWikiből és a játék fájljaiból.</sys:String>

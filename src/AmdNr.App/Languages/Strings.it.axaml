@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} giochi non sono più installati, quindi sono stati tolti dall'elenco.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Mostra i dettagli</sys:String>
   <sys:String x:Key="Str.DetectedSection">Rilevato</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Si installa in: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">È fuori dalla cartella che hai aggiunto: è dove si trova {0}, la build che il launcher avvia. Se giochi con un'altra, scegli il suo {0} qui sopra.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">I file dicono a cosa è collegato un gioco, non con cosa gira: una cartella può contenere un eseguibile D3D11 e uno D3D12. La wiki dice quale usa il gioco.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Letto dai file del gioco stesso.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Da PCGamingWiki e dai file del gioco.</sys:String>

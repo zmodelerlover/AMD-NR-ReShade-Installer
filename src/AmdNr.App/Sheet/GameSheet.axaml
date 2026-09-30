@@ -179,6 +179,14 @@
                                 VerticalAlignment="Center" />
                       </Grid>
                     </Border>
+                    <!-- Where the files go: a launcher's build, FiveM and Unreal write outside the card's folder. -->
+                    <Grid ColumnDefinitions="Auto,*" Margin="2,0,0,0">
+                      <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" Foreground="{DynamicResource Muted}" VerticalAlignment="Top" Margin="0,2,8,0" />
+                      <SelectableTextBlock Grid.Column="1" x:Name="InstallsInto" TextWrapping="Wrap" LineHeight="19" Foreground="{DynamicResource TextSoft}" />
+                    </Grid>
+                    <Border x:Name="ElsewhereBox" Classes="callout" IsVisible="False">
+                      <TextBlock x:Name="Elsewhere" TextWrapping="Wrap" LineHeight="19" Foreground="{DynamicResource WarnText}" />
+                    </Border>
                     <!-- Read by the (i) above: this sheet explains itself in tooltips, not paragraphs. -->
                     <TextBlock x:Name="ExeNote" IsVisible="False" />
                     <Border x:Name="ApiHintBox" Classes="callout" IsVisible="False">

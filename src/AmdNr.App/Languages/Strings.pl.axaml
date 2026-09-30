@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">Gry, które nie są już zainstalowane i zniknęły z listy: {0}.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Pokaż szczegóły</sys:String>
   <sys:String x:Key="Str.DetectedSection">Wykryto</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Instaluje do: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">To poza dodanym folderem: tu jest {0}, kompilacja, którą uruchamia launcher. Jeśli grasz na innej, wybierz powyżej jej {0}.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Pliki mówią, z czym gra jest linkowana, a nie na czym działa: jeden folder może zawierać plik wykonywalny D3D11 i D3D12. Wiki mówi, którego gra używa.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Odczytane z własnych plików gry.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Z PCGamingWiki i plików gry.</sys:String>

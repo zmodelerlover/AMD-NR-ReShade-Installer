@@ -343,6 +343,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} jogos não estão mais instalados e saíram da lista.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Ver os detalhes</sys:String>
   <sys:String x:Key="Str.DetectedSection">Detectado</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Instala em: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Fica fora da pasta que você adicionou: é onde está o {0}, a build que o launcher abre. Se você joga outra build, escolha o {0} dela acima.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Os arquivos dizem com o que o jogo se liga, não no que ele roda: uma pasta pode ter um executável D3D11 e um D3D12. A wiki diz qual o jogo usa.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Lido dos arquivos do próprio jogo.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Da PCGamingWiki e dos arquivos do jogo.</sys:String>

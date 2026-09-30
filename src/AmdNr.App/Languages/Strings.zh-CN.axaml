@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} 款游戏已不再安装，因此已从列表中移除。</sys:String>
   <sys:String x:Key="Str.ShowDetails">显示详细信息</sys:String>
   <sys:String x:Key="Str.DetectedSection">检测结果</sys:String>
+  <sys:String x:Key="Str.InstallsInto">安装到：{0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">这在你添加的文件夹之外：这里是启动器所启动版本的 {0}。如果你玩的是另一个版本，请在上方选择它的 {0}。</sys:String>
   <sys:String x:Key="Str.CheckApiTip">文件只能说明游戏链接了什么，而不能说明它实际运行在什么上：同一个文件夹里可能同时有 D3D11 和 D3D12 的可执行文件。维基会说明游戏实际使用的是哪一个。</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">从游戏自身的文件中读取。</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">来自 PCGamingWiki 和游戏文件。</sys:String>

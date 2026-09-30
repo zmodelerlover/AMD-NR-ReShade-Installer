@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} oyun artık kurulu değil, bu yüzden listeden çıkarıldı.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Ayrıntıları göster</sys:String>
   <sys:String x:Key="Str.DetectedSection">Algılanan</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Şuraya kurulur: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Bu, eklediğin klasörün dışında: başlatıcının açtığı sürümün {0} dosyası burada. Başka bir sürümle oynuyorsan yukarıdan onun {0} dosyasını seç.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Dosyalar bir oyunun neye bağlandığını söyler, ne üzerinde çalıştığını değil: bir klasörde hem D3D11 hem D3D12 çalıştırılabilir dosyası olabilir. Oyunun hangisini kullandığını wiki söyler.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Oyunun kendi dosyalarından okundu.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">PCGamingWiki'den ve oyunun dosyalarından.</sys:String>

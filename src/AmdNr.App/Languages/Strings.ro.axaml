@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">Jocuri care nu mai sunt instalate și au ieșit din listă: {0}.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Arată detaliile</sys:String>
   <sys:String x:Key="Str.DetectedSection">Detectat</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Se instalează în: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Este în afara folderului adăugat: aici se află {0}, versiunea pe care o pornește launcherul. Dacă joci pe alta, alege mai sus {0} al ei.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Fișierele spun cu ce este legat un joc, nu pe ce rulează: un folder poate conține un executabil D3D11 și unul D3D12. Wiki-ul spune pe care îl folosește jocul.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Citit din fișierele proprii ale jocului.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Din PCGamingWiki și fișierele jocului.</sys:String>

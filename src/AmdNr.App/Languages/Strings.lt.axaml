@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">Nebeįdiegti ir iš sąrašo pašalinti žaidimai: {0}.</sys:String>
   <sys:String x:Key="Str.ShowDetails">Rodyti išsamią informaciją</sys:String>
   <sys:String x:Key="Str.DetectedSection">Aptikta</sys:String>
+  <sys:String x:Key="Str.InstallsInto">Diegiama į: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">Tai už pridėto aplanko ribų: čia yra {0} – versija, kurią paleidžia paleidyklė. Jei žaidžiate kitą, viršuje pasirinkite jos {0}.</sys:String>
   <sys:String x:Key="Str.CheckApiTip">Failai rodo, su kuo žaidimas susietas, o ne su kuo jis veikia: viename aplanke gali būti D3D11 ir D3D12 vykdomasis failas. Wiki nurodo, kurią naudoja žaidimas.</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">Perskaityta iš paties žaidimo failų.</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">Iš PCGamingWiki ir žaidimo failų.</sys:String>

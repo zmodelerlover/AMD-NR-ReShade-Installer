@@ -300,6 +300,8 @@
   <sys:String x:Key="Str.GamesGone.Many">{0} गेम अब इंस्टॉल नहीं हैं, इसलिए सूची से हट गए।</sys:String>
   <sys:String x:Key="Str.ShowDetails">विवरण दिखाएँ</sys:String>
   <sys:String x:Key="Str.DetectedSection">पहचाना गया</sys:String>
+  <sys:String x:Key="Str.InstallsInto">यहाँ इंस्टॉल होगा: {0}</sys:String>
+  <sys:String x:Key="Str.InstallsElsewhere">यह आपके जोड़े गए फ़ोल्डर के बाहर है: यहाँ {0} है, वह बिल्ड जिसे लॉन्चर चलाता है। अगर आप कोई और बिल्ड खेलते हैं, तो ऊपर उसका {0} चुनें।</sys:String>
   <sys:String x:Key="Str.CheckApiTip">फ़ाइलें बताती हैं कि गेम किससे लिंक है, न कि वह किस पर चलता है: एक फ़ोल्डर में D3D11 और D3D12 दोनों एक्ज़ीक्यूटेबल हो सकती हैं। विकी बताती है कि गेम कौन-सा इस्तेमाल करता है।</sys:String>
   <sys:String x:Key="Str.DetectedFromFiles">गेम की अपनी फ़ाइलों से पढ़ा गया।</sys:String>
   <sys:String x:Key="Str.DetectedFromWiki">PCGamingWiki और गेम की फ़ाइलों से।</sys:String>
