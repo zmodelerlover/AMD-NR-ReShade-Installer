@@ -55,6 +55,8 @@ public class OptiScalerWikiTests
         Assert.Equal(["d3d12.dll"], db.OptiScalerNames("1680880", "FORSPOKEN Digital Deluxe"));
         Assert.Equal(["d3d12.dll"], db.OptiScalerNames(null, "Forspoken"));
         Assert.Empty(db.OptiScalerNames(null, "Cyberpunk 2077"));
+        // A name given in the app that says nothing, and then the folder's: the first that matches.
+        Assert.Equal(["d3d12.dll"], db.OptiScalerNames(null, "my rpg", null, "Forspoken"));
         // A database written before the key existed still reads.
         Assert.Empty(ApiDatabase.Parse("{\"schema\":1,\"games\":{}}").OptiScalerNames(null, "Forspoken"));
     }

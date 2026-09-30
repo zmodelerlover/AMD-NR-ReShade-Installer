@@ -190,7 +190,8 @@ public partial class GameSheet
 
     /// <summary>The name the OptiScaler wiki gives OptiScaler for this game, when it gives one this route can use.</summary>
     private string? WikiProxy(GameCard card) =>
-        Session.ApiDb?.OptiScalerNames(card.Entry.AppId, card.Entry.Name)
+        Session.ApiDb?.OptiScalerNames(card.Entry.AppId, card.Entry.CustomName, card.Entry.Name,
+                Path.GetFileName(card.Path.TrimEnd('\\', '/')))
             .FirstOrDefault(n => Work.ProxyAllowed(Preset.OptiScaler, n));
 
     private void OnProxyChanged(object? sender, SelectionChangedEventArgs e)

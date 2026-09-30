@@ -51,6 +51,11 @@ public partial class Korean : ResourceDictionary
     public Korean() => AvaloniaXamlLoader.Load(this);
 }
 
+public partial class Thai : ResourceDictionary
+{
+    public Thai() => AvaloniaXamlLoader.Load(this);
+}
+
 public partial class Arabic : ResourceDictionary
 {
     public Arabic() => AvaloniaXamlLoader.Load(this);

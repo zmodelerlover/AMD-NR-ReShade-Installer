@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">ReShade 로드 이름</sys:String>
   <sys:String x:Key="Str.ProxyNote">"자동"은 모든 Direct3D에 쓸 수 있는 dxgi.dll을 사용합니다. 게임이 이를 로드하지 않을 때만 바꾸세요.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler 로드 이름</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">"자동"은 이곳에서 이미 쓰는 이름을 유지하거나, OptiScaler 위키가 이 게임에 알려 주는 이름을, 그것도 없으면 dxgi.dll을 사용합니다. 다른 프로그램의 dxgi.dll을 유지하려면 winmm.dll을 고르세요.</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">'자동'은 OptiScaler 위키가 이 게임에 제시하는 첫 번째 파일 이름을 사용하고, 없으면 여기서 이미 쓰는 이름을, 그것도 없으면 dxgi.dll을 사용합니다. 다른 프로그램의 dxgi.dll을 유지하려면 winmm.dll을 선택하세요.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">자동</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">자동(위키: {0})</sys:String>
   <sys:String x:Key="Str.PrefetchAll">지금 모두 다운로드</sys:String>

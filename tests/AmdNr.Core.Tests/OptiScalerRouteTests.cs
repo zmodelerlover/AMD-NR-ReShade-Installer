@@ -153,7 +153,7 @@ public class OptiScalerRouteTests
     }
 
     [Fact]
-    public void AutomaticTakesTheWikisNameAndThenKeepsTheInstalledOne()
+    public void AutomaticTakesTheWikisFirstNameAndMovesAnInstallThatHasAnother()
     {
         var game = Fixture.Temp("opti-wiki-name");
         var (src, pins) = Payloads("wiki-name");
@@ -164,11 +164,20 @@ public class OptiScalerRouteTests
         Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "d3d12.dll"));
         Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")));
 
-        // An update on Automatic stays where it is, even when the wiki has moved on.
+        // An install under another name, from before the app read the wiki: Automatic moves it to the wiki's
+        // name, and gives the old one back, as picking a name does.
+        var pre2 = Work.Preflight(game, src, Preset.OptiScaler, pins, suggestedProxy: "winmm.dll");
+        Assert.True(Fixture.HasAny(pre2, "puts it in as winmm.dll, the name the OptiScaler wiki gives"), pre2.ToLog("pre2"));
         var update = Work.Install(game, src, Preset.OptiScaler, pins, suggestedProxy: "winmm.dll");
         Assert.False(update.Failed, update.ToLog("update"));
-        Assert.True(File.Exists(Path.Combine(game, "d3d12.dll")));
-        Assert.False(File.Exists(Path.Combine(game, "winmm.dll")));
+        Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "winmm.dll"));
+        Assert.False(File.Exists(Path.Combine(game, "d3d12.dll")));
+
+        // With no word from the wiki, Automatic keeps the name that is installed.
+        var again = Work.Install(game, src, Preset.OptiScaler, pins);
+        Assert.False(again.Failed, again.ToLog("again"));
+        Assert.True(File.Exists(Path.Combine(game, "winmm.dll")));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")));
     }
 
     [Fact]

@@ -62,14 +62,16 @@ public static partial class Work
         _ => payloadPath,
     };
 
-    /// <summary>The name OptiScaler goes in as: the one picked, or else the one an install of it here already
-    /// has -- Automatic on an update must not put a second OptiScaler beside the first -- or else the one the
-    /// OptiScaler wiki gives for the game, or else dxgi.dll.</summary>
+    /// <summary>The name OptiScaler goes in as: the one picked, or else the first the OptiScaler wiki gives for
+    /// the game, or else the one an install of it here already has, or else dxgi.dll. The wiki comes before the
+    /// installed name: an install made before the app read the wiki went in as dxgi.dll, which the wiki can
+    /// say the game refuses, and an update moves it the way picking a name does -- the old name is given back,
+    /// so there is never a second OptiScaler beside the first.</summary>
     internal static string OptiProxyFor(string? wanted, Manifest? installed = null, string? suggested = null)
     {
         var choices = ProxyChoicesFor(Preset.OptiScaler);
         string? Named(string? name) => choices.FirstOrDefault(n => string.Equals(n, name, StringComparison.OrdinalIgnoreCase));
-        return Named(wanted) ?? InstalledOptiProxies(installed).FirstOrDefault() ?? Named(suggested) ?? choices[0];
+        return Named(wanted) ?? Named(suggested) ?? InstalledOptiProxies(installed).FirstOrDefault() ?? choices[0];
     }
 
     /// <summary>The proxy names an OptiScaler install recorded writing. An entry of no bytes is a file the
@@ -128,14 +130,12 @@ public static partial class Work
     private static void NoteProxy(string proxyName, string? wanted, Manifest? m, string? suggested, Report report)
     {
         var had = InstalledOptiProxies(m).FirstOrDefault();
-        var wiki = ProxyAllowed(Preset.OptiScaler, suggested) ? suggested!.ToLowerInvariant() : null;
+        var fromWiki = !ProxyAllowed(Preset.OptiScaler, wanted) && ProxyAllowed(Preset.OptiScaler, suggested)
+                       && string.Equals(suggested, proxyName, StringComparison.OrdinalIgnoreCase);
+        var why = fromWiki ? ", the name the OptiScaler wiki gives for this game," : "";
         if (had is not null && had != proxyName)
-            report.Info($"OptiScaler is here as {had}. This install puts it in as {proxyName} instead, and {had} goes back to what it was.");
-        else if (ProxyAllowed(Preset.OptiScaler, wanted) || wiki is null) return;
-        else if (had is not null && wiki != had)
-            report.Info($"OptiScaler stays {had}, the name it is installed under here. The OptiScaler wiki gives {wiki} "
-                        + "for this game: pick it as the name to switch.");
-        else if (had is null)
+            report.Info($"OptiScaler is here as {had}. This install puts it in as {proxyName}{why} instead, and {had} goes back to what it was.");
+        else if (had is null && fromWiki)
             report.Info($"OptiScaler goes in as {proxyName}, the name the OptiScaler wiki gives for this game.");
     }
 

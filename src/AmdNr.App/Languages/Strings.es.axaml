@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">ReShade se carga como</sys:String>
   <sys:String x:Key="Str.ProxyNote">Automático usa dxgi.dll, que sirve para todo Direct3D. Cámbialo solo si el juego se niega a cargarlo.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler se carga como</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">Automático mantiene el nombre que ya se usa aquí, o el que la wiki de OptiScaler indica para este juego, o dxgi.dll. Elige winmm.dll para conservar el dxgi.dll de otro programa.</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">«Automático» usa el primer nombre que la wiki de OptiScaler indica para este juego; si no hay, el que ya se usa aquí; y si tampoco, dxgi.dll. Elige winmm.dll para conservar el dxgi.dll de otro programa.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">Automático</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">Automático (wiki: {0})</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Descargar todo ahora</sys:String>

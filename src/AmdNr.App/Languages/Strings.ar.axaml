@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">يُحمَّل ReShade باسم</sys:String>
   <sys:String x:Key="Str.ProxyNote">«تلقائي» يستخدم dxgi.dll الذي يخدم كل إصدارات Direct3D. لا تغيّره إلا إذا رفضت اللعبة تحميله.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">يُحمَّل OptiScaler باسم</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">«تلقائي» يُبقي الاسم المستخدَم هنا مسبقًا، أو الاسم الذي يحدّده ويكي OptiScaler لهذه اللعبة، وإلا فـ dxgi.dll. اختر winmm.dll للإبقاء على ملف dxgi.dll الخاص ببرنامج آخر.</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">«تلقائي» يستخدم أول اسم يحدّده ويكي OptiScaler لهذه اللعبة، وإلا فالاسم المستخدم هنا مسبقًا، وإلا فـ dxgi.dll. اختر winmm.dll للإبقاء على ملف dxgi.dll الخاص ببرنامج آخر.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">تلقائي</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">تلقائي (الويكي: {0})</sys:String>
   <sys:String x:Key="Str.PrefetchAll">تنزيل الكل الآن</sys:String>

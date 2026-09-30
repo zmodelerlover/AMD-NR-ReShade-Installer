@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">ReShade の読み込み名</sys:String>
   <sys:String x:Key="Str.ProxyNote">「自動」は dxgi.dll を使います。これはすべての Direct3D に対応します。ゲームがこれを読み込まない場合にだけ変更してください。</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler の読み込み名</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">「自動」は、ここで既に使われている名前、または OptiScaler の Wiki がこのゲームに推奨する名前、なければ dxgi.dll を使います。別のプログラムの dxgi.dll を残したい場合は winmm.dll を選んでください。</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">「自動」は、OptiScaler Wiki がこのゲームに示す最初のファイル名を使います。なければここで既に使われている名前、それもなければ dxgi.dll です。ほかのプログラムの dxgi.dll を残すには winmm.dll を選んでください。</sys:String>
   <sys:String x:Key="Str.ProxyAuto">自動</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">自動（Wiki：{0}）</sys:String>
   <sys:String x:Key="Str.PrefetchAll">今すぐすべてダウンロード</sys:String>

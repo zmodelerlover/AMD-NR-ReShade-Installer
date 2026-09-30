@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">ReShade boards as</sys:String>
   <sys:String x:Key="Str.ProxyNote">Automatic uses dxgi.dll, which serves every Direct3D. Change it only if the game refuses to let it aboard.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler boards as</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">Automatic keeps the name already in use here, or the one the OptiScaler wiki gives for this game, or dxgi.dll. Pick winmm.dll to leave another program's dxgi.dll be.</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">Automatic uses the first name the OptiScaler wiki gives for this game, or else the one already aboard here, or else dxgi.dll. Pick winmm.dll to leave another program's dxgi.dll be.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">Automatic</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">Automatic (wiki: {0})</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Haul it all aboard now</sys:String>

@@ -93,7 +93,7 @@
   <sys:String x:Key="Str.ProxySection">ReShade şu adla yüklenir</sys:String>
   <sys:String x:Key="Str.ProxyNote">«Otomatik», tüm Direct3D sürümlerine hizmet eden dxgi.dll'yi kullanır. Yalnızca oyun onu yüklemeyi reddederse değiştirin.</sys:String>
   <sys:String x:Key="Str.ProxySectionOpti">OptiScaler şu adla yüklenir</sys:String>
-  <sys:String x:Key="Str.ProxyNoteOpti">«Otomatik», burada zaten kullanılan adı ya da OptiScaler wiki'sinin bu oyun için verdiği adı korur; ikisi de yoksa dxgi.dll kullanır. Başka bir programın dxgi.dll dosyasını korumak için winmm.dll seçin.</sys:String>
+  <sys:String x:Key="Str.ProxyNoteOpti">«Otomatik», OptiScaler wiki'sinin bu oyun için verdiği ilk adı kullanır; yoksa burada zaten kullanılan adı, o da yoksa dxgi.dll. Başka bir programın dxgi.dll dosyasını korumak için winmm.dll seçin.</sys:String>
   <sys:String x:Key="Str.ProxyAuto">Otomatik</sys:String>
   <sys:String x:Key="Str.ProxyAutoWiki">Otomatik (wiki: {0})</sys:String>
   <sys:String x:Key="Str.PrefetchAll">Hepsini şimdi indir</sys:String>

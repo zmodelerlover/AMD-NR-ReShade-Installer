@@ -98,12 +98,12 @@ public sealed class ApiDatabase
         string.Join(",", record.Apis.Select(a => a.ToUpperInvariant()).OrderBy(a => a, StringComparer.Ordinal))
         + $"|{record.Has32Bit}|{record.Has64Bit}";
 
-    /// <summary>The names the OptiScaler wiki gives for this game, best first, or none. By the game's own
-    /// title, and by the title of its record here when the Steam app id finds one: a store's name and the
-    /// wiki's differ more often than two wikis' do.</summary>
-    public IReadOnlyList<string> OptiScalerNames(string? steamAppId, string? name)
+    /// <summary>The names the OptiScaler wiki gives for this game, best first, or none. By each of the game's
+    /// titles in turn -- the one given it in the app, the store's, its folder's -- and by the title of its record
+    /// here when the Steam app id finds one: a store's name and the wiki's differ more often than two wikis' do.</summary>
+    public IReadOnlyList<string> OptiScalerNames(string? steamAppId, params string?[] gameTitles)
     {
-        var titles = new List<string?> { name };
+        var titles = new List<string?>(gameTitles);
         if (!string.IsNullOrWhiteSpace(steamAppId) && Games.TryGetValue(SteamKey(steamAppId), out var record))
             titles.Add(record.Title);
         foreach (var title in titles)
