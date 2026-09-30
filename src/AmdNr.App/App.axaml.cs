@@ -26,6 +26,7 @@ public partial class App : Application
         ("zh-CN", "简体中文", () => new Languages.ChineseSimplified()),
         ("ja", "日本語", () => new Languages.Japanese()),
         ("ko", "한국어", () => new Languages.Korean()),
+        ("th", "ไทย", () => new Languages.Thai()),
         ("ar", "العربية", () => new Languages.Arabic()),
         ("x-pirate", "Pirate English", () => new Languages.Pirate()),
     ];
@@ -121,12 +122,13 @@ public partial class App : Application
         CurrentLanguage = code;
 
         // Chinese, Japanese and Korean share characters that each draws its own way, so the font
-        // falling back behind Inter has to be the one made for the language on screen.
+        // falling back behind Inter has to be the one made for the language on screen; Thai is in neither.
         Current!.Resources["UiFont"] = new FontFamily(code switch
         {
             "zh-CN" => "Inter, Microsoft YaHei UI, Segoe UI, sans-serif",
             "ja" => "Inter, Yu Gothic UI, Meiryo UI, Segoe UI, sans-serif",
             "ko" => "Inter, Malgun Gothic, Segoe UI, sans-serif",
+            "th" => "Inter, Leelawadee UI, Segoe UI, sans-serif",
             _ => "Inter, Segoe UI, sans-serif",
         });
 

@@ -168,8 +168,8 @@ Ported verbatim from the Rust engine, because these were paid for the hard way:
   an update, not installed, emulators) and three orders (name, recently played, recently added); a
   name and cover art of your own per game; games taken out of the list stay out of the next scan
   until Settings brings them back; and an auto-update switch per game, off until you turn it on.
-- **Twelve languages**: English, Português (Brasil), Español, Français, Deutsch, Italiano, Русский,
-  Türkçe, 简体中文, 日本語, 한국어 and العربية (right to left), plus Pirate English for fun.
+- **Thirteen languages**: English, Português (Brasil), Español, Français, Deutsch, Italiano, Русский,
+  Türkçe, 简体中文, 日本語, 한국어, ไทย and العربية (right to left), plus Pirate English for fun.
 
 ## When something goes wrong
 
