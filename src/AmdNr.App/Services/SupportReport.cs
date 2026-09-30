@@ -36,6 +36,9 @@ public static class SupportReport
         "amd-nr-x86.log", "amd-nr-x86-host.log",
         // The mochizuki runtime's own, beside it: why its network was not built is only said there.
         "mochizuki_nr.log",
+        // The OptiScaler route's own: which process loaded the proxy, and whether an overlay came
+        // through its dxgi hooks, is only in these.
+        "OptiScaler.log", "OptiScaler.ini", "amd_bridge.log", "amd_presr.log",
     ];
 
     /// <summary>A single file this big is taken in full; past it, the tail is taken and the cut is
