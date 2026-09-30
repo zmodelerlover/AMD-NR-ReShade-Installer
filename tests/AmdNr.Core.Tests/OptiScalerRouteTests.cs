@@ -346,4 +346,22 @@ public class OptiScalerRouteTests
         Assert.Empty(older.OptiFiles);
         Assert.True(Work.Preflight(Fixture.Temp("opti-no-route"), Fixture.Temp("opti-no-src"), Preset.OptiScaler, older).Failed);
     }
+
+    [Fact]
+    public void RedDeadRedemptionsLauncherBesideTheGameLeavesOptiScalerPassiveInIt()
+    {
+        var (src, pins) = Payloads("launcher");
+        var game = Fixture.Temp("opti-rdr1");
+        File.WriteAllText(Path.Combine(game, "RDR.exe"), "game");
+        File.WriteAllText(Path.Combine(game, "PlayRDR.exe"), "launcher");
+        var report = Work.Install(game, src, Preset.OptiScaler, pins);
+        Assert.False(report.Failed, report.ToLog("rdr1"));
+        Assert.Equal("rdr.exe", Engine.Trim(Engine.GetIni(Bytes(game, Work.OptiScalerIni), "ProcessFilter", "TargetProcessName")));
+
+        // Any other game gets the package's ini as it is.
+        var other = Fixture.Temp("opti-no-launcher");
+        File.WriteAllText(Path.Combine(other, "RDR.exe"), "game");
+        Assert.False(Work.Install(other, src, Preset.OptiScaler, pins).Failed);
+        Assert.Equal("stand-in OptiScaler.ini", Bytes(other, Work.OptiScalerIni));
+    }
 }

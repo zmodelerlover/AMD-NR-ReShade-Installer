@@ -62,6 +62,24 @@ public static partial class Work
         _ => payloadPath,
     };
 
+    /// <summary>Launchers that sit beside the game they start and so load its proxy first. OptiScaler
+    /// hooking inside Red Dead Redemption's PlayRDR.exe broke the Rockstar Games SDK (error 25D11006);
+    /// TargetProcessName leaves it passive in every process but the game.</summary>
+    private static readonly (string Launcher, string Game, string Why)[] Launchers =
+        [("PlayRDR.exe", "rdr.exe", "the Rockstar Games SDK")];
+
+    internal static (string Launcher, string Game, string Why)? LauncherBeside(string dir) =>
+        Launchers.Where(l => File.Exists(Path.Combine(dir, l.Launcher)) && File.Exists(Path.Combine(dir, l.Game)))
+            .Select(l => ((string Launcher, string Game, string Why)?)l).FirstOrDefault();
+
+    private static byte[] OnlyInTheGame(string dir, byte[] ini, Report report)
+    {
+        if (LauncherBeside(dir) is not { } l) return ini;
+        report.Info($"{OptiScalerIni} names {l.Game} as the only process to hook: {l.Launcher} loads OptiScaler first.");
+        var text = System.Text.Encoding.UTF8.GetString(ini);
+        return System.Text.Encoding.UTF8.GetBytes(Engine.SetIni(text, "ProcessFilter", "TargetProcessName", l.Game));
+    }
+
     /// <summary>The name OptiScaler goes in as: the one picked, or else the first the OptiScaler wiki gives for
     /// the game, or else the one an install of it here already has, or else dxgi.dll. The wiki comes before the
     /// installed name: an install made before the app read the wiki went in as dxgi.dll, which the wiki can
@@ -346,8 +364,12 @@ public static partial class Work
                             + "Delete it before installing to start from the package's.");
                 continue;
             }
-            if (VerifiedPayload(src, path, sha, report) is { } bytes) files[destination] = bytes;
+            if (VerifiedPayload(src, path, sha, report) is { } bytes)
+                files[destination] = destination == OptiScalerIni ? OnlyInTheGame(dir, bytes, report) : bytes;
         }
+        if (!files.ContainsKey(OptiScalerIni) && LauncherBeside(dir) is { } kept)
+            report.Warn($"{kept.Launcher} sits beside the game and loads OptiScaler first, which breaks {kept.Why}. "
+                        + $"Set TargetProcessName={kept.Game} under [ProcessFilter] in your {OptiScalerIni}.");
         // A build the person supplied comes first; the author's version.dll goes to the backup either way.
         var author = OwnRuntime(dir, pins);
         var own = Supplied(ownRuntime, wantedRuntime, pins, Preset.OptiScaler, report) is { } supplied
