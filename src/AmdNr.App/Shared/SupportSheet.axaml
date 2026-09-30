@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AmdNr.App.SupportSheet"
+             IsVisible="False">
+
+  <!-- Why support matters, and where it goes, in the "What's new" card. The names are the notes' own,
+       so Sheet.axaml's NotesDrawer styles give it the same backdrop, card and entrance. -->
+  <Panel x:Name="NotesDrawer">
+    <Border x:Name="NotesBackdrop" Background="#C2080505" PointerPressed="OnBackdropPressed" />
+    <Border x:Name="NotesPanel" Background="{DynamicResource Surface}" BorderThickness="1" ClipToBounds="True" MaxWidth="560">
+      <Panel>
+        <Border Height="180" VerticalAlignment="Top" IsHitTestVisible="False" Background="{DynamicResource NotesGlow}" />
+        <Grid RowDefinitions="Auto,Auto,Auto" Margin="28,24,28,22">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Border Classes="iconTile" Margin="0,0,14,0" VerticalAlignment="Center">
+              <PathIcon Data="{StaticResource IconCoffee}" Width="20" Height="20" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource Str.SupportSection}" Classes="section" />
+              <TextBlock Text="{DynamicResource Str.SupportTitle}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="2" x:Name="SupportCloseButton" Classes="ghost icon" Click="OnClose" VerticalAlignment="Top"
+                    Margin="12,0,0,0" AutomationProperties.Name="{DynamicResource Str.Close}"
+                    ToolTip.Tip="{DynamicResource Str.CloseHint}">
+              <PathIcon Data="{StaticResource IconClose}" />
+            </Button>
+          </Grid>
+
+          <StackPanel Grid.Row="1" Spacing="16" Margin="0,22,0,0">
+            <TextBlock Text="{DynamicResource Str.SupportBody}" TextWrapping="Wrap" LineHeight="21"
+                       Foreground="{DynamicResource TextSoft}" />
+
+            <!-- The same two tiles as the credits, each opening its page. -->
+            <Button x:Name="KofiLink" Classes="pick" Padding="12,11" Click="OnOpen" HorizontalAlignment="Stretch">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Width="32" Height="32" CornerRadius="9" Background="#00B9FE" Margin="0,0,11,0">
+                  <PathIcon Data="{StaticResource IconCoffee}" Width="17" Height="17" Foreground="White" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="{DynamicResource Str.SupportKofiTitle}" FontWeight="SemiBold" />
+                  <TextBlock Text="{DynamicResource Str.SupportKofiBody}" Classes="muted" TextWrapping="Wrap" LineHeight="17" />
+                </StackPanel>
+                <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="14" Height="14"
+                          Foreground="{DynamicResource Muted}" VerticalAlignment="Center" />
+              </Grid>
+            </Button>
+            <Button x:Name="VakinhaLink" Classes="pick" Padding="12,11" Click="OnOpen" HorizontalAlignment="Stretch">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Width="32" Height="32" CornerRadius="9" Background="#12A150" Margin="0,0,11,0">
+                  <PathIcon Data="{StaticResource IconHeart}" Width="17" Height="17" Foreground="White" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="{DynamicResource Str.SupportVakinhaTitle}" FontWeight="SemiBold" />
+                  <TextBlock Text="{DynamicResource Str.SupportBrazil}" Classes="muted" TextWrapping="Wrap" LineHeight="17" />
+                </StackPanel>
+                <PathIcon Grid.Column="2" Data="{StaticResource IconExternal}" Width="14" Height="14"
+                          Foreground="{DynamicResource Muted}" VerticalAlignment="Center" />
+              </Grid>
+            </Button>
+          </StackPanel>
+
+          <Border Grid.Row="2" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="0,16,0,0" Margin="0,22,0,0">
+            <Button Classes="primary large" Click="OnClose" MinWidth="140" HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Center" Content="{DynamicResource Str.Close}" />
+          </Border>
+        </Grid>
+      </Panel>
+    </Border>
+  </Panel>
+</UserControl>

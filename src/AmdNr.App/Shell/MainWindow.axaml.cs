@@ -94,6 +94,8 @@ public partial class MainWindow : Window
     /// release's name.</summary>
     public void ShowNotes(string title, Task<string?> notes, string? url) => Notes.Show(title, notes, url);
 
+    private void OnSupport(object? sender, RoutedEventArgs e) => Support.Show();
+
     /// <summary>This app's release notes for one version: the ones the update check already read, or
     /// GitHub's.</summary>
     public void ShowWhatsNew(string version, string? known = null)
@@ -171,6 +173,7 @@ public partial class MainWindow : Window
         if (sender != TabGames && Sheet.IsOpen && !Sheet.Docked) Sheet.Close();
         // The notes belong to the moment they were opened in, not to a page: any switch closes them.
         if (Notes.IsOpen) Notes.Close();
+        if (Support.IsOpen) Support.Close();
         if (sender == TabSystem) Run("files", SystemPage.RefreshAsync);
     }
 
@@ -208,6 +211,12 @@ public partial class MainWindow : Window
         if (e.Key == Key.Escape && Notes.IsOpen)
         {
             Notes.Close();
+            e.Handled = true;
+            return;
+        }
+        if (e.Key == Key.Escape && Support.IsOpen)
+        {
+            Support.Close();
             e.Handled = true;
             return;
         }

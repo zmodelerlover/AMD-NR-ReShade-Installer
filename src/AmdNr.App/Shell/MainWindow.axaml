@@ -60,7 +60,16 @@
           </RadioButton>
         </StackPanel>
 
-        <TextBlock Grid.Row="2" x:Name="VersionText" Classes="caption" Margin="0,0,0,14" HorizontalAlignment="Center" />
+        <!-- Support, one click from every page: a grey coffee above the version, quiet like the rest of
+             the rail. It opens a card that says why support matters and where it goes. -->
+        <StackPanel Grid.Row="2" Spacing="6" Margin="0,0,0,14">
+          <Button x:Name="SupportButton" Classes="ghost icon" Click="OnSupport" HorizontalAlignment="Center"
+                  ToolTip.Tip="{DynamicResource Str.SupportRail}" ToolTip.Placement="Right"
+                  AutomationProperties.Name="{DynamicResource Str.SupportRail}">
+            <PathIcon Data="{StaticResource IconCoffee}" Foreground="{DynamicResource Faint}" />
+          </Button>
+          <TextBlock x:Name="VersionText" Classes="caption" HorizontalAlignment="Center" />
+        </StackPanel>
       </Grid>
     </Border>
 
@@ -100,6 +109,7 @@
 
         <!-- "What's new": over everything on the page, the game's sheet included. -->
         <local:NotesSheet x:Name="Notes" />
+        <local:SupportSheet x:Name="Support" />
       </Panel>
     </Grid>
     </Border>
