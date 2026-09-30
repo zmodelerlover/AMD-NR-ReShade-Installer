@@ -12,6 +12,7 @@
         <ResourceInclude Source="/Styles/Palette.axaml" />
         <ResourceInclude Source="/Styles/Icons.axaml" />
       </ResourceDictionary.MergedDictionaries>
+      <FontFamily x:Key="UiFont">Inter, Segoe UI, sans-serif</FontFamily>
     </ResourceDictionary>
   </Application.Resources>
 

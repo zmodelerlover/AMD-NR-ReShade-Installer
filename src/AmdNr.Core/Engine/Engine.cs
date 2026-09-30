@@ -187,9 +187,14 @@ public static partial class Engine
         "dlss5-neural.addon64",
         "dlss5-neural-host64.exe",
         // The OptiScaler route. OptiScaler itself goes in under a proxy name: dxgi.dll above, or
-        // winmm.dll. It drives the runtime through one copy per pass, which the ReShade route
-        // retired, and keeps its upscaler libraries in an OptiScaler folder beside the game.
+        // winmm.dll, or one of the other names its wiki gives for some games (d3d12.dll and
+        // version.dll are listed elsewhere here). It drives the runtime through one copy per pass,
+        // which the ReShade route retired, and keeps its upscaler libraries in an OptiScaler folder
+        // beside the game.
         "winmm.dll",
+        "dbghelp.dll",
+        "wininet.dll",
+        "winhttp.dll",
         "OptiScaler.ini",
         "dlssnr_amd_pass2.dll",
         "dlssnr_amd_pass3.dll",
@@ -210,9 +215,9 @@ public static partial class Engine
         "LmxxfNrRuntime.dll",
         // OptiScaler 0.4.0's third runtime, mochizuki. Its dlssnr-amd folder is matched by rule.
         "MochizukiNrRuntime.dll",
-        // Nothing installs this name. The author's setup loads danielblnc's runtime under it, and the
-        // OptiScaler route moves that file to the backup when it takes it as its runtime; uninstall
-        // puts it back.
+        // The author's setup loads danielblnc's runtime under this name, and the OptiScaler route
+        // moves that file to the backup when it takes it as its runtime; uninstall puts it back.
+        // OptiScaler itself goes in under it when that is the name picked for it.
         "version.dll",
     };
 

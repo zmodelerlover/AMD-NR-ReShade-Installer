@@ -14,26 +14,36 @@ public partial class GameSheet
     /// <summary>Starts the game. Through Steam when it has an app id, because that is the path the
     /// game expects -- its own launcher, its DRM, its overlay -- and running the executable straight
     /// is what breaks that. Not while an install is writing the very DLLs the game would open.</summary>
-    private void OnPlay(object? sender, RoutedEventArgs e)
+    internal void OnPlay(object? sender, RoutedEventArgs e)
     {
-        if (Session.Busy || _card is not { } card) return;
+        if (!Session.Busy && _card is { } card) Play(card, _shell);
+    }
+
+    /// <summary>Starts a game, from the sheet or from its tile; says so in the corner when it cannot.</summary>
+    internal static void Play(GameCard card, MainWindow shell)
+    {
         var what = card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 } id
             ? $"steam://rungameid/{id}"
             : card.Graphics?.Executable;
         if (what is null || (!what.StartsWith("steam://", StringComparison.Ordinal) && !File.Exists(what)))
         {
-            _shell.Toast(Ui.Text("Str.PlayFailed"), Level.Warn);
+            shell.Toast(Ui.Text("Str.PlayFailed"), Level.Warn);
             return;
         }
-        try { Process.Start(new ProcessStartInfo(what) { UseShellExecute = true, WorkingDirectory = card.Path }); }
-        catch (Exception e2) when (e2 is System.ComponentModel.Win32Exception or FileNotFoundException
-                                       or InvalidOperationException)
+        try
         {
-            _shell.Toast(Ui.Text("Str.PlayFailed"), Level.Warn);
+            Process.Start(new ProcessStartInfo(what) { UseShellExecute = true, WorkingDirectory = card.Path });
+            card.Entry.LastPlayed = DateTime.Now;
+            shell.Library.Save();
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or FileNotFoundException
+                                      or InvalidOperationException)
+        {
+            shell.Toast(Ui.Text("Str.PlayFailed"), Level.Warn);
         }
     }
 
-    private void OnOpenFolder(object? sender, RoutedEventArgs e)
+    internal void OnOpenFolder(object? sender, RoutedEventArgs e)
     {
         if (_card is { } card) AppUpdate.OpenFolder(card.Path, create: false);
     }
@@ -48,7 +58,7 @@ public partial class GameSheet
 
     /// <summary>Takes a game out of the list. It removes a row and nothing else: whatever is
     /// installed in that folder stays installed, which is why the message says so.</summary>
-    private void OnRemoveGame(object? sender, RoutedEventArgs e)
+    internal void OnRemoveGame(object? sender, RoutedEventArgs e)
     {
         if (_card is not { } card || Session.Busy) return;
         var installed = card.Installed;

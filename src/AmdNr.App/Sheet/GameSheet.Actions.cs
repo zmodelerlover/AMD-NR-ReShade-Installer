@@ -34,6 +34,7 @@ public partial class GameSheet
                 _checkWaiting = true;
                 Steps.IsVisible = false;
                 ResultBanner.IsVisible = false;
+                VerdictPill.IsVisible = false;
                 _report.Clear();
             }
             return;
@@ -46,7 +47,7 @@ public partial class GameSheet
             Steps.IsVisible = false;
             _report.Clear();
             ReportEmpty.IsVisible = false; // no check is running: it waits for the route
-            SetVerdict(Level.Warn, Ui.Text("Str.PickRouteTitle"), Ui.Text("Str.PickRouteDetail"));
+            ShowPill(Level.Warn, Ui.Text("Str.PickRouteTitle"), Ui.Text("Str.PickRouteDetail"));
             Status("");
             return;
         }
@@ -57,11 +58,12 @@ public partial class GameSheet
         var wanted = WantedRuntime(card);
         // One offered here and not found is the check's error (NoteRuntime); anything else the engine explains.
         var unoffered = wanted is not null && !Offered(wanted);
+        var wiki = WikiProxy(card);
 
         // A result belongs to the action that produced it; a new check replaces it.
         Steps.IsVisible = false;
-        ResultBanner.IsVisible = false;
         _report.Clear();
+        ShowPill(null, Ui.Text("Str.Checking"));
 
         Report report;
         string? staged, runtime = null;
@@ -72,7 +74,7 @@ public partial class GameSheet
                 var folder = CachedPayloadFolder(preset, mochizuki);
                 var own = wanted is null ? null : Work.FindUserRuntime(wanted, TargetFor(card));
                 return (Work.Preflight(TargetFor(card), folder ?? "", preset, pins, proxy, mochizuki, own,
-                    unoffered ? wanted : null), folder, own);
+                    unoffered ? wanted : null, wiki), folder, own);
             });
         }
         catch (Exception e)
@@ -92,7 +94,11 @@ public partial class GameSheet
         Status(staged is null ? Ui.Text("Str.WillDownload") : Ui.Text("Str.PayloadsReady"));
     }
 
-    private void OnInstall(object? sender, RoutedEventArgs e) => _shell.Run("install", InstallAsync);
+    private void OnInstall(object? sender, RoutedEventArgs e) => Install();
+
+    /// <summary>What Install on the sheet does, for the tile's own Install: the sheet is open on that
+    /// game by then, so the download, the steps and the result are where they always are.</summary>
+    public void Install() => _shell.Run("install", InstallAsync);
 
     private async Task InstallAsync()
     {
@@ -148,7 +154,8 @@ public partial class GameSheet
             Status(Ui.Text("Str.Working"));
             var target = TargetFor(card);
             Report report;
-            try { report = await WritingAsync(() => Work.Install(target, folder, preset, pins, proxy, mochizuki, runtime, wanted)); }
+            var wiki = WikiProxy(card);
+            try { report = await WritingAsync(() => Work.Install(target, folder, preset, pins, proxy, mochizuki, runtime, wanted, wiki)); }
             catch (Exception ex)
             {
                 // The engine turns everything it expects into a report line, and rolls back before

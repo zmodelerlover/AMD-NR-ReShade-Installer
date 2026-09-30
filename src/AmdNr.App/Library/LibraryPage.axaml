@@ -25,6 +25,39 @@
       </TextBox>
 
       <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+        <!-- Which games show, and in what order. Lit while it hides some of them. -->
+        <Button x:Name="FilterButton" Classes="ghost icon" ToolTip.Tip="{DynamicResource Str.SortFilter}"
+                AutomationProperties.Name="{DynamicResource Str.SortFilter}">
+          <PathIcon Data="{StaticResource IconFilter}" />
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="{DynamicResource Str.FilterShow}" IsEnabled="False" />
+              <MenuItem x:Name="FilterAll" Tag="all" Header="{DynamicResource Str.FilterAll}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <MenuItem x:Name="FilterInstalled" Tag="installed" Header="{DynamicResource Str.FilterInstalled}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <MenuItem x:Name="FilterUpdates" Tag="updates" Header="{DynamicResource Str.FilterUpdates}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <MenuItem x:Name="FilterNotInstalled" Tag="notinstalled" Header="{DynamicResource Str.FilterNotInstalled}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <MenuItem x:Name="FilterEmulators" Tag="emulators" Header="{DynamicResource Str.FilterEmulators}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <Separator />
+              <MenuItem Header="{DynamicResource Str.SortBy}" IsEnabled="False" />
+              <MenuItem x:Name="SortName" Tag="name" Header="{DynamicResource Str.SortName}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
+              <MenuItem x:Name="SortRecent" Tag="recent" Header="{DynamicResource Str.SortRecent}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
+              <MenuItem x:Name="SortAdded" Tag="added" Header="{DynamicResource Str.SortAdded}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+        <!-- How the library is laid out: covers in a grid, or a list beside the open game's page. -->
+        <Border Classes="segmented">
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <Button x:Name="GridViewButton" Classes="seg" Click="OnGridView"
+                    ToolTip.Tip="{DynamicResource Str.ViewGrid}" AutomationProperties.Name="{DynamicResource Str.ViewGrid}">
+              <PathIcon Data="{StaticResource IconViewGrid}" />
+            </Button>
+            <Button x:Name="ListViewButton" Classes="seg" Click="OnListView"
+                    ToolTip.Tip="{DynamicResource Str.ViewList}" AutomationProperties.Name="{DynamicResource Str.ViewList}">
+              <PathIcon Data="{StaticResource IconViewList}" />
+            </Button>
+          </StackPanel>
+        </Border>
         <!-- One button for the three ways a game gets into the list by hand: they are one question,
              and three buttons for it pushed the GPU off the edge of a small window. -->
         <Button x:Name="AddButton" Classes="ghost" AutomationProperties.Name="{DynamicResource Str.Add}">
@@ -96,7 +129,7 @@
               <ToolTip.Tip>
                 <StackPanel Spacing="2" MaxWidth="380">
                   <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding Path}" Classes="muted" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Path}" Classes="muted path" TextWrapping="Wrap" />
                 </StackPanel>
               </ToolTip.Tip>
               <Border Classes="tile">
@@ -118,6 +151,35 @@
                         <TextBlock Text="{Binding Platform}" IsVisible="{Binding IsLauncher}" />
                         <TextBlock Text="{DynamicResource Str.Folder}" IsVisible="{Binding IsManual}" />
                       </Panel>
+                    </Border>
+                    <!-- Under the pointer: Play and Configure once the mod is in, Install before. -->
+                    <Border Classes="hoverActions" CornerRadius="11,11,0,0">
+                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Width="128">
+                        <Button Classes="play" Tag="{Binding}" Click="OnTilePlay" IsVisible="{Binding Installed}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                AutomationProperties.Name="{DynamicResource Str.Play}">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconPlay}" FlowDirection="LeftToRight" />
+                            <TextBlock Text="{DynamicResource Str.Play}" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                        <Button Classes="ghost" Tag="{Binding}" Click="OnTileConfigure" IsVisible="{Binding Installed}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                AutomationProperties.Name="{DynamicResource Str.Configure}">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconSettings}" />
+                            <TextBlock Text="{DynamicResource Str.Configure}" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                        <Button Classes="primary" Tag="{Binding}" Click="OnTileInstall" IsVisible="{Binding !Installed}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                AutomationProperties.Name="{DynamicResource Str.Install}">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconDownload}" />
+                            <TextBlock Text="{DynamicResource Str.Install}" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                      </StackPanel>
                     </Border>
                     <!-- Colour says the state, the words say the route. -->
                     <Border Classes="state" Classes.update="{Binding Outdated}" Classes.pulse="{Binding Pulsing}"
@@ -161,6 +223,36 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
     </ScrollViewer>
+
+    <!-- The list view: every game down the left, small cover and name, and the open game's page
+         beside it, docked in DockHost instead of floating over the grid (MainWindow.DockSheet). -->
+    <Grid Grid.Row="1" x:Name="ListLayout" ColumnDefinitions="300,*" Margin="24,6,24,24" IsVisible="False">
+      <Border Grid.Column="0" Classes="gameList">
+        <ListBox x:Name="GameList" SelectionChanged="OnListSelection" Background="Transparent"
+                 AutomationProperties.Name="{DynamicResource Str.Games}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="local:GameCard">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" ToolTip.Tip="{Binding Path}">
+                <Border Width="32" Height="42" CornerRadius="5" ClipToBounds="True">
+                  <Panel>
+                    <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+                      <TextBlock Text="{Binding Initials}" FontSize="11" FontWeight="Bold" Foreground="#60FFFFFF"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
+                  </Panel>
+                </Border>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                <!-- Green once the mod is in, amber when it has an update waiting. -->
+                <Ellipse Grid.Column="2" Width="8" Height="8" VerticalAlignment="Center"
+                         Fill="{DynamicResource Ok}" IsVisible="{Binding Installed}" Classes.update="{Binding Outdated}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+      <Panel Grid.Column="1" x:Name="DockHost" Margin="16,0,0,0" />
+    </Grid>
 
     <ProgressBar Grid.Row="1" x:Name="ScanSpinner" Height="2" MinHeight="2" IsIndeterminate="True"
                  VerticalAlignment="Top" Margin="24,0" IsVisible="False"

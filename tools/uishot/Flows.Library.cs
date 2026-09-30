@@ -26,5 +26,16 @@ internal static class LibraryFlow
         var again = page.SearchFolderAsync(lib);
         check(until(() => again.IsCompleted && !main.Session.Busy, 20) && !Listed("Gone Game") && Listed("Kept Game"),
             "searching again takes out the game that was uninstalled, and keeps the rest");
+
+        // A game taken out by hand stays out: the next search passes over it, and Settings brings it back.
+        var kept = main.Library.Cards.First(c => c.Name == "Kept Game");
+        main.Library.Remove(kept);
+        check(main.Library.Ignored.Any(i => i.Name == "Kept Game"), "a game taken out of the list is ignored");
+        var third = page.SearchFolderAsync(lib);
+        check(until(() => third.IsCompleted && !main.Session.Busy, 20) && !Listed("Kept Game"),
+            "and searching again leaves it out");
+        check(main.Library.Restore(main.Library.Ignored.First(i => i.Name == "Kept Game")) && Listed("Kept Game")
+              && !main.Library.Ignored.Any(i => i.Name == "Kept Game"),
+            "until it is brought back, which takes it off the ignored list");
     }
 }

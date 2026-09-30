@@ -144,8 +144,57 @@ public class OptiScalerRouteTests
         Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "winmm.dll"));
         Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")));
 
-        Assert.Equal(["dxgi.dll", "winmm.dll"], Work.ProxyChoicesFor(Preset.OptiScaler));
+        Assert.Equal(["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll"],
+            Work.ProxyChoicesFor(Preset.OptiScaler));
+        Assert.All(Work.ProxyChoicesFor(Preset.OptiScaler), name => Assert.Contains(name, Engine.Allowed));
         Assert.Equal("dxgi.dll", Work.OptiProxyFor("d3d9.dll"));
+        Assert.Equal("d3d12.dll", Work.OptiProxyFor(null, suggested: "D3D12.dll"));
+        Assert.Equal("winmm.dll", Work.OptiProxyFor("winmm.dll", suggested: "d3d12.dll"));
+    }
+
+    [Fact]
+    public void AutomaticTakesTheWikisNameAndThenKeepsTheInstalledOne()
+    {
+        var game = Fixture.Temp("opti-wiki-name");
+        var (src, pins) = Payloads("wiki-name");
+
+        var pre = Work.Preflight(game, src, Preset.OptiScaler, pins, suggestedProxy: "d3d12.dll");
+        Assert.True(Fixture.HasAny(pre, "the name the OptiScaler wiki gives"), pre.ToLog("pre"));
+        Assert.False(Work.Install(game, src, Preset.OptiScaler, pins, suggestedProxy: "d3d12.dll").Failed);
+        Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "d3d12.dll"));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")));
+
+        // An update on Automatic stays where it is, even when the wiki has moved on.
+        var update = Work.Install(game, src, Preset.OptiScaler, pins, suggestedProxy: "winmm.dll");
+        Assert.False(update.Failed, update.ToLog("update"));
+        Assert.True(File.Exists(Path.Combine(game, "d3d12.dll")));
+        Assert.False(File.Exists(Path.Combine(game, "winmm.dll")));
+    }
+
+    [Fact]
+    public void PickingAnotherNameMovesOptiScalerAndPutsBackWhatTheOldNameDisplaced()
+    {
+        var game = Fixture.Temp("opti-rename");
+        File.WriteAllText(Path.Combine(game, "dxgi.dll"), "somebody else's dxgi");
+        var (src, pins) = Payloads("rename");
+
+        Assert.False(Work.Install(game, src, Preset.OptiScaler, pins).Failed);
+        Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "dxgi.dll"));
+
+        var pre = Work.Preflight(game, src, Preset.OptiScaler, pins, "version.dll");
+        Assert.True(Fixture.HasAny(pre, "OptiScaler is here as dxgi.dll"), pre.ToLog("pre"));
+        var report = Work.Install(game, src, Preset.OptiScaler, pins, "version.dll");
+        Assert.False(report.Failed, report.ToLog("rename"));
+        Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "version.dll"));
+        Assert.Equal("somebody else's dxgi", Bytes(game, "dxgi.dll"));
+
+        // OptiScaler as version.dll is not the author's setup: the weights beside it are this install's.
+        Assert.False(Work.IsAuthorsWeights(game, Work.WeightsName));
+        var gone = Work.Uninstall(game, Preset.OptiScaler);
+        Assert.False(gone.Failed, gone.ToLog("uninstall"));
+        Assert.False(File.Exists(Path.Combine(game, "version.dll")));
+        Assert.False(File.Exists(Path.Combine(game, Work.WeightsName)));
+        Assert.Equal("somebody else's dxgi", Bytes(game, "dxgi.dll"));
     }
 
     [Fact]

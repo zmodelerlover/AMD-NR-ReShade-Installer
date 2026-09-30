@@ -98,6 +98,31 @@ public sealed class Library(Session session)
         return gone;
     }
 
+    /// <summary>Raised when the games a scan passes over change.</summary>
+    public event Action? IgnoredChanged;
+
+    public IReadOnlyList<IgnoredGame> Ignored => Settings.Load().Ignored;
+
+    private void Unignore(string path)
+    {
+        var settings = Settings.Load();
+        if (settings.Ignored.RemoveAll(i => Engine.SamePath(i.Path, path)) == 0) return;
+        settings.Save();
+        IgnoredChanged?.Invoke();
+    }
+
+    /// <summary>An ignored game back in the list, found and detected as a new one would be. False when its
+    /// folder is gone: it only leaves the ignored list then.</summary>
+    public bool Restore(IgnoredGame game)
+    {
+        Unignore(game.Path);
+        if (!Directory.Exists(game.Path)) return false;
+        var card = Add(new GameEntry { Path = game.Path, Name = game.Name, Preset = GameScanner.GuessPreset(game.Path) });
+        Redetect(card);
+        _ = LoadCoversAsync();
+        return true;
+    }
+
     public void Save() => GameStore.Save(_cards.Select(c => c.Entry).Concat(_away));
 
     public GameCard? Find(string path) => _cards.FirstOrDefault(c => Engine.SamePath(c.Path, path));
@@ -107,8 +132,11 @@ public sealed class Library(Session session)
     public GameCard Add(GameEntry entry)
     {
         if (Find(entry.Path) is { } existing) return existing;
+        // Added by hand: whatever was said about this folder before, it is wanted now.
+        Unignore(entry.Path);
         var away = _away.FirstOrDefault(e => Engine.SamePath(e.Path, entry.Path));
         if (away is not null) _away.Remove(away);
+        entry.Added ??= DateTime.Now;
         var card = new GameCard(away ?? entry);
         _cards.Add(card);
         Sort();
@@ -123,12 +151,16 @@ public sealed class Library(Session session)
     public int Merge(IReadOnlyList<ScannedGame> found)
     {
         var added = 0;
+        var ignored = Settings.Load().Ignored;
         foreach (var game in found)
         {
-            if (Find(game.InstallPath) is not null) continue;
+            if (Find(game.InstallPath) is not null
+                || ignored.Any(i => Engine.SamePath(i.Path, game.InstallPath))) continue;
             var away = _away.FirstOrDefault(e => Engine.SamePath(e.Path, game.InstallPath));
             if (away is not null) _away.Remove(away);
-            _cards.Add(new GameCard(away ?? GameEntry.From(game)));
+            var entry = away ?? GameEntry.From(game);
+            entry.Added ??= DateTime.Now;
+            _cards.Add(new GameCard(entry));
             added++;
         }
         Sort();
@@ -138,11 +170,20 @@ public sealed class Library(Session session)
         return added;
     }
 
+    /// <summary>Takes a game out of the list for good: a scan passes over its folder from then on, until
+    /// it is brought back from Settings or added by hand.</summary>
     public void Remove(GameCard card)
     {
         _cards.Remove(card);
         Save();
+        var settings = Settings.Load();
+        if (!settings.Ignored.Any(i => Engine.SamePath(i.Path, card.Path)))
+            settings.Ignored.Add(new IgnoredGame { Path = card.Path, Name = card.Name });
+        settings.Save();
+        IgnoredChanged?.Invoke();
         Changed?.Invoke();
+        DeleteCover(card.Entry.CustomCover);
+        DeleteCover(card.Entry.CustomHero);
     }
 
     private void Sort() =>
@@ -189,8 +230,8 @@ public sealed class Library(Session session)
     /// <summary>What the game renders with: its own files first, then what the API database knows
     /// about it. Only reads, so it runs on any thread.</summary>
     public GraphicsDetection Detect(GameCard card) =>
-        GraphicsDetector.Detect(card.Path, card.Entry.Name, card.Entry.Executable)
-            .With(session.ApiDb?.Lookup(card.Entry.AppId, card.Entry.Name));
+        GraphicsDetector.Detect(card.Path, card.Entry.LookupName, card.Entry.Executable)
+            .With(session.ApiDb?.Lookup(card.Entry.AppId, card.Entry.LookupName));
 
     /// <summary>A detection taken as the game's, and the route following it unless the person chose
     /// one. Every reader goes through here, so the tile, the sheet and the install agree.</summary>
@@ -203,25 +244,24 @@ public sealed class Library(Session session)
     }
 
     /// <summary>Cover art, a few at a time, and only for what has none yet. Steam publishes it on its
-    /// own CDN keyed by the app id the scan already read; everything else keeps its tile. Each cover
-    /// is decoded off the thread that draws the window and at the size a tile shows it, not at the
-    /// 600x900 it was published at: a few hundred full-size covers was a few hundred megabytes.</summary>
+    /// own CDN, by the app id the scan read or the one the game's title finds (CoverCache); what Steam
+    /// does not have keeps its tile. Each cover is decoded off the thread that draws the window and at
+    /// the size a tile shows it, not at the 600x900 it was published at: a few hundred full-size covers
+    /// was a few hundred megabytes.</summary>
     public async Task LoadCoversAsync()
     {
-        var covers = new CoverCache(session.Http);
+        var covers = new CoverCache(session.Http, session.ApiDb);
         using var gate = new SemaphoreSlim(4);
-        await Task.WhenAll(_cards.Where(c => c.Cover is null && c.Entry.AppId is not null).ToList().Select(async card =>
+        await Task.WhenAll(_cards.Where(c => c.Cover is null).ToList().Select(async card =>
         {
             await gate.WaitAsync();
             try
             {
-                var file = await covers.EnsureAsync(card.Entry.AppId);
+                var file = card.Entry.CustomCover is { } own && File.Exists(own)
+                    ? own
+                    : await covers.EnsureAsync(card.Entry.AppId, card.Entry.LookupName, card.Path);
                 if (file is null) return;
-                var bitmap = await Task.Run(() =>
-                {
-                    using var stream = File.OpenRead(file);
-                    return Bitmap.DecodeToWidth(stream, 440, BitmapInterpolationMode.HighQuality);
-                });
+                var bitmap = await Decode(file);
                 Dispatcher.UIThread.Post(() => card.Cover = bitmap);
             }
             catch (Exception e) when (e is IOException or HttpRequestException or ArgumentException
@@ -234,5 +274,112 @@ public sealed class Library(Session session)
                 gate.Release();
             }
         }));
+    }
+    /// <summary>The game's banner for its page in the list view, once. Games Steam has no banner for
+    /// show their cover there instead.</summary>
+    public async Task LoadHeroAsync(GameCard card)
+    {
+        if (card.HeroLooked) return;
+        card.HeroLooked = true;
+        try
+        {
+            var file = card.Entry.CustomHero is { } own && File.Exists(own)
+                ? own
+                : await new CoverCache(session.Http, session.ApiDb)
+                    .EnsureHeroAsync(card.Entry.AppId, card.Entry.LookupName, card.Path);
+            if (file is null) return;
+            var bitmap = await Decode(file, HeroWidth);
+            Dispatcher.UIThread.Post(() => card.Hero = bitmap);
+        }
+        catch (Exception e) when (e is IOException or HttpRequestException or ArgumentException
+                                      or UnauthorizedAccessException or InvalidOperationException)
+        {
+            // No banner: the page shows the cover.
+        }
+    }
+
+    /// <summary>The widths art is decoded at: what a tile shows a cover at, and what the widest page shows a banner at.</summary>
+    private const int CoverWidth = 440, HeroWidth = 1600;
+
+    private static Task<Bitmap> Decode(string file, int width = CoverWidth) => Task.Run(() =>
+    {
+        using var stream = File.OpenRead(file);
+        return Bitmap.DecodeToWidth(stream, width, BitmapInterpolationMode.HighQuality);
+    });
+
+    /// <summary>The name the person gives a game here. Empty, or the name it already had, goes back to that
+    /// one. A tile still without a cover looks again under the new name.</summary>
+    public void Rename(GameCard card, string? name)
+    {
+        name = name?.Trim();
+        card.Entry.CustomName = string.IsNullOrEmpty(name) || name == card.Entry.Name ? null : name;
+        card.RaiseName();
+        Sort();
+        Save();
+        Changed?.Invoke();
+        if (card.Cover is null) _ = LoadCoversAsync();
+    }
+
+    /// <summary>A picture the person picked, as the game's cover; null goes back to the one found online.
+    /// The picture is copied into the cache, and read before anything is saved: a file that is not an image
+    /// throws here and the cover stays as it was.</summary>
+    public async Task SetCoverAsync(GameCard card, string? picked)
+    {
+        var old = card.Entry.CustomCover;
+        if (picked is null)
+        {
+            card.Entry.CustomCover = null;
+            card.Cover = null;
+            Save();
+            _ = LoadCoversAsync();
+        }
+        else
+        {
+            var bitmap = await Decode(picked);
+            card.Entry.CustomCover = await CopyInAsync(picked);
+            card.Cover = bitmap;
+            Save();
+        }
+        if (old != card.Entry.CustomCover) DeleteCover(old);
+    }
+
+    /// <summary>The same for the banner over the game's page in the list view; null goes back to Steam's.</summary>
+    public async Task SetHeroAsync(GameCard card, string? picked)
+    {
+        var old = card.Entry.CustomHero;
+        if (picked is null)
+        {
+            card.Entry.CustomHero = null;
+            card.Hero = null;
+            card.HeroLooked = false;
+            Save();
+            _ = LoadHeroAsync(card);
+        }
+        else
+        {
+            var bitmap = await Decode(picked, HeroWidth);
+            card.Entry.CustomHero = await CopyInAsync(picked);
+            card.HeroLooked = true;
+            card.Hero = bitmap;
+            Save();
+        }
+        if (old != card.Entry.CustomHero) DeleteCover(old);
+    }
+
+    /// <summary>A picture the person picked, copied into the cache under a name of its own.</summary>
+    private static async Task<string> CopyInAsync(string picked)
+    {
+        var folder = Path.Combine(CoverCache.Folder, "custom");
+        Directory.CreateDirectory(folder);
+        var copy = Path.Combine(folder, $"{Guid.NewGuid():N}{Path.GetExtension(picked).ToLowerInvariant()}");
+        await Task.Run(() => File.Copy(picked, copy));
+        return copy;
+    }
+
+    private static void DeleteCover(string? file)
+    {
+        if (file is null) return;
+        try { File.Delete(file); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { /* a stray file in the cache */ }
     }
 }

@@ -48,6 +48,11 @@ public sealed class ApiDatabase
     /// <summary>"steam:12210" -> record. Also "name:&lt;normalised title&gt;" for games with no app id.</summary>
     [JsonPropertyName("games")] public Dictionary<string, ApiRecord> Games { get; set; } = new(StringComparer.Ordinal);
 
+    /// <summary>Normalised title -> the names the OptiScaler wiki gives OptiScaler for that game, the one
+    /// to use first. Read out of the wiki's game pages and compatibility list by tools/ApiDbBuilder; an
+    /// app older than this key ignores it.</summary>
+    [JsonPropertyName("optiscaler")] public Dictionary<string, List<string>> OptiScaler { get; set; } = new(StringComparer.Ordinal);
+
     private Dictionary<string, ApiRecord>? _byTitle;
 
     public static ApiDatabase Parse(string json)
@@ -93,10 +98,36 @@ public sealed class ApiDatabase
         string.Join(",", record.Apis.Select(a => a.ToUpperInvariant()).OrderBy(a => a, StringComparer.Ordinal))
         + $"|{record.Has32Bit}|{record.Has64Bit}";
 
+    /// <summary>The names the OptiScaler wiki gives for this game, best first, or none. By the game's own
+    /// title, and by the title of its record here when the Steam app id finds one: a store's name and the
+    /// wiki's differ more often than two wikis' do.</summary>
+    public IReadOnlyList<string> OptiScalerNames(string? steamAppId, string? name)
+    {
+        var titles = new List<string?> { name };
+        if (!string.IsNullOrWhiteSpace(steamAppId) && Games.TryGetValue(SteamKey(steamAppId), out var record))
+            titles.Add(record.Title);
+        foreach (var title in titles)
+            if (PcgwParser.NormaliseTitle(title) is { Length: >= 2 } key && OptiScaler.TryGetValue(key, out var names))
+                return names;
+        return [];
+    }
+
+    private Dictionary<string, string>? _steamIds;
+
+    /// <summary>The Steam app id of the record whose title normalises to exactly this one, or null.</summary>
+    public string? SteamAppIdFor(string? title)
+    {
+        _steamIds ??= Games.Where(g => g.Key.StartsWith("steam:", StringComparison.Ordinal))
+            .GroupBy(g => PcgwParser.NormaliseTitle(g.Value.Title))
+            .ToDictionary(g => g.Key, g => g.First().Key["steam:".Length..]);
+        return _steamIds.GetValueOrDefault(PcgwParser.NormaliseTitle(title));
+    }
+
     public void Put(string key, ApiRecord record)
     {
         Games[key] = record;
         _byTitle = null;
+        _steamIds = null;
     }
 
     // -- Where the app gets it ----------------------------------------------------------------------

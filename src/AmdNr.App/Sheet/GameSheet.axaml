@@ -7,61 +7,50 @@
   <!-- A large sheet over the library, the game's own art behind its header. The choice it exists for
        comes first: which of the two routes, then what that route needs to know, then the evidence. -->
   <Panel x:Name="Drawer">
-    <Border Background="#C2080505" PointerPressed="OnBackdropPressed" />
-    <Border x:Name="DrawerPanel" Margin="24" MaxWidth="900" MaxHeight="920"
-            HorizontalAlignment="Center" VerticalAlignment="Center"
-            Background="{DynamicResource Surface}" BorderBrush="{DynamicResource BorderStrong}"
-            BorderThickness="1" CornerRadius="16" ClipToBounds="True" BoxShadow="0 30 80 0 #D0000000">
+    <Border x:Name="Backdrop" Background="#C2080505" PointerPressed="OnBackdropPressed" />
+    <!-- Its size and place are in Styles/Sheet.axaml, where the list view's docked page overrides them. -->
+    <Border x:Name="DrawerPanel" Background="{DynamicResource Surface}" BorderThickness="1" ClipToBounds="True">
       <Panel x:Name="DrawerHeader" x:DataType="local:GameCard">
-        <Panel Height="240" VerticalAlignment="Top" ClipToBounds="True" IsHitTestVisible="False">
+        <Panel x:Name="BlurBand" Height="240" VerticalAlignment="Top" ClipToBounds="True" IsHitTestVisible="False">
           <Image Source="{Binding Cover}" Stretch="UniformToFill" Opacity="0.5" Effect="blur(48)" />
           <Border Background="{DynamicResource HeroFade}" />
         </Panel>
-
-        <Grid ColumnDefinitions="Auto,*" Margin="24">
-          <!-- Left: the cover, where the game lives, and what can be done with it besides installing. -->
-          <StackPanel Grid.Column="0" Width="208" Spacing="12">
-            <Border x:Name="CoverBox" CornerRadius="12" ClipToBounds="True" Height="312" BoxShadow="0 14 34 0 #99000000">
-              <Panel>
-                <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
-                  <TextBlock Text="{Binding Initials}" FontSize="56" FontWeight="Bold" Foreground="#38FFFFFF"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
-              </Panel>
-            </Border>
-            <StackPanel Spacing="4" Margin="2,4,2,0">
-              <TextBlock Text="{DynamicResource Str.Location}" Classes="section" />
-              <!-- One line, cut in the middle: a folder path has no spaces to wrap on. -->
-              <TextBlock Text="{Binding Path}" Classes="muted" TextTrimming="PathSegmentEllipsis"
-                         ToolTip.Tip="{Binding Path}" />
-            </StackPanel>
-            <!-- A ghost: Install is the one red button on this sheet. -->
-            <Button x:Name="PlayButton" Classes="ghost" HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center" Click="OnPlay"
-                    AutomationProperties.Name="{DynamicResource Str.Play}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <PathIcon Data="{StaticResource IconPlay}" />
-                <TextBlock x:Name="PlayLabel" Text="{DynamicResource Str.Play}" VerticalAlignment="Center" />
-              </StackPanel>
-            </Button>
-            <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                    Click="OnOpenFolder" AutomationProperties.Name="{DynamicResource Str.OpenFolder}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <PathIcon Data="{StaticResource IconFolder}" />
-                <TextBlock Text="{DynamicResource Str.OpenFolder}" VerticalAlignment="Center" />
-              </StackPanel>
-            </Button>
-            <Button x:Name="RemoveButton" Classes="ghost" HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center" Click="OnRemoveGame"
-                    ToolTip.Tip="{DynamicResource Str.RemoveGameHint}"
-                    AutomationProperties.Name="{DynamicResource Str.RemoveGame}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <PathIcon Data="{StaticResource IconDelete}" />
-                <TextBlock Text="{DynamicResource Str.RemoveGame}" VerticalAlignment="Center" />
-              </StackPanel>
-            </Button>
+        <!-- Docked in the list view: the game's own wide banner across the top, as Steam's library has it,
+             or its cover blurred behind when Steam has no banner for it. -->
+        <Panel x:Name="HeroBand" Height="320" VerticalAlignment="Top" ClipToBounds="True" IsHitTestVisible="False">
+          <Image Source="{Binding Cover}" Stretch="UniformToFill" Opacity="0.55" Effect="blur(40)" IsVisible="{Binding !HasHero}" />
+          <Image Source="{Binding Hero}" Stretch="UniformToFill" IsVisible="{Binding HasHero}" />
+          <Border Background="{DynamicResource BannerFade}" />
+        </Panel>
+        <!-- Docked, the cover is not on the page, so its art is changed from here: the cover (the list's
+             icon too) and the banner, each with the way back to the one found online. -->
+        <Button x:Name="ArtButton" Classes="artEdit" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16"
+                AutomationProperties.Name="{DynamicResource Str.Customize}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconImage}" Width="14" Height="14" />
+            <TextBlock Text="{DynamicResource Str.Customize}" VerticalAlignment="Center" FontSize="12" />
           </StackPanel>
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="{DynamicResource Str.CoverPick}" Click="OnPickCover">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconFolder}" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem x:Name="ArtCoverResetItem" Header="{DynamicResource Str.CoverReset}" Click="OnResetCover">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconRefresh}" /></MenuItem.Icon>
+              </MenuItem>
+              <Separator />
+              <MenuItem Header="{DynamicResource Str.HeroPick}" Click="OnPickHero">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconImage}" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem x:Name="HeroResetItem" Header="{DynamicResource Str.HeroReset}" Click="OnResetHero">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconRefresh}" /></MenuItem.Icon>
+              </MenuItem>
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+
+        <Grid x:Name="ContentGrid" ColumnDefinitions="Auto,*">
+          <local:SheetSide x:Name="Side" Grid.Column="0" />
 
           <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" Margin="28,0,0,0">
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
@@ -74,19 +63,34 @@
                     </Panel>
                   </Border>
                   <Border Classes="tag"><TextBlock x:Name="ApiTag" /></Border>
-                  <Border Classes="state" Classes.update="{Binding Outdated}" Classes.pulse="{Binding Pulsing}"
-                          IsVisible="{Binding Installed}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                      <PathIcon Data="{StaticResource IconCheck}" IsVisible="{Binding !Outdated}" />
-                      <PathIcon Data="{StaticResource IconDownload}" IsVisible="{Binding Outdated}" />
-                      <!-- Read the same as the tile's badge: "Update OptiScaler". -->
-                      <TextBlock Text="{DynamicResource Str.UpdateShort}" IsVisible="{Binding Outdated}" />
-                      <TextBlock Text="{Binding InstalledName}" />
+                  <!-- What the check found, in one badge: ready, installed, an update, or how many notes.
+                       Its sentence is the tooltip; a click opens the details. -->
+                  <Button x:Name="VerdictPill" Classes="pill" IsVisible="False" Click="OnShowDetails"
+                          ToolTip.ShowDelay="200">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                      <PathIcon x:Name="VerdictGlyph" />
+                      <Arc x:Name="VerdictSpin" Classes="spin" Width="11" Height="11" StrokeThickness="1.5"
+                           Stroke="{DynamicResource Muted}" IsVisible="False" />
+                      <TextBlock x:Name="VerdictTitle" />
                     </StackPanel>
-                  </Border>
+                  </Button>
                 </StackPanel>
-                <TextBlock Text="{Binding Name}" Classes="page" TextWrapping="Wrap" MaxLines="2"
-                           TextTrimming="CharacterEllipsis" />
+                <!-- The name, and the pencil that renames it here, in this app only. -->
+                <Grid x:Name="NameView" ColumnDefinitions="Auto,Auto">
+                  <TextBlock Text="{Binding Name}" Classes="page" TextWrapping="Wrap" MaxLines="2"
+                             TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Classes="ghost icon" Width="30" Height="30" Margin="10,0,0,0"
+                          VerticalAlignment="Center" Click="OnRename"
+                          ToolTip.Tip="{DynamicResource Str.Rename}" AutomationProperties.Name="{DynamicResource Str.Rename}">
+                    <PathIcon Data="{StaticResource IconEdit}" Width="13" Height="13" />
+                  </Button>
+                </Grid>
+                <StackPanel x:Name="NameEdit" Orientation="Horizontal" Spacing="8" IsVisible="False">
+                  <TextBox x:Name="NameBox" Width="360" FontSize="18" KeyDown="OnNameKey"
+                           AutomationProperties.Name="{DynamicResource Str.Rename}" />
+                  <Button Classes="primary" Content="{DynamicResource Str.Save}" Click="OnNameSave" />
+                  <Button Classes="ghost" Content="{DynamicResource Str.Cancel}" Click="OnNameCancel" />
+                </StackPanel>
               </StackPanel>
               <Button Grid.Column="1" x:Name="CloseButton" Classes="ghost icon" Click="OnClose"
                       VerticalAlignment="Top" Margin="12,0,0,0"
@@ -101,7 +105,7 @@
               <StackPanel Spacing="18" Margin="0,0,14,4">
                 <!-- The verdict, or what the running action is doing. -->
                 <StackPanel Spacing="12">
-                  <Border x:Name="ReportEmpty" Classes="result">
+                  <Border x:Name="ReportEmpty" Classes="result" IsVisible="False">
                     <StackPanel Orientation="Horizontal" Spacing="12">
                       <Arc Classes="spin" Stroke="{DynamicResource Muted}" />
                       <TextBlock Text="{DynamicResource Str.Checking}" Foreground="{DynamicResource Muted}"
@@ -143,12 +147,18 @@
                   </Grid>
                 </StackPanel>
 
+                <!-- How the last session went: SessionBox.axaml, filled by GameSheet.Session.cs. -->
+                <local:SessionBox x:Name="LastSession" IsVisible="False" />
+
                 <!-- Everything the person can change, locked as one while something is running. -->
                 <StackPanel x:Name="Options" Spacing="18">
                   <!-- What the route is read off. Detection picks the file out of the folder and can
                        pick a launcher instead of the game, so it is shown and it can be changed. -->
                   <StackPanel Spacing="8">
-                    <TextBlock Text="{DynamicResource Str.DetectedSection}" Classes="section" />
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{DynamicResource Str.DetectedSection}" Classes="section" />
+                      <Border Classes="info" ToolTip.Tip="{Binding #ExeNote.Text}" IsVisible="{Binding #ExeNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                    </StackPanel>
                     <Border Classes="detect">
                       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
@@ -169,7 +179,8 @@
                                 VerticalAlignment="Center" />
                       </Grid>
                     </Border>
-                    <TextBlock x:Name="ExeNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                    <!-- Read by the (i) above: this sheet explains itself in tooltips, not paragraphs. -->
+                    <TextBlock x:Name="ExeNote" IsVisible="False" />
                     <Border x:Name="ApiHintBox" Classes="callout" IsVisible="False">
                       <Grid ColumnDefinitions="Auto,*">
                         <PathIcon Grid.Column="0" Data="{StaticResource IconWarn}" Width="16" Height="16"
@@ -189,7 +200,10 @@
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
                           <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconLayers}" /></Border>
                           <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                            <TextBlock Text="{DynamicResource Str.RouteReShade}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.RouteReShade}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                              <Border Classes="info" ToolTip.Tip="{Binding #ReShadeSummary.Text}" IsVisible="{Binding #ReShadeSummary.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <WrapPanel ItemSpacing="4" LineSpacing="4">
                               <Border x:Name="ReShadeRecommended" Classes="status ok"><TextBlock Text="{DynamicResource Str.Recommended}" /></Border>
                               <Border x:Name="ReShadeInstalled" Classes="status ok">
@@ -200,8 +214,7 @@
                               </Border>
                             </WrapPanel>
                           </StackPanel>
-                          <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="ReShadeSummary" Classes="muted"
-                                     TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="17" />
+                          <TextBlock Grid.Row="1" x:Name="ReShadeSummary" IsVisible="False" />
                         </Grid>
                       </RadioButton>
                       <RadioButton Grid.Column="2" x:Name="RouteOpti" Classes="route" GroupName="route"
@@ -209,7 +222,10 @@
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
                           <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconSparkle}" /></Border>
                           <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                            <TextBlock Text="{DynamicResource Str.RouteOpti}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.RouteOpti}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                              <Border Classes="info" ToolTip.Tip="{Binding #OptiSummary.Text}" IsVisible="{Binding #OptiSummary.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <WrapPanel ItemSpacing="4" LineSpacing="4">
                               <Border x:Name="OptiRecommended" Classes="status ok"><TextBlock Text="{DynamicResource Str.Recommended}" /></Border>
                               <Border x:Name="OptiInstalled" Classes="status ok">
@@ -220,8 +236,7 @@
                               </Border>
                             </WrapPanel>
                           </StackPanel>
-                          <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="OptiSummary" Classes="muted"
-                                     TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="17" />
+                          <TextBlock Grid.Row="1" x:Name="OptiSummary" IsVisible="False" />
                         </Grid>
                       </RadioButton>
                     </Grid>
@@ -243,10 +258,13 @@
                     <Border x:Name="ReShadePanel" Classes="routePanel">
                       <StackPanel Spacing="12">
                         <StackPanel Spacing="6">
-                          <TextBlock Text="{DynamicResource Str.ApiSection}" Classes="section" />
+                          <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource Str.ApiSection}" Classes="section" />
+                            <Border Classes="info" ToolTip.Tip="{Binding #PresetNote.Text}" IsVisible="{Binding #PresetNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                          </StackPanel>
                           <ComboBox x:Name="PresetBox" HorizontalAlignment="Stretch" SelectionChanged="OnPresetChanged"
                                     AutomationProperties.Name="{DynamicResource Str.ApiSection}" />
-                          <TextBlock x:Name="PresetNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          <TextBlock x:Name="PresetNote" IsVisible="False" />
                         </StackPanel>
                         <Border x:Name="MismatchBox" Classes="callout" IsVisible="False">
                           <Grid ColumnDefinitions="Auto,*">
@@ -258,17 +276,24 @@
                         </Border>
                         <Grid ColumnDefinitions="*,12,*">
                           <StackPanel Grid.Column="0" x:Name="ProxySection" Spacing="6">
-                            <TextBlock Text="{DynamicResource Str.ProxySection}" Classes="section" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.ProxySection}" Classes="section" />
+                              <Border Classes="info" ToolTip.Tip="{DynamicResource Str.ProxyNote}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <ComboBox x:Name="ProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
                                       AutomationProperties.Name="{DynamicResource Str.ProxySection}" />
-                            <TextBlock Text="{DynamicResource Str.ProxyNote}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                           </StackPanel>
                           <StackPanel Grid.Column="2" x:Name="VersionSection" Spacing="6">
-                            <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.VersionSection}" Classes="section" />
+                              <Border Classes="info" ToolTip.Tip="{Binding #VersionNote.Text}" IsVisible="{Binding #VersionNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <ComboBox x:Name="AddonVersionBox" HorizontalAlignment="Stretch"
                                       SelectionChanged="OnAddonVersionChanged"
                                       AutomationProperties.Name="{DynamicResource Str.VersionSection}" />
-                            <TextBlock x:Name="VersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                            <TextBlock x:Name="VersionNote" IsVisible="False" />
+                            <Button Classes="link" Click="OnWhatsNew" HorizontalAlignment="Left"
+                                    Content="{DynamicResource Str.WhatsNew}" />
                           </StackPanel>
                         </Grid>
                       </StackPanel>
@@ -277,7 +302,6 @@
                     <!-- OptiScaler: the name it loads as, and the three things to do in the game. -->
                     <Border x:Name="OptiPanel" Classes="routePanel" IsVisible="False">
                       <StackPanel Spacing="12">
-                        <TextBlock Text="{DynamicResource Str.OptiAbout}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                         <Border x:Name="OptiMismatchBox" Classes="callout" IsVisible="False">
                           <Grid ColumnDefinitions="Auto,*">
                             <PathIcon Data="{StaticResource IconWarn}" Width="16" Height="16"
@@ -288,30 +312,26 @@
                         </Border>
                         <Grid ColumnDefinitions="*,12,*">
                           <StackPanel Grid.Column="0" Spacing="6">
-                            <TextBlock Text="{DynamicResource Str.ProxySectionOpti}" Classes="section" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.ProxySectionOpti}" Classes="section" />
+                              <Border Classes="info" ToolTip.Tip="{DynamicResource Str.ProxyNoteOpti}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <ComboBox x:Name="OptiProxyBox" HorizontalAlignment="Stretch" SelectionChanged="OnProxyChanged"
                                       AutomationProperties.Name="{DynamicResource Str.ProxySectionOpti}" />
-                            <TextBlock Text="{DynamicResource Str.ProxyNoteOpti}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
                           </StackPanel>
                           <StackPanel Grid.Column="2" x:Name="OptiVersionSection" Spacing="6">
-                            <TextBlock Text="{DynamicResource Str.VersionSectionOpti}" Classes="section" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock Text="{DynamicResource Str.VersionSectionOpti}" Classes="section" />
+                              <Border Classes="info" ToolTip.Tip="{Binding #OptiVersionNote.Text}" IsVisible="{Binding #OptiVersionNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                            </StackPanel>
                             <ComboBox x:Name="OptiVersionBox" HorizontalAlignment="Stretch"
                                       SelectionChanged="OnAddonVersionChanged"
                                       AutomationProperties.Name="{DynamicResource Str.VersionSectionOpti}" />
-                            <TextBlock x:Name="OptiVersionNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                            <TextBlock x:Name="OptiVersionNote" IsVisible="False" />
+                            <Button Classes="link" Click="OnWhatsNew" HorizontalAlignment="Left"
+                                    Content="{DynamicResource Str.WhatsNew}" />
                           </StackPanel>
                         </Grid>
-                        <StackPanel Spacing="8">
-                          <TextBlock Text="{DynamicResource Str.InGame}" Classes="section" />
-                          <Grid ColumnDefinitions="22,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
-                            <TextBlock Grid.Row="0" Text="1" Classes="stepNumber" />
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{DynamicResource Str.OptiStep1}" TextWrapping="Wrap" />
-                            <TextBlock Grid.Row="1" Text="2" Classes="stepNumber" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{DynamicResource Str.OptiStep2}" TextWrapping="Wrap" />
-                            <TextBlock Grid.Row="2" Text="3" Classes="stepNumber" />
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{DynamicResource Str.OptiStep3}" TextWrapping="Wrap" />
-                          </Grid>
-                        </StackPanel>
                       </StackPanel>
                     </Border>
 
@@ -321,31 +341,39 @@
                          supporter card only once it is chosen. -->
                     <Border x:Name="RuntimeSection" Classes="routePanel" IsVisible="False">
                       <StackPanel Spacing="10">
-                        <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal">
                           <TextBlock Text="{DynamicResource Str.SupporterTitle}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                          <TextBlock Text="{DynamicResource Str.SupporterChoose}" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                          <Border Classes="info" ToolTip.Tip="{DynamicResource Str.SupporterChoose}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
                         </StackPanel>
                         <Grid ColumnDefinitions="*,12,*">
                           <RadioButton x:Name="RuntimeDownloadChoice" Classes="route" GroupName="runtime"
                                        IsCheckedChanged="OnRuntimeChoice"
                                        AutomationProperties.Name="{DynamicResource Str.SupporterUseDownload}">
-                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
                               <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconDownload}" /></Border>
                               <TextBlock Grid.Column="1" x:Name="RuntimeDownloadTitle" FontWeight="SemiBold" TextWrapping="Wrap"
                                          VerticalAlignment="Center" />
-                              <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{DynamicResource Str.SupporterDownloadBody}"
-                                         Classes="muted" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="17" />
+                              <Border Grid.Column="2" Classes="info" ToolTip.Tip="{DynamicResource Str.SupporterDownloadBody}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
                             </Grid>
                           </RadioButton>
                           <RadioButton Grid.Column="2" x:Name="RuntimeSupporterChoice" Classes="route" GroupName="runtime"
                                        IsCheckedChanged="OnRuntimeChoice"
                                        AutomationProperties.Name="{DynamicResource Str.SupporterUse}">
-                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
                               <Border Classes="iconTile small" Margin="0,0,10,0"><PathIcon Data="{StaticResource IconHeart}" /></Border>
                               <TextBlock Grid.Column="1" x:Name="RuntimeSupporterTitle" FontWeight="SemiBold" TextWrapping="Wrap"
                                          VerticalAlignment="Center" />
-                              <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="RuntimePitch" Classes="muted" TextWrapping="Wrap"
-                                         Margin="0,10,0,0" LineHeight="17" />
+                              <!-- What the supporter build is, and that this app never hands it out. -->
+                              <Border Grid.Column="2" Classes="info">
+                                <ToolTip.Tip>
+                                  <StackPanel Spacing="6">
+                                    <TextBlock Text="{Binding #RuntimePitch.Text}" />
+                                    <TextBlock Text="{DynamicResource Str.SupporterNotDistributed}" Foreground="{DynamicResource Muted}" />
+                                  </StackPanel>
+                                </ToolTip.Tip>
+                                <PathIcon Data="{StaticResource IconInfo}" />
+                              </Border>
+                              <TextBlock x:Name="RuntimePitch" IsVisible="False" />
                             </Grid>
                           </RadioButton>
                         </Grid>
@@ -362,26 +390,21 @@
                             </StackPanel>
                           </Button>
                         </StackPanel>
-                        <Border Classes="callout">
-                          <Grid ColumnDefinitions="Auto,*">
-                            <PathIcon Data="{StaticResource IconInfo}" Width="16" Height="16"
-                                      Foreground="{DynamicResource Warn}" VerticalAlignment="Top" Margin="0,1,10,0" />
-                            <TextBlock Grid.Column="1" Text="{DynamicResource Str.SupporterNotDistributed}" TextWrapping="Wrap"
-                                       LineHeight="19" Foreground="{DynamicResource WarnText}" />
-                          </Grid>
-                        </Border>
                       </StackPanel>
                     </Border>
 
                     <!-- The third runtime, on either route, only where the version chosen carries it.
                          Off until ticked: experimental, RDNA4 only, and a 141 MB model to download. -->
                     <StackPanel x:Name="MochizukiSection" Spacing="6" IsVisible="False">
-                      <TextBlock Text="{DynamicResource Str.MochizukiSection}" Classes="section" />
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{DynamicResource Str.MochizukiSection}" Classes="section" />
+                        <Border Classes="info" ToolTip.Tip="{Binding #MochizukiNote.Text}" IsVisible="{Binding #MochizukiNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                      </StackPanel>
                       <CheckBox x:Name="MochizukiBox" IsCheckedChanged="OnMochizukiChanged"
                                 AutomationProperties.Name="{DynamicResource Str.MochizukiCheck}">
                         <TextBlock x:Name="MochizukiCheckText" Text="{DynamicResource Str.MochizukiCheck}" TextWrapping="Wrap" />
                       </CheckBox>
-                      <TextBlock x:Name="MochizukiNote" Classes="muted" TextWrapping="Wrap" LineHeight="18" />
+                      <TextBlock x:Name="MochizukiNote" IsVisible="False" />
                     </StackPanel>
                   </StackPanel>
                 </StackPanel>
@@ -412,25 +435,6 @@
                   </StackPanel>
                 </Expander>
 
-                <!-- The install can say "done" and the game still show nothing: that is the most
-                     common failure this project has, and it is the one a clean banner hides. So the
-                     offer to report stands whatever the result was. -->
-                <Border Classes="callout" Background="Transparent" BorderBrush="{DynamicResource Border}">
-                  <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
-                      <TextBlock Text="{DynamicResource Str.ReportTitle}" FontWeight="SemiBold" FontSize="13" />
-                      <TextBlock Text="{DynamicResource Str.ReportBody}" Classes="muted" TextWrapping="Wrap" FontSize="12" />
-                    </StackPanel>
-                    <Button Grid.Column="1" x:Name="ReportButton" Classes="ghost" Margin="12,0,0,0"
-                            VerticalAlignment="Center" Click="OnReport"
-                            AutomationProperties.Name="{DynamicResource Str.Report}">
-                      <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{StaticResource IconReport}" />
-                        <TextBlock Text="{DynamicResource Str.Report}" VerticalAlignment="Center" />
-                      </StackPanel>
-                    </Button>
-                  </Grid>
-                </Border>
               </StackPanel>
             </ScrollViewer>
 
@@ -443,8 +447,23 @@
                 <!-- The sentence gets the full width above the buttons: beside them it was cut
                      mid-word as soon as the window narrowed. -->
                 <TextBlock x:Name="StatusText" Classes="muted" TextWrapping="Wrap" />
-                <Grid ColumnDefinitions="*,Auto">
-                  <Button Grid.Column="0" HorizontalAlignment="Right" x:Name="UninstallButton" Classes="ghost danger large"
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <!-- The install can say "done" and the game still show nothing: that is the most common
+                       failure this project has, so the report sits beside Install, whatever the result. -->
+                  <Button Grid.Column="0" x:Name="ReportButton" Classes="ghost large" Click="OnReport"
+                          AutomationProperties.Name="{DynamicResource Str.Report}">
+                    <ToolTip.Tip>
+                      <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str.ReportTitle}" FontWeight="SemiBold" />
+                        <TextBlock Text="{DynamicResource Str.ReportBody}" />
+                      </StackPanel>
+                    </ToolTip.Tip>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <PathIcon Data="{StaticResource IconReport}" />
+                      <TextBlock Text="{DynamicResource Str.Report}" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Column="1" HorizontalAlignment="Right" x:Name="UninstallButton" Classes="ghost danger large"
                           Click="OnUninstall" Margin="0,0,8,0" AutomationProperties.Name="{DynamicResource Str.Uninstall}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                       <PathIcon x:Name="UninstallIcon" Data="{StaticResource IconDelete}" />
@@ -452,7 +471,7 @@
                       <TextBlock x:Name="UninstallLabel" Text="{DynamicResource Str.Uninstall}" VerticalAlignment="Center" />
                     </StackPanel>
                   </Button>
-                  <Button Grid.Column="1" x:Name="InstallButton" Classes="primary large" Click="OnInstall" MinWidth="168"
+                  <Button Grid.Column="2" x:Name="InstallButton" Classes="primary large" Click="OnInstall" MinWidth="168"
                           HorizontalContentAlignment="Center" AutomationProperties.Name="{DynamicResource Str.Install}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                       <PathIcon x:Name="InstallIcon" Data="{StaticResource IconDownload}" />

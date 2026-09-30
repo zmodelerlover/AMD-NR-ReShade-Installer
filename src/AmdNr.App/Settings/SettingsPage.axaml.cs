@@ -28,7 +28,24 @@ public partial class SettingsPage : UserControl
     {
         _shell = shell;
         shell.Session.UpdateChanged += ShowUpdate;
+        shell.Library.IgnoredChanged += ShowIgnored;
         ShowUpdate();
+        ShowIgnored();
+    }
+
+    private void ShowIgnored()
+    {
+        var ignored = _shell.Library.Ignored.OrderBy(i => i.Name ?? i.Path, StringComparer.CurrentCultureIgnoreCase).ToList();
+        IgnoredList.ItemsSource = ignored;
+        IgnoredEmpty.IsVisible = ignored.Count == 0;
+    }
+
+    private void OnRestoreIgnored(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: IgnoredGame game }) return;
+        var name = game.Name ?? Path.GetFileName(game.Path.TrimEnd('\\', '/'));
+        _shell.Toast(Ui.Format(_shell.Library.Restore(game) ? "Str.IgnoredRestored" : "Str.IgnoredGone", name),
+            Level.Ok);
     }
 
     private void OnLanguageChanged(object? sender, SelectionChangedEventArgs e)
@@ -69,6 +86,7 @@ public partial class SettingsPage : UserControl
             _ => Ui.Text("Str.UpdateFailed"),
         };
         UpdateButton.IsEnabled = update.State != UpdateState.Checking;
+        UpdateNotesButton.IsVisible = update.State != UpdateState.Checking;
         UpdateButton.Content = Ui.Text(update is { State: UpdateState.Available, Release: { } release }
             ? release.ActionKey
             : "Str.UpdateCheck");
@@ -87,6 +105,11 @@ public partial class SettingsPage : UserControl
         }
         await _shell.Session.CheckForUpdateAsync();
     });
+
+    /// <summary>The notes of the release on offer, or of this one when there is nothing newer.</summary>
+    private void OnUpdateNotes(object? sender, RoutedEventArgs e) =>
+        _shell.ShowWhatsNew(_shell.Session.Update.Release is { } release ? release.Version : App.Version,
+            _shell.Session.Update.Release?.Notes);
 
     private void OnOpenData(object? sender, RoutedEventArgs e) => AppUpdate.OpenFolder(AppPaths.Root);
 }

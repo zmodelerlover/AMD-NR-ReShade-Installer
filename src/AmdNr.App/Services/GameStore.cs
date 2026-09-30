@@ -54,8 +54,35 @@ public sealed class GameEntry
     /// preselected, and the download everywhere else.</summary>
     public string? UserRuntime { get; set; }
 
+    /// <summary>The name the person gave the game in this app. Null keeps the launcher's, or the folder's.
+    /// Kept apart from <see cref="Name"/> so going back to the original is always possible.</summary>
+    public string? CustomName { get; set; }
+
+    /// <summary>A picture the person chose for the tile, copied into this app's cache so it survives the
+    /// original being moved. Null is the cover found online.</summary>
+    public string? CustomCover { get; set; }
+
+    /// <summary>The same for the wide banner over the game's page in the list view.</summary>
+    public string? CustomHero { get; set; }
+
+    /// <summary>Update this game by itself when the app opens and a newer build is out. Off until the person
+    /// turns it on: an update replaces files in a game folder, and that is theirs to allow.</summary>
+    public bool AutoUpdate { get; set; }
+
+    /// <summary>When the game was last started from this app. A game started from its launcher is seen by
+    /// the logs it leaves instead (GameCard.LastPlayed).</summary>
+    public DateTime? LastPlayed { get; set; }
+
+    /// <summary>When the game came into the list, for sorting by it. Null for games added before this was kept.</summary>
+    public DateTime? Added { get; set; }
+
     [JsonIgnore]
-    public string Display => Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
+    public string Display => CustomName ?? Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
+
+    /// <summary>The name to look the game up by, online and in the API database: a rename usually says what
+    /// the game is better than a folder called bin64 did.</summary>
+    [JsonIgnore]
+    public string? LookupName => CustomName ?? Name;
 
     public static GameEntry From(ScannedGame game) => new()
     {

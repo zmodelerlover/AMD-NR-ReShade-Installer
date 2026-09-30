@@ -19,8 +19,10 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AmdNr.App;
 using AmdNr.Core;
+using static Seed;
 
 var outDir = args.Length > 0 ? args[0] : ".";
+MainWindow.WhatsNewOnUpdate = false;
 Directory.CreateDirectory(outDir);
 var failures = 0;
 
@@ -128,67 +130,6 @@ bool Until(Func<bool> done, int seconds = 30)
 
 void Click(Button button) => button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
 
-// The smallest file that reads as a 64-bit executable: MZ, the PE signature, AMD64, PE32+.
-byte[] Pe64()
-{
-    var b = new byte[512];
-    b[0] = 0x4d; b[1] = 0x5a; b[60] = 128; b[128] = 0x50; b[129] = 0x45;
-    b[132] = 0x64; b[133] = 0x86;
-    b[152] = 0x0b; b[153] = 0x02;
-    return b;
-}
-
-// A payload list whose every file is already in the cache. No ReShade component, whose hash is pinned
-// in the engine and cannot be stood in for; the add-on route installs without it. An OptiScaler release
-// goes under "releases", the way v0.5.0 lists every OptiScaler beyond the one older apps read.
-void SeedPayload(string addonVersion, string optiVersion = "1.0.0", string? optiRelease = null)
-{
-    var components = new System.Text.Json.Nodes.JsonObject();
-    string[] optiPaths =
-    [
-        "OptiScaler.dll", "OptiScaler.ini",
-        "OptiScaler/amd_fidelityfx_loader_dx12.dll", "OptiScaler/amd_fidelityfx_upscaler_dx12.dll",
-        "OptiScaler/amd_fidelityfx_framegeneration_dx12.dll", "OptiScaler/amd_fidelityfx_denoiser_dx12.dll",
-        "OptiScaler/amd_fidelityfx_vk.dll", "OptiScaler/libxess.dll", "OptiScaler/libxess_dx11.dll",
-        "OptiScaler/libxess_fg.dll", "OptiScaler/libxell.dll", "D3D12_OptiScaler/D3D12Core.dll",
-    ];
-    void Component(string name, string version, params string[] paths) =>
-        components[name] = Pinned(name, version, paths);
-    System.Text.Json.Nodes.JsonObject Pinned(string name, string version, params string[] paths)
-    {
-        var files = new System.Text.Json.Nodes.JsonArray();
-        foreach (var path in paths)
-        {
-            // The bytes carry the version, so a second list pins a different build.
-            byte[] bytes = path == "amd-nr.addon64"
-                ? [.. Pe64(), .. System.Text.Encoding.UTF8.GetBytes(addonVersion)]
-                : System.Text.Encoding.UTF8.GetBytes($"stand-in {path} {version}");
-            var full = Path.Combine(PayloadCache.FolderFor(name, version), path);
-            Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-            File.WriteAllBytes(full, bytes);
-            files.Add(new System.Text.Json.Nodes.JsonObject
-            {
-                ["name"] = Path.GetFileName(path),
-                ["path"] = path,
-                ["size"] = bytes.Length,
-                ["sha256"] = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(bytes)),
-                ["url"] = "https://127.0.0.1:1/" + Path.GetFileName(path),
-            });
-        }
-        return new System.Text.Json.Nodes.JsonObject { ["version"] = version, ["files"] = files };
-    }
-    Component("addon", addonVersion, "amd-nr.addon64");
-    Component("runtime", "1.0.0", "dlssnr_amd_pass1.dll", "dlssnr_on_amd_weights.bin");
-    Component("optiscaler", optiVersion, optiPaths);
-    Component("opti-runtime", "1.0.0", "dlssnr_amd_runtime-0.3.1.dll");
-    var manifest = new System.Text.Json.Nodes.JsonObject { ["schema"] = 1, ["components"] = components };
-    if (optiRelease is not null)
-        manifest["releases"] = new System.Text.Json.Nodes.JsonObject { ["optiscaler"] = new System.Text.Json.Nodes.JsonArray(
-            new System.Text.Json.Nodes.JsonObject { ["version"] = optiRelease, ["components"] =
-                new System.Text.Json.Nodes.JsonObject { ["optiscaler"] = Pinned("optiscaler", optiRelease, optiPaths) } }) };
-    File.WriteAllText(Path.Combine(AppPaths.Root, "payload.json"), manifest.ToJsonString());
-}
-
 void Flows()
 {
     File.WriteAllText(Path.Combine(AppPaths.Root, "config.json"), """
@@ -221,7 +162,8 @@ void Flows()
     var uninstall = Named<Button>("UninstallButton");
     var label = Named<TextBlock>("InstallLabel");
     var verdict = Named<TextBlock>("ResultTitle");
-    Check(Until(() => sheet.IsOpen && verdict.Text is { Length: > 0 }), "a tile opens its sheet, with a verdict");
+    var pill = Named<TextBlock>("VerdictTitle");
+    Check(Until(() => sheet.IsOpen && pill.Text is { Length: > 0 }), "a tile opens its sheet, with a verdict");
     Check(label.Text == S("Str.Install") && !uninstall.IsVisible, "nothing installed: Install, and no Uninstall");
 
     RouteFlow.Run(main, sheet, card, Check, Until, Click, (w, n) => Save(w, n)); // picks ReShade by hand and installs
@@ -296,13 +238,15 @@ void Flows()
     SeedPayload("1.0.1");
     var reload = session.LoadManifestAsync();
     Check(Until(() => reload.IsCompleted && card.Outdated), "a payload that moves on marks the install out of date");
-    Check(Until(() => label.Text == S("Str.Update") && verdict.Text == S("Str.PreflightOutdated"), 10)
+    Check(Until(() => label.Text == S("Str.Update") && pill.Text == S("Str.PreflightOutdated"), 10)
           && TileSays(S("Str.UpdateShort")), "the sheet offers Update and says why, and the tile says so");
     Save(main, "flow-3-outdated");
     Click(install);
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.ReShade && !card.Outdated,
         "Update brings it in line");
     RuntimeFlow.Run(main, sheet, card, game, Check, Until, Click, (w, n) => Save(w, n)); // leaves the download in
+    // Late, where no check reads the tile any more: the filter takes it out of the grid and a new one comes back.
+    SessionFlow.Run(main, sheet, card, game, Check, Until, (w, n) => Save(w, n));
 
     // A download with nowhere to come from: the sheet and the files panel both say so, stay saying
     // so, and offer the DNS fix, because no answer ever came back.
@@ -480,6 +424,21 @@ void Main(int w, int h, string suffix = "")
     }
     Console.WriteLine($"main{suffix} {w}x{h}: ok");
     main.Close();
+}
+
+// `uishot <out> langs`: every other language at the smallest sizes, where a longer string wraps
+// or overflows first, and where a script the fonts lack shows up as boxes.
+if (args.Length > 1 && args[1] == "langs")
+{
+    SeedLibrary(61);
+    foreach (var (code, _, _) in App.Languages.Skip(2))
+    {
+        App.ChangeLanguage(code);
+        Wizard("-" + code, 700, 640);
+        Main(980, 620, "-" + code);
+    }
+    Console.WriteLine(failures == 0 ? "every scroll reaches its end" : $"{failures} scroll(s) cut off");
+    return failures == 0 ? 0 : 1;
 }
 
 Wizard("", 820, 900);

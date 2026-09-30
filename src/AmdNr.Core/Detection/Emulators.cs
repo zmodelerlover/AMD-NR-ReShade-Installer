@@ -101,6 +101,13 @@ public static class Emulators
             GraphicsApi.Vulkan,
             "Options > Settings > Graphics > Graphics Backend: Vulkan. No depth on Vulkan."),
 
+        // yuzu and the forks that carried it on after it stopped: one codebase, one settings path.
+        new("yuzu", "yuzu", "Switch",
+            ["yuzu.exe", "yuzu_ea.exe", "suyu.exe", "sudachi.exe", "citron.exe", "eden.exe"],
+            [GraphicsApi.Vulkan, GraphicsApi.OpenGL],
+            GraphicsApi.Vulkan,
+            "Emulation > Configure > Graphics > API: Vulkan. No depth on Vulkan."),
+
         new("vita3k", "Vita3K", "PS Vita",
             ["Vita3K.exe"],
             [GraphicsApi.Vulkan, GraphicsApi.OpenGL],

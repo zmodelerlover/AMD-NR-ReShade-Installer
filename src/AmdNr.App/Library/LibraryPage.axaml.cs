@@ -19,7 +19,14 @@ public partial class LibraryPage : UserControl
     {
         InitializeComponent();
         CardList.ItemsSource = _shown;
+        GameList.ItemsSource = _shown;
     }
+
+    /// <summary>The list view: games down the left, the open one's page beside them.</summary>
+    private bool _list;
+
+    /// <summary>Set while the code moves the list's selection, which is not a person picking a game.</summary>
+    private bool _selecting;
 
     private Session Session => _shell.Session;
     private Library Library => _shell.Library;
@@ -29,7 +36,120 @@ public partial class LibraryPage : UserControl
         _shell = shell;
         Library.Changed += Refresh;
         Session.BusyChanged += () => ScanButton.IsEnabled = !Session.Busy;
+        var settings = Settings.Load();
+        _list = settings.LibraryView == "list";
+        _filter = settings.LibraryFilter ?? "all";
+        _sort = settings.LibrarySort ?? "name";
+        ShowFilter();
         Refresh();
+        ApplyView();
+    }
+
+    private string _filter = "all";
+    private string _sort = "name";
+
+    private void OnFilter(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { Tag: string filter }) return;
+        _filter = filter;
+        var settings = Settings.Load();
+        settings.LibraryFilter = filter == "all" ? null : filter;
+        settings.Save();
+        ShowFilter();
+        Refresh();
+    }
+
+    private void OnSort(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { Tag: string sort }) return;
+        _sort = sort;
+        var settings = Settings.Load();
+        settings.LibrarySort = sort == "name" ? null : sort;
+        settings.Save();
+        ShowFilter();
+        Refresh();
+    }
+
+    private void ShowFilter()
+    {
+        foreach (var item in new[] { FilterAll, FilterInstalled, FilterUpdates, FilterNotInstalled, FilterEmulators })
+            item.IsChecked = (string?)item.Tag == _filter;
+        foreach (var item in new[] { SortName, SortRecent, SortAdded })
+            item.IsChecked = (string?)item.Tag == _sort;
+        // Lit while games are hidden, so an empty-looking library never keeps a filter secret.
+        FilterButton.Classes.Set("on", _filter != "all");
+    }
+
+    private bool Shows(GameCard card) => _filter switch
+    {
+        "installed" => card.Installed,
+        "updates" => card.Outdated,
+        "notinstalled" => !card.Installed,
+        "emulators" => card.Graphics?.Emulator is not null,
+        _ => true,
+    };
+
+    /// <summary>The library already keeps its games by name, so that order needs nothing; the others sort a
+    /// copy, with the name settling ties and games that never ran, or came before the date was kept, last.</summary>
+    private IEnumerable<GameCard> Ordered(IEnumerable<GameCard> cards) => _sort switch
+    {
+        "recent" => cards.OrderByDescending(c => c.LastPlayed ?? DateTime.MinValue),
+        "added" => cards.OrderByDescending(c => c.Entry.Added ?? DateTime.MinValue),
+        _ => cards,
+    };
+
+    private void OnGridView(object? sender, RoutedEventArgs e) => SetView(list: false);
+
+    private void OnListView(object? sender, RoutedEventArgs e) => SetView(list: true);
+
+    private void SetView(bool list)
+    {
+        if (_list == list) return;
+        _list = list;
+        var settings = Settings.Load();
+        settings.LibraryView = list ? "list" : null;
+        settings.Save();
+        // The sheet of a game open over the grid is a page of the list now, and the other way round
+        // a floating sheet nobody asked for: it closes when the grid comes back.
+        if (!list && _shell.Sheet.IsOpen && !Session.Busy) _shell.Sheet.Close();
+        ApplyView();
+    }
+
+    private void ApplyView()
+    {
+        GridScroll.IsVisible = !_list;
+        ListLayout.IsVisible = _list;
+        GridViewButton.Classes.Set("on", !_list);
+        ListViewButton.Classes.Set("on", _list);
+        _shell.DockSheet(_list ? DockHost : null);
+        if (_list) KeepSelection();
+    }
+
+    /// <summary>In the list view a game is always open: the one the sheet shows, or else the first.</summary>
+    private void KeepSelection()
+    {
+        if (!_list || _shown.Count == 0) return;
+        var open = _shell.Sheet.Card is { } card && _shown.Contains(card) ? card : null;
+        if (open is null || !_shell.Sheet.IsOpen) _shell.OpenSheet(open ?? _shown[0]);
+        else Select(open);
+    }
+
+    /// <summary>The list's selection brought in line with the game whose sheet is open.</summary>
+    public void Select(GameCard card)
+    {
+        if (!_list || GameList.SelectedItem == card) return;
+        _selecting = true;
+        GameList.SelectedItem = card;
+        GameList.ScrollIntoView(card);
+        _selecting = false;
+    }
+
+    private void OnListSelection(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_selecting || GameList.SelectedItem is not GameCard card || card == _shell.Sheet.Card) return;
+        _shell.OpenSheet(card);
+        // Refused while another game's install runs: the list goes back to the game that has the sheet.
+        if (_shell.Sheet.Card is { } open && open != card) Select(open);
     }
 
     /// <summary>The grid filtered by the search, and the two different empties: nothing in the list
@@ -37,8 +157,8 @@ public partial class LibraryPage : UserControl
     public void Refresh()
     {
         var needle = SearchBox.Text?.Trim() ?? "";
-        var wanted = Library.Cards.Where(c => needle.Length == 0
-                                              || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var wanted = Ordered(Library.Cards.Where(c => Shows(c) && (needle.Length == 0
+                                              || c.Name.Contains(needle, StringComparison.CurrentCultureIgnoreCase)))).ToList();
 
         // Brought in line, not rebuilt. A tile is a few controls deep, and clearing the grid built
         // every one of them again: over a second for each key typed in the search with a few hundred
@@ -49,6 +169,7 @@ public partial class LibraryPage : UserControl
         for (var i = 0; i < wanted.Count; i++)
             if (i >= _shown.Count || _shown[i] != wanted[i]) _shown.Insert(i, wanted[i]);
         while (_shown.Count > wanted.Count) _shown.RemoveAt(_shown.Count - 1);
+        if (_shell is not null) KeepSelection();
 
         var all = Library.Cards.Count;
         var noMatch = all > 0 && _shown.Count == 0;
@@ -56,7 +177,8 @@ public partial class LibraryPage : UserControl
         EmptyActions.IsVisible = !noMatch;
         Ui.Localize(EmptyTitle, noMatch ? "Str.NoMatchTitle" : "Str.EmptyTitle");
         EmptyIcon.Data = Ui.Icon(noMatch ? "IconSearch" : "IconGames");
-        if (noMatch) EmptyBody.Text = Ui.Format("Str.NoMatch", needle);
+        if (noMatch && needle.Length == 0) Ui.Localize(EmptyBody, "Str.NoFilterMatch");
+        else if (noMatch) EmptyBody.Text = Ui.Format("Str.NoMatch", needle);
         else Ui.Localize(EmptyBody, "Str.NoGames");
         Foot(all == 0 ? "" : Ui.Format("Str.GameCount", all)
                              + (Library.Away > 0 ? " · " + Ui.Format("Str.GamesAway", Library.Away) : ""));
@@ -78,6 +200,30 @@ public partial class LibraryPage : UserControl
     private void OnCardClick(object? sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: GameCard card }) _shell.OpenSheet(card);
+    }
+
+    // The buttons a tile shows under the pointer: Play and Configure once the mod is in, Install before.
+
+    private void OnTilePlay(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (Session.Busy || sender is not Button { Tag: GameCard card }) return;
+        if (card.Graphics is null) Library.Apply(card, Library.Detect(card));
+        GameSheet.Play(card, _shell);
+    }
+
+    private void OnTileConfigure(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is Button { Tag: GameCard card }) _shell.OpenSheet(card);
+    }
+
+    private void OnTileInstall(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (Session.Busy || sender is not Button { Tag: GameCard card }) return;
+        _shell.OpenSheet(card);
+        if (_shell.Sheet.Card == card) _shell.Sheet.Install();
     }
 
     private void OnScan(object? sender, RoutedEventArgs e) => _shell.Run("scan", ScanAsync);

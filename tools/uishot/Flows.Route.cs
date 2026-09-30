@@ -23,7 +23,7 @@ internal static class RouteFlow
         check(Named<Border>("PickRouteBox").IsVisible && !Named<Border>("ReShadePanel").IsVisible
               && Named<TextBlock>("PickRouteText").Text?.Contains("OptiScaler") == true,
             "the sheet asks for one and says which suits which game");
-        check(until(() => Named<TextBlock>("ResultTitle").Text == S("Str.PickRouteTitle"), 5) && !install.IsEnabled
+        check(until(() => Named<TextBlock>("VerdictTitle").Text == S("Str.PickRouteTitle"), 5) && !install.IsEnabled
               && !Named<Border>("ReportEmpty").IsVisible,
             "and Install waits for it");
         save(main, "flow-0-pick-route");

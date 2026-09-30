@@ -10,7 +10,8 @@ internal static class SheetFlow
     public static void Run(MainWindow main, GameSheet sheet, GameCard card, Action<bool, string> check,
         Func<Func<bool>, int, bool> until)
     {
-        var banner = sheet.FindControl<Border>("ResultBanner")!;
+        // The check's verdict is the badge beside the platform and the API.
+        var banner = sheet.FindControl<Button>("VerdictPill")!;
         check(until(() => banner.IsVisible, 10), "the open sheet shows its verdict");
 
         sheet.Close();

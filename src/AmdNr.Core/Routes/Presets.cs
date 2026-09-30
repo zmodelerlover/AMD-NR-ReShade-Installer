@@ -141,9 +141,9 @@ public static class Presets
             + "per-game override: it beats the global setting silently, and it is the most common way "
             + "this looks broken when it is not.",
         Preset.Rpcs3 =>
-            "EXPERIMENTAL. ReShade on Vulkan is a global layer, not a proxy DLL: run the ReShade "
-            + "installer against rpcs3.exe and pick Vulkan, or nothing will load. The network gets "
-            + "colour and estimated motion only -- there is no depth on Vulkan.",
+            "EXPERIMENTAL. ReShade on Vulkan is a layer, not a proxy DLL: this install registers it "
+            + "for your Windows user when none is, and turns it on for rpcs3.exe with a ReShade.ini "
+            + "beside it. The network gets colour and estimated motion only -- there is no depth on Vulkan.",
         Preset.Dx11 =>
             "The best case. D3D11 is the only route where the game's own motion vectors reach the "
             + "network, together with its depth.",
@@ -160,8 +160,9 @@ public static class Presets
             + "and turn on Enable NR; a game that uses Ray Reconstruction needs \"After the finished "
             + "frame\" as the processing point.",
         Preset.Vulkan =>
-            "EXPERIMENTAL. ReShade on Vulkan is a global layer, not a proxy DLL: run its installer "
-            + "against the game's own .exe and pick Vulkan, or nothing loads. The game also has to "
+            "EXPERIMENTAL. ReShade on Vulkan is a layer, not a proxy DLL: this install registers it "
+            + "for your Windows user when none is, and turns it on for this program with a ReShade.ini "
+            + "beside its .exe. The game also has to "
             + "import vkCreateDevice statically -- one that resolves Vulkan through "
             + "vkGetInstanceProcAddr cannot be hooked, and the add-on stands down rather than guess. "
             + "No depth on Vulkan either way: colour and estimated motion.",

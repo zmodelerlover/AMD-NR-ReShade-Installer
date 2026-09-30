@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AmdNr.App"
+             x:Class="AmdNr.App.SheetSide"
+             x:DataType="local:GameCard">
+
+  <!-- The game sheet's left column: the cover, where the game lives, and what can be done with it
+       besides installing. Its own file for length; what the buttons do is the sheet's. -->
+  <StackPanel Width="208" Spacing="12">
+    <Border x:Name="CoverBox" x:FieldModifier="internal" CornerRadius="12" ClipToBounds="True" Height="312" BoxShadow="0 14 34 0 #99000000">
+      <Panel>
+        <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
+          <TextBlock Text="{Binding Initials}" FontSize="56" FontWeight="Bold" Foreground="#38FFFFFF"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
+        <!-- A picture of the person's own, or back to the one found online. -->
+        <Button Classes="ghost coverEdit" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8"
+                Height="32" AutomationProperties.Name="{DynamicResource Str.ChangeCover}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconImage}" Width="14" Height="14" />
+            <TextBlock Text="{DynamicResource Str.ChangeCover}" VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="{DynamicResource Str.CoverPick}" Click="OnPickCover">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconFolder}" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem x:Name="CoverResetItem" x:FieldModifier="internal" Header="{DynamicResource Str.CoverReset}" Click="OnResetCover">
+                <MenuItem.Icon><PathIcon Data="{StaticResource IconRefresh}" /></MenuItem.Icon>
+              </MenuItem>
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+      </Panel>
+    </Border>
+    <StackPanel Spacing="4" Margin="2,4,2,0">
+      <TextBlock Text="{DynamicResource Str.Location}" Classes="section" />
+      <!-- One line, cut in the middle: a folder path has no spaces to wrap on. -->
+      <TextBlock Text="{Binding Path}" Classes="muted path" TextTrimming="PathSegmentEllipsis"
+                 ToolTip.Tip="{Binding Path}" />
+    </StackPanel>
+    <!-- Green: Install is the one red button on this sheet, and Play must not look like it. -->
+    <Button x:Name="PlayButton" x:FieldModifier="internal" Classes="play large" HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center" Click="OnPlay"
+            AutomationProperties.Name="{DynamicResource Str.Play}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{StaticResource IconPlay}" FlowDirection="LeftToRight" />
+        <TextBlock x:Name="PlayLabel" x:FieldModifier="internal" Text="{DynamicResource Str.Play}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Button>
+    <!-- Only for a game that has something installed to keep up to date. -->
+    <!-- A row of its own, set apart: the switch at one end, what it does at the other. -->
+    <Border IsVisible="{Binding Installed}" Background="{DynamicResource SurfaceHigh}" CornerRadius="8"
+            Padding="10,4,12,4" ToolTip.Tip="{DynamicResource Str.AutoUpdateTip}">
+      <Grid ColumnDefinitions="Auto,*">
+        <ToggleSwitch Grid.Column="0" x:Name="AutoUpdateSwitch" x:FieldModifier="internal" OnContent="" OffContent=""
+                      MinWidth="0" VerticalAlignment="Center"
+                      IsCheckedChanged="OnAutoUpdateChanged"
+                      AutomationProperties.Name="{DynamicResource Str.AutoUpdate}" />
+        <TextBlock Grid.Column="1" Text="{DynamicResource Str.AutoUpdate}" HorizontalAlignment="Right"
+                   VerticalAlignment="Center" FontSize="13" />
+      </Grid>
+    </Border>
+    <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+            Click="OnOpenFolder" AutomationProperties.Name="{DynamicResource Str.OpenFolder}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{StaticResource IconFolder}" />
+        <TextBlock Text="{DynamicResource Str.OpenFolder}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Button>
+    <!-- This game's NR settings in one file, out or in. Only once the mod is in: before, there are none. -->
+    <Button x:Name="TransferButton" x:FieldModifier="internal" Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+            IsVisible="{Binding Installed}" ToolTip.Tip="{DynamicResource Str.TransferTip}"
+            AutomationProperties.Name="{DynamicResource Str.Transfer}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{StaticResource IconTune}" />
+        <TextBlock Text="{DynamicResource Str.Transfer}" VerticalAlignment="Center" />
+      </StackPanel>
+      <Button.Flyout>
+        <MenuFlyout Placement="BottomEdgeAlignedLeft">
+          <MenuItem Header="{DynamicResource Str.TransferExport}" Click="OnExportSettings">
+            <MenuItem.Icon><PathIcon Data="{StaticResource IconUpload}" /></MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="{DynamicResource Str.TransferImport}" Click="OnImportSettings">
+            <MenuItem.Icon><PathIcon Data="{StaticResource IconDownload}" /></MenuItem.Icon>
+          </MenuItem>
+        </MenuFlyout>
+      </Button.Flyout>
+    </Button>
+    <Button x:Name="RemoveButton" x:FieldModifier="internal" Classes="ghost" HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center" Click="OnRemoveGame"
+            ToolTip.Tip="{DynamicResource Str.RemoveGameHint}"
+            AutomationProperties.Name="{DynamicResource Str.RemoveGame}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{StaticResource IconDelete}" />
+        <TextBlock Text="{DynamicResource Str.RemoveGame}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Button>
+  </StackPanel>
+</UserControl>

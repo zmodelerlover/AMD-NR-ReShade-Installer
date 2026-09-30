@@ -76,6 +76,25 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     public bool HasCover => _cover is not null;
     public bool NoCover => _cover is null;
 
+    private Bitmap? _hero;
+    /// <summary>The wide banner over the game's page in the list view. Loaded when the page is first
+    /// shown, not with the covers: most people never open most games.</summary>
+    public Bitmap? Hero
+    {
+        get => _hero;
+        set
+        {
+            _hero = value;
+            Raise();
+            Raise(nameof(HasHero));
+        }
+    }
+
+    public bool HasHero => _hero is not null;
+
+    /// <summary>Set once the banner was looked for, found or not, so a game without one is not asked again.</summary>
+    public bool HeroLooked { get; set; }
+
     private bool _installed;
     public bool Installed
     {
@@ -174,6 +193,14 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>After a rename: everything drawn from the name.</summary>
+    public void RaiseName()
+    {
+        Raise(nameof(Name));
+        Raise(nameof(Initials));
+        Raise(nameof(Tile));
+    }
+
     private void Raise([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
@@ -196,19 +223,35 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     /// <summary>The route's name as the tile prints it. Product names, so not translated.</summary>
     public string InstalledName => _installedVia?.ToString() ?? "";
 
+    /// <summary>The game's folder, and the one the install writes into when that is another.</summary>
+    public List<string> Folders
+    {
+        get
+        {
+            List<string> folders = [Entry.Path];
+            if (_graphics?.Target is { } target && System.IO.Path.GetDirectoryName(target) is { } targetFolder
+                && !Engine.SamePath(targetFolder, Entry.Path))
+                folders.Add(targetFolder);
+            return folders;
+        }
+    }
+
     /// <summary>Looked for beside the folder the install writes into as well as at the root: an
     /// Unreal install lands in Binaries\Win64 and a Source one in bin\, and neither is the root.</summary>
     public void RefreshInstalled()
     {
-        List<string> folders = [Entry.Path];
-        if (_graphics?.Target is { } target && System.IO.Path.GetDirectoryName(target) is { } targetFolder)
-            folders.Add(targetFolder);
+        var folders = Folders;
         try { InstalledVia = folders.Select(GameScanner.InstalledAs).FirstOrDefault(v => v is not null); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
             InstalledVia = null;
         }
         Installed = InstalledVia is not null;
+        try { LastPlayed = new[] { Entry.LastPlayed, SessionLog.LastWrite(folders) }.Max(); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            LastPlayed = Entry.LastPlayed;
+        }
         // Only an install can be out of date, and only against a manifest that has arrived. Before
         // it does, the tile says nothing rather than guessing -- a badge that appears offline and
         // disappears online is worse than no badge.
@@ -228,6 +271,10 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
             Outdated = false;
         }
     }
+
+    /// <summary>When the game last ran: started from this app, or seen in the logs the mod writes beside
+    /// it, however it was started.</summary>
+    public DateTime? LastPlayed { get; private set; }
 
     public void RefreshRoute()
     {

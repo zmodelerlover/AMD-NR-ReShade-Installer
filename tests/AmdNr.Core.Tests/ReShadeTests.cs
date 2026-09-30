@@ -312,6 +312,47 @@ public class ReShadeTests
         Assert.False(GameScanner.IsInstalled(game));
     }
 
+    /// <summary>Vulkan has no proxy: ReShade goes in as a layer registered for the user (under the test run's
+    /// own key, see TestHome), turned on for this program by the ReShade.ini beside it, and turned off again
+    /// by the uninstall with the settings kept.</summary>
+    [Fact]
+    public void AVulkanInstallRegistersReShadeAsALayerAndTurnsItOnWithTheIni()
+    {
+        var game = Fixture.Temp("vulkan-install");
+        var (src, pins) = Fixture.Payloads("vulkan-install");
+        var reShade = Fixture.Pe(true).Concat(new byte[2048]).ToArray();
+        File.WriteAllBytes(Path.Combine(src, "ReShade64.dll"), reShade);
+        pins = new PayloadPins
+        {
+            AddonSha = pins.AddonSha, AddonSize = pins.AddonSize,
+            RuntimeSha = pins.RuntimeSha, RuntimeSize = pins.RuntimeSize,
+            WeightsSha = pins.WeightsSha, WeightsSize = pins.WeightsSize,
+            ReShade64Sha = Engine.Sha(reShade),
+        };
+
+        Assert.True(Fixture.HasAny(Work.Preflight(game, src, Preset.Vulkan, pins), "as a Vulkan layer for your Windows user"));
+        var report = Work.Install(game, src, Preset.Vulkan, pins);
+        Assert.False(report.Failed, report.ToLog("install"));
+        Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")), "Vulkan has no proxy");
+        Assert.True(File.Exists(Path.Combine(game, "ReShade.ini")), "the ini is what turns the layer on");
+
+        var layer = Work.FindReShadeLayer();
+        Assert.NotNull(layer);
+        Assert.True(layer!.Ours);
+        Assert.Equal(reShade, File.ReadAllBytes(layer.Library));
+
+        // A second game uses the same layer, and says nothing about registering it again.
+        var other = Fixture.Temp("vulkan-install-2");
+        var again = Work.Install(other, src, Preset.Vulkan, pins);
+        Assert.False(again.Failed, again.ToLog("again"));
+        Assert.False(Fixture.HasAny(again, "is registered as a Vulkan layer"), again.ToLog("again"));
+
+        var removed = Work.Uninstall(game, Preset.Vulkan);
+        Assert.False(removed.Failed, removed.ToLog("uninstall"));
+        Assert.False(File.Exists(Path.Combine(game, "ReShade.ini")));
+        Assert.True(File.Exists(Path.Combine(game, "ReShade.ini.off")));
+    }
+
     /// <summary>A 32-bit D3D9 game loads d3d9.dll and never dxgi.dll. Checking the 64-bit names
     /// there reported "no ReShade proxy DLL found" about a folder with ReShade sitting in it -- on
     /// every 32-bit install, including the ones this installer had just written itself.</summary>

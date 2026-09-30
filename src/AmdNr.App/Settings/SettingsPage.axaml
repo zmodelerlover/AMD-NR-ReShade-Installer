@@ -23,6 +23,35 @@
         </Grid>
       </Border>
 
+      <!-- Games taken out of the list: a scan passes over them, and each can come back from here. -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Classes="iconTile neutral" Margin="0,0,14,0" VerticalAlignment="Center"><PathIcon Data="{StaticResource IconGames}" /></Border>
+            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource Str.IgnoredGames}" Classes="subtitle" />
+              <TextBlock Text="{DynamicResource Str.IgnoredGamesHint}" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+          </Grid>
+          <TextBlock x:Name="IgnoredEmpty" Text="{DynamicResource Str.IgnoredNone}" Classes="muted" />
+          <ItemsControl x:Name="IgnoredList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="local:IgnoredGame">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                  <StackPanel Spacing="2" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Path}" Classes="muted path" FontSize="12" TextTrimming="PathSegmentEllipsis"
+                               ToolTip.Tip="{Binding Path}" />
+                  </StackPanel>
+                  <Button Grid.Column="1" Classes="ghost" Tag="{Binding}" Click="OnRestoreIgnored"
+                          Content="{DynamicResource Str.IgnoredRestore}" VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
       <!-- Updates: whether this is the newest release, said either way. -->
       <Border Classes="card">
         <Grid ColumnDefinitions="Auto,*,Auto">
@@ -44,6 +73,8 @@
               </Border>
             </StackPanel>
             <TextBlock x:Name="UpdateText" Classes="muted" TextWrapping="Wrap" />
+            <Button x:Name="UpdateNotesButton" Classes="link" Click="OnUpdateNotes" HorizontalAlignment="Left"
+                    Content="{DynamicResource Str.WhatsNew}" />
           </StackPanel>
           <Button Grid.Column="2" x:Name="UpdateButton" Classes="ghost" VerticalAlignment="Center" Click="OnUpdate" />
         </Grid>
@@ -52,9 +83,9 @@
       <Border Classes="card" Padding="0">
         <StackPanel>
           <Grid ColumnDefinitions="Auto,*" Margin="20,18">
-            <Border Width="40" Height="40" CornerRadius="11" Margin="0,0,14,0" Background="{DynamicResource LogoFill}">
-              <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png" Width="28" Height="28"
-                     Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Border Width="40" Height="40" CornerRadius="11" Margin="0,0,14,0" ClipToBounds="True">
+              <Image Source="avares://AMD-NR-ReShade-Installer/Assets/logo.png"
+                     Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
             </Border>
             <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="10">
@@ -71,7 +102,7 @@
                   Background="{DynamicResource Bg}" CornerRadius="0,0,12,12">
             <Grid ColumnDefinitions="Auto,*,Auto">
               <TextBlock Text="{DynamicResource Str.DataFolder}" Classes="caption" VerticalAlignment="Center" Margin="0,0,12,0" />
-              <TextBlock Grid.Column="1" x:Name="DataFolderText" Classes="muted" VerticalAlignment="Center"
+              <TextBlock Grid.Column="1" x:Name="DataFolderText" Classes="muted path" VerticalAlignment="Center"
                          TextTrimming="PathSegmentEllipsis" />
               <Button Grid.Column="2" Classes="ghost small" Margin="12,0,0,0" Content="{DynamicResource Str.OpenFolder}"
                       Click="OnOpenData" />

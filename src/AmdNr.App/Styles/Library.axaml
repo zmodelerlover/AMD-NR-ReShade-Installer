@@ -107,6 +107,107 @@
     <Setter Property="BoxShadow" Value="0 0 0 2 #C4242C" />
   </Style>
 
+  <!-- Grid or list: two icon buttons in one pill, the one in use lit. -->
+  <Style Selector="Border.segmented">
+    <Setter Property="Background" Value="{DynamicResource Surface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="2" />
+    <Setter Property="Height" Value="36" />
+  </Style>
+  <Style Selector="Button.seg">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Width" Value="34" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+  </Style>
+  <Style Selector="Button.seg:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <Style Selector="Button.seg.on /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+  </Style>
+  <Style Selector="Button.seg.on">
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <!-- The filter button while it hides some games. -->
+  <Style Selector="Button#FilterButton.on /template/ ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentText}" />
+  </Style>
+  <Style Selector="Button#FilterButton.on PathIcon">
+    <Setter Property="Foreground" Value="{DynamicResource AccentText}" />
+  </Style>
+  <Style Selector="Button.seg PathIcon">
+    <Setter Property="Width" Value="14" />
+    <Setter Property="Height" Value="14" />
+  </Style>
+
+  <!-- The list view's game list: one card down the left, a row per game, the open one lit in the accent. -->
+  <Style Selector="Border.gameList">
+    <Setter Property="Background" Value="{DynamicResource Surface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </Style>
+  <Style Selector="Border.gameList ListBoxItem">
+    <Setter Property="Padding" Value="8,5" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Margin" Value="0,1" />
+  </Style>
+  <Style Selector="Border.gameList ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+  </Style>
+  <Style Selector="Border.gameList ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+  </Style>
+  <Style Selector="Border.gameList ListBoxItem:selected TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Border.gameList Ellipse.update">
+    <Setter Property="Fill" Value="{DynamicResource Warn}" />
+  </Style>
+
+  <!-- The tile's buttons, over a darkened cover, only while the pointer is on it. Not hit-testable
+       while hidden, so a click on a tile at rest still opens the sheet. -->
+  <Style Selector="Border.hoverActions">
+    <Setter Property="Background" Value="#B8000000" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button.card:pointerover Border.hoverActions">
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="IsHitTestVisible" Value="True" />
+  </Style>
+
+  <!-- The sheet's cover button: there when the cover is pointed at or the button has focus. -->
+  <Style Selector="Button.coverEdit">
+    <Setter Property="Background" Value="#CC0B0808" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border#CoverBox:pointerover Button.coverEdit, Button.coverEdit:focus-visible, Button.coverEdit:flyout-open">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
   <!-- Small label over a cover: dark glass, so it reads on any artwork. -->
   <Style Selector="Border.badge">
     <Setter Property="Background" Value="#B80D0A0A" />

@@ -256,9 +256,10 @@ public static partial class Work
     public static string[] ProxyChoicesFor(Preset preset) => preset switch
     {
         _ when preset.IsVulkan() => [],
-        // Not ReShade's list: these are names OptiScaler itself can be loaded under. winmm.dll is
-        // the way in when dxgi.dll has to stay something else's.
-        Preset.OptiScaler => ["dxgi.dll", "winmm.dll"],
+        // Not ReShade's list: every name OptiScaler's dllmain answers to. winmm.dll is the way in
+        // when dxgi.dll has to stay something else's; the rest are what the OptiScaler wiki names
+        // for games that load neither (Forspoken wants d3d12.dll, No Man's Sky dbghelp.dll).
+        Preset.OptiScaler => ["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll"],
         Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "dinput8.dll"],
         Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
         Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "dinput8.dll"],
@@ -381,11 +382,14 @@ public static partial class Work
     /// OptiScaler, as before, a build of the author's already in the folder.</param>
     /// <param name="wantedRuntime">The build chosen for the game when no file of it was found: the download
     /// goes in, and the report says the build is not used and why.</param>
+    /// <param name="suggestedProxy">The name the OptiScaler wiki gives for this game (<see cref="ApiDatabase.OptiScalerNames"/>):
+    /// what OptiScaler goes in as when no name was picked and no install of it is here already.</param>
     public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
-        string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null)
+        string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null,
+        string? suggestedProxy = null)
     {
         var report = preset.IsOptiScaler()
-            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime)
+            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
             : PreflightReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime);
         // Said before Install is pressed, as what Install does about it rather than as a problem.
         try
@@ -402,8 +406,10 @@ public static partial class Work
     /// <param name="mochizuki">See <see cref="Preflight"/>.</param>
     /// <param name="ownRuntime">See <see cref="Preflight"/>.</param>
     /// <param name="wantedRuntime">See <see cref="Preflight"/>.</param>
+    /// <param name="suggestedProxy">See <see cref="Preflight"/>.</param>
     public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
-        string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null)
+        string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null,
+        string? suggestedProxy = null)
     {
         // What would make the transaction refuse, cleared first, on every route: see InTheWay.
         var report = ClearTheWay(gameDir, preset, pins) ?? new Report();
@@ -413,7 +419,7 @@ public static partial class Work
             return report;
         }
         report.Append(preset.Route() == Route.X86 ? InstallX86(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime)
-            : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime)
+            : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
             : InstallReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime));
         return report;
     }

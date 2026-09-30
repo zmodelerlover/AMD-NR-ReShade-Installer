@@ -66,6 +66,8 @@ public partial class MainWindow : Window
         if (GameStore.SetAside is { } aside) Toast(Ui.Format("Str.GamesUnreadable", Path.GetFileName(aside)), Level.Warn);
         _lastPrune = DateTime.Now;
 
+        ShowWhatsNewOnce();
+
         var machine = await Session.ReadMachineAsync();
         GamesPage.ShowMachine(machine);
         SystemPage.Show(machine);
@@ -75,6 +77,7 @@ public partial class MainWindow : Window
         await Library.DetectAsync();
         _ = Library.LoadCoversAsync();
         _ = Session.CheckForUpdateAsync();
+        await AutoUpdateAsync();
 
         // A first run has nothing in the list, and a scan is what it wants. Reading the launchers is
         // read-only -- nothing is installed or changed by looking -- so it just happens, unless the
@@ -87,9 +90,40 @@ public partial class MainWindow : Window
     private static string GoneMessage(IReadOnlyList<string> gone) =>
         gone.Count == 1 ? Ui.Format("Str.GameGone", gone[0]) : Ui.Count("Str.GamesGone", gone.Count);
 
+    /// <summary>A release's notes over the page, in the game sheet's frame, under "What's new" and the
+    /// release's name.</summary>
+    public void ShowNotes(string title, Task<string?> notes, string? url) => Notes.Show(title, notes, url);
+
+    /// <summary>This app's release notes for one version: the ones the update check already read, or
+    /// GitHub's.</summary>
+    public void ShowWhatsNew(string version, string? known = null)
+    {
+        var repo = Session.Config.App;
+        var tag = $"v{version}";
+        ShowNotes($"AMD-NR ReShade Installer v{version}",
+            known is not null ? Task.FromResult<string?>(known) : ReleaseNotes.GetAsync(Session.Http, repo.Owner, repo.Repo, tag),
+            $"https://github.com/{repo.Owner}/{repo.Repo}/releases/tag/{tag}");
+    }
+
+    /// <summary>After this app updated itself, once: what the new version brought. Not on a first run,
+    /// where nothing was there before it.</summary>
+    private void ShowWhatsNewOnce()
+    {
+        var settings = Settings.Load();
+        if (settings.SeenVersion == App.Version) return;
+        var updated = settings.SetupDone;
+        settings.SeenVersion = App.Version;
+        settings.Save();
+        if (updated && WhatsNewOnUpdate) ShowWhatsNew(App.Version);
+    }
+
+    /// <summary>Off in the headless renders, where notes nobody closes would sit over every capture.</summary>
+    public static bool WhatsNewOnUpdate { get; set; } = true;
+
     /// <summary>Back to the front after being away: a game uninstalled meanwhile goes from the list
     /// now, not on the next start. Not more often than every few seconds -- alt-tabbing back and
     /// forth should not walk a few hundred folders each time.</summary>
+
     private void OnBack()
     {
         if (DateTime.Now - _lastPrune < TimeSpan.FromSeconds(10) || Session.Busy) return;
@@ -100,7 +134,25 @@ public partial class MainWindow : Window
             if (gone.Count > 0) Toast(GoneMessage(gone), Level.Info);
             // Games back from a drive that returned have not been read yet; nothing to do otherwise.
             await Library.DetectAsync();
+            // Back from a game, most likely: when each game last ran, and how the open one's session went.
+            foreach (var card in Library.Cards) card.RefreshInstalled();
+            GamesPage.Refresh();
+            if (Sheet.IsOpen && Sheet.Card is { } open) Sheet.ShowSession(open);
         });
+    }
+
+    /// <summary>The games whose automatic update is on and that the payload list has moved past, updated
+    /// one after another through their sheet, once the list has been read. Anything else running first wins.</summary>
+    private async Task AutoUpdateAsync()
+    {
+        var due = Library.Cards.Where(c => c.Entry.AutoUpdate && c.Outdated).ToList();
+        var done = 0;
+        foreach (var card in due)
+        {
+            if (Session.Busy) break;
+            if (await Sheet.UpdateAsync(card)) done++;
+        }
+        if (done > 0) Toast(Ui.Count("Str.AutoUpdated", done), Level.Ok);
     }
 
     public void ShowPage(Page page)
@@ -115,7 +167,10 @@ public partial class MainWindow : Window
         GamesPage.IsVisible = sender == TabGames;
         SystemPage.IsVisible = sender == TabSystem;
         SettingsPage.IsVisible = sender == TabSettings;
-        if (sender != TabGames && Sheet.IsOpen) Sheet.Close();
+        // Docked, the sheet is part of the games page and goes out of sight with it.
+        if (sender != TabGames && Sheet.IsOpen && !Sheet.Docked) Sheet.Close();
+        // The notes belong to the moment they were opened in, not to a page: any switch closes them.
+        if (Notes.IsOpen) Notes.Close();
         if (sender == TabSystem) Run("files", SystemPage.RefreshAsync);
     }
 
@@ -131,11 +186,32 @@ public partial class MainWindow : Window
         }
         ShowPage(Page.Games);
         Sheet.Open(card);
+        GamesPage.Select(card);
+    }
+
+    /// <summary>Moves the sheet into <paramref name="host"/> -- the list view's page column -- or, with
+    /// null, back over the pages where it floats over the grid. The control itself moves, so what it
+    /// shows, and an install it is running, carry over.</summary>
+    public void DockSheet(Panel? host)
+    {
+        var target = host ?? Pages;
+        if (Sheet.Parent == target) return;
+        (Sheet.Parent as Panel)?.Children.Remove(Sheet);
+        // Over the pages it goes under the toast, where it was built.
+        if (host is null) Pages.Children.Insert(Pages.Children.IndexOf(ToastBox), Sheet);
+        else host.Children.Add(Sheet);
+        Sheet.SetDocked(host is not null);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && Sheet.IsOpen)
+        if (e.Key == Key.Escape && Notes.IsOpen)
+        {
+            Notes.Close();
+            e.Handled = true;
+            return;
+        }
+        if (e.Key == Key.Escape && Sheet.IsOpen && !Sheet.Docked)
         {
             Sheet.Close();
             e.Handled = true;

@@ -29,12 +29,12 @@ public partial class GameSheet : UserControl
         ReportList.ItemsSource = _report;
         _report.CollectionChanged += (_, _) =>
         {
-            ReportEmpty.IsVisible = _report.Count == 0;
             DetailsCount.Text = _report.Count == 0 ? "" : Ui.Format("Str.DetailsCount", _report.Count);
         };
         DrawerPanel.SizeChanged += (_, e) =>
-            // A short window cannot fit the cover and the choice both, and the choice is the point.
-            CoverBox.IsVisible = e.NewSize.Height >= 640;
+            // A short window cannot fit the cover and the choice both, and the choice is the point. Docked,
+            // the banner stands for the cover.
+            Side.CoverBox.IsVisible = !Docked && e.NewSize.Height >= 640;
     }
 
     private Session Session => _shell.Session;
@@ -44,6 +44,17 @@ public partial class GameSheet : UserControl
     public GameCard? Card => _card;
 
     public bool IsOpen => Drawer.Classes.Contains("open");
+
+    /// <summary>Shown as the page beside the list view's game list rather than over the grid
+    /// (MainWindow.DockSheet): it stays open, and Escape and switching pages leave it be.</summary>
+    public bool Docked => Drawer.Classes.Contains("docked");
+
+    public void SetDocked(bool docked)
+    {
+        Drawer.Classes.Set("docked", docked);
+        Side.CoverBox.IsVisible = !docked && DrawerPanel.Bounds.Height >= 640;
+        if (docked && _card is { } card) _ = Library.LoadHeroAsync(card);
+    }
 
     public void Attach(MainWindow shell)
     {
@@ -66,6 +77,8 @@ public partial class GameSheet : UserControl
         _card = card;
         card.IsSelected = true;
         DrawerHeader.DataContext = card;
+        ShowCustom(card);
+        if (Docked) _ = Library.LoadHeroAsync(card);
         if (!IsOpen)
         {
             IsVisible = true;
@@ -75,7 +88,7 @@ public partial class GameSheet : UserControl
             {
                 Drawer.Classes.Set("open", true);
                 // Focus goes into the sheet, so Tab walks its controls rather than the grid behind it.
-                CloseButton.Focus();
+                if (!Docked) CloseButton.Focus();
             }, DispatcherPriority.Render);
         }
         Show(card);
@@ -117,7 +130,7 @@ public partial class GameSheet : UserControl
         ShowApiHint(graphics);
 
         Lock(Session.Busy);
-        Ui.Localize(PlayLabel, graphics.Emulator is not null ? "Str.Launch" : "Str.Play");
+        Ui.Localize(Side.PlayLabel, graphics.Emulator is not null ? "Str.Launch" : "Str.Play");
 
         // The width comes from the executable the detection picked, so a folder holding a 32-bit
         // launcher beside a 64-bit game is decided by the game and not by the launcher.
@@ -126,6 +139,7 @@ public partial class GameSheet : UserControl
             : Work.Detect(card.Path);
 
         ShowRoutes(card, graphics);
+        ShowSession(card);
         _ = RefreshAsync();
     }
 
@@ -153,7 +167,6 @@ public partial class GameSheet : UserControl
 
         // The long explanation only where it is news: nothing was found, or the person chose the file.
         ExeNote.Text = exe is null ? Ui.Text("Str.ExeNote") : chosen ? Ui.Text("Str.ExeNoteChosen") : "";
-        ExeNote.IsVisible = ExeNote.Text.Length > 0;
     }
 
     private void ShowApiHint(GraphicsDetection graphics)
@@ -185,9 +198,10 @@ public partial class GameSheet : UserControl
     private void Lock(bool busy)
     {
         Options.IsEnabled = !busy;
-        RemoveButton.IsEnabled = !busy;
+        Side.RemoveButton.IsEnabled = !busy;
+        Side.TransferButton.IsEnabled = !busy;
         // Steam can always start it; anything else needs an executable we actually found.
-        PlayButton.IsEnabled = !busy && _card is { } card
+        Side.PlayButton.IsEnabled = !busy && _card is { } card
                                && ((card.Entry.Platform == GamePlatform.Steam && card.Entry.AppId is { Length: > 0 })
                                    || (card.Graphics?.Executable is { } exe && File.Exists(exe)));
         ReportButton.IsEnabled = !busy;

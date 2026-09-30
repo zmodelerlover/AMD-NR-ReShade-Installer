@@ -12,6 +12,11 @@
 //   dotnet run --project tools/ApiDbBuilder -- --steam-top 1000
 //   dotnet run --project tools/ApiDbBuilder -- --local
 //   dotnet run --project tools/ApiDbBuilder -- --appids 12210,1262540
+//   git clone --depth 1 https://github.com/optiscaler/OptiScaler.wiki.git <dir>
+//   dotnet run --project tools/ApiDbBuilder -- --optiscaler-wiki <dir>
+//
+// The last one replaces the file names OptiScaler goes in as per game (see OptiScalerWiki.cs) and
+// looks nothing up on PCGamingWiki unless asked to as well.
 //
 // It resumes: games already in the database, and pages already known not to exist, are skipped. It
 // saves every 20 games, and stops cleanly after repeated refusals rather than hammering a wiki that
@@ -42,6 +47,14 @@ if (IntArg("--steam-top", 0) is > 0 and var top)
 queue = queue.DistinctBy(q => q.AppId)
     .Where(q => !db.Games.ContainsKey(ApiDatabase.SteamKey(q.AppId)) && !misses.Contains(q.AppId))
     .ToList();
+
+if (StringArg("--optiscaler-wiki") is { } wiki)
+{
+    var pages = Directory.GetFiles(wiki, "*.asciidoc").ToDictionary(p => Path.GetFileName(p), File.ReadAllText);
+    db.OptiScaler = OptiScalerWiki.Read(pages,File.ReadAllText(Path.Combine(wiki, "Compatibility-List.md")));
+    Console.WriteLine($"OptiScaler wiki: a file name for {db.OptiScaler.Count} titles, "
+                      + $"{db.OptiScaler.Count(g => g.Value[0] != "dxgi.dll")} of them not dxgi.dll first.");
+}
 
 Console.WriteLine($"{db.Games.Count} already in the database, {misses.Count} known misses, {queue.Count} to look up.");
 

@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AmdNr.App.SessionBox">
+
+  <!-- How the last session went, read off the logs the add-on and the runtime leave beside the game.
+       GameSheet.Session.cs fills it in. -->
+  <StackPanel Spacing="8">
+    <StackPanel Orientation="Horizontal">
+      <TextBlock Text="{DynamicResource Str.SessionSection}" Classes="section" />
+      <Border Classes="info" ToolTip.Tip="{DynamicResource Str.SessionTip}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+    </StackPanel>
+    <Border Classes="detect">
+      <Grid ColumnDefinitions="Auto,*">
+        <PathIcon x:Name="SessionGlyph" x:FieldModifier="internal" Width="16" Height="16" VerticalAlignment="Top" Margin="0,2,10,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock x:Name="SessionTitle" x:FieldModifier="internal" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock x:Name="SessionDetail" x:FieldModifier="internal" Classes="muted" TextWrapping="Wrap" />
+          <!-- The log's own words behind a crash or a failure, as written: what Discord asks for. -->
+          <SelectableTextBlock x:Name="SessionLine" x:FieldModifier="internal" Foreground="{DynamicResource TextSoft}" FontSize="12" FlowDirection="LeftToRight" TextWrapping="Wrap"
+                               FontFamily="Cascadia Mono, Consolas, monospace" IsVisible="False" />
+          <TextBlock x:Name="SessionHint" x:FieldModifier="internal" Classes="muted" TextWrapping="Wrap" IsVisible="False" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </StackPanel>
+</UserControl>

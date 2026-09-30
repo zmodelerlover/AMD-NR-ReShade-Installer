@@ -33,6 +33,9 @@ public static partial class GraphicsDetector
         "zlib", "sdl", "xinput", "xaudio", "dinput", "d3d12core", "d3d12sdklayers", "dstorage", "tobii",
         "powrprof", "dbghelp", "crashpad", "sentry", "bugsplat", "overlay", "gameoverlay", "rtss",
         "reshade", "amd-nr", "dlss5", "dlssnr", "dxgi", "d3d11", "d3d12", "d3d9", "d3d8", "opengl32", "vulkan",
+        // What this app installs: the other runtimes, and OptiScaler under the proxy names it can take.
+        // Read as the game's, the mochizuki runtime made Euro Truck Simulator 2 a Vulkan game.
+        "mochizukinrruntime", "lmxxfnrruntime", "optiscaler", "winmm", "version", "wininet", "winhttp",
     ];
 
     /// <summary>Engine modules worth opening when the executable imports no renderer itself.</summary>
@@ -207,6 +210,12 @@ public static partial class GraphicsDetector
                 $"{exeName} is a Unity player, which renders with D3D11 on Windows unless the game was built otherwise.");
         }
 
+        // An executable that links D3D11 and ships what only a D3D12 game loads: RE Engine's re9.exe
+        // imports d3d11.dll and nothing else, and creates its D3D12 device at run time.
+        if (fromExe is { Api: GraphicsApi.D3D11, Both: false } && OnlyD3D12Loads(root, folder) is { } d3d12)
+            return new GraphicsDetection(exe, width, GraphicsApi.D3D12, false,
+                $"{exeName} imports {fromExe.Evidence}, but ships {d3d12}, which only a D3D12 game loads.");
+
         if (fromExe is not null)
         {
             var both = fromExe.Both && IsUnreal(root, exe);
@@ -275,6 +284,17 @@ public static partial class GraphicsDetector
         // often than not, but it is reported as such rather than dressed up as certainty.
         if (Has("dxgi.dll")) return new Decision(GraphicsApi.D3D11, false, "dxgi.dll only (D3D10/11 family)");
         if (Has("opengl32.dll")) return new Decision(GraphicsApi.OpenGL, false, "opengl32.dll");
+        return null;
+    }
+
+    /// <summary>What beside the executable is loaded by D3D12 and nothing else: the Agility SDK, and
+    /// DirectStorage, which runs on D3D12 queues. Null when neither is there.</summary>
+    private static string? OnlyD3D12Loads(string root, string exeFolder)
+    {
+        bool Any(params string[] relative) =>
+            relative.Any(r => File.Exists(Path.Combine(exeFolder, r)) || File.Exists(Path.Combine(root, r)));
+        if (Any(@"D3D12\D3D12Core.dll", "D3D12Core.dll")) return "the D3D12 Agility SDK (D3D12Core.dll)";
+        if (Any("dstorage.dll", "dstoragecore.dll")) return "DirectStorage (dstorage.dll)";
         return null;
     }
 

@@ -15,11 +15,28 @@ public sealed class Settings
     /// the X leaves it false, so the wizard asks again rather than silently never running.</summary>
     public bool SetupDone { get; set; }
 
+    /// <summary>The version of this app that last ran, so the one after an update shows what it brought.</summary>
+    public string? SeenVersion { get; set; }
+
     /// <summary>True when the wizard's games step was left without a scan being run. The main
     /// window used to scan on its own whenever the list was empty, which is exactly the state
     /// skipping that step leaves behind -- so the one person who said no was the one person it ran
     /// for. Scan games is still there; it just has to be asked for.</summary>
     public bool ScanDeclined { get; set; }
+
+    /// <summary>How the library is laid out: the grid of covers, or a list beside the open game's page
+    /// ("list"). The grid until someone switches.</summary>
+    public string? LibraryView { get; set; }
+
+    /// <summary>Which games the library shows ("installed", "updates", "notinstalled", "emulators"); null is all.</summary>
+    public string? LibraryFilter { get; set; }
+
+    /// <summary>The library's order ("recent", "added"); null is by name.</summary>
+    public string? LibrarySort { get; set; }
+
+    /// <summary>Games the person took out of the list. A scan passes over them, so a game removed on
+    /// purpose stays removed; Settings lists them, each with the way back.</summary>
+    public List<IgnoredGame> Ignored { get; set; } = [];
 
     private static string Path => System.IO.Path.Combine(AppPaths.Root, "settings.json");
 
@@ -45,6 +62,13 @@ public sealed class Settings
             // A preference that did not persist is not worth interrupting anyone over.
         }
     }
+}
+
+/// <summary>One game taken out of the list: its folder, which is what a scan finds it by, and the name it had.</summary>
+public sealed class IgnoredGame
+{
+    public string Path { get; set; } = "";
+    public string? Name { get; set; }
 }
 
 /// <summary>The app's own files, described at compile time: a trimmed executable cannot reflect

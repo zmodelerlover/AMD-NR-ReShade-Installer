@@ -17,6 +17,10 @@
   <StreamGeometry x:Key="IconOk">M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z</StreamGeometry>
   <StreamGeometry x:Key="IconDot">M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z</StreamGeometry>
   <StreamGeometry x:Key="IconDownload">M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z</StreamGeometry>
+  <StreamGeometry x:Key="IconViewGrid">M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z</StreamGeometry>
+  <StreamGeometry x:Key="IconViewList">M3 4h4v4H3V4zm6 1h12v2H9V5zM3 10h4v4H3v-4zm6 1h12v2H9v-2zm-6 5h4v4H3v-4zm6 1h12v2H9v-2z</StreamGeometry>
+  <StreamGeometry x:Key="IconEdit">M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z</StreamGeometry>
+  <StreamGeometry x:Key="IconImage">M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z</StreamGeometry>
   <StreamGeometry x:Key="IconDelete">M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</StreamGeometry>
   <StreamGeometry x:Key="IconDriver">M20 6h-8l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-8 11-4-4h3V9h2v4h3l-4 4z</StreamGeometry>
   <StreamGeometry x:Key="IconBolt">M7 2v11h3v9l7-12h-4l4-8z</StreamGeometry>
@@ -34,6 +38,9 @@
   <!-- Added with the sheet's route cards, the payload panel and the Add menu. -->
   <StreamGeometry x:Key="IconLayers">M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z</StreamGeometry>
   <StreamGeometry x:Key="IconSparkle">M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z</StreamGeometry>
+  <StreamGeometry x:Key="IconTune">M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z</StreamGeometry>
+  <StreamGeometry x:Key="IconUpload">M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z</StreamGeometry>
+  <StreamGeometry x:Key="IconFilter">M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z</StreamGeometry>
   <StreamGeometry x:Key="IconChevronDown">M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z</StreamGeometry>
   <StreamGeometry x:Key="IconFolderOpen">M20 6h-8l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 12H4V8h16v10z</StreamGeometry>
   <StreamGeometry x:Key="IconSearchFolder">M20 6h-8l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-5.5 3a3.5 3.5 0 0 1 2.96 5.37L19.1 16 18 17.1l-1.63-1.64A3.5 3.5 0 1 1 14.5 9zm0 1.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z</StreamGeometry>

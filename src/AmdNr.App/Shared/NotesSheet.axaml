@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AmdNr.App.NotesSheet"
+             IsVisible="False">
+
+  <!-- "What's new": a release's notes over the page, in the game sheet's frame: the same backdrop,
+       card and entrance, so it reads as part of the app and not as a window Windows drew. -->
+  <Panel x:Name="NotesDrawer">
+    <Border x:Name="NotesBackdrop" Background="#C2080505" PointerPressed="OnBackdropPressed" />
+    <Border x:Name="NotesPanel" Background="{DynamicResource Surface}" BorderThickness="1" ClipToBounds="True">
+      <Panel>
+        <!-- The accent glow the game sheet gets from its cover, here from the product's own colour. -->
+        <Border Height="180" VerticalAlignment="Top" IsHitTestVisible="False" Background="{DynamicResource NotesGlow}" />
+        <Grid RowDefinitions="Auto,*,Auto" Margin="28,24,28,22">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Border Classes="iconTile" Margin="0,0,14,0" VerticalAlignment="Center">
+              <PathIcon Data="{StaticResource IconSparkle}" Width="20" Height="20" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource Str.WhatsNew}" Classes="section" />
+              <TextBlock x:Name="NotesTitle" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="2" x:Name="NotesCloseButton" Classes="ghost icon" Click="OnClose" VerticalAlignment="Top"
+                    Margin="12,0,0,0" AutomationProperties.Name="{DynamicResource Str.Close}"
+                    ToolTip.Tip="{DynamicResource Str.CloseHint}">
+              <PathIcon Data="{StaticResource IconClose}" />
+            </Button>
+          </Grid>
+
+          <ScrollViewer Grid.Row="1" Margin="0,22,0,0" HorizontalScrollBarVisibility="Disabled">
+            <Panel Margin="0,0,14,4">
+              <StackPanel x:Name="NotesLoading" Orientation="Horizontal" Spacing="12">
+                <Arc Classes="spin" Stroke="{DynamicResource Muted}" />
+                <TextBlock Text="{DynamicResource Str.Working}" Foreground="{DynamicResource Muted}" VerticalAlignment="Center" />
+              </StackPanel>
+              <!-- The notes are written in English, whatever language the app is in. -->
+              <StackPanel x:Name="NotesBody" Spacing="10" FlowDirection="LeftToRight" />
+            </Panel>
+          </ScrollViewer>
+
+          <Border Grid.Row="2" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="0,16,0,0" Margin="0,14,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+              <Button x:Name="NotesGitHubButton" Classes="ghost large" Click="OnGitHub"
+                      AutomationProperties.Name="{DynamicResource Str.WhatsNewOnGitHub}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconExternal}" Width="14" Height="14" />
+                  <TextBlock Text="{DynamicResource Str.WhatsNewOnGitHub}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Classes="primary large" Click="OnClose" MinWidth="140" HorizontalContentAlignment="Center"
+                      Content="{DynamicResource Str.Close}" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Panel>
+    </Border>
+  </Panel>
+</UserControl>

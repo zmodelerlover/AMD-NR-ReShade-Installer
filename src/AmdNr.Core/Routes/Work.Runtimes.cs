@@ -27,7 +27,17 @@ public static partial class Work
     /// <summary>The weights file beside the author's version.dll is the author's runtime's: it builds
     /// one there from the game's nvngx_dlssnr.dll, so it says nothing about an install of ours.</summary>
     internal static bool IsAuthorsWeights(string dir, string name) =>
-        name == WeightsName && File.Exists(Path.Combine(dir, AuthorRuntimeName));
+        name == WeightsName && AuthorsVersionDllHere(dir);
+
+    /// <summary>A version.dll here that is not OptiScaler, which goes in under that name too when it is picked:
+    /// neither one an install of it recorded nor one that says it is OptiScaler.</summary>
+    internal static bool AuthorsVersionDllHere(string dir)
+    {
+        var path = Path.Combine(dir, AuthorRuntimeName);
+        return File.Exists(path)
+               && !InstalledOptiProxies(InstalledManifest(dir)).Contains(AuthorRuntimeName)
+               && Identify(path).Product?.Contains("OptiScaler", StringComparison.OrdinalIgnoreCase) != true;
+    }
 
     /// <summary>The danielblnc runtimes OptiScaler runs in place of the one it ships with: SHA-256, runtime
     /// version, and the first OptiScaler release whose AmdLayout.h accepts that build (0.2.17 is in there too,

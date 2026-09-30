@@ -6,8 +6,14 @@
   <!-- Type scale: 11 caption, 12 small, 13 body, 15 subtitle, 20 title, 26 page. -->
   <Style Selector="Window">
     <Setter Property="Background" Value="{DynamicResource Bg}" />
-    <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+    <Setter Property="FontFamily" Value="{DynamicResource UiFont}" />
     <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <!-- A folder path reads left to right in every language, Arabic included. -->
+  <Style Selector="TextBlock.path">
+    <Setter Property="FlowDirection" Value="LeftToRight" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
   </Style>
 
   <Style Selector="TextBlock">
@@ -119,6 +125,51 @@
   <Style Selector="Border.status.err TextBlock"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
   <Style Selector="Border.status.err PathIcon"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
 
+  <!-- The sheet's verdict badge: the size of the tags beside it, coloured by what the check found. -->
+  <Style Selector="Button.pill">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHigh}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="8,3" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.pill TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.pill PathIcon">
+    <Setter Property="Width" Value="11" />
+    <Setter Property="Height" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.pill:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceTop}" />
+  </Style>
+  <Style Selector="Button.pill.ok /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource OkSoft}" />
+    <Setter Property="BorderBrush" Value="#665CB37E" />
+  </Style>
+  <Style Selector="Button.pill.ok TextBlock"><Setter Property="Foreground" Value="{DynamicResource Ok}" /></Style>
+  <Style Selector="Button.pill.ok PathIcon"><Setter Property="Foreground" Value="{DynamicResource Ok}" /></Style>
+  <Style Selector="Button.pill.warn /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource WarnSoft}" />
+    <Setter Property="BorderBrush" Value="#99DDA13A" />
+  </Style>
+  <Style Selector="Button.pill.warn TextBlock"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+  <Style Selector="Button.pill.warn PathIcon"><Setter Property="Foreground" Value="{DynamicResource Warn}" /></Style>
+  <Style Selector="Button.pill.err /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ErrSoft}" />
+    <Setter Property="BorderBrush" Value="#99E05B4C" />
+  </Style>
+  <Style Selector="Button.pill.err TextBlock"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
+  <Style Selector="Button.pill.err PathIcon"><Setter Property="Foreground" Value="{DynamicResource Err}" /></Style>
+
   <!-- Every button eases between states instead of snapping, and gives a little on press, so a
        click is felt even when the work behind it takes a moment to show. -->
   <Style Selector="Button">
@@ -170,6 +221,61 @@
     <Setter Property="Background" Value="{DynamicResource Accent}" />
     <Setter Property="Foreground" Value="#FFFFFF" />
     <Setter Property="Opacity" Value="0.65" />
+  </Style>
+  <!-- The (i) beside a heading: its explanation is a tooltip, so the sheet shows the choices and not
+       paragraphs about them. A Border rather than a button: it does nothing when clicked. -->
+  <Style Selector="Border.info">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Margin" Value="6,0,0,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Cursor" Value="Help" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="ToolTip.ShowDelay" Value="120" />
+    <Setter Property="ToolTip.Placement" Value="Right" />
+  </Style>
+  <Style Selector="Border.info PathIcon">
+    <Setter Property="Width" Value="14" />
+    <Setter Property="Height" Value="14" />
+    <Setter Property="Foreground" Value="{DynamicResource Faint}" />
+  </Style>
+  <Style Selector="Border.info:pointerover PathIcon">
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <!-- What the (i) shows: a paragraph that wraps, not one line across the screen. -->
+  <Style Selector="ToolTip">
+    <Setter Property="MaxWidth" Value="340" />
+  </Style>
+  <Style Selector="ToolTip TextBlock">
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="LineHeight" Value="18" />
+  </Style>
+
+  <!-- Play: the primary button's shape in green. -->
+  <Style Selector="Button.play">
+    <Setter Property="Background" Value="{DynamicResource Play}" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="#2EFFFFFF" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Button.play:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PlayHover}" />
+    <Setter Property="BorderBrush" Value="#4DFFFFFF" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+  </Style>
+  <Style Selector="Button.play:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PlayPressed}" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+  </Style>
+  <Style Selector="Button.play:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Play}" />
+    <Setter Property="Foreground" Value="#FFFFFF" />
+    <Setter Property="Opacity" Value="0.5" />
   </Style>
   <Style Selector="Button.large">
     <Setter Property="Height" Value="42" />
@@ -391,5 +497,4 @@
     <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
     <Setter Property="Padding" Value="14,10" />
   </Style>
-
 </Styles>

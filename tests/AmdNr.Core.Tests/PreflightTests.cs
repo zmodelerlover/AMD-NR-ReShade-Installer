@@ -192,7 +192,7 @@ public class PreflightTests
         foreach (var p in new[] { Preset.Rpcs3, Preset.Vulkan })
         {
             var report = Work.Preflight(dir, src, p, pins);
-            Assert.True(Fixture.HasAny(report, "global layer"), $"{p.Label()} said the wrong thing");
+            Assert.True(Fixture.HasAny(report, "Vulkan layer"), $"{p.Label()} said the wrong thing");
             Assert.False(Fixture.HasAny(report, "No ReShade proxy DLL found"), p.Label());
         }
 

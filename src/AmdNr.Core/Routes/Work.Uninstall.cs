@@ -42,7 +42,7 @@ public static partial class Work
         var recorded = Manifests(dir, migrate: true);
         // The weights beside the author's runtime, there now or coming back from the backup under any name
         // (an entry of no bytes is a file an install moved out), are his runtime's.
-        var authors = File.Exists(Path.Combine(dir, AuthorRuntimeName))
+        var authors = AuthorsVersionDllHere(dir)
                       || recorded.Any(m => m.Entries.Any(e => e.Backup.Length > 0
                                                               && (e.Name == AuthorRuntimeName || e.Hash == Engine.Sha([]))));
         // A file the runtime rewrites on its own (the mochizuki prewarm list) is changed by design,
@@ -86,6 +86,7 @@ public static partial class Work
         if (removeConfig)
             foreach (var name in OurSettings.Where(n => !still.Contains(n))) gone += RemoveFile(dir, name, report);
 
+        gone += SwitchOffVulkanReShade(dir, recorded, report);
         gone += SweepDroppings(dir, report);
         gone += RemovePinnedMochizuki(dir, builds, still, report);
         foreach (var route in unreadable) gone += SetAside(dir, route, report);
@@ -99,6 +100,30 @@ public static partial class Work
         if (proxies.Any(n => File.Exists(Path.Combine(dir, n)) && Identify(Path.Combine(dir, n)).IsReShade))
             report.Info("A ReShade this app did not install was left alone. Use its own installer to remove it.");
         return report;
+    }
+
+    /// <summary>On Vulkan the ReShade.ini an install wrote is what turns the ReShade layer on for this program,
+    /// so kept as a setting it would leave ReShade running here without the add-on. It is renamed instead, the
+    /// settings in it kept; one that was here before the install is somebody's own ReShade and stays.</summary>
+    private static int SwitchOffVulkanReShade(string dir, List<Manifest> recorded, Report report)
+    {
+        var vulkan = Enum.GetValues<Preset>().Where(p => p.IsVulkan()).Select(p => p.ManifestPreset()).ToHashSet();
+        var ini = Path.Combine(dir, "ReShade.ini");
+        if (!File.Exists(ini) || !recorded.Any(m => vulkan.Contains(m.Preset)
+                                                     && m.Entries.Any(e => e.Name == "ReShade.ini" && e.Owned && e.Backup.Length == 0)))
+            return 0;
+        try
+        {
+            File.Move(ini, ini + ".off", overwrite: true);
+            report.Info("ReShade.ini is now ReShade.ini.off: on Vulkan it is what turns ReShade on for this program. "
+                        + "Your ReShade settings are in it; rename it back to use ReShade here again.");
+            return 1;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            report.Warn($"ReShade.ini could not be switched off ({e.Message}), so ReShade still loads here. Delete it by hand.");
+            return 0;
+        }
     }
 
     /// <summary>Moves a record this build cannot read out of the way, kept beside it under

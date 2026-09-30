@@ -47,7 +47,8 @@ internal static class RuntimeFlow
         var reload = main.Session.LoadManifestAsync();
         check(until(() => reload.IsCompleted && section.IsVisible, 10), "a supporter build in the list shows its block");
         check(section.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == S("Str.SupporterTitle"))
-              && section.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == S("Str.SupporterNotDistributed")),
+              // Said by the (i) on the supporter card, where it is read on the pointer.
+              && section.GetVisualDescendants().OfType<Border>().Any(b => b.Classes.Contains("info") && ToolTip.GetTip(b) is StackPanel),
             "titled, and saying it is not distributed");
         check(download.IsChecked == true && supporter.IsChecked != true && !files.IsVisible && card.Entry.UserRuntime is null,
             "two cards, the download lit, and nothing to supply under it");

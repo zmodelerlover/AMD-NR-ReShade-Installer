@@ -179,11 +179,19 @@ public partial class GameSheet
         if (!Work.ProxyAllowed(preset, _proxy)) _proxy = null;
         if (choices.Length == 0) return;
 
+        var auto = preset.IsOptiScaler() && _card is { } card && WikiProxy(card) is { } wiki
+            ? Ui.Format("Str.ProxyAutoWiki", wiki)
+            : Ui.Text("Str.ProxyAuto");
         _setting = true;
-        box.ItemsSource = new[] { Ui.Text("Str.ProxyAuto") }.Concat(choices).ToList();
+        box.ItemsSource = new[] { auto }.Concat(choices).ToList();
         box.SelectedIndex = _proxy is null ? 0 : Array.IndexOf(choices, _proxy) + 1;
         _setting = false;
     }
+
+    /// <summary>The name the OptiScaler wiki gives OptiScaler for this game, when it gives one this route can use.</summary>
+    private string? WikiProxy(GameCard card) =>
+        Session.ApiDb?.OptiScalerNames(card.Entry.AppId, card.Entry.Name)
+            .FirstOrDefault(n => Work.ProxyAllowed(Preset.OptiScaler, n));
 
     private void OnProxyChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -281,6 +289,31 @@ public partial class GameSheet
         { Release: null } => Ui.Text("Str.VersionNoteShipped"),
         _ => Ui.Format("Str.VersionNoteRelease", _version.Version),
     };
+
+    /// <summary>The notes of the version picked in the menu: the add-on's release, or the OptiScaler
+    /// release its archive comes from.</summary>
+    private void OnWhatsNew(object? sender, RoutedEventArgs e)
+    {
+        if (_version is not { } version) return;
+        string owner, repo, tag, name;
+        if (version.Opti is { } opti)
+        {
+            var url = opti.Components.TryGetValue(PayloadManifest.OptiScalerComponent, out var component)
+                ? component.Files.FirstOrDefault()?.Url
+                : null;
+            if (ReleaseNotes.FromAssetUrl(url) is not { } release) return;
+            (owner, repo, tag) = release;
+            name = $"OptiScaler {opti.Version}";
+        }
+        else
+        {
+            (owner, repo) = (Session.Config.Addon.Owner, Session.Config.Addon.Repo);
+            tag = version.Release?.Tag ?? $"v{version.Version}";
+            name = $"{repo} v{version.Version}";
+        }
+        _shell.ShowNotes(name,
+            ReleaseNotes.GetAsync(Session.Http, owner, repo, tag), $"https://github.com/{owner}/{repo}/releases/tag/{tag}");
+    }
 
     private void OnAddonVersionChanged(object? sender, SelectionChangedEventArgs e)
     {

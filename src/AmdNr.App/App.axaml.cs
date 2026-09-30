@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using AmdNr.Core;
 
 namespace AmdNr.App;
@@ -16,6 +17,17 @@ public partial class App : Application
     [
         ("en", "English", () => new Languages.English()),
         ("pt-BR", "Português (Brasil)", () => new Languages.Portuguese()),
+        ("es", "Español", () => new Languages.Spanish()),
+        ("fr", "Français", () => new Languages.French()),
+        ("de", "Deutsch", () => new Languages.German()),
+        ("it", "Italiano", () => new Languages.Italian()),
+        ("ru", "Русский", () => new Languages.Russian()),
+        ("tr", "Türkçe", () => new Languages.Turkish()),
+        ("zh-CN", "简体中文", () => new Languages.ChineseSimplified()),
+        ("ja", "日本語", () => new Languages.Japanese()),
+        ("ko", "한국어", () => new Languages.Korean()),
+        ("ar", "العربية", () => new Languages.Arabic()),
+        ("x-pirate", "Pirate English", () => new Languages.Pirate()),
     ];
 
     public static string CurrentLanguage { get; private set; } = "en";
@@ -26,6 +38,9 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        // Windows opened after a language change take its direction too.
+        Window.WindowOpenedEvent.AddClassHandler<Window>((window, _) => window.FlowDirection = Flow);
 
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
@@ -104,5 +119,21 @@ public partial class App : Application
         if (dictionaries.Count > 0) dictionaries.RemoveAt(0);
         dictionaries.Insert(0, language.Strings());
         CurrentLanguage = code;
+
+        // Chinese, Japanese and Korean share characters that each draws its own way, so the font
+        // falling back behind Inter has to be the one made for the language on screen.
+        Current!.Resources["UiFont"] = new FontFamily(code switch
+        {
+            "zh-CN" => "Inter, Microsoft YaHei UI, Segoe UI, sans-serif",
+            "ja" => "Inter, Yu Gothic UI, Meiryo UI, Segoe UI, sans-serif",
+            "ko" => "Inter, Malgun Gothic, Segoe UI, sans-serif",
+            _ => "Inter, Segoe UI, sans-serif",
+        });
+
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            foreach (var window in desktop.Windows) window.FlowDirection = Flow;
     }
+
+    /// <summary>Arabic reads right to left; every other language here left to right.</summary>
+    public static FlowDirection Flow => CurrentLanguage == "ar" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 }

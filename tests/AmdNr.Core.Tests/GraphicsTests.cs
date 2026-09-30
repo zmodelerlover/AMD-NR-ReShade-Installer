@@ -110,6 +110,35 @@ public class GraphicsTests
         Assert.Null(d.Preset);
     }
 
+    /// <summary>RE Engine: re9.exe imports d3d11.dll alone, and ships the Agility SDK and DirectStorage,
+    /// which only a D3D12 game loads. It renders D3D12; it was read as a D3D11 game.</summary>
+    [Fact]
+    public void AD3D11ImportBesideTheAgilitySdkOrDirectStorageIsAD3D12Game()
+    {
+        var agility = Game("re9-agility", "re9.exe", Fixture.PeWithImports(true, ["d3d11.dll"]));
+        Directory.CreateDirectory(Path.Combine(agility, "D3D12"));
+        File.WriteAllText(Path.Combine(agility, "D3D12", "D3D12Core.dll"), "stand-in");
+        Assert.Equal(GraphicsApi.D3D12, GraphicsDetector.Detect(agility).Api);
+
+        var storage = Game("re9-dstorage", "re9.exe", Fixture.PeWithImports(true, ["d3d11.dll"]));
+        File.WriteAllText(Path.Combine(storage, "dstorage.dll"), "stand-in");
+        Assert.Equal(GraphicsApi.D3D12, GraphicsDetector.Detect(storage).Api);
+
+        // Without either it stays what it imports.
+        Assert.Equal(GraphicsApi.D3D11, GraphicsDetector.Detect(Game("plain-dx11", "game.exe", Fixture.PeWithImports(true, ["d3d11.dll"]))).Api);
+    }
+
+    /// <summary>What this app installs is not the game: the mochizuki runtime beside an executable that
+    /// imports nothing made Euro Truck Simulator 2 a Vulkan game, and OptiScaler as winmm.dll imports D3D12.</summary>
+    [Fact]
+    public void TheRuntimesAndProxiesThisAppInstallsAreNotReadAsTheGamesRenderer()
+    {
+        var root = Game("ours-beside", "eurotrucks2.exe", Fixture.PeWithImports(true, ["kernel32.dll"]));
+        File.WriteAllBytes(Path.Combine(root, "MochizukiNrRuntime.dll"), Fixture.PeWithImports(true, ["vulkan-1.dll"]));
+        File.WriteAllBytes(Path.Combine(root, "winmm.dll"), Fixture.PeWithImports(true, ["d3d12.dll"]));
+        Assert.Equal(GraphicsApi.Unknown, GraphicsDetector.Detect(root).Api);
+    }
+
     [Fact]
     public void A64BitOpenGLGameTakesTheOpenGLRoute()
     {

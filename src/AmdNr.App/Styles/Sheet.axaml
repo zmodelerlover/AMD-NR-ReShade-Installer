@@ -33,6 +33,14 @@
     <Setter Property="Opacity" Value="1" />
   </Style>
   <Style Selector="Panel#Drawer Border#DrawerPanel">
+    <Setter Property="Margin" Value="24" />
+    <Setter Property="MaxWidth" Value="900" />
+    <Setter Property="MaxHeight" Value="920" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="BoxShadow" Value="0 30 80 0 #D0000000" />
     <Setter Property="RenderTransform" Value="translateY(16px) scale(0.98)" />
     <Setter Property="Transitions">
       <Transitions>
@@ -42,6 +50,93 @@
   </Style>
   <Style Selector="Panel#Drawer.open Border#DrawerPanel">
     <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
+  <!-- "What's new" enters the same way, as a narrower card. -->
+  <Style Selector="Panel#NotesDrawer">
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel#NotesDrawer.open">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="Panel#NotesDrawer Border#NotesPanel">
+    <Setter Property="Margin" Value="24" />
+    <Setter Property="MaxWidth" Value="720" />
+    <Setter Property="MaxHeight" Value="760" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="BoxShadow" Value="0 30 80 0 #D0000000" />
+    <Setter Property="RenderTransform" Value="translateY(16px) scale(0.98)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.24" Easing="CubicEaseOut" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel#NotesDrawer.open Border#NotesPanel">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
+  <!-- Docked in the list view: the same sheet as a page beside the list, filling its column. No
+       backdrop, no floating card, no close button, and the banner across the top in place of the blur. -->
+  <Style Selector="Panel#Drawer.docked Border#Backdrop">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Border#DrawerPanel">
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="MaxWidth" Value="Infinity" />
+    <Setter Property="MaxHeight" Value="Infinity" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+    <Setter Property="BoxShadow" Value="0 2 8 0 #50000000" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Button#CloseButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel#Drawer Panel#HeroBand">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Panel#HeroBand">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+  <Style Selector="Panel#Drawer Button#ArtButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Button#ArtButton">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+  <Style Selector="Button.artEdit">
+    <Setter Property="Background" Value="#B80B0808" />
+    <Setter Property="BorderBrush" Value="#33FFFFFF" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <Style Selector="Button.artEdit:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#E0241D1C" />
+    <Setter Property="BorderBrush" Value="#55FFFFFF" />
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Panel#BlurBand">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel#Drawer Grid#ContentGrid">
+    <Setter Property="Margin" Value="24" />
+  </Style>
+  <Style Selector="Panel#Drawer.docked Grid#ContentGrid">
+    <Setter Property="Margin" Value="24,190,24,24" />
   </Style>
 
   <!-- Install steps as a segmented bar: pending, the one running, the ones done, the one that failed. -->

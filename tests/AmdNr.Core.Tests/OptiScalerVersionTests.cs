@@ -205,7 +205,7 @@ public class OptiScalerVersionTests
         Assert.False(Engine.IsAllowed("native-game-tiled-assets/"));
         Assert.False(Engine.IsAllowed("../native-game-tiled-assets/x"));
         Assert.False(Engine.IsAllowed("Engine/x.dll"));
-        Assert.False(Engine.IsAllowed("winhttp.dll"));
+        Assert.False(Engine.IsAllowed("xinput1_3.dll"));
     }
 
     [Fact]

@@ -128,7 +128,12 @@ public static partial class Work
         // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
         // "no ReShade here" is not a problem to report there -- it is the state before installing.
         var shipped = ShippedReShade(src, preset);
-        if (shipped is not null)
+        if (preset.IsVulkan())
+        {
+            NoteVulkanLayer(src.Length > 0 && File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")), report);
+            CheckReShade(dir, preset, report);
+        }
+        else if (shipped is not null)
             report.Ok(preset.Route() == Route.X86
                 ? $"The pinned 32-bit ReShade 6.8.0 is part of this install, as {ProxyNameFor(preset, dir, proxy)}; nothing to install by hand."
                 : $"ReShade 6.8.0 with full add-on support is part of this install, as {ReShadeProxyFor(preset, dir, proxy)}; nothing to install by hand.");
@@ -220,8 +225,12 @@ public static partial class Work
         }
 
         // ReShade itself, when the payload carries it: the add-on does nothing without it, and asking
-        // someone to run a second installer and pick the right API is the step people get wrong.
+        // someone to run a second installer and pick the right API is the step people get wrong. On
+        // Vulkan it is a layer, registered once the files are in (Work.VulkanLayer.cs).
         var shipsReShade = false;
+        byte[]? vulkanReShade = null;
+        if (preset.IsVulkan() && File.Exists(Path.Combine(payloads, "ReShade64.dll")) && FindReShadeLayer() is not { Ours: false })
+            vulkanReShade = VerifiedPayload(payloads, "ReShade64.dll", pins.ReShade64Sha, report);
         if (File.Exists(Path.Combine(payloads, "ReShade64.dll"))
             && ReShadeProxyFor(preset, dir, proxy) is { } proxyName
             && VerifiedPayload(payloads, "ReShade64.dll", pins.ReShade64Sha, report) is { } reShade)
@@ -232,8 +241,9 @@ public static partial class Work
         }
         // A ReShade.ini already here is readied too, whoever installed ReShade: one that lists this add-on
         // under DisabledAddons never loads it, and the pre-flight says the install takes it off.
+        // On Vulkan it is also what turns the layer on for this program at all.
         var iniPath = Path.Combine(dir, "ReShade.ini");
-        if (shipsReShade || File.Exists(iniPath))
+        if (shipsReShade || preset.IsVulkan() || File.Exists(iniPath))
         {
             var before = File.Exists(iniPath) ? File.ReadAllText(iniPath) : "";
             var after = ReadyReShadeIni(before);
@@ -269,6 +279,8 @@ public static partial class Work
             report.Err($"{e.Message}. Nothing was left half-written: the install rolled itself back.");
             return report;
         }
+
+        if (vulkanReShade is not null) EnsureVulkanLayer(vulkanReShade, report);
 
         if (SweepDead(dir, report.Warn) is { Count: > 0 } swept)
             report.Ok($"removed {swept.Count} file(s) an older install left behind: {string.Join(", ", swept)}");

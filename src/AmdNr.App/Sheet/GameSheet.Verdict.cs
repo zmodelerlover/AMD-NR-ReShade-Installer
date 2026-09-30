@@ -59,23 +59,37 @@ public partial class GameSheet
         }
     }
 
-    /// <summary>The pre-flight in one sentence. The report itself stays folded under Details.</summary>
+    /// <summary>The pre-flight in the header's badge. The report itself stays folded under Details.</summary>
     private void ShowVerdict(Report report, GameCard card)
     {
         var warnings = report.Lines.Count(l => l.Level == Level.Warn);
         var errors = report.Lines.Count(l => l.Level == Level.Err);
         if (errors > 0)
-            SetVerdict(Level.Err, Ui.Count("Str.PreflightErr", errors), Ui.Text("Str.SeeDetails"), details: true);
+            ShowPill(Level.Err, Ui.Count("Str.PreflightErr", errors), Ui.Text("Str.SeeDetails"));
         // The same amber the tile and the button already say it in; a green "installed" under an
         // Update button read as two answers to one question.
         else if (card.Outdated)
-            SetVerdict(Level.Warn, Ui.Text("Str.PreflightOutdated"), Ui.Text("Str.PreflightOutdatedDetail"));
+            ShowPill(Level.Warn, Ui.Text("Str.PreflightOutdated"), Ui.Text("Str.PreflightOutdatedDetail"));
         else if (card.Installed)
-            SetVerdict(Level.Ok, Ui.Text("Str.PreflightInstalled"), Ui.Text("Str.PreflightInstalledDetail"));
+            ShowPill(Level.Ok, Ui.Text("Str.PreflightInstalled"), Ui.Text("Str.PreflightInstalledDetail"));
         else if (warnings > 0)
-            SetVerdict(Level.Warn, Ui.Count("Str.PreflightWarn", warnings), Ui.Text("Str.SeeDetails"), details: true);
+            ShowPill(Level.Warn, Ui.Count("Str.PreflightWarn", warnings), Ui.Text("Str.SeeDetails"));
         else
-            SetVerdict(Level.Ok, Ui.Text("Str.PreflightOk"), Ui.Text("Str.PreflightOkDetail"));
+            ShowPill(Level.Ok, Ui.Text("Str.PreflightOk"), Ui.Text("Str.PreflightOkDetail"));
+    }
+
+    /// <summary>The check's answer beside the platform and the API, where the big banner used to stand
+    /// before anything was done. Null is a check still running. What an action does still takes the banner.</summary>
+    private void ShowPill(Level? level, string title, string detail = "")
+    {
+        ResultBanner.IsVisible = false;
+        Ui.SetLevel(VerdictPill, level);
+        VerdictSpin.IsVisible = level is null;
+        VerdictGlyph.IsVisible = level is not null;
+        VerdictGlyph.Data = level is { } l ? Ui.Glyph(l) : null;
+        VerdictTitle.Text = title;
+        ToolTip.SetTip(VerdictPill, detail.Length > 0 ? detail : null);
+        VerdictPill.IsVisible = true;
     }
 
     /// <summary>Lights the chips: everything before <paramref name="current"/> done, the current one
@@ -123,6 +137,7 @@ public partial class GameSheet
 
     private void SetVerdict(Level level, string title, string detail, bool details = false)
     {
+        VerdictPill.IsVisible = false;
         Ui.SetLevel(ResultBanner, level == Level.Info ? null : level);
         Ui.SetLevel(ResultDot, level == Level.Info ? null : level);
         ResultSpin.IsVisible = false;

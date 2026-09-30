@@ -62,10 +62,24 @@ public static partial class Work
         _ => payloadPath,
     };
 
-    internal static string OptiProxyFor(string? wanted) =>
-        ProxyAllowed(Preset.OptiScaler, wanted)
-            ? ProxyChoicesFor(Preset.OptiScaler).First(n => string.Equals(n, wanted, StringComparison.OrdinalIgnoreCase))
-            : ProxyChoicesFor(Preset.OptiScaler)[0];
+    /// <summary>The name OptiScaler goes in as: the one picked, or else the one an install of it here already
+    /// has -- Automatic on an update must not put a second OptiScaler beside the first -- or else the one the
+    /// OptiScaler wiki gives for the game, or else dxgi.dll.</summary>
+    internal static string OptiProxyFor(string? wanted, Manifest? installed = null, string? suggested = null)
+    {
+        var choices = ProxyChoicesFor(Preset.OptiScaler);
+        string? Named(string? name) => choices.FirstOrDefault(n => string.Equals(n, name, StringComparison.OrdinalIgnoreCase));
+        return Named(wanted) ?? InstalledOptiProxies(installed).FirstOrDefault() ?? Named(suggested) ?? choices[0];
+    }
+
+    /// <summary>The proxy names an OptiScaler install recorded writing. An entry of no bytes is a file the
+    /// install moved out (the author's version.dll), not OptiScaler.</summary>
+    private static IEnumerable<string> InstalledOptiProxies(Manifest? m) =>
+        m is null || m.Preset != Preset.OptiScaler.ManifestPreset()
+            ? []
+            : m.Entries.Where(e => e.Owned && e.Hash != Engine.Sha([])
+                                   && ProxyChoicesFor(Preset.OptiScaler).Contains(e.Name, StringComparer.OrdinalIgnoreCase))
+                .Select(e => e.Name);
 
     /// <summary>What an OptiScaler install is compared against: the newest version the payload
     /// offers, the one an install gets when nobody picks another. Keyed by the path in the game
@@ -109,6 +123,21 @@ public static partial class Work
     private static bool OtherRouteInstalled(Manifest? m, string dir) =>
         m is not null && m.Preset != Preset.OptiScaler.ManifestPreset()
         && m.Entries.Any(e => e.Owned && !e.Configuration && File.Exists(Path.Combine(dir, e.Name)));
+
+    /// <summary>Where the name OptiScaler goes in as came from, when it is not simply the one picked.</summary>
+    private static void NoteProxy(string proxyName, string? wanted, Manifest? m, string? suggested, Report report)
+    {
+        var had = InstalledOptiProxies(m).FirstOrDefault();
+        var wiki = ProxyAllowed(Preset.OptiScaler, suggested) ? suggested!.ToLowerInvariant() : null;
+        if (had is not null && had != proxyName)
+            report.Info($"OptiScaler is here as {had}. This install puts it in as {proxyName} instead, and {had} goes back to what it was.");
+        else if (ProxyAllowed(Preset.OptiScaler, wanted) || wiki is null) return;
+        else if (had is not null && wiki != had)
+            report.Info($"OptiScaler stays {had}, the name it is installed under here. The OptiScaler wiki gives {wiki} "
+                        + "for this game: pick it as the name to switch.");
+        else if (had is null)
+            report.Info($"OptiScaler goes in as {proxyName}, the name the OptiScaler wiki gives for this game.");
+    }
 
     /// <param name="preflight">Said before Install is pressed: the sheet asks to switch and takes the ReShade
     /// route out first, so there it is what Install does, not a problem.</param>
@@ -174,7 +203,7 @@ public static partial class Work
             .Append((WeightsName, pins.WeightsSize));
 
     private static Report PreflightOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
-        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime)
+        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -219,8 +248,9 @@ public static partial class Work
                 "That folder cannot be written to. It is either read-only or somewhere that needs "
                 + "administrator rights. Run this installer as administrator, or move the game.");
 
-        var proxyName = OptiProxyFor(proxy);
         var manifest = InstalledManifest(dir);
+        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy);
+        NoteProxy(proxyName, proxy, manifest, suggestedProxy, report);
         var retiring = !mochizuki && MochizukiRecorded(manifest).Count > 0;
         var held = new[] { proxyName, WeightsName }.Concat(OptiPasses).Concat(AuthorsRuntimesHere(dir, pins).Select(f => f.Name))
             .Where(n => Engine.IsLocked(Path.Combine(dir, n)))
@@ -256,7 +286,7 @@ public static partial class Work
     }
 
     private static Report InstallOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
-        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime)
+        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -292,8 +322,8 @@ public static partial class Work
             return report;
         }
 
-        var proxyName = OptiProxyFor(proxy);
         var manifest = InstalledManifest(dir);
+        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy);
         CheckOptiInTheWay(dir, proxyName, manifest, report);
         CheckRuntimeAsVersionDll(dir, pins, report);
         var moves = CheckAuthorsRuntime(dir, pins, Preset.OptiScaler, report);
@@ -338,7 +368,9 @@ public static partial class Work
 
         // What an earlier install put in of mochizuki and this one does not write again comes out in
         // the same transaction: all of it when it was left off, what an older build had when it is on.
-        var recorded = MochizukiRecorded(manifest);
+        // So does OptiScaler under the name it had, when it now goes in under another: two of it would
+        // both load, and whatever that name displaced comes back.
+        var recorded = MochizukiRecorded(manifest).Concat(InstalledOptiProxies(manifest).Where(n => n != proxyName)).ToList();
         var log = new List<string>();
         try
         {

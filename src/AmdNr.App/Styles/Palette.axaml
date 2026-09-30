@@ -24,6 +24,10 @@
        This is 4.7:1 and still a clear step below Muted. -->
   <SolidColorBrush x:Key="Faint" Color="#8C7F7A" />
   <SolidColorBrush x:Key="Ok" Color="#5CB37E" />
+  <!-- Play: the one green button, so starting the game is never mistaken for installing. -->
+  <SolidColorBrush x:Key="Play" Color="#23984F" />
+  <SolidColorBrush x:Key="PlayHover" Color="#2BAF5D" />
+  <SolidColorBrush x:Key="PlayPressed" Color="#1C7C41" />
   <SolidColorBrush x:Key="OkSoft" Color="#1F5CB37E" />
   <SolidColorBrush x:Key="Warn" Color="#DDA13A" />
   <SolidColorBrush x:Key="WarnSoft" Color="#1FDDA13A" />
@@ -45,12 +49,22 @@
     <GradientStop Offset="0.6" Color="#00000000" />
     <GradientStop Offset="1" Color="#CC000000" />
   </LinearGradientBrush>
+  <!-- The list view's banner: clear at the top, into the page's surface at the bottom, so the name and
+       the controls under it read on any art. -->
+  <LinearGradientBrush x:Key="BannerFade" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="#101A1514" />
+    <GradientStop Offset="0.55" Color="#881A1514" />
+    <GradientStop Offset="1" Color="#FF1A1514" />
+  </LinearGradientBrush>
   <!-- The detail panel's blurred cover fades into the panel instead of ending on an edge. -->
   <LinearGradientBrush x:Key="HeroFade" StartPoint="0%,0%" EndPoint="0%,100%">
     <GradientStop Offset="0" Color="#661A1514" />
     <GradientStop Offset="1" Color="#FF1A1514" />
   </LinearGradientBrush>
-  <!-- The mark is a red logo with transparency, so the tile behind it is white: red on red
-       would not read at 40px. -->
-  <SolidColorBrush x:Key="LogoFill" Color="#FFFFFF" />
+
+  <!-- The top of the "What's new" card: the accent, fading into the card. -->
+  <LinearGradientBrush x:Key="NotesGlow" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="#38A61C22" />
+    <GradientStop Offset="1" Color="#00A61C22" />
+  </LinearGradientBrush>
 </ResourceDictionary>

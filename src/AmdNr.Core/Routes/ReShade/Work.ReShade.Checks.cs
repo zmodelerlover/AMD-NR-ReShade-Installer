@@ -112,14 +112,8 @@ public static partial class Work
 
         if (preset.IsVulkan())
         {
-            if (found.Count == 0)
-            {
-                report.Info(
-                    "No ReShade proxy DLL here, which is correct for Vulkan: ReShade loads as a global "
-                    + $"layer instead. Make sure you ran its installer against {preset.ExpectedExe() ?? "the game's own .exe"} "
-                    + "and picked Vulkan.");
-            }
-            else
+            // None is what it should be: NoteVulkanLayer says where ReShade comes from instead.
+            if (found.Count > 0)
             {
                 report.Warn(
                     $"Found {string.Join(", ", found)} here. On Vulkan ReShade loads as a global layer, "
