@@ -178,6 +178,17 @@ public static partial class Engine
         // the game's root. Path.Combine takes the forward slashes, and SafePath still walks
         // every prefix refusing links, so the write cannot leave the folder the user chose.
         "reshade-shaders/Shaders/AMD_Neural_Feed.fx",
+        // The FiveM route, rooted at FiveM.app: ReShade and the add-on where FiveM loads plugins
+        // from, and the runtime and weights beside the game process, which is where the add-on
+        // looks for them. ReShade only ever under the name one is already loaded as there.
+        "plugins/amd-nr.addon64",
+        "plugins/dxgi.dll",
+        "plugins/d3d11.dll",
+        "plugins/dinput8.dll",
+        "plugins/ReShade.ini",
+        "plugins/reshade-shaders/Shaders/AMD_Neural_Feed.fx",
+        "data/cache/subprocess/dlssnr_amd_pass1.dll",
+        "data/cache/subprocess/dlssnr_on_amd_weights.bin",
         // The names add-on v0.6.0 and earlier installed. They stay in this set because a
         // manifest written by an older install names them, and a manifest naming anything
         // outside this set is refused -- which would take that folder's state and its
@@ -298,6 +309,7 @@ public static partial class Engine
     /// translated to D3D9 before anything else, so it is the D3D9 name there too.</summary>
     public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
 
+    /// <summary>By file name, so plugins/ReShade.ini on the FiveM route is the person's too.</summary>
     public static bool IsConfig(string name) =>
-        name is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini" or "OptiScaler.ini";
+        Path.GetFileName(name) is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini" or "OptiScaler.ini";
 }

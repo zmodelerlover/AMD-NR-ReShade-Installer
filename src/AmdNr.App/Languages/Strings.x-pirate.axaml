@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">A one-off mug o' coffee (rum not included).</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">The crew's Brazilian treasure chest.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Support AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Keep AMD-NR afloat</sys:String>
+  <sys:String x:Key="Str.SupportBody">This ship only stays afloat on the doubloons o' them that sail her. 'Tis two pirates, two graphics cards an' long afternoons o' work: no company, no patron. Everythin' here be free an' stays free. Support unlocks no treasure; it keeps the work sailin'.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">In Brazil, matey? The Vakinha takes Pix, card or boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — by danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">The network itself, an' the reason any o' this sails at all: it be what got DLSS 5's neural renderin' runnin' on Radeon in the first place. The runtime an' weights this app hauls aboard be his work, not ours. Thank ye kindly, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — the add-on</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">The finest heading: D3D11 be the only one where the game's own motion vectors reach the network, together with its depth.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Leaky. On D3D12 the add-on finds the game's depth but not its motion vectors, so the network gets colour an' depth an' guesses the motion. It floats; expect less from it. A game with DLSS, FSR or XeSS in its settings be better served by the OptiScaler heading.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Recommended for D3D12 games. Instead o' ReShade this hoists OptiScaler, which commandeers the game's DLSS, FSR or XeSS an' runs the network inside it, with the game's own depth an' motion vectors. The game has to offer one o' those upscalers, switched on in its settings. In game, press Insert, open the Neural tab an' turn on Enable NR; a game with Ray Reconstruction needs "After the finished frame" as the processing point.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan be a layer: the hoist registers it for yer Windows user an' turns it on for this program with a ReShade.ini beside its .exe. The game must import vkCreateDevice statically, an' there be no depth on Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan be a layer: the hoist registers it for yer Windows user an' turns it on for this program with a ReShade.ini beside its .exe. There be no depth on Vulkan.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this be an ordinary proxy DLL: ReShade goes aboard as opengl32.dll beside the game, with no separate installer run. Colour an' estimated motion only; the game's own depth be reachable on this API but ain't wired up yet. A 32-bit OpenGL game has no heading.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game can't load the 64-bit runtime, so the add-on sails as a pair sharin' frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. The same 32-bit pair as D3D11, through a private D3D9/D3D11 stage. Plain D3D9 costs a fixed few milliseconds per frame; D3D9Ex don't. Install ReShade as the 32-bit d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 be translated to D3D9 an' then takes the D3D9 heading above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM has its own anti-cheat: sail at yer own risk, an' check yer server's articles. The add-on an' ReShade go in FiveM.app\plugins, the runtime an' weights beside the game process in data\cache\subprocess. What ye already have in plugins — ReShade.ini, presets, shaders, other add-ons, ENB — stays as it be.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Ahoy!</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">The DLSS 5 Neural Rendering network on Radeon cards, through ReShade or OptiScaler. Four quick knots to tie.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">This here vessel</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64-bit games</sys:String>
   <sys:String x:Key="Str.Group32">32-bit games (experimental)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emulators</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">Instead o' ReShade this hoists OptiScaler, which commandeers the game's DLSS, FSR or XeSS an' runs the network inside it, with the game's own depth an' motion vectors.</sys:String>
   <sys:String x:Key="Str.InGame">In the game</sys:String>
   <sys:String x:Key="Str.OptiStep1">Turn on DLSS, FSR or XeSS in the game's graphics settings.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. No depth on Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan be the default backend. No depth on Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Vulkan only. No depth on Vulkan, an' this emulator be a young ship itself — expect rough seas.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Vulkan only. Point at kyty_emulator.exe's folder (launcher.exe only starts it). No depth, an' the emulator be young yet — expect squalls.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">In game: Home opens ReShade, an' AMD Neural Rendering be under Add-ons, or Ctrl+End. FiveM has its own anti-cheat — check yer server's articles first.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. OpenGL has a heading now too, but Vulkan be the one with the nautical miles on it here.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu renders with OpenGL an' nothin' else, so the OpenGL heading be the only one there is here. It be the newest o' the headings an' it be experimental: colour an' estimated motion, no depth.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. The software renderer draws on the CPU an' there be nothin' there for an add-on to grab, so it has to be the OpenGL one — an' that heading be experimental: colour an' estimated motion, no depth.</sys:String>

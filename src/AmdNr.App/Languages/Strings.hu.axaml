@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Egy egyszeri kávé.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">A projekt brazil gyűjtése.</sys:String>
+  <sys:String x:Key="Str.SupportRail">AMD-NR támogatása</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Tartsd életben az AMD-NR-t</sys:String>
+  <sys:String x:Key="Str.SupportBody">Ez a projekt csak a használói támogatásából él. Két ember, két videokártya és délutánnyi munka: se cég, se szponzor. Itt minden ingyenes, és az is marad. A támogatás semmit sem old fel; a munkát viszi tovább.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Brazíliában vagy? A Vakinha Pixet, kártyát vagy boletót fogad.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — danielblnc munkája</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Maga a hálózat, és az oka annak, hogy mindez létezik: ennek köszönhetően indult el egyáltalán a DLSS 5 neurális renderelése Radeonon. A futtatókörnyezet és a súlyok, amelyeket ez az alkalmazás letölt, az ő munkája, nem a miénk. Köszönjük, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — a kiegészítő</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">A legjobb útvonal: a D3D11 az egyetlen, ahol a játék saját mozgásvektorai a mélységével együtt eljutnak a hálózathoz.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Korlátozott. D3D12-n a kiegészítő megtalálja a játék mélységét, de a mozgásvektorait nem, így a hálózat színt és mélységet kap, a mozgást pedig megbecsüli. Működik, de kevesebbet várj tőle. Egy olyan játékot, amelynek beállításaiban van DLSS, FSR vagy XeSS, jobban kiszolgál az OptiScaler útvonal.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">D3D12-es játékokhoz ajánlott. A ReShade helyett az OptiScalert telepíti, amely átveszi a játék DLSS, FSR vagy XeSS felskálázóját, és azon belül futtatja a hálózatot, a játék saját mélységével és mozgásvektoraival. A játéknak kínálnia kell az egyik ilyen felskálázót, bekapcsolva a beállításaiban. A játékban nyomd meg az Insert gombot, nyisd meg a Neural lapot, és kapcsold be az Enable NR-t; a Ray Reconstructiont használó játéknál feldolgozási pontnak az „After the finished frame” kell.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Kísérleti. A ReShade Vulkanon réteg: a telepítés regisztrálja a Windows-felhasználódnak, és egy, az .exe mellé tett ReShade.ini-vel bekapcsolja ehhez a programhoz. A játéknak statikusan kell importálnia a vkCreateDevice-t, és Vulkanon nincs mélység.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Kísérleti. A ReShade Vulkanon réteg: a telepítés regisztrálja a Windows-felhasználódnak, és egy, az .exe mellé tett ReShade.ini-vel bekapcsolja ehhez a programhoz. Vulkanon nincs mélység.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Kísérleti. A Vulkannal ellentétben ez egy közönséges proxy DLL: a ReShade opengl32.dll-ként kerül a játék mellé, külön telepítő futtatása nélkül. Csak szín és becsült mozgás; a játék saját mélysége ezen az API-n elérhető, de még nincs bekötve. Egy 32 bites OpenGL-es játéknak nincs útvonala.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Kísérleti. Egy 32 bites játék nem tudja betölteni a 64 bites futtatókörnyezetet, ezért a kiegészítő egy párként fut, amely egy adapteren osztozik a képkockákon. Telepítsd a ReShade-et kiegészítő-támogatással 32 bites dxgi.dll-ként.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Kísérleti. Ugyanaz a 32 bites pár, mint D3D11-nél, egy privát D3D9/D3D11 lépcsőn át. A sima D3D9 képkockánként néhány fix ezredmásodpercbe kerül; a D3D9Ex nem. Telepítsd a ReShade-et 32 bites d3d9.dll-ként.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Kísérleti. A D3D8 D3D9-re fordítódik, majd a fenti D3D9 útvonalon halad, ugyanazzal a 32 bites párral. Telepítsd a ReShade-et 32 bites d3d9.dll-ként.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">A FiveM-nek saját csalásvédelme van: saját felelősségre, és nézd meg a szervered szabályait. Az add-on és a ReShade a FiveM.app\plugins mappába kerül, a runtime és a súlyok a játékfolyamat mellé, a data\cache\subprocess mappába. Ami már a plugins mappában van — ReShade.ini, presetek, shaderek, más add-onok, ENB — marad, ahogy van.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Üdvözlünk</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">A DLSS 5 Neural Rendering hálózat Radeon kártyákon, ReShade-en vagy OptiScaleren keresztül. Négy gyors lépés.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Ez a gép</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64 bites játékok</sys:String>
   <sys:String x:Key="Str.Group32">32 bites játékok (kísérleti)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emulátorok</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">A ReShade helyett az OptiScalert telepíti, amely átveszi a játék DLSS, FSR vagy XeSS felskálázóját, és azon belül futtatja a hálózatot, a játék saját mélységével és mozgásvektoraival.</sys:String>
   <sys:String x:Key="Str.InGame">A játékban</sys:String>
   <sys:String x:Key="Str.OptiStep1">Kapcsold be a DLSS-t, az FSR-t vagy az XeSS-t a játék grafikai beállításaiban.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Vulkanon nincs mélység.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Az alapértelmezett háttérrendszer a Vulkan. Vulkanon nincs mélység.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Csak Vulkan. Vulkanon nincs mélység, és maga az emulátor is korai állapotú — számíts gondokra.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Csak Vulkan. A kyty_emulator.exe mappáját add meg (a launcher.exe csak elindítja). Nincs mélység, és az emulátor még korai — számíts gondokra.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">Játékban: a Home megnyitja a ReShade-et, az AMD Neural Rendering az Add-ons fülön van, vagy Ctrl+End. A FiveM-nek saját csalásvédelme van — előbb nézd meg a szerver szabályait.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. Most már az OpenGL-nek is van útvonala, de itt a Vulkan a kipróbáltabb.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">Az xemu csak OpenGL-lel renderel, így itt az OpenGL útvonal az egyetlen. Ez a legújabb útvonal, és kísérleti: szín és becsült mozgás, mélység nélkül.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. A szoftveres renderelő a CPU-n rajzol, és ott nincs mit elérnie egy kiegészítőnek, ezért az OpenGL-esnek kell lennie — ez az útvonal pedig kísérleti: szín és becsült mozgás, mélység nélkül.</sys:String>

@@ -60,6 +60,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Um café avulso.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">A vaquinha do projeto.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Apoiar o AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Mantenha o AMD-NR vivo</sys:String>
+  <sys:String x:Key="Str.SupportBody">Este projeto só continua vivo com o apoio de quem usa. São duas pessoas, duas placas de vídeo e tardes de trabalho: sem empresa, sem patrocínio. Tudo aqui é grátis e vai continuar grátis. O apoio não desbloqueia nada; ele mantém o trabalho andando.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Está no Brasil? A Vakinha aceita Pix, cartão ou boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — do danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">A rede em si, e o motivo de tudo isto existir: foi ele que fez o neural rendering do DLSS 5 rodar em Radeon. A runtime e os pesos que este app baixa são trabalho dele, não nosso. Obrigado, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — o add-on</sys:String>
@@ -222,11 +226,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">A melhor rota: o D3D11 é a única em que os vetores de movimento do próprio jogo chegam na rede, junto com a profundidade.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Rota limitada. No D3D12 o add-on acha a profundidade do jogo, mas não os vetores de movimento, então a rede recebe cor e profundidade e estima o movimento. Funciona, mas espere menos. Um jogo com DLSS, FSR ou XeSS nas configurações fica melhor na rota OptiScaler.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Recomendada para jogos D3D12. Em vez do ReShade, instala o OptiScaler, que assume o DLSS, FSR ou XeSS do jogo e roda a rede dentro dele, com a profundidade e os vetores de movimento do próprio jogo. O jogo precisa oferecer um desses upscalers, ligado nas configurações. No jogo, aperte Insert, abra a aba Neural e ligue Enable NR; num jogo com Ray Reconstruction, escolha "After the finished frame" como ponto de processamento.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. No Vulkan o ReShade entra como camada: a instalação registra a camada para o seu usuário do Windows e liga o ReShade neste programa com um ReShade.ini ao lado do .exe. O jogo precisa importar vkCreateDevice de forma estática, e não há profundidade no Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. No Vulkan o ReShade entra como camada: a instalação registra a camada para o seu usuário do Windows e liga o ReShade neste programa com um ReShade.ini ao lado do .exe. Não há profundidade no Vulkan.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Diferente do Vulkan, esta é uma DLL proxy comum: o ReShade entra como opengl32.dll ao lado do jogo, sem rodar instalador separado. Só cor e movimento estimado; a profundidade do próprio jogo é alcançável nesta API, mas ainda não está ligada. Jogo OpenGL de 32 bits não tem rota.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. Um jogo de 32 bits não carrega o runtime de 64 bits, então o add-on roda em dupla, dividindo os quadros na mesma placa. Instale o ReShade com suporte a add-on como dxgi.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. A mesma dupla de 32 bits do D3D11, passando por um estágio D3D9/D3D11 interno. O D3D9 comum custa alguns milissegundos fixos por quadro; o D3D9Ex não. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. O D3D8 é traduzido para D3D9 e segue a rota do D3D9 acima, com a mesma dupla de 32 bits. Instale o ReShade como d3d9.dll de 32 bits.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">O FiveM tem anti-cheat próprio: por sua conta e risco, e confira as regras do seu servidor. O add-on e o ReShade vão em FiveM.app\plugins; o runtime e os pesos, ao lado do processo do jogo, em data\cache\subprocess. O que você já tem em plugins — ReShade.ini, presets, shaders, outros add-ons, ENB — fica como está.</sys:String>
 
   <!-- First run -->
   <sys:String x:Key="Str.SetupWelcome">Bem-vindo</sys:String>
@@ -307,6 +312,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Sem profundidade no Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan é o backend padrão. Sem profundidade no Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Só Vulkan. Sem profundidade, e o emulador em si é recente — espere problemas.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Só Vulkan. Aponte para a pasta do kyty_emulator.exe (o launcher.exe só inicia ele). Sem profundidade, e o emulador em si é recente — espere problemas.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">No jogo: Home abre o ReShade, e o AMD Neural Rendering fica em Add-ons, ou Ctrl+End. O FiveM tem anti-cheat próprio — confira as regras do seu servidor antes.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. OpenGL também tem rota agora, mas a do Vulkan é a rodada.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">O xemu renderiza só em OpenGL, então a rota de OpenGL é a única que existe aqui. É a mais nova das rotas e é experimental: cor e movimento estimado, sem profundidade.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. O renderizador por software desenha na CPU e não há o que um add-on alcance ali, então tem que ser o OpenGL — e essa rota é experimental: cor e movimento estimado, sem profundidade.</sys:String>
@@ -353,6 +360,7 @@
   <sys:String x:Key="Str.Group64">Jogos 64-bit</sys:String>
   <sys:String x:Key="Str.Group32">Jogos 32-bit (experimental)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emuladores</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">No lugar do ReShade, instala o OptiScaler, que assume o DLSS, FSR ou XeSS do jogo e roda a rede dentro dele, com a profundidade e os vetores de movimento do próprio jogo.</sys:String>
   <sys:String x:Key="Str.InGame">No jogo</sys:String>
   <sys:String x:Key="Str.OptiStep1">Ligue DLSS, FSR ou XeSS nas opções gráficas do jogo.</sys:String>

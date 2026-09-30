@@ -75,6 +75,37 @@ in the first-run wizard, and the install goes through the same transaction, mani
 every other route. In game, OptiScaler opens with Insert; the network is switched on under its
 Neural tab, and lmxxf is picked under NR runtime there.
 
+## FiveM
+
+FiveM has its own anti-cheat. ReShade with full add-on support is unsigned, some servers block it
+and some ban for client mods: check your server's rules. At your own risk.
+
+**Scan** finds FiveM on its own (`%LOCALAPPDATA%\FiveM\FiveM.app`), and it gets a route of its own,
+because it keeps its plugins and its game process in two different folders:
+
+| | |
+|---|---|
+| `plugins\amd-nr.addon64`, `plugins\reshade-shaders\Shaders\AMD_Neural_Feed.fx` | where FiveM loads ReShade and add-ons from |
+| `data\cache\subprocess\dlssnr_amd_pass1.dll`, `dlssnr_on_amd_weights.bin` | beside `FiveM_b####_GTAProcess.exe`, where the add-on looks for them |
+
+What is already in `plugins` stays yours: `ReShade.ini` gets only the add-on's panel and its name
+taken off `DisabledAddons`, and presets, shaders, other add-ons and ENB are not touched. ReShade
+itself is kept when the add-on can load in it, which means the build with full add-on support
+(unsigned; the normal build is signed and switches add-ons off online) at 6.8.0 or newer, the first
+with ReShade API 20. Anything older is replaced by 6.8.0 under the name it already had, and Uninstall
+puts the original back. A `dxgi.dll` that is not ReShade is never replaced. The GTA V folder is
+not touched either: FiveM ignores graphics mods there.
+
+## shadPS4 and Kyty
+
+Both are under **Add > Emulator**, found by their executables, and go on the Vulkan route, which
+registers ReShade as a Vulkan layer like any other Vulkan program. A ReShade layer already registered
+is used as it is, and the pre-flight says so when the add-on cannot load in it (older than 6.8.0, or
+the normal build). Neither imports Vulkan statically, and the add-on hooks them anyway since v0.5.3.
+shadPS4's Qt launcher keeps each build in a folder of its own; pointed at the launcher, the pre-flight
+names the folders the builds are in. Kyty's `launcher.exe` only starts `kyty_emulator.exe`, whose
+folder is the one to pick.
+
 ## danielblnc's supporter builds: your own files
 
 Some of danielblnc's runtime builds go to his supporters only, 0.5.1 among them. **This app does not

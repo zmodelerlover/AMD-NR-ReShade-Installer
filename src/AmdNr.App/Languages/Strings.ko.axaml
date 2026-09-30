@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">커피 한 잔, 한 번만.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">프로젝트의 브라질 모금.</sys:String>
+  <sys:String x:Key="Str.SupportRail">AMD-NR 후원</sys:String>
+  <sys:String x:Key="Str.SupportTitle">AMD-NR이 계속되도록</sys:String>
+  <sys:String x:Key="Str.SupportBody">이 프로젝트는 사용하는 분들의 후원으로만 이어집니다. 두 사람, 그래픽카드 두 장, 그리고 오후의 작업 시간뿐입니다. 회사도 후원사도 없습니다. 여기 있는 모든 것은 무료이며 앞으로도 무료입니다. 후원으로 잠금 해제되는 것은 없고, 작업을 이어가게 해 줍니다.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">브라질에 계신가요? Vakinha는 Pix, 카드, boleto를 받습니다.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD, 제작: danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">신경망 그 자체이자 이 모든 것이 존재하는 이유입니다. DLSS 5의 뉴럴 렌더링을 처음으로 Radeon에서 돌아가게 만든 것이 바로 이것입니다. 이 앱이 다운로드하는 런타임과 가중치는 저희가 아니라 그의 작업입니다. 고마워요, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd, 애드온</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">가장 좋은 설치 방식입니다. 게임 자체의 모션 벡터가 깊이 정보와 함께 신경망에 전달되는 것은 D3D11뿐입니다.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">기능이 제한됩니다. D3D12에서 애드온은 게임의 깊이 정보는 찾지만 모션 벡터는 찾지 못하므로, 신경망은 색과 깊이를 받고 움직임은 추정합니다. 동작은 하지만 효과는 덜합니다. 설정에 DLSS, FSR, XeSS가 있는 게임이라면 OptiScaler 설치 방식이 더 잘 맞습니다.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">D3D12 게임에 권장. ReShade 대신 OptiScaler를 설치합니다. OptiScaler는 게임의 DLSS, FSR 또는 XeSS를 넘겨받아 그 안에서 신경망을 실행하며, 게임 자체의 깊이 정보와 모션 벡터를 사용합니다. 게임이 이 업스케일러 중 하나를 지원하고, 설정에서 켜져 있어야 합니다. 게임 안에서 Insert 키를 누르고 Neural 탭을 열어 "Enable NR"을 켜세요. 레이 리컨스트럭션(Ray Reconstruction)을 쓰는 게임은 처리 지점을 "After the finished frame"으로 설정해야 합니다.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">실험적. Vulkan에서 ReShade는 레이어입니다. 설치 시 사용자의 Windows 계정에 등록하고, .exe 옆의 ReShade.ini로 이 프로그램에 대해 켭니다. 게임이 vkCreateDevice를 정적으로 가져와야 하며, Vulkan에는 깊이 정보가 없습니다.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">실험적. Vulkan에서 ReShade는 레이어입니다. 설치 시 사용자의 Windows 계정에 등록하고, .exe 옆의 ReShade.ini로 이 프로그램에 대해 켭니다. Vulkan에는 깊이 정보가 없습니다.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">실험적. Vulkan과 달리 여기서는 일반적인 프록시 DLL입니다. ReShade가 opengl32.dll로 게임 옆에 들어가며, 별도의 설치 프로그램은 실행하지 않습니다. 색과 추정한 움직임만 있으며, 이 API에서 게임의 깊이 정보에 접근할 수는 있지만 아직 연결되지 않았습니다. 32비트 OpenGL 게임은 설치 방식이 없습니다.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">실험적. 32비트 게임은 64비트 런타임을 로드할 수 없으므로, 애드온은 하나의 어댑터에서 프레임을 공유하는 두 개의 프로세스로 동작합니다. 애드온을 지원하는 ReShade를 32비트 dxgi.dll로 설치하세요.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">실험적. D3D11과 같은 32비트 프로세스 쌍을, 별도의 D3D9/D3D11 중계 단계를 거쳐 사용합니다. 일반 D3D9는 프레임마다 몇 밀리초의 고정 비용이 들지만, D3D9Ex는 그렇지 않습니다. ReShade를 32비트 d3d9.dll로 설치하세요.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">실험적. D3D8은 D3D9로 변환된 뒤, 같은 32비트 프로세스 쌍으로 위의 D3D9 설치 방식을 따릅니다. ReShade를 32비트 d3d9.dll로 설치하세요.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM에는 자체 안티치트가 있습니다. 본인 책임이며, 서버 규칙을 확인하세요. 애드온과 ReShade는 FiveM.app\plugins에, 런타임과 가중치는 게임 프로세스 옆 data\cache\subprocess에 들어갑니다. plugins에 이미 있는 것(ReShade.ini, 프리셋, 셰이더, 다른 애드온, ENB)은 그대로 둡니다.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">환영합니다</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Radeon 그래픽 카드에서 ReShade 또는 OptiScaler를 통해 DLSS 5 Neural Rendering 신경망을 사용합니다. 간단한 4단계입니다.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">이 PC</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64비트 게임</sys:String>
   <sys:String x:Key="Str.Group32">32비트 게임(실험적)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">에뮬레이터</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V 온라인</sys:String>
   <sys:String x:Key="Str.OptiAbout">ReShade 대신 OptiScaler를 설치합니다. OptiScaler는 게임의 DLSS, FSR 또는 XeSS를 넘겨받아 그 안에서 신경망을 실행하며, 게임 자체의 깊이 정보와 모션 벡터를 사용합니다.</sys:String>
   <sys:String x:Key="Str.InGame">게임 안에서</sys:String>
   <sys:String x:Key="Str.OptiStep1">게임의 그래픽 설정에서 DLSS, FSR 또는 XeSS를 켜세요.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Vulkan에는 깊이 정보가 없습니다.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan이 기본 백엔드입니다. Vulkan에는 깊이 정보가 없습니다.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Vulkan 전용입니다. Vulkan에는 깊이 정보가 없고, 에뮬레이터 자체도 아직 초기 단계라 문제가 생길 수 있습니다.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Vulkan 전용. kyty_emulator.exe가 있는 폴더를 지정하세요(launcher.exe는 실행만 합니다). 깊이 정보가 없고 에뮬레이터 자체도 아직 초기 단계라 문제가 있을 수 있습니다.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">게임에서: Home으로 ReShade를 열고, AMD Neural Rendering은 Add-ons에 있습니다. 또는 Ctrl+End. FiveM에는 자체 안티치트가 있으니 먼저 서버 규칙을 확인하세요.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. 이제 OpenGL에도 설치 방식이 있지만, 여기서 더 검증된 것은 Vulkan입니다.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu는 OpenGL로만 렌더링하므로, 여기서는 OpenGL 설치 방식이 유일합니다. 가장 새로운 설치 방식이며 실험적입니다. 색과 추정한 움직임만 있고, 깊이 정보는 없습니다.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. 소프트웨어 렌더러는 CPU에서 그리기 때문에 애드온이 닿을 수 있는 것이 없습니다. 따라서 OpenGL 렌더러여야 하며, 이 설치 방식은 실험적입니다. 색과 추정한 움직임만 있고, 깊이 정보는 없습니다.</sys:String>

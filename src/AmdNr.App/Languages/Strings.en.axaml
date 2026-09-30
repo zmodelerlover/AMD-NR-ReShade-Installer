@@ -63,6 +63,10 @@
   <sys:String x:Key="Str.SupportKofiBody">A one-off coffee.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">The project's Brazilian fundraiser.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Support AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Keep AMD-NR alive</sys:String>
+  <sys:String x:Key="Str.SupportBody">This project only stays alive with support from the people who use it. It is two people, two graphics cards and afternoons of work: no company, no sponsor. Everything here is free and stays free. Support unlocks nothing; it keeps the work going.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">In Brazil? The Vakinha takes Pix, card or boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — by danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">The network itself, and the reason any of this exists: it is what got DLSS 5's neural rendering running on Radeon at all. The runtime and the weights this app downloads are his work, not ours. Thank you, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — the add-on</sys:String>
@@ -225,11 +229,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">The best route: D3D11 is the only one where the game’s own motion vectors reach the network, together with its depth.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Degraded. On D3D12 the add-on finds the game’s depth but not its motion vectors, so the network gets colour and depth and estimates the motion. It works; expect less from it. A game with DLSS, FSR or XeSS in its settings is better served by the OptiScaler route.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Recommended for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS and runs the network inside it, with the game's own depth and motion vectors. The game has to offer one of those upscalers, switched on in its settings. In game, press Insert, open the Neural tab and turn on Enable NR; a game with Ray Reconstruction needs "After the finished frame" as the processing point.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan is a layer: the install registers it for your Windows user and turns it on for this program with a ReShade.ini beside its .exe. The game must import vkCreateDevice statically, and there is no depth on Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan is a layer: the install registers it for your Windows user and turns it on for this program with a ReShade.ini beside its .exe. There is no depth on Vulkan.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this is an ordinary proxy DLL: ReShade goes in as opengl32.dll beside the game, with no separate installer run. Colour and estimated motion only; the game’s own depth is reachable on this API but is not wired up yet. A 32-bit OpenGL game has no route.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. The same 32-bit pair as D3D11, through a private D3D9/D3D11 stage. Plain D3D9 costs a fixed few milliseconds per frame; D3D9Ex does not. Install ReShade as the 32-bit d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 is translated to D3D9 and then takes the D3D9 route above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM has its own anti-cheat: at your own risk, and check your server’s rules. The add-on and ReShade go in FiveM.app\plugins, the runtime and weights beside the game process in data\cache\subprocess. What you already have in plugins — ReShade.ini, presets, shaders, other add-ons, ENB — stays as it is.</sys:String>
 
   <!-- First run -->
   <sys:String x:Key="Str.SetupWelcome">Welcome</sys:String>
@@ -337,6 +342,7 @@
   <sys:String x:Key="Str.Group64">64-bit games</sys:String>
   <sys:String x:Key="Str.Group32">32-bit games (experimental)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emulators</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS and runs the network inside it, with the game's own depth and motion vectors.</sys:String>
   <sys:String x:Key="Str.InGame">In the game</sys:String>
   <sys:String x:Key="Str.OptiStep1">Turn on DLSS, FSR or XeSS in the game's graphics settings.</sys:String>

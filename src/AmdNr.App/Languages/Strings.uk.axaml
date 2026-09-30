@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Разова кава.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">Бразильський збір коштів проєкту.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Підтримати AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Допоможіть AMD-NR жити</sys:String>
+  <sys:String x:Key="Str.SupportBody">Цей проєкт живе лише завдяки підтримці тих, хто ним користується. Це двоє людей, дві відеокарти й пообідні години роботи: ні компанії, ні спонсора. Усе тут безкоштовне й таким лишиться. Підтримка нічого не відкриває — вона дає змогу працювати далі.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Ви в Бразилії? Vakinha приймає Pix, картку або boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — автор danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Сама мережа і причина, з якої все це існує: саме вона вперше запустила нейронний рендеринг DLSS 5 на Radeon. Рантайм і ваги, які завантажує ця програма, — його робота, не наша. Дякуємо, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — аддон</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">Найкращий маршрут: D3D11 — єдиний, де власні вектори руху гри доходять до мережі разом із її глибиною.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Обмежений. На D3D12 аддон знаходить глибину гри, але не її вектори руху, тож мережа отримує колір і глибину, а рух оцінює. Працює, але чекайте від нього меншого. Грі з DLSS, FSR або XeSS у налаштуваннях краще підійде маршрут OptiScaler.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Рекомендовано для ігор на D3D12. Замість ReShade встановлює OptiScaler, який перехоплює DLSS, FSR або XeSS гри й запускає мережу всередині нього, з власною глибиною й векторами руху гри. Гра має пропонувати один із цих апскейлерів, увімкнений у її налаштуваннях. У грі натисніть Insert, відкрийте вкладку Neural і ввімкніть Enable NR; для гри з Ray Reconstruction точкою обробки має бути «After the finished frame».</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Експериментально. ReShade на Vulkan — це шар: встановлення реєструє його для вашого користувача Windows і вмикає для цієї програми через ReShade.ini поруч з її .exe. Гра має статично імпортувати vkCreateDevice, а на Vulkan немає глибини.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Експериментально. ReShade на Vulkan — це шар: встановлення реєструє його для вашого користувача Windows і вмикає для цієї програми через ReShade.ini поруч з її .exe. На Vulkan немає глибини.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Експериментально. На відміну від Vulkan це звичайна проксі-DLL: ReShade лягає поруч із грою як opengl32.dll, без окремого запуску інсталятора. Лише колір і оцінений рух; власна глибина гри на цьому API доступна, але ще не підключена. 32-бітна гра на OpenGL маршруту не має.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Експериментально. 32-бітна гра не може завантажити 64-бітний рантайм, тож аддон працює як пара, що ділить кадри на одному адаптері. Встановіть ReShade з підтримкою аддонів як 32-бітний dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Експериментально. Та сама 32-бітна пара, що й для D3D11, через приватний етап D3D9/D3D11. Звичайний D3D9 коштує кілька фіксованих мілісекунд на кадр; D3D9Ex — ні. Встановіть ReShade як 32-бітний d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Експериментально. D3D8 перекладається на D3D9 і далі йде маршрутом D3D9 вище, з тією самою 32-бітною парою. Встановіть ReShade як 32-бітний d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM має власний античит: на власний ризик, і перевірте правила свого сервера. Аддон і ReShade йдуть у FiveM.app\plugins, рантайм і ваги — поруч із процесом гри в data\cache\subprocess. Те, що вже є в plugins — ReShade.ini, пресети, шейдери, інші аддони, ENB, — лишається як є.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Вітаємо</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Мережа DLSS 5 Neural Rendering на картах Radeon, через ReShade або OptiScaler. Чотири швидкі кроки.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Цей комп’ютер</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64-бітні ігри</sys:String>
   <sys:String x:Key="Str.Group32">32-бітні ігри (експериментально)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Емулятори</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">Замість ReShade встановлює OptiScaler, який перехоплює DLSS, FSR або XeSS гри й запускає мережу всередині нього, з власною глибиною й векторами руху гри.</sys:String>
   <sys:String x:Key="Str.InGame">У грі</sys:String>
   <sys:String x:Key="Str.OptiStep1">Увімкніть DLSS, FSR або XeSS у графічних налаштуваннях гри.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. На Vulkan немає глибини.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan — бекенд за замовчуванням. На Vulkan немає глибини.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Лише Vulkan. На Vulkan немає глибини, а сам емулятор ще на ранній стадії — чекайте проблем.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Лише Vulkan. Вкажіть теку kyty_emulator.exe (launcher.exe лише запускає його). Глибини немає, а сам емулятор ще ранній — чекайте проблем.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">У грі: Home відкриває ReShade, AMD Neural Rendering — у вкладці Add-ons, або Ctrl+End. FiveM має власний античит — спершу перевірте правила сервера.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. Для OpenGL тепер теж є маршрут, але найбільш випробуваний тут Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu рендерить лише через OpenGL, тож маршрут OpenGL тут єдиний. Це найновіший із маршрутів, і він експериментальний: колір і оцінений рух, без глибини.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. Програмний рендерер малює на CPU, і аддону там нічого досягти, тож потрібен саме OpenGL — а цей маршрут експериментальний: колір і оцінений рух, без глибини.</sys:String>

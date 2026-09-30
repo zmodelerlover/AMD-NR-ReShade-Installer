@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">एक बार की कॉफ़ी।</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">प्रोजेक्ट का ब्राज़ीलियाई फ़ंडरेज़र।</sys:String>
+  <sys:String x:Key="Str.SupportRail">AMD-NR को सपोर्ट करें</sys:String>
+  <sys:String x:Key="Str.SupportTitle">AMD-NR को ज़िंदा रखें</sys:String>
+  <sys:String x:Key="Str.SupportBody">यह प्रोजेक्ट सिर्फ़ इस्तेमाल करने वालों के सपोर्ट से चलता है। दो लोग, दो ग्राफ़िक्स कार्ड और दोपहर भर का काम: न कोई कंपनी, न कोई स्पॉन्सर। यहाँ सब कुछ मुफ़्त है और मुफ़्त ही रहेगा। सपोर्ट से कुछ अनलॉक नहीं होता; इससे काम चलता रहता है।</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">ब्राज़ील में हैं? Vakinha पर Pix, कार्ड या boleto से दे सकते हैं।</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — danielblnc द्वारा</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">नेटवर्क खुद, और इस सबके होने की वजह: इसी से DLSS 5 की न्यूरल रेंडरिंग पहली बार Radeon पर चली। यह ऐप जो रनटाइम और वेट्स डाउनलोड करता है, वे उनका काम हैं, हमारा नहीं। धन्यवाद, danielblnc।</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — ऐड-ऑन</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">सबसे अच्छा रूट: D3D11 ही अकेला है जहाँ गेम के अपने मोशन वेक्टर उसकी डेप्थ के साथ नेटवर्क तक पहुँचते हैं।</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">सीमित। D3D12 पर ऐड-ऑन गेम की डेप्थ ढूँढ लेता है, लेकिन उसके मोशन वेक्टर नहीं, इसलिए नेटवर्क को रंग और डेप्थ मिलते हैं और मोशन का अनुमान लगाता है। यह काम करता है; इससे कम की उम्मीद रखें। जिस गेम की सेटिंग्स में DLSS, FSR या XeSS है, उसके लिए OptiScaler रूट बेहतर है।</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">D3D12 गेम के लिए सुझाया गया। ReShade की जगह यह OptiScaler इंस्टॉल करता है, जो गेम का DLSS, FSR या XeSS अपने हाथ में लेता है और उसी के अंदर नेटवर्क चलाता है, गेम की अपनी डेप्थ और मोशन वेक्टर के साथ। गेम में इनमें से कोई अपस्केलर होना चाहिए, और वह उसकी सेटिंग्स में चालू होना चाहिए। गेम में Insert दबाएँ, Neural टैब खोलें और Enable NR चालू करें; Ray Reconstruction वाले गेम में प्रोसेसिंग पॉइंट “After the finished frame” होना चाहिए।</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">प्रायोगिक। Vulkan पर ReShade एक लेयर है: इंस्टॉल इसे आपके Windows यूज़र के लिए रजिस्टर करता है और इस प्रोग्राम के .exe के बगल में ReShade.ini रखकर इसके लिए चालू करता है। गेम को vkCreateDevice स्टैटिक रूप से इम्पोर्ट करना चाहिए, और Vulkan पर डेप्थ नहीं है।</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">प्रायोगिक। Vulkan पर ReShade एक लेयर है: इंस्टॉल इसे आपके Windows यूज़र के लिए रजिस्टर करता है और इस प्रोग्राम के .exe के बगल में ReShade.ini रखकर इसके लिए चालू करता है। Vulkan पर डेप्थ नहीं है।</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">प्रायोगिक। Vulkan के उलट यह एक सामान्य प्रॉक्सी DLL है: ReShade गेम के बगल में opengl32.dll के रूप में जाता है, अलग इंस्टॉलर चलाए बिना। केवल रंग और अनुमानित मोशन; गेम की अपनी डेप्थ इस API पर मिल सकती है, लेकिन अभी जोड़ी नहीं गई है। 32-बिट OpenGL गेम के लिए कोई रूट नहीं है।</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">प्रायोगिक। 32-बिट गेम 64-बिट रनटाइम लोड नहीं कर सकता, इसलिए ऐड-ऑन एक जोड़ी के रूप में चलता है जो एक ही एडैप्टर पर फ़्रेम साझा करती है। ReShade को ऐड-ऑन सपोर्ट के साथ 32-बिट dxgi.dll के रूप में इंस्टॉल करें।</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">प्रायोगिक। D3D11 वाली वही 32-बिट जोड़ी, एक निजी D3D9/D3D11 चरण के ज़रिए। साधारण D3D9 हर फ़्रेम पर कुछ तय मिलीसेकंड लेता है; D3D9Ex नहीं। ReShade को 32-बिट d3d9.dll के रूप में इंस्टॉल करें।</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">प्रायोगिक। D3D8 को D3D9 में बदला जाता है और फिर ऊपर वाला D3D9 रूट लिया जाता है, उसी 32-बिट जोड़ी के साथ। ReShade को 32-बिट d3d9.dll के रूप में इंस्टॉल करें।</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM का अपना एंटी-चीट है: अपने जोखिम पर, और अपने सर्वर के नियम देख लें। ऐड-ऑन और ReShade FiveM.app\plugins में जाते हैं, रनटाइम और वेट्स गेम प्रोसेस के बगल में data\cache\subprocess में। plugins में जो पहले से है — ReShade.ini, प्रीसेट, शेडर, दूसरे ऐड-ऑन, ENB — वैसा ही रहता है।</sys:String>
   <sys:String x:Key="Str.SetupWelcome">स्वागत है</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Radeon कार्ड पर DLSS 5 Neural Rendering नेटवर्क, ReShade या OptiScaler के ज़रिए। चार आसान चरण।</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">यह कंप्यूटर</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64-बिट गेम</sys:String>
   <sys:String x:Key="Str.Group32">32-बिट गेम (प्रायोगिक)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">एमुलेटर</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V ऑनलाइन</sys:String>
   <sys:String x:Key="Str.OptiAbout">ReShade की जगह यह OptiScaler इंस्टॉल करता है, जो गेम का DLSS, FSR या XeSS अपने हाथ में लेता है और उसी के अंदर नेटवर्क चलाता है, गेम की अपनी डेप्थ और मोशन वेक्टर के साथ।</sys:String>
   <sys:String x:Key="Str.InGame">गेम में</sys:String>
   <sys:String x:Key="Str.OptiStep1">गेम की ग्राफ़िक्स सेटिंग्स में DLSS, FSR या XeSS चालू करें।</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Vulkan पर डेप्थ नहीं।</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan डिफ़ॉल्ट बैकएंड है। Vulkan पर डेप्थ नहीं।</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">केवल Vulkan। Vulkan पर डेप्थ नहीं, और यह एमुलेटर खुद अभी शुरुआती दौर में है — दिक्कतों की उम्मीद रखें।</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">सिर्फ़ Vulkan। kyty_emulator.exe वाला फ़ोल्डर चुनें (launcher.exe सिर्फ़ उसे चलाता है)। डेप्थ नहीं है, और एमुलेटर खुद अभी शुरुआती है — दिक्कतों की उम्मीद रखें।</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">गेम में: Home से ReShade खुलता है, AMD Neural Rendering Add-ons में है, या Ctrl+End दबाएँ। FiveM का अपना एंटी-चीट है — पहले सर्वर के नियम देख लें।</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. अब OpenGL का भी रूट है, लेकिन यहाँ सबसे ज़्यादा परखा हुआ Vulkan है।</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu केवल OpenGL से रेंडर करता है, इसलिए यहाँ OpenGL रूट ही अकेला है। यह सबसे नया रूट है और प्रायोगिक है: रंग और अनुमानित मोशन, डेप्थ नहीं।</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. सॉफ़्टवेयर रेंडरर CPU पर बनाता है और वहाँ ऐड-ऑन के पहुँचने लायक कुछ नहीं है, इसलिए OpenGL वाला ही होना चाहिए — और वह रूट प्रायोगिक है: रंग और अनुमानित मोशन, डेप्थ नहीं।</sys:String>

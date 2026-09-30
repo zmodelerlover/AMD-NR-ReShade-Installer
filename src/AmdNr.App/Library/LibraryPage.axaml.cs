@@ -369,14 +369,15 @@ public partial class LibraryPage : UserControl
             _shell.Toast(Ui.Format("Str.EmulatorUnknown", card.Graphics?.Tag ?? "?"), Level.Info);
     });
 
-    /// <summary>The two with a route of their own, then everything else. Returns an emulator id,
-    /// "other", or null when it was dismissed.</summary>
+    /// <summary>The two with a route of their own and the PlayStation 4 and 5 ones, then everything
+    /// else. Returns an emulator id, "other", or null when it was dismissed.</summary>
     private Task<string?> AskWhichEmulatorAsync()
     {
-        var named = new[] { "pcsx2", "rpcs3" }.Select(Emulators.ById).OfType<EmulatorInfo>().ToList();
+        var named = new[] { "pcsx2", "rpcs3", "shadps4", "kyty" }.Select(Emulators.ById).OfType<EmulatorInfo>().ToList();
         var options = named.Select(e => (e.Id, e.Name, e.System)).ToList();
-        // Everything else this app recognises, so "other" is a real list and not a shrug.
-        var rest = Emulators.Known.Where(e => named.All(n => n.Id != e.Id)).ToList();
+        // Everything else this app recognises, so "other" is a real list and not a shrug. FiveM is not
+        // an emulator, and Scan finds it where its installer puts it.
+        var rest = Emulators.Known.Where(e => named.All(n => n.Id != e.Id) && e.Route != Preset.FiveM).ToList();
         options.Add(("other", Ui.Text("Str.EmulatorOther"),
             $"{Ui.Text("Str.EmulatorOtherBody")} ({string.Join(", ", rest.Take(6).Select(e => e.Name))}…)"));
         return ChoiceDialog.ShowAsync(_shell, Ui.Text("Str.EmulatorTitle"), Ui.Text("Str.EmulatorBody"), options);

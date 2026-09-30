@@ -102,6 +102,11 @@ public static partial class Work
     public static readonly string[] InstalledMarkers =
         [AddonName, Addon32Name, Host64Name, RuntimeName, WeightsName];
 
+    /// <summary>The same, for the FiveM route, which writes under FiveM.app rather than beside an
+    /// executable. Kept apart so every other route's folder is still asked only for its own names.</summary>
+    public static readonly string[] FiveMMarkers =
+        [$"{FiveMPlugins}/{AddonName}", $"{FiveMGame}/{RuntimeName}", $"{FiveMGame}/{WeightsName}"];
+
     /// <summary>Whether what is installed in this folder is still what the payload pins. An install
     /// records the SHA-256 of every file it wrote, so a recorded hash that is not the one the
     /// manifest now carries for that name is an install the payload has moved past -- which is how
@@ -255,7 +260,8 @@ public static partial class Work
     /// some games only ever load one. Vulkan has none: ReShade is a layer there.</summary>
     public static string[] ProxyChoicesFor(Preset preset) => preset switch
     {
-        _ when preset.IsVulkan() => [],
+        // FiveM: whatever name the ReShade in plugins already has, or dxgi.dll. Not a choice.
+        _ when preset.IsVulkan() || preset == Preset.FiveM => [],
         // Not ReShade's list: every name OptiScaler's dllmain answers to. winmm.dll is the way in
         // when dxgi.dll has to stay something else's; the rest are what the OptiScaler wiki names
         // for games that load neither (Forspoken wants d3d12.dll, No Man's Sky dbghelp.dll).
@@ -390,6 +396,7 @@ public static partial class Work
     {
         var report = preset.IsOptiScaler()
             ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
+            : preset == Preset.FiveM ? PreflightFiveM(gameDir, payloadDir, pins, ownRuntime, wantedRuntime)
             : PreflightReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime);
         // Said before Install is pressed, as what Install does about it rather than as a problem.
         try
@@ -420,6 +427,7 @@ public static partial class Work
         }
         report.Append(preset.Route() == Route.X86 ? InstallX86(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime)
             : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
+            : preset == Preset.FiveM ? InstallFiveM(gameDir, payloadDir, pins, ownRuntime, wantedRuntime)
             : InstallReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime));
         return report;
     }

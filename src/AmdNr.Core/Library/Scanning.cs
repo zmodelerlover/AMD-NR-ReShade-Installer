@@ -24,6 +24,7 @@ public enum GamePlatform
     Ubisoft,
     BattleNet,
     Xbox,
+    FiveM,
 }
 
 public sealed record ScannedGame(string Name, string InstallPath, GamePlatform Platform, string? AppId = null);
@@ -50,7 +51,7 @@ public static partial class GameScanner
     {
         var sources = new Func<IEnumerable<ScannedGame>>[]
         {
-            () => Steam(), Epic, Gog, Ea, Ubisoft, BattleNet, Xbox,
+            () => Steam(), Epic, Gog, Ea, Ubisoft, BattleNet, Xbox, FiveM,
         };
 
         var found = new List<ScannedGame>();
@@ -74,6 +75,14 @@ public static partial class GameScanner
             .Select(group => group.First())
             .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
+    }
+
+    /// <summary>FiveM, where its installer always puts it. The card is FiveM.app, which is where
+    /// the FiveM route installs and what its manifest is rooted at.</summary>
+    public static IEnumerable<ScannedGame> FiveM()
+    {
+        var app = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FiveM", "FiveM.app");
+        if (Directory.Exists(app)) yield return new ScannedGame("FiveM", app, GamePlatform.FiveM);
     }
 
     // -- Steam -----------------------------------------------------------------------------------
@@ -458,5 +467,6 @@ public static partial class GameScanner
     };
 
     public static bool IsInstalled(string folder) =>
-        Work.InstalledMarkers.Any(name => File.Exists(Path.Combine(folder, name)) && !Work.IsAuthorsWeights(folder, name));
+        Work.InstalledMarkers.Any(name => File.Exists(Path.Combine(folder, name)) && !Work.IsAuthorsWeights(folder, name))
+        || Work.FiveMMarkers.Any(name => File.Exists(Path.Combine(folder, name)));
 }

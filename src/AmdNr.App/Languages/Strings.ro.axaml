@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">O cafea, o singură dată.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">Strângerea de fonduri braziliană a proiectului.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Susține AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Ține AMD-NR în viață</sys:String>
+  <sys:String x:Key="Str.SupportBody">Acest proiect rămâne în viață doar cu sprijinul celor care îl folosesc. Sunt două persoane, două plăci video și după-amiezi de muncă: nicio firmă, niciun sponsor. Totul aici e gratuit și așa rămâne. Sprijinul nu deblochează nimic; ține munca în mișcare.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Ești în Brazilia? Vakinha acceptă Pix, card sau boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — de danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Rețeaua în sine și motivul pentru care există toate acestea: datorită ei a pornit randarea neurală DLSS 5 pe Radeon. Runtime-ul și ponderile pe care le descarcă această aplicație sunt munca lui, nu a noastră. Mulțumim, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — add-on-ul</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">Cea mai bună rută: D3D11 este singurul API pe care vectorii de mișcare proprii ai jocului ajung la rețea, împreună cu adâncimea lui.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Limitată. Pe D3D12 add-on-ul găsește adâncimea jocului, dar nu și vectorii lui de mișcare, așa că rețeaua primește culoare și adâncime și estimează mișcarea. Funcționează; așteaptă-te la mai puțin. Un joc cu DLSS, FSR sau XeSS în setări este mai bine servit de ruta OptiScaler.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Recomandată pentru jocurile D3D12. În locul ReShade instalează OptiScaler, care preia DLSS, FSR sau XeSS al jocului și rulează rețeaua în interiorul lui, cu adâncimea și vectorii de mișcare proprii ai jocului. Jocul trebuie să ofere unul dintre aceste upscalere, activat în setări. În joc, apasă Insert, deschide fila Neural și activează Enable NR; un joc cu Ray Reconstruction are nevoie de punctul de procesare „After the finished frame”.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade pe Vulkan este un strat: instalarea îl înregistrează pentru utilizatorul tău Windows și îl activează pentru acest program cu un ReShade.ini lângă .exe-ul lui. Jocul trebuie să importe static vkCreateDevice, iar pe Vulkan nu există adâncime.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade pe Vulkan este un strat: instalarea îl înregistrează pentru utilizatorul tău Windows și îl activează pentru acest program cu un ReShade.ini lângă .exe-ul lui. Pe Vulkan nu există adâncime.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Spre deosebire de Vulkan, acesta este un DLL proxy obișnuit: ReShade intră ca opengl32.dll lângă joc, fără să ruleze un instalator separat. Doar culoare și mișcare estimată; adâncimea jocului este accesibilă pe acest API, dar nu este conectată încă. Un joc OpenGL pe 32 de biți nu are rută.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. Un joc pe 32 de biți nu poate încărca runtime-ul pe 64 de biți, așa că add-on-ul rulează ca o pereche care împarte cadrele pe un singur adaptor. Instalează ReShade cu suport pentru add-on-uri ca dxgi.dll pe 32 de biți.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. Aceeași pereche pe 32 de biți ca la D3D11, printr-o etapă privată D3D9/D3D11. D3D9 simplu costă câteva milisecunde fixe pe cadru; D3D9Ex nu. Instalează ReShade ca d3d9.dll pe 32 de biți.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 este tradus în D3D9 și apoi urmează ruta D3D9 de mai sus, cu aceeași pereche pe 32 de biți. Instalează ReShade ca d3d9.dll pe 32 de biți.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM are propriul anti-cheat: pe riscul tău, și verifică regulile serverului. Add-on-ul și ReShade merg în FiveM.app\plugins, runtime-ul și ponderile lângă procesul jocului în data\cache\subprocess. Ce ai deja în plugins — ReShade.ini, preseturi, shadere, alte add-on-uri, ENB — rămâne cum e.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Bun venit</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Rețeaua DLSS 5 Neural Rendering pe plăcile Radeon, prin ReShade sau OptiScaler. Patru pași rapizi.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Acest PC</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">Jocuri pe 64 de biți</sys:String>
   <sys:String x:Key="Str.Group32">Jocuri pe 32 de biți (experimental)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emulatoare</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">În locul ReShade instalează OptiScaler, care preia DLSS, FSR sau XeSS al jocului și rulează rețeaua în interiorul lui, cu adâncimea și vectorii de mișcare proprii ai jocului.</sys:String>
   <sys:String x:Key="Str.InGame">În joc</sys:String>
   <sys:String x:Key="Str.OptiStep1">Activează DLSS, FSR sau XeSS în setările grafice ale jocului.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Fără adâncime pe Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan este backendul implicit. Fără adâncime pe Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Doar Vulkan. Fără adâncime pe Vulkan, iar emulatorul însuși este încă la început — așteaptă-te la probleme.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Doar Vulkan. Alege folderul lui kyty_emulator.exe (launcher.exe doar îl pornește). Fără adâncime, iar emulatorul e încă la început — așteaptă-te la probleme.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">În joc: Home deschide ReShade, iar AMD Neural Rendering e la Add-ons, sau Ctrl+End. FiveM are propriul anti-cheat — verifică întâi regulile serverului.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. Și OpenGL are acum o rută, dar Vulkan este cea mai testată aici.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu randează doar cu OpenGL, așa că ruta OpenGL este singura de aici. Este cea mai nouă dintre rute și este experimentală: culoare și mișcare estimată, fără adâncime.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. Rendererul software desenează pe CPU și add-on-ul nu are acolo la ce să ajungă, așa că trebuie să fie cel OpenGL — iar această rută este experimentală: culoare și mișcare estimată, fără adâncime.</sys:String>

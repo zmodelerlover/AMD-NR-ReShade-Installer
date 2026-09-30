@@ -113,8 +113,31 @@ public class EmulatorTests
             Assert.False(string.IsNullOrWhiteSpace(e.Setting), $"{e.Id} has no guidance");
             Assert.Equal(e.Id, e.Id.ToLowerInvariant());
             // A route of its own has to be one the engine actually knows about as an emulator route.
-            if (e.Route is { } route) Assert.True(route is Preset.Pcsx2 or Preset.Rpcs3);
+            if (e.Route is { } route) Assert.True(route is Preset.Pcsx2 or Preset.Rpcs3 or Preset.FiveM);
         }
         Assert.Equal(Emulators.Known.Length, Emulators.Known.Select(e => e.Id).Distinct().Count());
+    }
+
+    /// <summary>shadPS4's Qt launcher keeps each emulator build in a folder of its own and starts it from
+    /// there, so an install beside the launcher is never loaded. It is refused, with where the build is.</summary>
+    [Fact]
+    public void ALaunchersFolderIsRefusedWithWhereTheBuildIs()
+    {
+        var launcher = Folder("shadps4-launcher", "shadPS4QtLauncher.exe");
+        Assert.Equal("shadps4", Emulators.Identify(launcher)?.Id);
+
+        var (src, pins) = Fixture.Payloads("shadps4-launcher");
+        Assert.True(Fixture.HasErr(Work.Preflight(launcher, src, Preset.Vulkan, pins), "download a build"));
+
+        var build = Path.Combine(launcher, "versions", "Pre-release-2026-09-30");
+        Directory.CreateDirectory(build);
+        File.WriteAllBytes(Path.Combine(build, "shadPS4.exe"), Fixture.Pe(x64: true));
+        var report = Work.Preflight(launcher, src, Preset.Vulkan, pins);
+        Assert.True(Fixture.HasErr(report, build), report.ToLog("launcher"));
+
+        // The build's own folder is the right one, and the Vulkan route is what it gets.
+        Assert.False(Fixture.HasErr(Work.Preflight(build, src, Preset.Vulkan, pins), "launcher"));
+        Assert.Equal(Preset.Vulkan, GraphicsDetector.Detect(build).Preset);
+        Assert.Equal(Preset.Vulkan, GraphicsDetector.Detect(Folder("kyty", "kyty_emulator.exe", "launcher.exe")).Preset);
     }
 }

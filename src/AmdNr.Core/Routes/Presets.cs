@@ -19,6 +19,7 @@ public enum Preset
     X86Dx8,
     // Last, so every games.json written before it still reads the same names.
     OptiScaler,
+    FiveM,
 }
 
 /// <summary>The two ways into a game. They are alternatives rather than layers: both write the
@@ -35,11 +36,11 @@ public static class Presets
     public static readonly Preset[] All =
     [
         Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL,
-        Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8,
+        Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8, Preset.FiveM,
     ];
 
     private static readonly Preset[] X64 =
-        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
+        [Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL, Preset.FiveM];
 
     /// <summary>The route that installs OptiScaler instead of ReShade and the add-on. It runs the same
     /// network inside the game's own upscaler call, where depth and motion vectors are handed over,
@@ -100,11 +101,13 @@ public static class Presets
         Preset.X86Dx9 => "D3D9",
         Preset.X86Dx8 => "D3D8",
         Preset.OptiScaler => "OptiScaler",
+        Preset.FiveM => "FiveM",
         _ => throw new ArgumentOutOfRangeException(nameof(p)),
     };
 
     public static string Label(this Preset p) => p switch
     {
+        Preset.FiveM => "FiveM",
         Preset.OptiScaler => "OptiScaler: D3D12 game with DLSS, FSR or XeSS",
         Preset.Pcsx2 => "PCSX2",
         Preset.Rpcs3 => "RPCS3",
@@ -125,7 +128,9 @@ public static class Presets
     /// <summary>"Game" is wrong for an emulator, and the people most likely to get the folder wrong
     /// are exactly the emulator users -- the files go beside the emulator, not beside the ROM.</summary>
     public static string FolderLabel(this Preset p) =>
-        p is Preset.Pcsx2 or Preset.Rpcs3 ? "Emulator folder or executable" : "Game folder or executable";
+        p is Preset.Pcsx2 or Preset.Rpcs3 ? "Emulator folder or executable"
+        : p == Preset.FiveM ? "FiveM.app folder"
+        : "Game folder or executable";
 
     /// <summary>An executable whose presence says the folder is the right one. Absent means "warn",
     /// never "refuse": there is no whitelist anywhere in this project and there is not going to be
@@ -159,13 +164,19 @@ public static class Presets
             + "switched on in its settings. In game, open OptiScaler with Insert, go to the Neural tab "
             + "and turn on Enable NR; a game that uses Ray Reconstruction needs \"After the finished "
             + "frame\" as the processing point.",
+        // Since add-on v0.5.3 a host that loads vulkan-1.dll itself (shadPS4 and Kyty import none of
+        // it) is hooked too, so the old line that sent those away was no longer true.
         Preset.Vulkan =>
             "EXPERIMENTAL. ReShade on Vulkan is a layer, not a proxy DLL: this install registers it "
             + "for your Windows user when none is, and turns it on for this program with a ReShade.ini "
-            + "beside its .exe. The game also has to "
-            + "import vkCreateDevice statically -- one that resolves Vulkan through "
-            + "vkGetInstanceProcAddr cannot be hooked, and the add-on stands down rather than guess. "
-            + "No depth on Vulkan either way: colour and estimated motion.",
+            + "beside its .exe. The layer has to be ReShade "
+            + "6.8.0 or newer with full add-on support. No depth on Vulkan either way: colour and estimated motion.",
+        Preset.FiveM =>
+            "FiveM has its own anti-cheat: use this at your own risk, and check your server's rules -- "
+            + "ReShade with full add-on support is unsigned, some servers block it and some ban for "
+            + "client mods. The add-on and ReShade go in FiveM.app\\plugins, and the runtime and "
+            + "weights beside the game process in data\\cache\\subprocess. What you already have in "
+            + "plugins -- ReShade.ini, presets, shaders, other add-ons, ENB -- is left as it is.",
         Preset.OpenGL =>
             "EXPERIMENTAL. Unlike Vulkan this one is an ordinary proxy DLL: ReShade goes in as "
             + "opengl32.dll beside the game, no separate installer run. The network gets colour "

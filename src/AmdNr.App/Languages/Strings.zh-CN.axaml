@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">请喝一杯咖啡。</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">本项目在巴西的众筹。</sys:String>
+  <sys:String x:Key="Str.SupportRail">支持 AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">让 AMD-NR 继续下去</sys:String>
+  <sys:String x:Key="Str.SupportBody">这个项目只能靠使用者的支持延续下去。它只是两个人、两张显卡和一个个下午的工作：没有公司，也没有赞助。这里的一切都是免费的，并将一直免费。支持不会解锁任何东西，它让工作得以继续。</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">在巴西？Vakinha 支持 Pix、银行卡或 boleto。</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD，作者 danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">神经网络本身，也是这一切得以存在的原因：正是它让 DLSS 5 的神经渲染第一次在 Radeon 上跑了起来。本应用下载的运行时和权重都是他的成果，而不是我们的。谢谢你，danielblnc。</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd，插件</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">最佳安装方式：只有在 D3D11 上，游戏自身的运动矢量和深度才能一起送达神经网络。</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">效果受限。在 D3D12 上，插件能找到游戏的深度，但找不到它的运动矢量，因此神经网络获得颜色和深度，运动则靠估算。可以运行，但效果会差一些。设置中带有 DLSS、FSR 或 XeSS 的游戏更适合使用 OptiScaler 安装方式。</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">推荐用于 D3D12 游戏。它不安装 ReShade，而是安装 OptiScaler，接管游戏的 DLSS、FSR 或 XeSS，并在其中运行神经网络，使用游戏自身的深度和运动矢量。游戏必须提供其中一种超分辨率技术，并在设置中启用。在游戏中按 Insert，打开 Neural 标签页并开启“Enable NR”；使用光线重建（Ray Reconstruction）的游戏需要将处理点设为“After the finished frame”。</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">实验性。在 Vulkan 上，ReShade 是一个层：安装时会为你的 Windows 用户注册该层，并通过其 .exe 旁的 ReShade.ini 为这个程序启用它。游戏必须静态导入 vkCreateDevice，并且 Vulkan 上没有深度。</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">实验性。在 Vulkan 上，ReShade 是一个层：安装时会为你的 Windows 用户注册该层，并通过其 .exe 旁的 ReShade.ini 为这个程序启用它。Vulkan 上没有深度。</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">实验性。与 Vulkan 不同，这里是普通的代理 DLL：ReShade 以 opengl32.dll 的形式放在游戏旁边，无需另外运行安装程序。只有颜色和估算的运动；在此 API 上可以取得游戏自身的深度，但尚未接入。32 位 OpenGL 游戏没有安装方式。</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">实验性。32 位游戏无法加载 64 位运行时，因此插件以一对进程的形式运行，在同一块显卡上共享画面。请将支持插件的 ReShade 安装为 32 位的 dxgi.dll。</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">实验性。与 D3D11 相同的 32 位进程对，通过一个私有的 D3D9/D3D11 中转阶段。普通 D3D9 每帧会固定多耗几毫秒，D3D9Ex 则不会。请将 ReShade 安装为 32 位的 d3d9.dll。</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">实验性。D3D8 会被转换为 D3D9，然后走上面的 D3D9 安装方式，使用同样的 32 位进程对。请将 ReShade 安装为 32 位的 d3d9.dll。</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM 有自己的反作弊：风险自负，并请查看你服务器的规则。插件和 ReShade 放在 FiveM.app\plugins，运行时和权重放在游戏进程旁边的 data\cache\subprocess。plugins 里你已有的东西（ReShade.ini、预设、着色器、其他插件、ENB）保持原样。</sys:String>
   <sys:String x:Key="Str.SetupWelcome">欢迎</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">在 Radeon 显卡上通过 ReShade 或 OptiScaler 运行 DLSS 5 神经渲染网络。只需四个简单步骤。</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">本机</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64 位游戏</sys:String>
   <sys:String x:Key="Str.Group32">32 位游戏（实验性）</sys:String>
   <sys:String x:Key="Str.GroupEmulators">模拟器</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V 在线</sys:String>
   <sys:String x:Key="Str.OptiAbout">它不安装 ReShade，而是安装 OptiScaler，接管游戏的 DLSS、FSR 或 XeSS，并在其中运行神经网络，使用游戏自身的深度和运动矢量。</sys:String>
   <sys:String x:Key="Str.InGame">在游戏中</sys:String>
   <sys:String x:Key="Str.OptiStep1">在游戏的图形设置中开启 DLSS、FSR 或 XeSS。</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan。Vulkan 上没有深度。</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan 是默认后端。Vulkan 上没有深度。</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">仅支持 Vulkan。Vulkan 上没有深度，而且这个模拟器本身还处于早期阶段，可能会遇到问题。</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">仅 Vulkan。请选择 kyty_emulator.exe 所在的文件夹（launcher.exe 只负责启动它）。没有深度，而且模拟器本身还很早期，可能会遇到问题。</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">游戏中：按 Home 打开 ReShade，AMD Neural Rendering 在 Add-ons 里，或按 Ctrl+End。FiveM 有自己的反作弊，请先查看服务器规则。</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan。OpenGL 现在也有安装方式了，但这里经过更多实际验证的是 Vulkan。</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu 只使用 OpenGL 渲染，所以这里只有 OpenGL 这一种安装方式。它是最新的安装方式，仍处于实验阶段：只有颜色和估算的运动，没有深度。</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL。软件渲染器在 CPU 上绘制，插件在那里无从介入，所以必须使用 OpenGL 渲染器，而该安装方式仍处于实验阶段：只有颜色和估算的运动，没有深度。</sys:String>

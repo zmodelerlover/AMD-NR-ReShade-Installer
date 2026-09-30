@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">فنجان قهوة لمرة واحدة.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">حملة جمع التبرعات البرازيلية للمشروع.</sys:String>
+  <sys:String x:Key="Str.SupportRail">ادعم AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">حافظ على AMD-NR حيًا</sys:String>
+  <sys:String x:Key="Str.SupportBody">هذا المشروع لا يستمر إلا بدعم من يستخدمونه. إنهما شخصان وبطاقتا رسومات وساعات عمل بعد الظهر: لا شركة ولا راعٍ. كل شيء هنا مجاني وسيبقى مجانيًا. الدعم لا يفتح أي ميزة، بل يُبقي العمل مستمرًا.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">في البرازيل؟ تقبل Vakinha الدفع عبر Pix أو البطاقة أو boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — من إعداد danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">الشبكة نفسها، والسبب في وجود كل هذا: هي ما جعل العرض العصبي لـ DLSS 5 يعمل على Radeon أصلًا. بيئة التشغيل والأوزان التي ينزّلها هذا التطبيق من عمله هو، لا من عملنا. شكرًا لك يا danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — الإضافة</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">أفضل طريقة: D3D11 هي الوحيدة التي تصل فيها متجهات الحركة الخاصة باللعبة إلى الشبكة، مع عمقها.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">محدودة. على D3D12 تجد الإضافة عمق اللعبة لكن لا تجد متجهات حركتها، لذا تتلقى الشبكة اللون والعمق وتقدّر الحركة. تعمل، لكن توقّع نتيجة أقل. اللعبة التي توفّر DLSS أو FSR أو XeSS في إعداداتها تُخدم على نحو أفضل بطريقة OptiScaler.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">موصى بها لألعاب D3D12. بدلًا من ReShade يثبّت هذا OptiScaler، الذي يتولّى DLSS أو FSR أو XeSS في اللعبة ويشغّل الشبكة داخله، باستخدام عمق اللعبة ومتجهات حركتها الخاصة. يجب أن توفّر اللعبة إحدى تقنيات رفع الدقة هذه، مفعّلة في إعداداتها. داخل اللعبة، اضغط Insert، وافتح تبويب Neural، وفعّل «Enable NR»؛ واللعبة التي تستخدم Ray Reconstruction تحتاج إلى «After the finished frame» كنقطة معالجة.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">تجريبي. على Vulkan يكون ReShade طبقة: يسجّلها التثبيت لمستخدم Windows الخاص بك ويفعّلها لهذا البرنامج عبر ملف ReShade.ini بجوار ملف ‎.exe‎ الخاص به. يجب أن تستورد اللعبة vkCreateDevice بشكل ثابت، ولا يوجد عمق على Vulkan.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">تجريبي. على Vulkan يكون ReShade طبقة: يسجّلها التثبيت لمستخدم Windows الخاص بك ويفعّلها لهذا البرنامج عبر ملف ReShade.ini بجوار ملف ‎.exe‎ الخاص به. لا يوجد عمق على Vulkan.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">تجريبي. بخلاف Vulkan، هذا ملف DLL وسيط عادي: يُوضع ReShade باسم opengl32.dll بجوار اللعبة، دون تشغيل مثبّت منفصل. اللون والحركة المقدّرة فقط؛ عمق اللعبة متاح على هذه الواجهة لكنه لم يُربط بعد. لا توجد طريقة للعبة OpenGL ذات 32 بت.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">تجريبي. لا تستطيع اللعبة ذات 32 بت تحميل بيئة التشغيل ذات 64 بت، لذا تعمل الإضافة كزوج من العمليات يتشاركان الإطارات على محوّل رسوميات واحد. ثبّت ReShade مع دعم الإضافات باسم dxgi.dll بنسخة 32 بت.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">تجريبي. الزوج نفسه ذو 32 بت كما في D3D11، عبر مرحلة وسيطة خاصة D3D9/D3D11. يكلّف D3D9 العادي بضعة أجزاء ثابتة من الثانية لكل إطار، أما D3D9Ex فلا. ثبّت ReShade باسم d3d9.dll بنسخة 32 بت.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">تجريبي. يُترجَم D3D8 إلى D3D9 ثم يسلك طريقة D3D9 أعلاه، بالزوج نفسه ذي 32 بت. ثبّت ReShade باسم d3d9.dll بنسخة 32 بت.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">لدى FiveM نظام مكافحة غش خاص به: الاستخدام على مسؤوليتك، وراجع قواعد خادمك. تُوضع الإضافة وReShade في FiveM.app\plugins، ووقت التشغيل والأوزان بجوار عملية اللعبة في data\cache\subprocess. ما لديك بالفعل في plugins — ReShade.ini والإعدادات المسبقة والمظللات والإضافات الأخرى وENB — يبقى كما هو.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">مرحبًا</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">شبكة DLSS 5 Neural Rendering على بطاقات Radeon، عبر ReShade أو OptiScaler. أربع خطوات سريعة.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">هذا الجهاز</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">ألعاب 64 بت</sys:String>
   <sys:String x:Key="Str.Group32">ألعاب 32 بت (تجريبي)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">المحاكيات</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V أونلاين</sys:String>
   <sys:String x:Key="Str.OptiAbout">بدلًا من ReShade يثبّت هذا OptiScaler، الذي يتولّى DLSS أو FSR أو XeSS في اللعبة ويشغّل الشبكة داخله، باستخدام عمق اللعبة ومتجهات حركتها الخاصة.</sys:String>
   <sys:String x:Key="Str.InGame">داخل اللعبة</sys:String>
   <sys:String x:Key="Str.OptiStep1">فعّل DLSS أو FSR أو XeSS من إعدادات الرسوميات في اللعبة.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. لا يوجد عمق على Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan هي الواجهة الخلفية الافتراضية. لا يوجد عمق على Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Vulkan فقط. لا يوجد عمق على Vulkan، والمحاكي نفسه ما زال في بداياته، فتوقّع مشكلات.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Vulkan فقط. اختر مجلد kyty_emulator.exe (فملف launcher.exe يشغّله فقط). لا يوجد عمق، والمحاكي نفسه ما زال في بدايته — توقّع مشكلات.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">داخل اللعبة: يفتح Home واجهة ReShade، وستجد AMD Neural Rendering ضمن Add-ons، أو اضغط Ctrl+End. لدى FiveM نظام مكافحة غش خاص به — راجع قواعد خادمك أولًا.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. صار لـ OpenGL طريقة أيضًا، لكن Vulkan هي الأكثر تجربةً هنا.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">يعرض xemu باستخدام OpenGL فقط، لذا فطريقة OpenGL هي الوحيدة المتاحة هنا. وهي أحدث الطرق وتجريبية: اللون والحركة المقدّرة، دون عمق.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. يرسم العارض البرمجي على المعالج المركزي، ولا يوجد هناك ما تصل إليه الإضافة، لذا يجب أن يكون عارض OpenGL، وهذه الطريقة تجريبية: اللون والحركة المقدّرة، دون عمق.</sys:String>

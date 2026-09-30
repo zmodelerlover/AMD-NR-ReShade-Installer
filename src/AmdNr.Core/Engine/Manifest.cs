@@ -138,10 +138,10 @@ public sealed class Manifest(string preset, Route route)
         // Adding a name here is backward compatible in the direction that matters: every manifest
         // already on disk still decodes, and one written by a newer build is refused by an older
         // one -- which is the honest answer, since an older build has no route to uninstall it
-        // with. "OptiScaler" is the newest.
+        // with. "FiveM" is the newest.
         var known = route == Route.X86
             ? preset is "D3D11" or "D3D9" or "D3D8"
-            : preset is "PCSX2" or "RPCS3" or "D3D11" or "D3D12" or "Vulkan" or "OpenGL" or "OptiScaler";
+            : preset is "PCSX2" or "RPCS3" or "D3D11" or "D3D12" or "Vulkan" or "OpenGL" or "OptiScaler" or "FiveM";
         Engine.Require(known, "Bad manifest preset");
 
         var state = Text(root, "state");

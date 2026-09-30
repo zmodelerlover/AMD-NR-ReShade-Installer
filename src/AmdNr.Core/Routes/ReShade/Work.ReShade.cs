@@ -13,59 +13,7 @@ public static partial class Work
         var dir = ResolveSource(gameDir);
         var src = ResolveSource(payloadDir);
 
-        // --- the payloads, which is where someone starts ---------------------------------------
-        if (src.Length == 0)
-        {
-            report.Info("Waiting for the payload folder: the add-on, the runtime and the weights.");
-        }
-        else if (!Directory.Exists(src))
-        {
-            report.Err($"{src} is not a folder.");
-        }
-        else
-        {
-            var allThere = true;
-            var payloads = PayloadDir(src);
-
-            // The 32-bit route installs its own pair, pinned by payload.sha256, and never the 64-bit
-            // add-on -- asking for that file there is asking for something that is not supposed to exist.
-            if (preset.Route() == Route.X86)
-            {
-                foreach (var name in new[] { "payload.sha256", @"files\amd-nr.addon32", @"files\amd-nr-host64.exe" })
-                {
-                    if (File.Exists(Path.Combine(src, name))) continue;
-                    report.Err($"{Path.GetFileName(name)} is not in the payload folder; the 32-bit bridge cannot be installed without it.");
-                    allThere = false;
-                }
-            }
-
-            var expected = preset.Route() == Route.X86
-                ? new[] { (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize) }
-                : [(AddonName, pins.AddonSize), (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize)];
-
-            foreach (var (name, want) in expected)
-            {
-                var nested = Path.Combine(src, "files", name);
-                switch (Engine.SizeOf(File.Exists(nested) ? nested : Path.Combine(payloads, name)))
-                {
-                    case null:
-                        report.Err($"{name} is not in that folder.");
-                        allThere = false;
-                        break;
-                    // want == 0 means the size is not known, not that the file should be empty: the
-                    // add-on's own size only comes from the payload manifest, and without one the
-                    // pins fall back to a zero there. Judging a real file against it said "that is a
-                    // different build" about the right file.
-                    case { } got when want > 0 && got != want:
-                        report.Err(
-                            $"{name} is {got} bytes, and this release expects {want}. That is a different "
-                            + "build, and the add-on refuses anything but the one it was compiled against.");
-                        allThere = false;
-                        break;
-                }
-            }
-            if (allThere) report.Ok("Every payload is there and the right size. Installing verifies the SHA-256 too.");
-        }
+        CheckPayloads(src, preset, pins, report);
         if (mochizuki) CheckMochizukiPayload(src, pins, report);
         CheckSupplied(ownRuntime, wantedRuntime, pins, preset, report);
 
@@ -123,6 +71,7 @@ public static partial class Work
         }
 
         CheckExe(dir, preset, report);
+        CheckLauncher(dir, report);
         CheckRouteIsReachable(dir, preset, report);
 
         // The 32-bit route installs the pinned ReShade build itself when the payload carries it, so
@@ -159,6 +108,65 @@ public static partial class Work
         return report;
     }
 
+    /// <summary>Whether the add-on, the runtime and the weights are in the payload folder and the
+    /// right size. Shared by every route that installs the add-on.</summary>
+    private static void CheckPayloads(string src, Preset preset, PayloadPins pins, Report report)
+    {
+        // --- the payloads, which is where someone starts ---------------------------------------
+        if (src.Length == 0)
+        {
+            report.Info("Waiting for the payload folder: the add-on, the runtime and the weights.");
+        }
+        else if (!Directory.Exists(src))
+        {
+            report.Err($"{src} is not a folder.");
+        }
+        else
+        {
+            var allThere = true;
+            var payloads = PayloadDir(src);
+
+            // The 32-bit route installs its own pair, pinned by payload.sha256, and never the 64-bit
+            // add-on -- asking for that file there is asking for something that is not supposed to exist.
+            if (preset.Route() == Route.X86)
+            {
+                foreach (var name in new[] { "payload.sha256", @"files\amd-nr.addon32", @"files\amd-nr-host64.exe" })
+                {
+                    if (File.Exists(Path.Combine(src, name))) continue;
+                    report.Err($"{Path.GetFileName(name)} is not in the payload folder; the 32-bit bridge cannot be installed without it.");
+                    allThere = false;
+                }
+            }
+
+            var expected = preset.Route() == Route.X86
+                ? new[] { (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize) }
+                : [(AddonName, pins.AddonSize), (RuntimeName, pins.RuntimeSize), (WeightsName, pins.WeightsSize)];
+
+            foreach (var (name, want) in expected)
+            {
+                var nested = Path.Combine(src, "files", name);
+                switch (Engine.SizeOf(File.Exists(nested) ? nested : Path.Combine(payloads, name)))
+                {
+                    case null:
+                        report.Err($"{name} is not in that folder.");
+                        allThere = false;
+                        break;
+                    // want == 0 means the size is not known, not that the file should be empty: the
+                    // add-on's own size only comes from the payload manifest, and without one the
+                    // pins fall back to a zero there. Judging a real file against it said "that is a
+                    // different build" about the right file.
+                    case { } got when want > 0 && got != want:
+                        report.Err(
+                            $"{name} is {got} bytes, and this release expects {want}. That is a different "
+                            + "build, and the add-on refuses anything but the one it was compiled against.");
+                        allThere = false;
+                        break;
+                }
+            }
+            if (allThere) report.Ok("Every payload is there and the right size. Installing verifies the SHA-256 too.");
+        }
+    }
+
     private static Report InstallReShade(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
         string? proxy, bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime)
     {
@@ -180,6 +188,7 @@ public static partial class Work
         report.Info($"preset: {preset.Label()}");
 
         CheckExe(dir, preset, report);
+        CheckLauncher(dir, report);
         if (src.Length == 0 || !File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) || preset.IsVulkan())
             CheckReShade(dir, preset, report);
         CheckDoubleReShade(dir, preset, report, ReShadeProxyFor(preset, dir, proxy), ShippedReShade(src, preset));

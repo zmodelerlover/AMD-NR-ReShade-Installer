@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">กาแฟหนึ่งแก้ว ครั้งเดียว</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">การระดมทุนของโปรเจกต์ในบราซิล</sys:String>
+  <sys:String x:Key="Str.SupportRail">สนับสนุน AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">ช่วยให้ AMD-NR ไปต่อได้</sys:String>
+  <sys:String x:Key="Str.SupportBody">โปรเจกต์นี้อยู่ได้ด้วยการสนับสนุนจากผู้ใช้เท่านั้น เป็นคนสองคน การ์ดจอสองใบ และงานในช่วงบ่าย ไม่มีบริษัท ไม่มีสปอนเซอร์ ทุกอย่างที่นี่ฟรีและจะฟรีต่อไป การสนับสนุนไม่ได้ปลดล็อกอะไร แต่ช่วยให้งานเดินต่อได้</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">อยู่บราซิลใช่ไหม Vakinha รับ Pix บัตร หรือ boleto</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — โดย danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">ตัวเครือข่ายนิวรัลเอง และเหตุผลที่ทั้งหมดนี้มีอยู่ เขาคือผู้ทำให้การเรนเดอร์แบบนิวรัลของ DLSS 5 ทำงานบน Radeon ได้ รันไทม์และน้ำหนักที่แอปนี้ดาวน์โหลดเป็นผลงานของเขา ไม่ใช่ของเรา ขอบคุณ danielblnc</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — add-on</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">วิธีที่ดีที่สุด D3D11 เป็นวิธีเดียวที่เวกเตอร์การเคลื่อนไหวของเกมเองไปถึงเครือข่าย พร้อมกับค่าความลึก</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">จำกัด บน D3D12 add-on เจอค่าความลึกของเกม แต่ไม่เจอเวกเตอร์การเคลื่อนไหว เครือข่ายจึงได้สีและความลึก แล้วประมาณการเคลื่อนไหวเอง ใช้งานได้ แต่คาดหวังผลน้อยกว่า เกมที่มี DLSS, FSR หรือ XeSS ในการตั้งค่า ใช้วิธี OptiScaler จะดีกว่า</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">แนะนำสำหรับเกม D3D12 แทนที่จะเป็น ReShade วิธีนี้ติดตั้ง OptiScaler ซึ่งเข้าควบคุม DLSS, FSR หรือ XeSS ของเกม แล้วรันเครือข่ายข้างในนั้น ด้วยค่าความลึกและเวกเตอร์การเคลื่อนไหวของเกมเอง เกมต้องมีตัวอัปสเกลตัวใดตัวหนึ่งเหล่านี้ และเปิดไว้ในการตั้งค่า ในเกม กด Insert เปิดแท็บ Neural แล้วเปิด «Enable NR» เกมที่ใช้ Ray Reconstruction ต้องตั้งจุดประมวลผลเป็น «After the finished frame»</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">ทดลอง บน Vulkan ReShade เป็นเลเยอร์ การติดตั้งจะลงทะเบียนให้ผู้ใช้ Windows ของคุณ และเปิดใช้กับโปรแกรมนี้ผ่าน ReShade.ini ข้างไฟล์ .exe เกมต้องนำเข้า vkCreateDevice แบบคงที่ และไม่มีค่าความลึกบน Vulkan</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">ทดลอง บน Vulkan ReShade เป็นเลเยอร์ การติดตั้งจะลงทะเบียนให้ผู้ใช้ Windows ของคุณ และเปิดใช้กับโปรแกรมนี้ผ่าน ReShade.ini ข้างไฟล์ .exe ไม่มีค่าความลึกบน Vulkan</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">ทดลอง ต่างจาก Vulkan ตรงที่นี่เป็น DLL พร็อกซีธรรมดา ReShade ถูกวางเป็น opengl32.dll ข้างเกม โดยไม่ต้องรันตัวติดตั้งแยก มีเพียงสีและการเคลื่อนไหวแบบประมาณ ค่าความลึกของเกมเข้าถึงได้บน API นี้ แต่ยังไม่ได้เชื่อมต่อ เกม OpenGL 32 บิต ไม่มีวิธีติดตั้ง</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">ทดลอง เกม 32 บิต โหลดรันไทม์ 64 บิต ไม่ได้ add-on จึงทำงานเป็นโปรเซสคู่ที่แชร์เฟรมกันบนการ์ดเดียว ติดตั้ง ReShade ที่รองรับ add-on เป็น dxgi.dll แบบ 32 บิต</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">ทดลอง ใช้โปรเซสคู่ 32 บิต แบบเดียวกับ D3D11 ผ่านขั้นตอน D3D9/D3D11 ภายใน D3D9 ธรรมดาใช้เวลาคงที่ไม่กี่มิลลิวินาทีต่อเฟรม ส่วน D3D9Ex ไม่ใช้ ติดตั้ง ReShade เป็น d3d9.dll แบบ 32 บิต</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">ทดลอง D3D8 ถูกแปลงเป็น D3D9 แล้วใช้วิธี D3D9 ด้านบน ด้วยโปรเซสคู่ 32 บิต แบบเดียวกัน ติดตั้ง ReShade เป็น d3d9.dll แบบ 32 บิต</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM มีระบบกันโกงของตัวเอง ใช้ตามความเสี่ยงของคุณเอง และตรวจสอบกฎของเซิร์ฟเวอร์ ส่วนเสริมและ ReShade จะอยู่ใน FiveM.app\plugins ส่วนรันไทม์และน้ำหนักจะอยู่ข้างโปรเซสของเกมใน data\cache\subprocess สิ่งที่คุณมีอยู่แล้วใน plugins (ReShade.ini พรีเซ็ต เชดเดอร์ ส่วนเสริมอื่น ENB) จะคงเดิม</sys:String>
   <sys:String x:Key="Str.SetupWelcome">ยินดีต้อนรับ</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">เครือข่าย DLSS 5 Neural Rendering บนการ์ด Radeon ผ่าน ReShade หรือ OptiScaler สี่ขั้นตอนสั้น ๆ</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">เครื่องนี้</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">เกม 64 บิต</sys:String>
   <sys:String x:Key="Str.Group32">เกม 32 บิต (ทดลอง)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">อีมูเลเตอร์</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V ออนไลน์</sys:String>
   <sys:String x:Key="Str.OptiAbout">แทนที่จะเป็น ReShade วิธีนี้ติดตั้ง OptiScaler ซึ่งเข้าควบคุม DLSS, FSR หรือ XeSS ของเกม แล้วรันเครือข่ายข้างในนั้น ด้วยค่าความลึกและเวกเตอร์การเคลื่อนไหวของเกมเอง</sys:String>
   <sys:String x:Key="Str.InGame">ในเกม</sys:String>
   <sys:String x:Key="Str.OptiStep1">เปิด DLSS, FSR หรือ XeSS ในการตั้งค่ากราฟิกของเกม</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan ไม่มีค่าความลึกบน Vulkan</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan เป็นแบ็กเอนด์เริ่มต้น ไม่มีค่าความลึกบน Vulkan</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Vulkan เท่านั้น ไม่มีค่าความลึกบน Vulkan และตัวอีมูเลเตอร์เองยังอยู่ในช่วงแรก คาดว่าจะเจอปัญหา</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Vulkan เท่านั้น ให้เลือกโฟลเดอร์ของ kyty_emulator.exe (launcher.exe แค่เปิดมันขึ้นมา) ไม่มีค่าความลึก และตัวอีมูเลเตอร์เองยังอยู่ช่วงแรก อาจเจอปัญหาได้</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">ในเกม: กด Home เพื่อเปิด ReShade แล้ว AMD Neural Rendering อยู่ในแท็บ Add-ons หรือกด Ctrl+End FiveM มีระบบกันโกงของตัวเอง ตรวจสอบกฎของเซิร์ฟเวอร์ก่อน</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan ตอนนี้ OpenGL ก็มีวิธีติดตั้งแล้ว แต่ Vulkan ผ่านการใช้งานมามากกว่าที่นี่</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu เรนเดอร์ด้วย OpenGL เท่านั้น วิธี OpenGL จึงเป็นวิธีเดียวที่มีที่นี่ เป็นวิธีใหม่ล่าสุดและยังทดลอง มีสีและการเคลื่อนไหวแบบประมาณ ไม่มีค่าความลึก</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL ตัวเรนเดอร์แบบซอฟต์แวร์วาดบน CPU และไม่มีอะไรให้ add-on เข้าถึงได้ จึงต้องเป็น OpenGL และวิธีนี้ยังทดลอง มีสีและการเคลื่อนไหวแบบประมาณ ไม่มีค่าความลึก</sys:String>

@@ -27,6 +27,15 @@ public sealed record EmulatorInfo(
     /// route follows <see cref="Best"/> like any other program.</summary>
     public Preset? Route { get; init; }
 
+    /// <summary>A front end that starts the emulator from somewhere else. It says which emulator
+    /// this is, but the add-on has to be beside the executable that renders, not beside this.</summary>
+    public string[] Launchers { get; init; } = [];
+
+    /// <summary>Files that say which program a folder belongs to without being the one to run, with the
+    /// executable one folder up: FiveM.app holds FiveM_Diag.exe, a diagnostic tool, and FiveM.exe is
+    /// beside FiveM.app. Starting the marker ran the diagnostic instead of FiveM.</summary>
+    public string[] Markers { get; init; } = [];
+
     public string PrimaryExecutable => Executables[0];
 }
 
@@ -114,11 +123,31 @@ public static class Emulators
             GraphicsApi.Vulkan,
             "Vulkan is the default backend. No depth on Vulkan."),
 
+        // The Qt launcher downloads each emulator build into a folder of its own and starts it from
+        // there, so the folder with the launcher is not the one the add-on has to be beside.
         new("shadps4", "shadPS4", "PlayStation 4",
             ["shadPS4.exe"],
             [GraphicsApi.Vulkan],
             GraphicsApi.Vulkan,
-            "Vulkan only. No depth on Vulkan, and this emulator is itself early -- expect trouble."),
+            "Vulkan only. No depth on Vulkan, and this emulator is itself early -- expect trouble.")
+        { Launchers = ["shadPS4QtLauncher.exe", "shadps4-qtlauncher.exe"] },
+
+        new("kyty", "Kyty", "PlayStation 4 and 5",
+            ["kyty_emulator.exe", "fc_script.exe"],
+            [GraphicsApi.Vulkan],
+            GraphicsApi.Vulkan,
+            "Vulkan only. Point this at kyty_emulator.exe's folder (launcher.exe only starts it). No "
+            + "depth on Vulkan, and this emulator is itself early -- expect trouble."),
+
+        // Not an emulator, but the same shape: a host that names its own route and is known by its
+        // executable, so the detection and the library find it the way they find the others.
+        new("fivem", "FiveM", "GTA V online",
+            ["FiveM.exe"],
+            [GraphicsApi.D3D11],
+            GraphicsApi.D3D11,
+            "In game: Home opens ReShade, and AMD Neural Rendering is under Add-ons, or Ctrl+End. "
+            + "FiveM has its own anti-cheat -- check your server's rules first.")
+        { Route = Preset.FiveM, Markers = ["FiveM_Diag.exe"] },
 
         new("azahar", "Azahar", "3DS",
             ["azahar.exe", "citra-qt.exe", "citra.exe"],
@@ -167,7 +196,26 @@ public static class Emulators
             return null;
         }
 
-        return Known.FirstOrDefault(emulator => emulator.Executables.Any(present.Contains));
+        return Known.FirstOrDefault(emulator => emulator.Executables.Any(present.Contains))
+               ?? Known.FirstOrDefault(emulator => emulator.Launchers.Any(present.Contains))
+               ?? Known.FirstOrDefault(emulator => emulator.Markers.Any(present.Contains));
+    }
+
+    /// <summary>Where the emulator's own executable is under a launcher's folder, when it is not in
+    /// it: every copy, at most three levels down, since a launcher keeps one build per folder.</summary>
+    public static IReadOnlyList<string> BuildsUnder(string folder, EmulatorInfo emulator)
+    {
+        var names = new HashSet<string>(emulator.Executables, StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            return Directory.EnumerateFiles(folder, "*.exe",
+                    new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3, IgnoreInaccessible = true })
+                .Where(p => names.Contains(Path.GetFileName(p))).ToList();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return [];
+        }
     }
 
     /// <summary>The executable of a known emulator inside a folder, or null. Used to point the
@@ -179,6 +227,10 @@ public static class Emulators
             var path = Path.Combine(folder, name);
             if (File.Exists(path)) return path;
         }
+        // A marker's folder keeps the executable one level up.
+        if (emulator.Markers.Any(m => File.Exists(Path.Combine(folder, m))) && Path.GetDirectoryName(folder) is { } up)
+            foreach (var name in emulator.Executables)
+                if (File.Exists(Path.Combine(up, name))) return Path.Combine(up, name);
         return null;
     }
 

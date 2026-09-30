@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Tek seferlik bir kahve.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">Projenin Brezilya'daki bağış kampanyası.</sys:String>
+  <sys:String x:Key="Str.SupportRail">AMD-NR'ı destekle</sys:String>
+  <sys:String x:Key="Str.SupportTitle">AMD-NR'ı yaşat</sys:String>
+  <sys:String x:Key="Str.SupportBody">Bu proje yalnızca kullananların desteğiyle ayakta kalıyor. İki kişi, iki ekran kartı ve öğleden sonraları süren bir emek: şirket yok, sponsor yok. Buradaki her şey ücretsiz ve öyle kalacak. Destek hiçbir şeyin kilidini açmaz; işin sürmesini sağlar.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Brezilya'da mısın? Vakinha Pix, kart veya boleto kabul eder.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Ağın kendisi ve tüm bunların var olma sebebi: DLSS 5'in nöral işlemesini Radeon'da çalıştırmayı başaran şey odur. Bu uygulamanın indirdiği çalışma zamanı ve ağırlıklar onun emeğidir, bizim değil. Teşekkürler, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — eklenti</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">En iyi yöntem: oyunun kendi hareket vektörlerinin, derinlik bilgisiyle birlikte ağa ulaştığı tek yöntem D3D11'dir.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Kısıtlı. D3D12'de eklenti oyunun derinlik bilgisini bulur ama hareket vektörlerini bulamaz; bu yüzden ağ renk ve derinlik alır ve hareketi tahmin eder. Çalışır, ama daha az şey bekleyin. Ayarlarında DLSS, FSR veya XeSS olan bir oyun için OptiScaler yöntemi daha iyidir.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">D3D12 oyunları için önerilir. ReShade yerine OptiScaler kurar; OptiScaler oyunun DLSS, FSR veya XeSS'ini devralır ve ağı onun içinde, oyunun kendi derinlik ve hareket vektörleriyle çalıştırır. Oyunun bu ölçekleyicilerden birini sunması ve ayarlarında açık olması gerekir. Oyunda Insert tuşuna basın, Neural sekmesini açın ve «Enable NR» seçeneğini açın; Ray Reconstruction kullanan bir oyunda işleme noktası olarak «After the finished frame» gerekir.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Deneysel. Vulkan'da ReShade bir katmandır (layer): kurulum onu Windows kullanıcınız için kaydeder ve .exe dosyasının yanındaki bir ReShade.ini ile bu program için etkinleştirir. Oyunun vkCreateDevice'ı statik olarak içe aktarması gerekir ve Vulkan'da derinlik yoktur.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Deneysel. Vulkan'da ReShade bir katmandır (layer): kurulum onu Windows kullanıcınız için kaydeder ve .exe dosyasının yanındaki bir ReShade.ini ile bu program için etkinleştirir. Vulkan'da derinlik yoktur.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Deneysel. Vulkan'ın aksine bu sıradan bir proxy DLL'dir: ReShade, ayrı bir yükleyici çalıştırılmadan oyunun yanına opengl32.dll olarak konur. Yalnızca renk ve tahmini hareket; oyunun derinlik bilgisine bu API'de erişilebilir ama henüz bağlanmadı. 32 bit bir OpenGL oyunu için yöntem yoktur.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Deneysel. 32 bit bir oyun 64 bit çalışma zamanını yükleyemez; bu yüzden eklenti, tek bir ekran kartında kareleri paylaşan bir süreç çifti olarak çalışır. ReShade'i eklenti desteğiyle 32 bit dxgi.dll olarak kurun.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Deneysel. D3D11'deki aynı 32 bit çift, özel bir D3D9/D3D11 aşaması üzerinden. Düz D3D9 kare başına sabit birkaç milisaniyeye mal olur; D3D9Ex olmaz. ReShade'i 32 bit d3d9.dll olarak kurun.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Deneysel. D3D8, D3D9'a çevrilir ve ardından aynı 32 bit çiftle yukarıdaki D3D9 yöntemini izler. ReShade'i 32 bit d3d9.dll olarak kurun.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM'in kendi hile koruması var: risk sana ait, sunucunun kurallarına bak. Eklenti ve ReShade FiveM.app\plugins içine, runtime ve ağırlıklar oyun işleminin yanına, data\cache\subprocess içine gider. plugins içinde zaten olanlar — ReShade.ini, ön ayarlar, shader'lar, diğer eklentiler, ENB — olduğu gibi kalır.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Hoş geldiniz</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Radeon kartlarda DLSS 5 Neural Rendering ağı; ReShade veya OptiScaler üzerinden. Dört kısa adım.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Bu bilgisayar</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64 bit oyunlar</sys:String>
   <sys:String x:Key="Str.Group32">32 bit oyunlar (deneysel)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emülatörler</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">ReShade yerine OptiScaler kurar; OptiScaler oyunun DLSS, FSR veya XeSS'ini devralır ve ağı onun içinde, oyunun kendi derinlik ve hareket vektörleriyle çalıştırır.</sys:String>
   <sys:String x:Key="Str.InGame">Oyunda</sys:String>
   <sys:String x:Key="Str.OptiStep1">Oyunun grafik ayarlarından DLSS, FSR veya XeSS'i açın.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Vulkan'da derinlik yok.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Varsayılan arka uç Vulkan'dır. Vulkan'da derinlik yok.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Yalnızca Vulkan. Vulkan'da derinlik yok ve emülatörün kendisi de henüz çok yeni; sorun bekleyin.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Yalnızca Vulkan. kyty_emulator.exe'nin klasörünü seç (launcher.exe onu yalnızca başlatır). Derinlik yok ve emülatörün kendisi henüz erken aşamada — sorun bekle.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">Oyunda: Home ReShade'i açar, AMD Neural Rendering Add-ons sekmesindedir ya da Ctrl+End. FiveM'in kendi hile koruması var — önce sunucunun kurallarına bak.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. Artık OpenGL için de bir yöntem var, ama burada en çok denenmiş olan Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu yalnızca OpenGL ile görüntü oluşturur, bu yüzden burada tek yöntem OpenGL yöntemidir. Yöntemlerin en yenisidir ve deneyseldir: renk ve tahmini hareket, derinlik yok.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. Yazılımsal işleyici CPU üzerinde çizer ve orada bir eklentinin erişebileceği hiçbir şey yoktur; bu yüzden OpenGL işleyicisi olmalıdır. Bu yöntem deneyseldir: renk ve tahmini hareket, derinlik yok.</sys:String>

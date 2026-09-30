@@ -51,6 +51,31 @@ public static partial class Engine
         }
     }
 
+    /// <summary>Whether the image carries an Authenticode certificate table (data directory 4). Only
+    /// checks that one is there, not that it is valid: what this is asked is which ReShade build a
+    /// file is, and crosire signs the normal build and not the one with full add-on support.</summary>
+    public static bool IsSigned(ReadOnlySpan<byte> b)
+    {
+        var machine = Machine(b);
+        var optional = (int)U32At(b, 60) + 24;
+        var directories = optional + (machine == MachineX64 ? 112 : 96);
+        return U32At(b, directories + 4 * 8 + 4) != 0;
+    }
+
+    public static bool IsSignedFile(string path)
+    {
+        try
+        {
+            using var f = File.OpenRead(path);
+            var head = new byte[64 * 1024];
+            return IsSigned(head.AsSpan(0, f.ReadAtLeast(head, head.Length, throwOnEndOfStream: false)));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InstallException)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Some maintained game wrappers deliberately forward Direct3D 8 to d3d8R.dll. Detect
     /// only an explicit embedded sidecar name; otherwise fail closed rather than replacing an
     /// unknown wrapper.</summary>

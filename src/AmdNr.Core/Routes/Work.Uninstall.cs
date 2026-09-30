@@ -13,11 +13,11 @@ public static partial class Work
     /// effect, and what older layouts left. Whatever is under one of these is ours, whether a manifest
     /// lists it or somebody copied it in by hand, and uninstall takes it. Nothing with a name anybody
     /// else uses is here.</summary>
-    internal static IEnumerable<string> OurNames => InstalledMarkers.Append(ShaderPath).Concat(DeadFiles());
+    internal static IEnumerable<string> OurNames => InstalledMarkers.Concat(FiveMMarkers).Append(ShaderPath).Concat(DeadFiles());
 
     /// <summary>The tuning files, by names only this project uses. Settings, so they are asked about
     /// rather than taken.</summary>
-    private static readonly string[] OurSettings = ["amd-nr.ini", "dlss5-neural.ini"];
+    private static readonly string[] OurSettings = ["amd-nr.ini", "dlss5-neural.ini", $"{FiveMGame}/amd-nr.ini"];
 
     /// <summary>Takes back everything of this app's in the folder, and puts back what it displaced.
     /// The settings -- a configuration entry in a manifest, or the tuning by name -- stay unless
@@ -88,6 +88,8 @@ public static partial class Work
 
         gone += SwitchOffVulkanReShade(dir, recorded, report);
         gone += SweepDroppings(dir, report);
+        // FiveM's add-on writes its runtime copies and logs beside the game process, not in FiveM.app.
+        if (Directory.Exists(Path.Combine(dir, FiveMGame))) gone += SweepDroppings(Path.Combine(dir, FiveMGame), report);
         gone += RemovePinnedMochizuki(dir, builds, still, report);
         foreach (var route in unreadable) gone += SetAside(dir, route, report);
         PruneEmpty(dir, [Engine.BackupDir, Engine.LegacyBackupDir, ShaderFolder, "reshade-shaders"], report);
@@ -197,6 +199,7 @@ public static partial class Work
     /// the 32-bit route. Null when that is not known yet.</summary>
     private static string? InstallFolder(string gameDir, Preset preset)
     {
+        if (preset == Preset.FiveM) return FiveMApp(gameDir);
         if (preset.Route() != Route.X86)
         {
             var dir = ResolveSource(gameDir);
@@ -223,6 +226,12 @@ public static partial class Work
         if (path.Length == 0)
         {
             report.Err("No game folder given.");
+            return null;
+        }
+        if (preset == Preset.FiveM)
+        {
+            if (FiveMApp(path) is { } app) return app;
+            report.Err(NotFiveM(path));
             return null;
         }
         if (File.Exists(path))

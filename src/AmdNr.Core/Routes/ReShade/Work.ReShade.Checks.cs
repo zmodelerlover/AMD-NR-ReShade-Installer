@@ -273,6 +273,36 @@ public static partial class Work
                 + "sign the path is wrong.");
     }
 
+    /// <summary>A launcher's folder, such as shadPS4's Qt launcher, is not where its emulator runs: the
+    /// launcher keeps each build in a folder of its own and starts it from there, so an install beside
+    /// the launcher is never loaded. Refused, with the folders the builds are in.</summary>
+    private static void CheckLauncher(string dir, Report report)
+    {
+        if (Emulators.Identify(dir) is not { } e || Emulators.ExecutableIn(dir, e) is not null) return;
+        var builds = Emulators.BuildsUnder(dir, e).Select(p => Path.GetDirectoryName(p)!).Distinct().ToList();
+        report.Err(builds.Count == 0
+            ? $"This is the {e.Name} launcher's folder, and {e.PrimaryExecutable} is neither in it nor under it. "
+              + $"The add-on has to be beside {e.PrimaryExecutable}: download a build in the launcher, then pick "
+              + "the folder that build went to."
+            : $"This is the {e.Name} launcher's folder, not where {e.PrimaryExecutable} runs. Pick the folder of "
+              + $"the build you play instead: {Joined(builds)}.");
+    }
+
+    /// <summary>The oldest ReShade the add-on registers with. It is built against ReShade API 20,
+    /// which 6.8.0 was the first to carry (6.7.3 is API 18): an older ReShade refuses it, and says so
+    /// only in its own log.</summary>
+    internal static readonly Version MinReShade = new(6, 8, 0);
+
+    internal enum ReShadeFit { Fits, Signed, TooOld }
+
+    /// <summary>Whether the add-on loads in a ReShade already there. The signed build is the normal
+    /// one, whose add-on support is limited and switched off altogether in an online game; the build
+    /// with full add-on support is not signed.</summary>
+    internal static ReShadeFit FitOf(string? version, bool signed) =>
+        signed ? ReShadeFit.Signed
+        : Version.TryParse(version, out var v) && v >= MinReShade ? ReShadeFit.Fits
+        : ReShadeFit.TooOld;
+
     /// <summary>ReShade writes DisabledAddons= into its own ini the first time anyone unticks an
     /// add-on, and from then on it never loads it again and says nothing anywhere. It is the one
     /// failure in this project that looks exactly like a broken install -- and every route's install

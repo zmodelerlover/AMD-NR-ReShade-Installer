@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Jednokratna kava.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">Brazilsko prikupljanje sredstava za projekt.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Podrži AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Održi AMD-NR na životu</sys:String>
+  <sys:String x:Key="Str.SupportBody">Ovaj projekt živi samo od podrške onih koji ga koriste. To su dvije osobe, dvije grafičke kartice i poslijepodneva rada: bez tvrtke i sponzora. Sve je ovdje besplatno i tako će i ostati. Podrška ništa ne otključava; ona omogućuje da se radi dalje.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">U Brazilu ste? Vakinha prima Pix, karticu ili boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — autor danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Sama mreža i razlog zašto sve ovo postoji: zahvaljujući njoj neuronsko renderiranje DLSS 5 uopće je pokrenuto na Radeonu. Runtime i težine koje ova aplikacija preuzima njegov su rad, ne naš. Hvala, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — dodatak</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">Najbolji put: D3D11 jedini je na kojem vlastiti vektori kretanja igre stižu do mreže, zajedno s njezinom dubinom.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Ograničeno. Na D3D12 dodatak pronalazi dubinu igre, ali ne i njezine vektore kretanja, pa mreža dobiva boju i dubinu, a kretanje procjenjuje. Radi, ali očekujte manje. Igri s DLSS-om, FSR-om ili XeSS-om u postavkama bolje odgovara put OptiScaler.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Preporučeno za igre na D3D12. Umjesto ReShadea instalira OptiScaler, koji preuzima DLSS, FSR ili XeSS igre i pokreće mrežu unutar njega, s vlastitom dubinom i vektorima kretanja igre. Igra mora nuditi jedan od tih upscalera, uključen u njezinim postavkama. U igri pritisnite Insert, otvorite karticu Neural i uključite Enable NR; igri s Ray Reconstructionom kao točka obrade treba „After the finished frame”.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Eksperimentalno. ReShade na Vulkanu je sloj: instalacija ga registrira za vašeg korisnika sustava Windows i uključuje ga za ovaj program pomoću ReShade.ini pokraj njegova .exe-a. Igra mora statički uvoziti vkCreateDevice, a na Vulkanu nema dubine.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Eksperimentalno. ReShade na Vulkanu je sloj: instalacija ga registrira za vašeg korisnika sustava Windows i uključuje ga za ovaj program pomoću ReShade.ini pokraj njegova .exe-a. Na Vulkanu nema dubine.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Eksperimentalno. Za razliku od Vulkana, ovo je običan proxy DLL: ReShade ide pokraj igre kao opengl32.dll, bez zasebnog pokretanja instalacijskog programa. Samo boja i procijenjeno kretanje; vlastita dubina igre na ovom je API-ju dostupna, ali još nije povezana. 32-bitna igra na OpenGL-u nema put.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Eksperimentalno. 32-bitna igra ne može učitati 64-bitni runtime, pa dodatak radi kao par koji dijeli okvire na jednom adapteru. Instalirajte ReShade s podrškom za dodatke kao 32-bitni dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Eksperimentalno. Isti 32-bitni par kao za D3D11, kroz privatnu fazu D3D9/D3D11. Obični D3D9 stoji nekoliko fiksnih milisekundi po okviru; D3D9Ex ne. Instalirajte ReShade kao 32-bitni d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Eksperimentalno. D3D8 se prevodi u D3D9 i zatim ide gornjim putem D3D9, s istim 32-bitnim parom. Instalirajte ReShade kao 32-bitni d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM ima vlastiti anti-cheat: na vlastitu odgovornost, i provjerite pravila svog poslužitelja. Dodatak i ReShade idu u FiveM.app\plugins, runtime i težine pokraj procesa igre u data\cache\subprocess. Ono što već imate u plugins — ReShade.ini, preseti, shaderi, drugi dodaci, ENB — ostaje kako jest.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Dobro došli</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">Mreža DLSS 5 Neural Rendering na karticama Radeon, preko ReShadea ili OptiScalera. Četiri brza koraka.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Ovo računalo</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64-bitne igre</sys:String>
   <sys:String x:Key="Str.Group32">32-bitne igre (eksperimentalno)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emulatori</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">Umjesto ReShadea instalira OptiScaler, koji preuzima DLSS, FSR ili XeSS igre i pokreće mrežu unutar njega, s vlastitom dubinom i vektorima kretanja igre.</sys:String>
   <sys:String x:Key="Str.InGame">U igri</sys:String>
   <sys:String x:Key="Str.OptiStep1">Uključite DLSS, FSR ili XeSS u grafičkim postavkama igre.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Na Vulkanu nema dubine.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan je zadani backend. Na Vulkanu nema dubine.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Samo Vulkan. Na Vulkanu nema dubine, a sam je emulator još u ranoj fazi — očekujte probleme.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Samo Vulkan. Odaberite mapu kyty_emulator.exe (launcher.exe ga samo pokreće). Bez dubine, a sam emulator je još rani — očekujte probleme.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">U igri: Home otvara ReShade, a AMD Neural Rendering je pod Add-ons, ili Ctrl+End. FiveM ima vlastiti anti-cheat — prvo provjerite pravila poslužitelja.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. I OpenGL sada ima put, ali Vulkan je ovdje najviše isproban.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu renderira samo s OpenGL-om, pa je put OpenGL ovdje jedini. To je najnoviji put i eksperimentalan je: boja i procijenjeno kretanje, bez dubine.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. Softverski renderer crta na CPU-u i dodatak tamo nema do čega doći, pa mora biti OpenGL — a taj je put eksperimentalan: boja i procijenjeno kretanje, bez dubine.</sys:String>

@@ -56,6 +56,10 @@
   <sys:String x:Key="Str.SupportKofiBody">Vienkartinė kava.</sys:String>
   <sys:String x:Key="Str.SupportVakinhaTitle">Vakinha</sys:String>
   <sys:String x:Key="Str.SupportVakinhaBody">Projekto lėšų rinkimas Brazilijoje.</sys:String>
+  <sys:String x:Key="Str.SupportRail">Paremti AMD-NR</sys:String>
+  <sys:String x:Key="Str.SupportTitle">Išlaikykite AMD-NR gyvą</sys:String>
+  <sys:String x:Key="Str.SupportBody">Šis projektas gyvuoja tik jo naudotojų parama. Tai du žmonės, dvi vaizdo plokštės ir darbo popietės: jokios įmonės, jokio rėmėjo. Viskas čia nemokama ir tokia liks. Parama nieko neatrakina; ji leidžia darbui tęstis.</sys:String>
+  <sys:String x:Key="Str.SupportBrazil">Esate Brazilijoje? Vakinha priima Pix, kortelę arba boleto.</sys:String>
   <sys:String x:Key="Str.CreditRuntimeTitle">DLSS-NR-on-AMD — danielblnc</sys:String>
   <sys:String x:Key="Str.CreditRuntimeBody">Pats tinklas ir priežastis, kodėl visa tai egzistuoja: būtent jis apskritai paleido DLSS 5 neuroninį atvaizdavimą Radeon kortose. Vykdymo aplinka ir svoriai, kuriuos atsisiunčia ši programa, yra jo darbas, ne mūsų. Ačiū, danielblnc.</sys:String>
   <sys:String x:Key="Str.CreditAddonTitle">dlss5-neural-amd — priedas</sys:String>
@@ -214,11 +218,12 @@
   <sys:String x:Key="Str.PresetNote.Dx11">Geriausias maršrutas: D3D11 — vienintelis, kur paties žaidimo judesio vektoriai pasiekia tinklą kartu su jo gyliu.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Ribotas. Su D3D12 priedas randa žaidimo gylį, bet ne jo judesio vektorius, todėl tinklas gauna spalvą ir gylį, o judesį įvertina. Veikia, bet tikėkitės mažiau. Žaidimui, kurio nustatymuose yra DLSS, FSR arba XeSS, geriau tinka OptiScaler maršrutas.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Rekomenduojama D3D12 žaidimams. Vietoj ReShade įdiegia OptiScaler, kuris perima žaidimo DLSS, FSR arba XeSS ir paleidžia tinklą jo viduje, su paties žaidimo gyliu ir judesio vektoriais. Žaidimas turi siūlyti vieną iš šių didinimo priemonių, įjungtą nustatymuose. Žaidime paspauskite Insert, atverkite skirtuką Neural ir įjunkite Enable NR; žaidimui su Ray Reconstruction apdorojimo taškas turi būti „After the finished frame“.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Vulkan">Eksperimentinis. ReShade su Vulkan yra sluoksnis: diegimas jį užregistruoja jūsų Windows naudotojui ir įjungia šiai programai per ReShade.ini šalia jos .exe. Žaidimas turi statiškai importuoti vkCreateDevice, o su Vulkan gylio nėra.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Vulkan">Eksperimentinis. ReShade su Vulkan yra sluoksnis: diegimas jį užregistruoja jūsų Windows naudotojui ir įjungia šiai programai per ReShade.ini šalia jos .exe. Su Vulkan gylio nėra.</sys:String>
   <sys:String x:Key="Str.PresetNote.OpenGL">Eksperimentinis. Kitaip nei Vulkan, tai įprastas tarpinis DLL: ReShade įdedamas šalia žaidimo kaip opengl32.dll, nepaleidžiant atskiros diegimo programos. Tik spalva ir įvertintas judesys; paties žaidimo gylis su šia API pasiekiamas, bet dar neprijungtas. 32 bitų OpenGL žaidimas maršruto neturi.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx11">Eksperimentinis. 32 bitų žaidimas negali įkelti 64 bitų vykdymo aplinkos, todėl priedas veikia kaip pora, dalijanti kadrus viename adapteryje. Įdiekite ReShade su priedų palaikymu kaip 32 bitų dxgi.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Eksperimentinis. Ta pati 32 bitų pora kaip su D3D11, per privatų D3D9/D3D11 etapą. Paprastas D3D9 kainuoja kelias fiksuotas milisekundes kadrui; D3D9Ex — ne. Įdiekite ReShade kaip 32 bitų d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Eksperimentinis. D3D8 verčiamas į D3D9 ir toliau eina aukščiau esančiu D3D9 maršrutu, su ta pačia 32 bitų pora. Įdiekite ReShade kaip 32 bitų d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.FiveM">FiveM turi savo apsaugą nuo sukčiavimo: savo rizika, ir pasitikrinkite serverio taisykles. Priedas ir ReShade dedami į FiveM.app\plugins, vykdymo biblioteka ir svoriai – šalia žaidimo proceso į data\cache\subprocess. Kas jau yra plugins aplanke – ReShade.ini, nustatymai, šešėliavimo programos, kiti priedai, ENB – lieka nepakeista.</sys:String>
   <sys:String x:Key="Str.SetupWelcome">Sveiki</sys:String>
   <sys:String x:Key="Str.SetupWelcomeBody">DLSS 5 Neural Rendering tinklas Radeon kortose, per ReShade arba OptiScaler. Keturi greiti žingsniai.</sys:String>
   <sys:String x:Key="Str.SetupStepMachine">Šis kompiuteris</sys:String>
@@ -312,6 +317,7 @@
   <sys:String x:Key="Str.Group64">64 bitų žaidimai</sys:String>
   <sys:String x:Key="Str.Group32">32 bitų žaidimai (eksperimentiniai)</sys:String>
   <sys:String x:Key="Str.GroupEmulators">Emuliatoriai</sys:String>
+  <sys:String x:Key="Str.GroupFiveM">GTA V online</sys:String>
   <sys:String x:Key="Str.OptiAbout">Vietoj ReShade įdiegia OptiScaler, kuris perima žaidimo DLSS, FSR arba XeSS ir paleidžia tinklą jo viduje, su paties žaidimo gyliu ir judesio vektoriais.</sys:String>
   <sys:String x:Key="Str.InGame">Žaidime</sys:String>
   <sys:String x:Key="Str.OptiStep1">Įjunkite DLSS, FSR arba XeSS žaidimo grafikos nustatymuose.</sys:String>
@@ -417,6 +423,8 @@
   <sys:String x:Key="Str.Emulator.yuzu">Emulation &gt; Configure &gt; Graphics &gt; API: Vulkan. Su Vulkan gylio nėra.</sys:String>
   <sys:String x:Key="Str.Emulator.vita3k">Vulkan yra numatytoji posistemė. Su Vulkan gylio nėra.</sys:String>
   <sys:String x:Key="Str.Emulator.shadps4">Tik Vulkan. Su Vulkan gylio nėra, o pats emuliatorius dar ankstyvos stadijos — tikėkitės problemų.</sys:String>
+  <sys:String x:Key="Str.Emulator.kyty">Tik Vulkan. Nurodykite kyty_emulator.exe aplanką (launcher.exe jį tik paleidžia). Gylio nėra, o pats emuliatorius dar ankstyvas – tikėkitės problemų.</sys:String>
+  <sys:String x:Key="Str.Emulator.fivem">Žaidime: Home atveria ReShade, AMD Neural Rendering yra Add-ons skiltyje, arba Ctrl+End. FiveM turi savo apsaugą nuo sukčiavimo – pirma pasitikrinkite serverio taisykles.</sys:String>
   <sys:String x:Key="Str.Emulator.azahar">Emulation &gt; Configure &gt; Graphics &gt; Graphics API: Vulkan. Dabar maršrutą turi ir OpenGL, bet čia labiausiai išbandytas Vulkan.</sys:String>
   <sys:String x:Key="Str.Emulator.xemu">xemu atvaizduoja tik su OpenGL, todėl OpenGL maršrutas čia vienintelis. Tai naujausias maršrutas, ir jis eksperimentinis: spalva ir įvertintas judesys, be gylio.</sys:String>
   <sys:String x:Key="Str.Emulator.melonds">Emu settings &gt; Video &gt; 3D renderer: OpenGL. Programinis atvaizduoklis piešia procesoriumi, ir ten priedui nėra ko pasiekti, todėl reikia OpenGL — o šis maršrutas eksperimentinis: spalva ir įvertintas judesys, be gylio.</sys:String>

@@ -79,7 +79,14 @@ public static partial class Work
     private static void NoteVulkanLayer(bool shipsReShade, Report report)
     {
         var layer = FindReShadeLayer();
-        if (layer is { Ours: false })
+        // Somebody else's layer is used as it is, so say when the add-on cannot load in it.
+        if (layer is { Ours: false } && Identify(layer.Library).Version is var version
+            && FitOf(version, Engine.IsSignedFile(layer.Library)) is not ReShadeFit.Fits)
+            report.Warn($"ReShade is already a Vulkan layer on this PC ({layer.Library}), and it is "
+                        + (Engine.IsSignedFile(layer.Library) ? "the normal build, not the one with full add-on support"
+                            : $"{version ?? "an unknown version"}, older than {MinReShade}") + ": the add-on does not load in it. "
+                        + "Run the ReShade 6.8.0 setup with full add-on support and pick Vulkan, which replaces it.");
+        else if (layer is { Ours: false })
             report.Ok($"ReShade is already a Vulkan layer on this PC ({layer.Library}). This install puts a ReShade.ini "
                       + "beside the executable, which is what turns it on for this program. The add-on needs that ReShade "
                       + "to be the build with full add-on support.");

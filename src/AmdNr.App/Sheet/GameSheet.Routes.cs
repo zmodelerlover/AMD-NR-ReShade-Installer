@@ -27,6 +27,7 @@ public partial class GameSheet
     private static readonly Preset[] Wide = [Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
     private static readonly Preset[] Narrow = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
     private static readonly Preset[] Emulated = [Preset.Pcsx2, Preset.Rpcs3];
+    private static readonly Preset[] FiveM = [Preset.FiveM];
 
     private void ShowRoutes(GameCard card, GraphicsDetection graphics)
     {
@@ -73,9 +74,10 @@ public partial class GameSheet
     {
         IEnumerable<(string Title, Preset[] Presets)> groups =
         [
-            ("Str.Group64", Wide), ("Str.Group32", Narrow), ("Str.GroupEmulators", Emulated),
+            ("Str.Group64", Wide), ("Str.Group32", Narrow), ("Str.GroupEmulators", Emulated), ("Str.GroupFiveM", FiveM),
         ];
-        groups = graphics.Emulator is not null ? groups.OrderBy(g => g.Presets != Emulated)
+        groups = graphics.Emulator?.Route == Preset.FiveM ? groups.OrderBy(g => g.Presets != FiveM)
+            : graphics.Emulator is not null ? groups.OrderBy(g => g.Presets != Emulated)
             : _detected.Route == Route.X86 ? groups.OrderBy(g => g.Presets != Narrow)
             : groups;
 
@@ -374,6 +376,7 @@ public partial class GameSheet
     private bool OffersMochizuki(GameCard card)
     {
         if (card.Entry.Preset.IsOptiScaler()) return _version?.Opti is { } opti && CarriesMochizuki(opti);
+        if (card.Entry.Preset == Preset.FiveM) return false;
         if (Selected() is not { } manifest) return false;
         var own = card.Entry.Preset.Route() == Route.X86 ? PayloadManifest.BridgeComponent : PayloadManifest.AddonComponent;
         var version = _version?.Version
