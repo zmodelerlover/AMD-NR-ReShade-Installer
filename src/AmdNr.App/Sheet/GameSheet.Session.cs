@@ -20,6 +20,17 @@ public partial class GameSheet
             LastSession.IsVisible = false;
             return;
         }
+        // An async void: whatever escapes it takes the window down, and this is a courtesy, not the install.
+        try { await ShowSessionAsync(card); }
+        catch (Exception e)
+        {
+            LastSession.IsVisible = false;
+            InstallLog.Append($"last session could not be shown: {e}");
+        }
+    }
+
+    private async Task ShowSessionAsync(GameCard card)
+    {
         var read = ++_sessionReads;
         var folders = card.Folders;
         var result = await Task.Run(() => folders.Select(SessionLog.Read).OfType<SessionResult>()
@@ -76,6 +87,9 @@ public partial class GameSheet
     /// culture for writes them as English does.</summary>
     internal static CultureInfo Culture()
     {
+        // A private tag such as x-pirate is accepted by name and has no data behind it: formatting a
+        // number with it threw, on every start once the list view put a game's page on screen.
+        if (App.CurrentLanguage.StartsWith("x-", StringComparison.Ordinal)) return CultureInfo.GetCultureInfo("en-US");
         try { return CultureInfo.GetCultureInfo(App.CurrentLanguage, predefinedOnly: true); }
         catch (CultureNotFoundException) { return CultureInfo.GetCultureInfo("en-US"); }
     }

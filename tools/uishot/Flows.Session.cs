@@ -45,8 +45,8 @@ internal static class SessionFlow
         check(until(() => title.Text == S("Str.SessionCrashed"), 10) && line.IsVisible && line.Text!.StartsWith("CRASH:"),
             "a crash says so, with the runtime's own line for Discord");
         save(main, "flow-session-crash");
-        // The longest of the languages, and the one that reads right to left.
-        foreach (var code in new[] { "de", "ar" })
+        // The longest of the languages, the one that reads right to left, and the one .NET has no culture for.
+        foreach (var code in new[] { "de", "ar", "x-pirate" })
         {
             App.ChangeLanguage(code);
             // What ChangeLanguage does to every window of the desktop, which a headless run has none of.
