@@ -36,6 +36,10 @@ public sealed record EmulatorInfo(
     /// beside FiveM.app. Starting the marker ran the diagnostic instead of FiveM.</summary>
     public string[] Markers { get; init; } = [];
 
+    /// <summary>Where a launcher keeps its list of the builds it downloaded: a folder beside it, or one
+    /// under the user's profile, first that exists. Environment variables are expanded.</summary>
+    public string[] LauncherData { get; init; } = [];
+
     public string PrimaryExecutable => Executables[0];
 }
 
@@ -130,7 +134,13 @@ public static class Emulators
             [GraphicsApi.Vulkan],
             GraphicsApi.Vulkan,
             "Vulkan only. No depth on Vulkan, and this emulator is itself early -- expect trouble.")
-        { Launchers = ["shadPS4QtLauncher.exe", "shadps4-qtlauncher.exe"] },
+        // Its data is "launcher" beside it when that folder exists (portable) and %APPDATA%\shadPS4QtLauncher
+        // otherwise (path_util.cpp); versions.json there lists each build's executable, and qt_ui.ini's
+        // [version_manager] versionSelected names the one it starts.
+        {
+            Launchers = ["shadPS4QtLauncher.exe", "shadps4-qtlauncher.exe"],
+            LauncherData = ["launcher", @"%APPDATA%\shadPS4QtLauncher"],
+        },
 
         new("kyty", "Kyty", "PlayStation 4 and 5",
             ["kyty_emulator.exe", "fc_script.exe"],
@@ -201,21 +211,53 @@ public static class Emulators
                ?? Known.FirstOrDefault(emulator => emulator.Markers.Any(present.Contains));
     }
 
-    /// <summary>Where the emulator's own executable is under a launcher's folder, when it is not in
-    /// it: every copy, at most three levels down, since a launcher keeps one build per folder.</summary>
+    /// <summary>Where the emulator's own executable is, for a launcher's folder that does not hold it:
+    /// the builds the launcher lists, the one it starts first, then any copy at most three levels down.</summary>
     public static IReadOnlyList<string> BuildsUnder(string folder, EmulatorInfo emulator)
     {
         var names = new HashSet<string>(emulator.Executables, StringComparer.OrdinalIgnoreCase);
+        var found = new List<string>(LauncherBuilds(folder, emulator));
         try
         {
-            return Directory.EnumerateFiles(folder, "*.exe",
+            found.AddRange(Directory.EnumerateFiles(folder, "*.exe",
                     new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3, IgnoreInaccessible = true })
-                .Where(p => names.Contains(Path.GetFileName(p))).ToList();
+                .Where(p => names.Contains(Path.GetFileName(p))));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            return [];
+            // What the launcher lists still stands.
         }
+        return found.Where(p => names.Contains(Path.GetFileName(p)) && File.Exists(p))
+            .Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
+    /// <summary>The builds a launcher's own list names, the selected one first.</summary>
+    private static IEnumerable<string> LauncherBuilds(string folder, EmulatorInfo emulator)
+    {
+        var data = emulator.LauncherData.Select(d => Path.Combine(folder, Environment.ExpandEnvironmentVariables(d)))
+            .FirstOrDefault(Directory.Exists);
+        if (data is null) yield break;
+
+        string? selected = null;
+        List<string> listed = [];
+        try
+        {
+            var ini = Path.Combine(data, "qt_ui.ini");
+            if (File.Exists(ini))
+                selected = Engine.GetIni(File.ReadAllText(ini), "version_manager", "versionSelected").Trim('"');
+            using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(data, "versions.json")));
+            foreach (var entry in doc.RootElement.EnumerateArray())
+                if (entry.ValueKind == System.Text.Json.JsonValueKind.Object
+                    && entry.TryGetProperty("path", out var path) && path.GetString() is { Length: > 0 } p)
+                    listed.Add(p);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Text.Json.JsonException
+                                      or InvalidOperationException or ArgumentException)
+        {
+            // A list that cannot be read is no list; the search below still runs.
+        }
+        if (selected is { Length: > 0 }) yield return selected;
+        foreach (var p in listed) yield return p;
     }
 
     /// <summary>The executable of a known emulator inside a folder, or null. Used to point the

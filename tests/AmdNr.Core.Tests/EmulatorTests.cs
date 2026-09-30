@@ -140,4 +140,39 @@ public class EmulatorTests
         Assert.Equal(Preset.Vulkan, GraphicsDetector.Detect(build).Preset);
         Assert.Equal(Preset.Vulkan, GraphicsDetector.Detect(Folder("kyty", "kyty_emulator.exe", "launcher.exe")).Preset);
     }
+
+    /// <summary>The Qt launcher loose in Downloads, as a player had it: its builds are nowhere under it
+    /// but in its data folder's versions.json, and qt_ui.ini says which one it starts. The detection goes
+    /// to that build, so the install lands beside the shadPS4.exe that runs, and the pre-flight is clean.</summary>
+    [Fact]
+    public void ALaunchersOwnListSaysWhichBuildItStarts()
+    {
+        var downloads = Folder("shadps4-downloads", "shadPS4QtLauncher.exe");
+        var data = Directory.CreateDirectory(Path.Combine(downloads, "launcher")).FullName;
+        var elsewhere = Fixture.Temp("shadps4-builds");
+        string Build(string name)
+        {
+            var dir = Directory.CreateDirectory(Path.Combine(elsewhere, "versions", name)).FullName;
+            var exe = Path.Combine(dir, "shadPS4.exe");
+            File.WriteAllBytes(exe, Fixture.Pe(x64: true));
+            return exe;
+        }
+        var older = Build("v0.12.0");
+        var picked = Build("Pre-release-2026-09-30");
+        string J(string p) => p.Replace(@"\", "/");
+        File.WriteAllText(Path.Combine(data, "versions.json"),
+            $"[{{\"name\":\"old\",\"path\":\"{J(older)}\"}},{{\"name\":\"new\",\"path\":\"{J(picked)}\"}}]");
+        File.WriteAllLines(Path.Combine(data, "qt_ui.ini"), ["[version_manager]", $"versionSelected={J(picked)}"]);
+
+        var detection = GraphicsDetector.Detect(downloads);
+        Assert.Equal("shadps4", detection.Emulator?.Id);
+        Assert.Equal(Path.GetFullPath(picked), Path.GetFullPath(detection.Executable!));
+
+        // What the sheet hands the pre-flight is that executable, and there is nothing to refuse.
+        var (src, pins) = Fixture.Payloads("shadps4-downloads");
+        Assert.False(Fixture.HasErr(Work.Preflight(detection.Executable!, src, Preset.Vulkan, pins), "launcher"));
+
+        // Somebody can still point at another build, and that one wins.
+        Assert.Equal(older, GraphicsDetector.Detect(downloads, executable: older).Executable);
+    }
 }

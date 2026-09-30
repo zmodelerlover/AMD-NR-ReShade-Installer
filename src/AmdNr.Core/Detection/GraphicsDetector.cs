@@ -86,9 +86,11 @@ public static partial class GraphicsDetector
     /// <summary>A detection for a folder already known to hold <paramref name="emulator"/>. The
     /// renderer list is the emulator's declared one rather than its import table, and the width
     /// still comes from the executable on this disk, because only that says which build is here.</summary>
-    private static GraphicsDetection ForEmulator(string root, EmulatorInfo emulator)
+    private static GraphicsDetection ForEmulator(string root, EmulatorInfo emulator, string? chosen = null)
     {
-        var exe = Emulators.ExecutableIn(root, emulator);
+        // The executable somebody picked, then the one in the folder, then, for a launcher's folder,
+        // the build the launcher starts: the install goes beside whichever this is.
+        var exe = chosen ?? Emulators.ExecutableIn(root, emulator) ?? Emulators.BuildsUnder(root, emulator).FirstOrDefault();
         var width = exe is null
             ? Route.X64
             : Engine.MachineOfFile(exe) switch
@@ -170,13 +172,12 @@ public static partial class GraphicsDetector
         // 0. A known emulator, before anything else. Its executable links every renderer it can be
         //    set to, so reading the imports here answers a different question than the one asked:
         //    what decides the route is a setting inside the emulator, which no file reveals.
-        if (Emulators.Identify(root) is { } emulator)
-            return ForEmulator(root, emulator);
-
         var chosen = executable is { Length: > 0 } && File.Exists(executable)
                      && Engine.MachineOfFile(executable) is not null
             ? executable
             : null;
+        if (Emulators.Identify(root) is { } emulator)
+            return ForEmulator(root, emulator, chosen);
         var exe = chosen ?? FindExecutable(root, gameName);
         if (exe is null) return new GraphicsDetection(null, null, GraphicsApi.Unknown, false, "No executable found in that folder.");
 

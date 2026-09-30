@@ -94,6 +94,25 @@ public static class SupportReport
                 Text(zip, "game/listing-root.txt", Listing(card.Path));
         }
 
+        // FiveM writes in two places under FiveM.app, neither of them beside FiveM.exe: ReShade and the
+        // add-on in plugins, the runtime and what the add-on writes beside the game process.
+        if (card?.Entry.Preset == Preset.FiveM && Work.FiveMApp(card.Path) is { } app)
+        {
+            foreach (var (folder, tag) in new[] { (Work.FiveMPlugins, "plugins"), (Work.FiveMGame, "subprocess") })
+            {
+                var dir = Path.Combine(app, folder);
+                if (!Directory.Exists(dir)) continue;
+                Text(zip, $"game/fivem-{tag}/listing.txt", Listing(dir));
+                foreach (var name in RuntimeEvidence)
+                {
+                    var file = Path.Combine(dir, name);
+                    if (File.Exists(file)) Copy(zip, new FileInfo(file), $"game/fivem-{tag}/{name}");
+                }
+            }
+            var manifest = Path.Combine(app, Route.X64.ManifestFileName());
+            if (File.Exists(manifest)) Copy(zip, new FileInfo(manifest), $"game/fivem-{Route.X64.ManifestFileName()}");
+        }
+
         return path;
     }
 

@@ -84,14 +84,19 @@ public partial class GameSheet
                 Title = Ui.Text("Str.ExeSection"),
                 AllowMultiple = false,
                 FileTypeFilter = [new FilePickerFileType("*.exe") { Patterns = ["*.exe"] }],
-                SuggestedStartLocation = await _shell.StorageProvider.TryGetFolderFromPathAsync(card.Path),
+                SuggestedStartLocation = await _shell.StorageProvider.TryGetFolderFromPathAsync(
+                    Path.GetDirectoryName(card.Graphics?.Executable) ?? card.Path),
             });
             var path = picked.Count > 0 ? picked[0].TryGetLocalPath() : null;
             if (string.IsNullOrWhiteSpace(path)) return;
 
             // Inside this game's folder, and a PE this can read. Both are refusals with a sentence
             // rather than a silent fallback to detection, which would look like the pick was taken.
-            if (!Engine.IsInside(Engine.WeaklyCanonical(card.Path), Engine.WeaklyCanonical(path)))
+            // An emulator's own executable may be anywhere: a launcher keeps its builds in folders of
+            // their own, shadPS4's under %APPDATA%, and the install goes beside the one picked.
+            var sameEmulator = card.Graphics?.Emulator is { } emulator
+                               && emulator.Executables.Contains(Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
+            if (!sameEmulator && !Engine.IsInside(Engine.WeaklyCanonical(card.Path), Engine.WeaklyCanonical(path)))
             {
                 _shell.Toast(Ui.Text("Str.ExeNotHere"), Level.Err);
                 return;
