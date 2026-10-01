@@ -394,6 +394,9 @@
   <sys:String x:Key="Str.UpdateChecking">Checking for a newer version…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} is the newest version. Checked at {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Version {0} is available. You have {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} hotfix {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">hotfix {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Hotfix {1} for v{0} is available: fixes for this version, not a new one.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Could not check: GitHub did not answer. The app works the same either way.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Download update</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Download from GitHub</sys:String>

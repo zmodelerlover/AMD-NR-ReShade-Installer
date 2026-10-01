@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">新しいバージョンを確認しています…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} が最新バージョンです。{1} に確認しました。</sys:String>
   <sys:String x:Key="Str.UpdateOut">バージョン {0} が利用可能です。現在のバージョンは {1} です。</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} ホットフィックス {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">ホットフィックス {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">v{0} のホットフィックス {1} があります。新しいバージョンではなく、このバージョンの修正です。</sys:String>
   <sys:String x:Key="Str.UpdateFailed">確認できませんでした。GitHub が応答しませんでした。どちらにしてもアプリは同じように動作します。</sys:String>
   <sys:String x:Key="Str.UpdateNow">アップデートをダウンロード</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">GitHub からダウンロード</sys:String>

@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">नया वर्ज़न देखा जा रहा है…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} सबसे नया वर्ज़न है। {1} बजे जाँचा गया।</sys:String>
   <sys:String x:Key="Str.UpdateOut">वर्ज़न {0} उपलब्ध है। आपके पास {1} है।</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} हॉटफ़िक्स {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">हॉटफ़िक्स {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">v{0} के लिए हॉटफ़िक्स {1} उपलब्ध है: इसी वर्ज़न के सुधार, कोई नया वर्ज़न नहीं।</sys:String>
   <sys:String x:Key="Str.UpdateFailed">जाँच नहीं हो सकी: GitHub ने जवाब नहीं दिया। ऐप दोनों तरह से वैसे ही काम करता है।</sys:String>
   <sys:String x:Key="Str.UpdateNow">अपडेट डाउनलोड करें</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">GitHub से डाउनलोड करें</sys:String>

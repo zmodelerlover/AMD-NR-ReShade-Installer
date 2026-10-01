@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">Suche nach einer neueren Version…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} ist die neueste Version. Geprüft um {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Version {0} ist verfügbar. Du hast {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} Hotfix {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">Hotfix {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Hotfix {1} für v{0} ist verfügbar: Korrekturen dieser Version, keine neue.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Prüfung nicht möglich: GitHub hat nicht geantwortet. Die App funktioniert so oder so gleich.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Update herunterladen</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Von GitHub herunterladen</sys:String>

@@ -39,9 +39,11 @@ Write-Host "csproj <Version>: $declared"
 # 2. what the built exe says it is
 if (-not $Exe) { $Exe = Join-Path $root "publish-v$declared/AMD-NR-ReShade-Installer.exe" }
 if (Test-Path $Exe) {
+    # A hotfix carries a fourth number (0.7.5.1); a release shows three.
     $built = [version](Get-Item $Exe).VersionInfo.FileVersion
-    if ($built.ToString(3) -eq $declared) { Ok "the built exe reports $declared" }
-    else { Bad "the built exe reports $($built.ToString(3)), the csproj says $declared" }
+    $says = if ($built.Revision -gt 0) { $built.ToString(4) } else { $built.ToString(3) }
+    if ($says -eq $declared) { Ok "the built exe reports $declared" }
+    else { Bad "the built exe reports $says, the csproj says $declared" }
 } else {
     Write-Host "  skip  no exe at $Exe; run dotnet publish first" -ForegroundColor Yellow
 }

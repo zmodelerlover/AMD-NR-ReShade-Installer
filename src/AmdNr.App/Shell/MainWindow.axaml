@@ -68,7 +68,7 @@
                   AutomationProperties.Name="{DynamicResource Str.SupportRail}">
             <PathIcon Data="{StaticResource IconCoffee}" Foreground="{DynamicResource Faint}" />
           </Button>
-          <TextBlock x:Name="VersionText" Classes="caption" HorizontalAlignment="Center" />
+          <TextBlock x:Name="VersionText" Classes="caption" HorizontalAlignment="Center" TextAlignment="Center" />
         </StackPanel>
       </Grid>
     </Border>

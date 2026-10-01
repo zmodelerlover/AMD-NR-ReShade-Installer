@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">กำลังตรวจหาเวอร์ชันใหม่…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} เป็นเวอร์ชันล่าสุด ตรวจเมื่อ {1}</sys:String>
   <sys:String x:Key="Str.UpdateOut">มีเวอร์ชัน {0} แล้ว คุณใช้ {1} อยู่</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} ฮอตฟิกซ์ {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">ฮอตฟิกซ์ {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">ฮอตฟิกซ์ {1} สำหรับ v{0} พร้อมแล้ว เป็นการแก้ไขของเวอร์ชันนี้ ไม่ใช่เวอร์ชันใหม่</sys:String>
   <sys:String x:Key="Str.UpdateFailed">ตรวจไม่ได้ เพราะ GitHub ไม่ตอบ แอปทำงานได้เหมือนเดิมไม่ว่ากรณีใด</sys:String>
   <sys:String x:Key="Str.UpdateNow">ดาวน์โหลดอัปเดต</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">ดาวน์โหลดจาก GitHub</sys:String>

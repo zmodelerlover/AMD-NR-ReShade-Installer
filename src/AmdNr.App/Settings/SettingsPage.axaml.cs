@@ -14,7 +14,7 @@ public partial class SettingsPage : UserControl
     public SettingsPage()
     {
         InitializeComponent();
-        AboutVersion.Text = $"v{App.Version}";
+        AboutVersion.Text = App.Label(App.Version);
         DataFolderText.Text = AppPaths.Root;
         ToolTip.SetTip(DataFolderText, AppPaths.Root);
 
@@ -82,7 +82,7 @@ public partial class SettingsPage : UserControl
         {
             UpdateState.Checking => Ui.Text("Str.UpdateChecking"),
             UpdateState.UpToDate => Ui.Format("Str.UpdateLatest", App.Version, update.When?.LocalDateTime.ToString("t") ?? ""),
-            UpdateState.Available => Ui.Format("Str.UpdateOut", update.Release!.Version, App.Version),
+            UpdateState.Available => App.UpdateOut(update.Release!.Version),
             _ => Ui.Text("Str.UpdateFailed"),
         };
         UpdateButton.IsEnabled = update.State != UpdateState.Checking;

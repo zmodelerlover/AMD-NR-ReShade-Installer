@@ -28,7 +28,10 @@ public partial class MainWindow : Window
     {
         Library = new Library(Session);
         InitializeComponent();
-        VersionText.Text = $"v{App.Version}";
+        // Two short lines in the rail: "v0.7.5" and, on a hotfix, "hotfix 1".
+        VersionText.Text = AppVersion.Hotfix(App.Version) is > 0 and var hotfix
+            ? $"v{AppVersion.Release(App.Version)}{Environment.NewLine}{Ui.Format("Str.HotfixShort", hotfix)}"
+            : $"v{App.Version}";
         _toastTimer.Tick += (_, _) =>
         {
             _toastTimer.Stop();
@@ -293,7 +296,7 @@ public partial class MainWindow : Window
         if (release is null) UpdateBanner.IsVisible = false;
         else if (!_dismissed)
         {
-            UpdateText.Text = Ui.Format("Str.UpdateOut", release.Version, App.Version);
+            UpdateText.Text = App.UpdateOut(release.Version);
             UpdateButton.Content = Ui.Text(release.ActionKey);
             UpdateBanner.IsVisible = true;
         }

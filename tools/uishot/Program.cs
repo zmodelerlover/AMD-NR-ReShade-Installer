@@ -288,6 +288,18 @@ void Flows()
         Check(main.FindControl<Control>("UpdateDot")!.IsVisible == (check.State == UpdateState.Available),
             $"update {check.State}: the dot on the gear only when there is one");
     }
+    // A hotfix of the release running is said as one, not as a version of its own.
+    var hotfix = $"{AppVersion.Release(App.Version)}.{AppVersion.Hotfix(App.Version) + 1}";
+    update.SetValue(session, new UpdateCheck(UpdateState.Available, new AppRelease(hotfix, "", "https://example.invalid",
+        new Dictionary<string, string> { [AppUpdate.ExeAsset] = "", [AppUpdate.SumsAsset] = "" })));
+    main.Relabel();
+    Settle(6);
+    Save(main, "flow-4-update-hotfix");
+    Check(main.FindControl<TextBlock>("UpdateText")!.Text == App.UpdateOut(hotfix) && !App.UpdateOut(hotfix).Contains("Str."),
+        $"a hotfix is offered as one: \"{App.UpdateOut(hotfix)}\"");
+    update.SetValue(session, new UpdateCheck(UpdateState.Failed));
+    main.Relabel();
+
     // Busy went on and off while the sheet was closed; a sheet opened afterwards has to work.
     main.ShowPage(MainWindow.Page.Games);
     Settle(6);

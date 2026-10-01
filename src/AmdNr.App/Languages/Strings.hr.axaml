@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">Provjera novije verzije…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} je najnovija verzija. Provjereno u {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Dostupna je verzija {0}. Vi imate {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} hitni popravak {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">popravak {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Dostupan je hitni popravak {1} za v{0}: ispravci ove verzije, ne nova verzija.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Provjera nije uspjela: GitHub nije odgovorio. Aplikacija radi jednako.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Preuzmi ažuriranje</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Preuzmi s GitHuba</sys:String>

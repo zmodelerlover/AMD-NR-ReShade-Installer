@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">Újabb verzió keresése…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">A v{0} a legújabb verzió. Ellenőrizve: {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Elérhető a(z) {0} verzió. Neked ez van: {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} gyorsjavítás {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">gyorsjavítás {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Elérhető a(z) {1}. gyorsjavítás a v{0} verzióhoz: ennek a verziónak a javításai, nem új verzió.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Nem sikerült ellenőrizni: a GitHub nem válaszolt. Az alkalmazás ugyanúgy működik.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Frissítés letöltése</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Letöltés a GitHubról</sys:String>

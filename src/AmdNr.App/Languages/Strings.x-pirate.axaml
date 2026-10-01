@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">Spyglassin' for a newer version…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} be the newest version. Checked at {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Version {0} be on the horizon. Ye have {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} patch {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">patch {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Patch {1} for v{0} be ready: repairs to this ship, not a new one.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Couldn't check: GitHub didn't answer the hail. The app sails the same either way.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Haul the update aboard</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Haul it from GitHub</sys:String>

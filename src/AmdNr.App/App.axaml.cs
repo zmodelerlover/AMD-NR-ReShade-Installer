@@ -40,8 +40,22 @@ public partial class App : Application
 
     public static string CurrentLanguage { get; private set; } = "en";
 
+    /// <summary>With the fourth number when this build is a hotfix (see <see cref="AppVersion"/>): cut to
+    /// three, a hotfix would call itself the release it fixes and never be offered.</summary>
     public static string Version { get; } =
-        Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
+        AmdNr.Core.AppVersion.Of(Assembly.GetExecutingAssembly().GetName().Version ?? new System.Version(0, 0, 0));
+
+    /// <summary>"v0.7.5", or "v0.7.5 hotfix 1".</summary>
+    public static string Label(string version) =>
+        AmdNr.Core.AppVersion.Hotfix(version) is > 0 and var n
+            ? Ui.Format("Str.HotfixLabel", AmdNr.Core.AppVersion.Release(version), n)
+            : $"v{version}";
+
+    /// <summary>What the update banner and the settings page say about a release that is out.</summary>
+    public static string UpdateOut(string latest) =>
+        AmdNr.Core.AppVersion.IsHotfixOf(latest, Version)
+            ? Ui.Format("Str.HotfixOut", AmdNr.Core.AppVersion.Release(latest), AmdNr.Core.AppVersion.Hotfix(latest))
+            : Ui.Format("Str.UpdateOut", latest, Version);
 
     public override void Initialize()
     {

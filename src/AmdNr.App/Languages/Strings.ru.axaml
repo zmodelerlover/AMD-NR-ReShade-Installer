@@ -369,6 +369,9 @@
   <sys:String x:Key="Str.UpdateChecking">Поиск новой версии…</sys:String>
   <sys:String x:Key="Str.UpdateLatest">v{0} — самая новая версия. Проверено в {1}.</sys:String>
   <sys:String x:Key="Str.UpdateOut">Доступна версия {0}. У вас {1}.</sys:String>
+  <sys:String x:Key="Str.HotfixLabel">v{0} хотфикс {1}</sys:String>
+  <sys:String x:Key="Str.HotfixShort">хотфикс {0}</sys:String>
+  <sys:String x:Key="Str.HotfixOut">Доступен хотфикс {1} для v{0}: исправления этой версии, а не новая версия.</sys:String>
   <sys:String x:Key="Str.UpdateFailed">Не удалось проверить: GitHub не ответил. Приложение работает так же в любом случае.</sys:String>
   <sys:String x:Key="Str.UpdateNow">Загрузить обновление</sys:String>
   <sys:String x:Key="Str.UpdateOnGitHub">Скачать с GitHub</sys:String>
