@@ -309,7 +309,11 @@ public static partial class Engine
     /// translated to D3D9 before anything else, so it is the D3D9 name there too.</summary>
     public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
 
-    /// <summary>By file name, so plugins/ReShade.ini on the FiveM route is the person's too.</summary>
+    /// <summary>By file name, so plugins/ReShade.ini on the FiveM route is the person's too.
+    /// dlss5-neural.ini is the tuning file's name before v0.6.5, and the Rust installer's is_config marked
+    /// it as configuration: without it here, a 32-bit folder that installer set up failed every install
+    /// with "Manifest config mismatch" (T6 Zombies).</summary>
     public static bool IsConfig(string name) =>
-        Path.GetFileName(name) is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini" or "OptiScaler.ini";
+        Path.GetFileName(name) is "ReShade.ini" or "dgVoodoo.conf" or "amd-nr.ini" or "OptiScaler.ini"
+            or "dlss5-neural.ini";
 }

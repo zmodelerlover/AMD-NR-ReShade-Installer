@@ -82,7 +82,9 @@ public static class SupportReport
                 var file = Path.Combine(dir, name);
                 if (File.Exists(file)) Copy(zip, new FileInfo(file), $"game/{name}");
             }
-            foreach (var manifest in new[] { Route.X64.ManifestFileName(), Engine.ManifestName })
+            // The names before v0.6.5 too: a record the older installers left is read on every install.
+            foreach (var manifest in new[] { Route.X64.ManifestFileName(), Engine.ManifestName,
+                         "dlss5-neural.install.json", "dlss5-x86bridge.install.json" })
             {
                 var file = Path.Combine(dir, manifest);
                 if (File.Exists(file)) Copy(zip, new FileInfo(file), $"game/{manifest}");

@@ -141,6 +141,16 @@ public class EngineTests
         Assert.Equal(text, Manifest.Encode(m));
     }
 
+    /// <summary>The Rust installer recorded the old tuning file as configuration, and its manifests
+    /// are still read: one of them has to decode, and keep the file as the person's.</summary>
+    [Fact]
+    public void TheRustInstallersTuningFileIsConfiguration()
+    {
+        var text = CapturedManifest().Replace("\"name\":\"d3d9.dll\"", "\"name\":\"dlss5-neural.ini\"")
+            .Replace("\"owned\":false,\"configuration\":false", "\"owned\":false,\"configuration\":true");
+        Assert.Contains(Manifest.Decode(text).Entries, e => e.Name == "dlss5-neural.ini" && e.Configuration);
+    }
+
     [Fact]
     public void AHandEditedManifestIsRejected()
     {
