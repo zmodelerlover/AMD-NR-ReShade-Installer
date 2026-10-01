@@ -112,7 +112,7 @@ public class OptiScalerVersionTests
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
         // The newest release is offered first, with its own opti-runtime: 0.4.5, 0.4.4 and 0.4.3 take danielblnc's
         // public 0.4.3, which no earlier OptiScaler accepts, so 0.4.2 keeps 0.4.1 and 0.4.1 keeps 0.4.0.
-        Assert.Equal("0.4.7-amd-nr", offered[0].Version);
+        Assert.Equal("0.4.8-amd-nr", offered[0].Version);
         var newestRuntime = shipped.With(offered[0]).Component(PayloadManifest.OptiRuntimeComponent);
         Assert.Equal("0.5.1", newestRuntime.Version);
         Assert.Equal("493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd", newestRuntime.Files.Single().Sha256);
@@ -146,11 +146,15 @@ public class OptiScalerVersionTests
         Assert.Contains("native-game-tiled-assets/block0-ffn.f16", shipped.With(offered[0]).Pins().OptiFiles.Keys);
 
         // The mochizuki runtime rides in 0.4.0 to 0.4.2 as one build, 0.4.3 carries its fix for a
-        // render-resolution change and 0.4.4 the faster build, which 0.4.5 keeps: every file it lists lands under
-        // a name the transaction takes, and its model is the one the runtime was built against.
+        // render-resolution change and 0.4.4 the faster build, which 0.4.5 to 0.4.7 keep, and 0.4.8 its own (the game's
+        // exposure, the Preprocess): every file it lists lands under a name the transaction takes, and its model is
+        // the one the runtime was built against.
         var next = offered[0];
         var r044 = offered.Single(r => r.Version == "0.4.4-amd-nr");
+        var r047 = offered.Single(r => r.Version == "0.4.7-amd-nr");
         Assert.Equal(r044.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256,
+            r047.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256);
+        Assert.NotEqual(r044.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256,
             next.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256);
         Assert.Equal(r040.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256,
             r042.Components[PayloadManifest.MochizukiComponent].Files.Single().Sha256);

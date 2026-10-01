@@ -97,6 +97,9 @@ public class PayloadTests
         var bridge = m.Component("bridge").Files;
         Assert.Equal("payload.sha256", bridge.Single(f => f.Name == "payload.sha256").RelativePath);
         Assert.Equal("files/amd-nr.addon32", bridge.Single(f => f.Name == "amd-nr.addon32").RelativePath);
+        // Every add-on release carries the 32-bit pair too. Pinning only the add-on left 32-bit games
+        // on the 0.7.2 pair through four releases.
+        Assert.Equal(m.Component(PayloadManifest.AddonComponent).Version, m.Component(PayloadManifest.BridgeComponent).Version);
     }
 
     // -- Downloading ------------------------------------------------------------------------------
