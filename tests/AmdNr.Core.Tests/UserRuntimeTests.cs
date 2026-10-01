@@ -338,22 +338,22 @@ public class UserRuntimeTests
         Assert.True(Fixture.HasAny(report, "no patch for it yet"), report.ToLog("incomplete"));
     }
 
-    /// <summary>The shipped list carries 0.5.1 alone now that 0.5.0 is public and the download: offered on the ReShade
-    /// routes from add-on v0.7.2 and on OptiScaler from 0.4.5, which runs it as it is.</summary>
+    /// <summary>The shipped list carries 0.6.0 alone now that 0.5.1 is public and the download: offered on the ReShade
+    /// routes from add-on v0.7.6 and on OptiScaler from 0.4.7, which runs it as it is.</summary>
     [Fact]
-    public void TheShippedListOffers050OnlyWhereNoPatchIsNeeded()
+    public void TheShippedListOffersTheSupporterBuildOnlyWhereItRuns()
     {
         var shipped = PayloadManifest.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "payload.json")));
         var build = Assert.Single(shipped.Pins().UserRuntimes);
-        Assert.Equal(("0.5.1", "493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd", 38_569_472UL, "0.7.2"),
+        Assert.Equal(("0.6.0", "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", 56_677_888UL, "0.7.6"),
             (build.Name, build.OriginalSha256, build.OriginalSize, build.AddonSince));
         Assert.Same(build, Assert.Single(Work.OfferedRuntimes(shipped.Pins(), Preset.Dx11)));
 
         var opti = shipped.Newest(PayloadManifest.OptiScalerComponent).Pins();
-        Assert.Equal("0.4.6-amd-nr", opti.OptiScalerVersion);
+        Assert.Equal("0.4.7-amd-nr", opti.OptiScalerVersion);
         Assert.Same(build, Assert.Single(Work.OfferedRuntimes(opti, Preset.OptiScaler)));
         Assert.Empty(Work.OfferedRuntimes(shipped.With(shipped.Offered(PayloadManifest.OptiScalerComponent)
-            .First(r => r.Version == "0.4.4-amd-nr")).Pins(), Preset.OptiScaler));
+            .First(r => r.Version == "0.4.6-amd-nr")).Pins(), Preset.OptiScaler));
     }
 
     /// <summary>Against the real setup, when AMDNR_TEST_RUNTIME_SETUP points at one (skipped otherwise: it is

@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Alege alt fișier…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Mai nouă decât versiunea publică, din propriul tău version.dll sau din setup-ul lui danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 adaugă kerneluri pentru plăcile RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 adaugă plăcile RX 6000 (RDNA2), care au nevoie de runtime-ul HIP SDK 7.2 de la AMD, și elimină pâlpâirea în zonele întunecate și pe luminile mici.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Nu este niciodată descărcat sau distribuit de această aplicație. Fișierul tău este verificat prin SHA-256 și păstrat, ca celelalte jocuri să nu mai întrebe.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Folosește fișierele mele de susținător…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Versiune publică</sys:String>

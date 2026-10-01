@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">选择其他文件…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">比 Public Release 更新，来自你自己的 version.dll 或 danielblnc 的安装程序。</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 增加了适用于 RDNA3 显卡的内核。</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 新增对 RX 6000（RDNA2）显卡的支持，这些显卡需要 AMD 的 HIP SDK 7.2 运行时；并修复了暗部和小光源的闪烁。</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">本应用从不下载或分发它。你的文件会经 SHA-256 校验后保存，其他游戏无需再次索取。</sys:String>
   <sys:String x:Key="Str.SupporterUse">使用我的赞助者文件…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

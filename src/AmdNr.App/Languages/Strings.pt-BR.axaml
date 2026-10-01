@@ -140,6 +140,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Escolher outro arquivo…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Mais nova que a Public Release, do seu version.dll ou do setup do danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">A 0.5.0 traz kernels para placas RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">A 0.6.0 adiciona as placas RX 6000 (RDNA2), que precisam do runtime HIP SDK 7.2 da AMD, e corrige o tremor em áreas escuras e em luzes pequenas.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Nunca é baixada nem repassada por este app. Seu arquivo é conferido pelo SHA-256 e guardado, para os outros jogos não pedirem de novo.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Usar meus arquivos de apoiador…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Choisir un autre fichier…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Plus récente que la Public Release, depuis votre propre version.dll ou l'installateur de danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">La 0.5.0 ajoute des kernels pour les cartes RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">La 0.6.0 ajoute les cartes RX 6000 (RDNA2), qui ont besoin du runtime HIP SDK 7.2 d'AMD, et corrige le scintillement dans les zones sombres et sur les petites lumières.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Jamais téléchargée ni partagée par cette application. Votre fichier est vérifié par SHA-256 et conservé, pour que les autres jeux ne le redemandent pas.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Utiliser mes fichiers de supporter…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

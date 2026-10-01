@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">เลือกไฟล์อื่น…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">ใหม่กว่า Public Release จาก version.dll ของคุณเอง หรือจากตัวติดตั้งของ danielblnc</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 เพิ่มเคอร์เนลสำหรับการ์ด RDNA3</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 เพิ่มการรองรับการ์ด RX 6000 (RDNA2) ซึ่งต้องใช้รันไทม์ HIP SDK 7.2 ของ AMD และแก้ภาพกะพริบ ในบริเวณมืดและที่แสงดวงเล็ก</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">แอปนี้ไม่ดาวน์โหลดหรือแจกจ่ายไฟล์นี้เด็ดขาด ไฟล์ของคุณถูกตรวจด้วย SHA-256 แล้วเก็บไว้ เกมอื่นจึงไม่ต้องถามอีก</sys:String>
   <sys:String x:Key="Str.SupporterUse">ใช้ไฟล์ผู้สนับสนุนของฉัน…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

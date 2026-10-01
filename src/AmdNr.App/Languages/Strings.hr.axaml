@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Odaberi drugu datoteku…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Novija od javnog izdanja, iz vašeg version.dll-a ili danielblncova instalacijskog programa.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 dodaje kernele za kartice RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 dodaje kartice RX 6000 (RDNA2), kojima treba AMD-ov HIP SDK 7.2 runtime, i uklanja treperenje u tamnim područjima i na malim svjetlima.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Ova ga aplikacija nikad ne preuzima niti dijeli. Vaša se datoteka provjerava SHA-256 i čuva, pa druge igre ne pitaju ponovno.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Koristi moje datoteke za podržavatelje…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Javno izdanje</sys:String>

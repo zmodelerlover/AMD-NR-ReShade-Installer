@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Başka bir dosya seç…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Public Release'ten daha yeni; kendi version.dll dosyanızdan veya danielblnc'nin kurulum dosyasından.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0, RDNA3 kartlar için çekirdekler ekler.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0, AMD'nin HIP SDK 7.2 çalışma zamanını gerektiren RX 6000 (RDNA2) kartları ekler ve karanlık alanlardaki ve küçük ışıklardaki titremeyi giderir.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Bu uygulama onu asla indirmez veya paylaşmaz. Dosyanız SHA-256 ile doğrulanır ve saklanır, böylece diğer oyunlar tekrar sormaz.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Destekçi dosyalarımı kullan…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

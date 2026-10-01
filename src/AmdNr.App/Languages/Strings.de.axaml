@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Andere Datei auswählen…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Neuer als die Public Release, aus deiner eigenen version.dll oder dem Setup von danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 bringt Kernels für RDNA3-Karten.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 unterstützt RX-6000-Karten (RDNA2), die die HIP-SDK-7.2-Laufzeit von AMD brauchen, und behebt das Flackern in dunklen Bereichen und bei kleinen Lichtern.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Wird von dieser App nie heruntergeladen oder weitergegeben. Deine Datei wird per SHA-256 geprüft und aufbewahrt, damit andere Spiele nicht erneut danach fragen.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Meine Supporter-Dateien verwenden…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

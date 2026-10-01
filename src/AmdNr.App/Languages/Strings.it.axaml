@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Scegli un altro file…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Più recente della Public Release, dal tuo version.dll o dal setup di danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">La 0.5.0 aggiunge kernel per le schede RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">La 0.6.0 aggiunge le schede RX 6000 (RDNA2), che richiedono il runtime HIP SDK 7.2 di AMD, e corregge lo sfarfallio nelle zone scure e sulle piccole luci.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Mai scaricata né condivisa da questa app. Il tuo file viene verificato con SHA-256 e conservato, così gli altri giochi non te lo richiedono.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Usa i miei file da sostenitore…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

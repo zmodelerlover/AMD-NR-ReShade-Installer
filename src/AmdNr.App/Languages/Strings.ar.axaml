@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">اختر ملفًا آخر…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">أحدث من Public Release، من ملف version.dll الخاص بك أو من برنامج إعداد danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">يضيف 0.5.0 نوى حسابية لبطاقات RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">يضيف الإصدار 0.6.0 بطاقات RX 6000 (RDNA2)، التي تحتاج إلى بيئة HIP SDK 7.2 من AMD، ويصلح الوميض في المناطق المظلمة وحول الأضواء الصغيرة.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">لا ينزّلها هذا التطبيق ولا يشاركها أبدًا. يُتحقَّق من ملفك عبر SHA-256 ويُحتفَظ به، فلا تطلبه الألعاب الأخرى مجددًا.</sys:String>
   <sys:String x:Key="Str.SupporterUse">استخدم ملفات الداعم الخاصة بي…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

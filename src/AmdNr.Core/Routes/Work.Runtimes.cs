@@ -9,7 +9,7 @@ namespace AmdNr.Core;
 public static partial class Work
 {
     /// <summary>The runtime builds this project has seen, by the start of their SHA-256: danielblnc's
-    /// 0.2.14, 0.2.17, 0.3.0, 0.3.1, 0.3.3, 0.4.0, 0.4.1, 0.4.2, 0.4.3 and 0.5.0, the 0.5.1 he gives his supporters, and
+    /// 0.2.14, 0.2.17, 0.3.0, 0.3.1, 0.3.3, 0.4.0, 0.4.1, 0.4.2, 0.4.3, 0.5.0 and 0.5.1, the 0.6.0 he gives his supporters, and
     /// the 0.3.0, 0.4.0 and 0.4.1 the add-on pins. Any of them sitting in the game folder as version.dll is the
     /// author's own way of loading the runtime.</summary>
     private static readonly string[] KnownRuntimePrefixes =
@@ -18,7 +18,7 @@ public static partial class Work
         "8321cae728d28cb7", "70af3fb757f83f71", "b108d6407eb7f094",
         "907b30a61644a6d7", "d62be3d8b9fbb3c6", "ff6feffa41abccce",
         "823063eb4c76b133", "c8808716c286a34f", "8aa2dcc5b6596aca", "d1e320862a8763ac",
-        "cddfb09e01934795", "493b4a3b80a21f72",
+        "cddfb09e01934795", "493b4a3b80a21f72", "195c4a891b6eac4c",
     ];
 
     /// <summary>The name the author's setup loads the runtime under.</summary>
@@ -52,6 +52,7 @@ public static partial class Work
         ("d1e320862a8763ac39e7ce194536d4b6c55ba61bae9e8a92753cec32df67a457", new(0, 4, 3), new(0, 4, 3)),
         ("cddfb09e019347957bf7b96c95c0e900e8d3062dfaed697a8a96b0a039aec31a", new(0, 5, 0), new(0, 4, 4)),
         ("493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd", new(0, 5, 1), new(0, 4, 5)),
+        ("195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", new(0, 6, 0), new(0, 4, 7)),
     ];
 
     /// <summary>"0.4.3-amd-nr" or "0.4.2" as a version, or null.</summary>
@@ -73,7 +74,7 @@ public static partial class Work
         foreach (var name in new[] { AuthorRuntimeName, OptiPasses[0] })
         {
             var path = Path.Combine(dir, name);
-            if (Engine.SizeOf(path) is not (> 7_000_000 and < 40_000_000)) continue;
+            if (Engine.SizeOf(path) is not (> 7_000_000 and < 80_000_000)) continue;
             var bytes = Engine.Read(path);
             if (AcceptedRuntime(Engine.Sha(bytes), pins.OptiScalerVersion) is not { } runtime) continue;
             if (name == AuthorRuntimeName || VersionOf(pins.OptiRuntimeVersion) is { } shipped && runtime > shipped)
@@ -98,7 +99,7 @@ public static partial class Work
     {
         var path = Path.Combine(dir, AuthorRuntimeName);
         // Size first, so this stays a stat() for every version.dll that is something else.
-        if (Engine.SizeOf(path) is not (> 7_000_000 and < 40_000_000)) return;
+        if (Engine.SizeOf(path) is not (> 7_000_000 and < 80_000_000)) return;
         var sha = Engine.HashFile(path);
         if (AcceptedRuntime(sha, pins.OptiScalerVersion) is { } runtime)
         {
@@ -254,7 +255,7 @@ public static partial class Work
         {
             var name = Path.GetFileName(path);
             if (ours.Contains(name) || Engine.SizeOf(path) is not { } size
-                || !(size is > 7_000_000 and < 40_000_000 || pins.UserRuntimes.Any(b => b.OriginalSize == size)))
+                || !(size is > 7_000_000 and < 80_000_000 || pins.UserRuntimes.Any(b => b.OriginalSize == size)))
                 continue;
             if (PayloadCache.HashOf(path) is { } sha && !patched.Contains(sha)
                 && (KnownRuntimePrefixes.Any(p => sha.StartsWith(p, StringComparison.Ordinal))

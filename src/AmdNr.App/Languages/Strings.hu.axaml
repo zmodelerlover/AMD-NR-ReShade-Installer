@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Másik fájl kiválasztása…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Újabb a nyilvános kiadásnál, a saját version.dll-edből vagy danielblnc telepítőjéből.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">A 0.5.0 kerneleket ad az RDNA3 kártyákhoz.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">A 0.6.0 támogatja az RX 6000 (RDNA2) kártyákat, amelyekhez az AMD HIP SDK 7.2 futtatókörnyezete kell, és megszünteti a villódzást a sötét részeken és a kis fényeken.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Ez az alkalmazás soha nem tölti le és nem osztja meg. A fájlodat SHA-256 alapján ellenőrzi és megőrzi, így a többi játék nem kérdezi újra.</sys:String>
   <sys:String x:Key="Str.SupporterUse">A támogatói fájljaim használata…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Nyilvános kiadás</sys:String>

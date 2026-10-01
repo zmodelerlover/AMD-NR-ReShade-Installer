@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Pasirinkti kitą failą…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Naujesnė nei viešas leidimas, iš jūsų version.dll arba danielblnc diegimo programos.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 prideda branduolius RDNA3 kortoms.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 prideda RX 6000 (RDNA2) kortas, kurioms reikia AMD HIP SDK 7.2 vykdymo aplinkos, ir pašalina mirgėjimą tamsiose vietose bei ties mažomis šviesomis.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Ši programa niekada jo neatsisiunčia ir neplatina. Jūsų failas patikrinamas pagal SHA-256 ir išsaugomas, todėl kiti žaidimai nebeklaus.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Naudoti mano rėmėjo failus…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Viešas leidimas</sys:String>

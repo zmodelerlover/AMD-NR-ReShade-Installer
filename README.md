@@ -108,7 +108,8 @@ folder is the one to pick.
 
 ## danielblnc's supporter builds: your own files
 
-Some of danielblnc's runtime builds go to his supporters only, 0.5.1 among them. **This app does not
+Some of danielblnc's runtime builds go to his supporters only, 0.6.0 among them (the one that adds RX 6000,
+RDNA2, cards, which also need AMD's HIP SDK 7.2 runtime). **This app does not
 distribute them, now or later, and neither does this repository or its payload.** Somebody who has
 one supplies it themselves. While the payload list names one (`user_runtimes` in
 `payload/payload.json`), the game's sheet has a block of its own under the route, on every ReShade
@@ -118,15 +119,15 @@ cards and the one that goes in lit: **Public Release** (the version the app down
 under them that the supporter build is not distributed. Picking the supporter card takes the copy
 already on this machine, or asks right there for your `version.dll` or the `dlssnr_on_amd_setup.exe`
 it came in; the DLL is read out of the setup without running it. Under the card the block says which
-runtime goes in: "Using 0.5.1 from your file", or why not (no copy on this machine yet, or an add-on or
+runtime goes in: "Using 0.6.0 from your file", or why not (no copy on this machine yet, or an add-on or
 OptiScaler version that does not run it, with the version that does). The Public Release card goes back.
 
 - The file is checked by SHA-256 against the build the list names. On the ReShade routes, 64-bit and
   the 32-bit bridge, it is then patched in place, each change only over the bytes it expects, and it
   goes in as `dlssnr_amd_pass1.dll` only if the result hashes to the patched SHA-256 the list gives;
-  the add-on accepts it by that hash from the version the list names (v0.7.2 for 0.5.1). On the
+  the add-on accepts it by that hash from the version the list names (v0.7.6 for 0.6.0). On the
   OptiScaler route it goes in unpatched, as its runtime passes, from the first OptiScaler release that
-  runs it (0.4.5-amd-nr for 0.5.1).
+  runs it (0.4.7-amd-nr for 0.6.0).
 - The checked original is kept in `%AppData%\AmdNrInstaller\runtimes\`, named by its hash, so other
   games do not ask for it again. It is hashed again every time it is installed, and it is never
   uploaded or written into a log or a report. Emptying the download cache leaves it; delete that

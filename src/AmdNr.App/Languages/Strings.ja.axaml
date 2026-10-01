@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">別のファイルを選択…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Public Release より新しいビルドです。自分の version.dll、または danielblnc のセットアップから読み込みます。</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 では RDNA3 カード向けのカーネルが追加されています。</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 は RX 6000（RDNA2）カードに対応します（AMD の HIP SDK 7.2 ランタイムが必要）。暗い部分や小さな光のちらつきも修正されています。</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">このアプリがダウンロードしたり配布したりすることはありません。あなたのファイルは SHA-256 で検証して保存されるので、他のゲームで再度求められることはありません。</sys:String>
   <sys:String x:Key="Str.SupporterUse">自分のサポーター用ファイルを使う…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Public Release</sys:String>

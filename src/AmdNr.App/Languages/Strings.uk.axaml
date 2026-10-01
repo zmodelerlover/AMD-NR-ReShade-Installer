@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">Вибрати інший файл…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">Новіша за публічний випуск, з вашого version.dll або інсталятора danielblnc.</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 додає ядра для карт RDNA3.</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 додає відеокарти RX 6000 (RDNA2), яким потрібен рантайм HIP SDK 7.2 від AMD, і прибирає мерехтіння в темних ділянках і на дрібних джерелах світла.</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">Ця програма ніколи його не завантажує й не поширює. Ваш файл перевіряється за SHA-256 і зберігається, тож інші ігри не питатимуть знову.</sys:String>
   <sys:String x:Key="Str.SupporterUse">Використати мої файли підписника…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">Публічний випуск</sys:String>

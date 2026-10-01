@@ -134,6 +134,7 @@
   <sys:String x:Key="Str.SupporterPickOther">कोई दूसरी फ़ाइल चुनें…</sys:String>
   <sys:String x:Key="Str.SupporterPitch">सार्वजनिक रिलीज़ से नया, आपके अपने version.dll या danielblnc के सेटअप से।</sys:String>
   <sys:String x:Key="Str.SupporterPitch.0.5.0">0.5.0 RDNA3 कार्ड के लिए कर्नेल जोड़ता है।</sys:String>
+  <sys:String x:Key="Str.SupporterPitch.0.6.0">0.6.0 RX 6000 (RDNA2) कार्ड जोड़ता है, जिन्हें AMD का HIP SDK 7.2 रनटाइम चाहिए, और अंधेरे हिस्सों व छोटी रोशनियों में टिमटिमाहट ठीक करता है।</sys:String>
   <sys:String x:Key="Str.SupporterNotDistributed">यह ऐप इसे कभी डाउनलोड या साझा नहीं करता। आपकी फ़ाइल SHA-256 से जाँची और रखी जाती है, ताकि दूसरे गेम फिर न पूछें।</sys:String>
   <sys:String x:Key="Str.SupporterUse">मेरी सपोर्टर फ़ाइलें इस्तेमाल करें…</sys:String>
   <sys:String x:Key="Str.SupporterUseDownload">सार्वजनिक रिलीज़</sys:String>
