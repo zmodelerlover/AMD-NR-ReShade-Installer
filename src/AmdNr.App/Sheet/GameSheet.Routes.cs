@@ -25,7 +25,7 @@ public partial class GameSheet
     private Preset? _lastReShade;
 
     private static readonly Preset[] Wide = [Preset.Dx11, Preset.Dx12, Preset.Vulkan, Preset.OpenGL];
-    private static readonly Preset[] Narrow = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
+    private static readonly Preset[] Narrow = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8, Preset.X86OpenGL];
     private static readonly Preset[] Emulated = [Preset.Pcsx2, Preset.Rpcs3];
     private static readonly Preset[] FiveM = [Preset.FiveM];
 

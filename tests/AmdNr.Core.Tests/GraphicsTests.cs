@@ -98,16 +98,35 @@ public class GraphicsTests
         Assert.Contains("Unity", d.Why, StringComparison.Ordinal);
     }
 
-    /// <summary>OpenGL has a route now, and it is 64-bit only: the 32-bit pair has a D3D8, D3D9
-    /// and D3D11 frontend and nothing for OpenGL. Half-Life is the shape of the game this is
-    /// about -- 32-bit, OpenGL, and still nothing this add-on can do for it.</summary>
+    /// <summary>The 32-bit pair has an OpenGL frontend since add-on v0.7.8, so a 32-bit OpenGL game
+    /// has a route and ReShade goes in as its opengl32.dll.</summary>
     [Fact]
-    public void A32BitOpenGLGameStillHasNoRouteAndSaysSo()
+    public void A32BitOpenGLGameTakesThe32BitOpenGLRoute()
     {
         var root = Game("opengl32bit", "hl.exe", Fixture.PeWithImports(false, ["opengl32.dll"]));
         var d = GraphicsDetector.Detect(root);
         Assert.Equal(GraphicsApi.OpenGL, d.Api);
-        Assert.Null(d.Preset);
+        Assert.Equal(Preset.X86OpenGL, d.Preset);
+        Assert.Equal(Route.X86, Preset.X86OpenGL.Route());
+        Assert.Equal("opengl32.dll", Engine.X86ProxyName(Preset.X86OpenGL.ManifestPreset()));
+    }
+
+    /// <summary>D3D10 installs as D3D11 does, ReShade as dxgi.dll, on either width; the add-on tells
+    /// the two apart. A game that offers D3D9 too is recommended D3D10, which shares on the GPU.</summary>
+    [Fact]
+    public void AD3D10GameTakesTheD3D11Route()
+    {
+        var x64 = GraphicsDetector.Detect(Game("d3d10-64", "game.exe", Fixture.PeWithImports(true, ["d3d10.dll", "dxgi.dll"])));
+        Assert.Equal(GraphicsApi.D3D10, x64.Api);
+        Assert.Equal(Preset.Dx11, x64.Preset);
+        var x86 = GraphicsDetector.Detect(Game("d3d10-32", "game.exe", Fixture.PeWithImports(false, ["d3d10_1.dll"])));
+        Assert.Equal(GraphicsApi.D3D10, x86.Api);
+        Assert.Equal(Preset.X86Dx11, x86.Preset);
+        Assert.Equal("DX10 · 32-bit", x86.Tag);
+        Assert.True(GraphicsDetection.Reachable(GraphicsApi.D3D11, [GraphicsApi.D3D10]));
+        var both = new GraphicsDetection("Game.exe", Route.X86, GraphicsApi.D3D9, false, "test")
+            { Supported = [GraphicsApi.D3D9, GraphicsApi.D3D10] };
+        Assert.Equal(GraphicsApi.D3D10, both.Recommended);
     }
 
     /// <summary>RE Engine: re9.exe imports d3d11.dll alone, and ships the Agility SDK and DirectStorage,
@@ -249,8 +268,7 @@ public class GraphicsTests
             |windows 64-bit exe     = true
             }}
             """)!;
-        // D3D10 has no route here and is left out rather than mapped onto something it is not.
-        Assert.Equal([GraphicsApi.D3D11, GraphicsApi.D3D12, GraphicsApi.Vulkan], api.Supported);
+        Assert.Equal([GraphicsApi.D3D10, GraphicsApi.D3D11, GraphicsApi.D3D12, GraphicsApi.Vulkan], api.Supported);
         Assert.Null(api.Has32Bit);
     }
 

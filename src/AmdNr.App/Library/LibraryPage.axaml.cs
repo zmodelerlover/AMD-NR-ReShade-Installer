@@ -40,6 +40,8 @@ public partial class LibraryPage : UserControl
         _list = settings.LibraryView == "list";
         _filter = settings.LibraryFilter ?? "all";
         _sort = settings.LibrarySort ?? "name";
+        _pinnedFirst = settings.LibraryPinnedFirst ?? true;
+        GameCard.OrderChanged += QueueRefresh;
         ShowFilter();
         Refresh();
         ApplyView();
@@ -47,6 +49,37 @@ public partial class LibraryPage : UserControl
 
     private string _filter = "all";
     private string _sort = "name";
+    private bool _pinnedFirst = true;
+    private bool _refreshQueued;
+
+    /// <summary>A game pinned or unpinned, installed or uninstalled moves in the order. Several at once (the
+    /// installed state of every game is read again after a scan) make one refresh.</summary>
+    private void QueueRefresh()
+    {
+        if (_refreshQueued) return;
+        _refreshQueued = true;
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            _refreshQueued = false;
+            Refresh();
+        });
+    }
+
+    private void OnStar(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true; // the tile under the star does not open
+        if (sender is Control { Tag: GameCard card }) Library.SetFavorite(card, !card.Favorite);
+    }
+
+    private void OnPinnedFirst(object? sender, RoutedEventArgs e)
+    {
+        _pinnedFirst = !_pinnedFirst;
+        var settings = Settings.Load();
+        settings.LibraryPinnedFirst = _pinnedFirst ? null : false;
+        settings.Save();
+        ShowFilter();
+        Refresh();
+    }
 
     private void OnFilter(object? sender, RoutedEventArgs e)
     {
@@ -72,16 +105,18 @@ public partial class LibraryPage : UserControl
 
     private void ShowFilter()
     {
-        foreach (var item in new[] { FilterAll, FilterInstalled, FilterUpdates, FilterNotInstalled, FilterEmulators })
+        foreach (var item in new[] { FilterAll, FilterFavorites, FilterInstalled, FilterUpdates, FilterNotInstalled, FilterEmulators })
             item.IsChecked = (string?)item.Tag == _filter;
         foreach (var item in new[] { SortName, SortRecent, SortAdded })
             item.IsChecked = (string?)item.Tag == _sort;
+        PinnedFirst.IsChecked = _pinnedFirst;
         // Lit while games are hidden, so an empty-looking library never keeps a filter secret.
         FilterButton.Classes.Set("on", _filter != "all");
     }
 
     private bool Shows(GameCard card) => _filter switch
     {
+        "favorites" => card.Favorite,
         "installed" => card.Installed,
         "updates" => card.Outdated,
         "notinstalled" => !card.Installed,
@@ -90,13 +125,19 @@ public partial class LibraryPage : UserControl
     };
 
     /// <summary>The library already keeps its games by name, so that order needs nothing; the others sort a
-    /// copy, with the name settling ties and games that never ran, or came before the date was kept, last.</summary>
-    private IEnumerable<GameCard> Ordered(IEnumerable<GameCard> cards) => _sort switch
+    /// copy, with the name settling ties and games that never ran, or came before the date was kept, last.
+    /// Pinned first (the default) then puts the favourites on top and the games with NR installed after them,
+    /// each group keeping that order: OrderBy is stable.</summary>
+    private IEnumerable<GameCard> Ordered(IEnumerable<GameCard> cards)
     {
-        "recent" => cards.OrderByDescending(c => c.LastPlayed ?? DateTime.MinValue),
-        "added" => cards.OrderByDescending(c => c.Entry.Added ?? DateTime.MinValue),
-        _ => cards,
-    };
+        var sorted = _sort switch
+        {
+            "recent" => cards.OrderByDescending(c => c.LastPlayed ?? DateTime.MinValue),
+            "added" => cards.OrderByDescending(c => c.Entry.Added ?? DateTime.MinValue),
+            _ => cards,
+        };
+        return _pinnedFirst ? sorted.OrderBy(c => c.Favorite ? 0 : c.Installed ? 1 : 2) : sorted;
+    }
 
     private void OnGridView(object? sender, RoutedEventArgs e) => SetView(list: false);
 

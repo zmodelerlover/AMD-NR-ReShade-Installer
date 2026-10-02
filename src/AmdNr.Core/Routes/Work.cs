@@ -274,7 +274,7 @@ public static partial class Work
         // really be loaded under. dinput8.dll is kept as the way in for a host that loads OpenGL
         // through something a proxy beside the executable cannot displace -- ReShade hooks the
         // system opengl32 once it is in the process, whichever name carried it there.
-        Preset.OpenGL => ["opengl32.dll", "dinput8.dll"],
+        Preset.OpenGL or Preset.X86OpenGL => ["opengl32.dll", "dinput8.dll"],
         _ => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
     };
 

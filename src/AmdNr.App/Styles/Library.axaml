@@ -208,6 +208,66 @@
     <Setter Property="Opacity" Value="1" />
   </Style>
 
+  <!-- The favourite star: dark glass on a cover, there once the game is pinned and under the pointer before;
+       gold when pinned. In the list it sits beside the name, faint until pointed at. -->
+  <Style Selector="Button.star">
+    <Setter Property="Background" Value="#B80D0A0A" />
+    <Setter Property="BorderBrush" Value="#24FFFFFF" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="15" />
+    <Setter Property="Width" Value="30" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="#E6FFFFFF" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button.star PathIcon">
+    <Setter Property="Width" Value="15" />
+    <Setter Property="Height" Value="15" />
+  </Style>
+  <Style Selector="Button.card:pointerover Button.star, Button.star.on, Button.star:focus-visible">
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="IsHitTestVisible" Value="True" />
+  </Style>
+  <Style Selector="Button.star PathIcon">
+    <Setter Property="Foreground" Value="#E6FFFFFF" />
+  </Style>
+  <Style Selector="Button.star.on PathIcon">
+    <Setter Property="Foreground" Value="{DynamicResource Warn}" />
+  </Style>
+  <Style Selector="Button.star:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#E00D0A0A" />
+  </Style>
+  <Style Selector="Button.star.small">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Foreground" Value="{DynamicResource Faint}" />
+  </Style>
+  <Style Selector="Button.star.small PathIcon">
+    <Setter Property="Foreground" Value="{DynamicResource Faint}" />
+  </Style>
+  <Style Selector="Button.star.small.on PathIcon">
+    <Setter Property="Foreground" Value="{DynamicResource Warn}" />
+  </Style>
+  <Style Selector="ListBoxItem:pointerover Button.star.small">
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="IsHitTestVisible" Value="True" />
+  </Style>
+  <Style Selector="Button.star.small:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
   <!-- Small label over a cover: dark glass, so it reads on any artwork. -->
   <Style Selector="Border.badge">
     <Setter Property="Background" Value="#B80D0A0A" />

@@ -34,6 +34,10 @@ public sealed class Settings
     /// <summary>The library's order ("recent", "added"); null is by name.</summary>
     public string? LibrarySort { get; set; }
 
+    /// <summary>Favourites first, then the games with NR installed, then the rest, each group in the order above.
+    /// Null is on; false keeps one list.</summary>
+    public bool? LibraryPinnedFirst { get; set; }
+
     /// <summary>Games the person took out of the list. A scan passes over them, so a game removed on
     /// purpose stays removed; Settings lists them, each with the way back.</summary>
     public List<IgnoredGame> Ignored { get; set; } = [];

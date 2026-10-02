@@ -95,14 +95,32 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     /// <summary>Set once the banner was looked for, found or not, so a game without one is not asked again.</summary>
     public bool HeroLooked { get; set; }
 
+    /// <summary>Raised when a game becomes or stops being a favourite, or gains or loses its install: what puts it
+    /// higher or lower in the library's default order.</summary>
+    public static event Action? OrderChanged;
+
     private bool _installed;
     public bool Installed
     {
         get => _installed;
         set
         {
+            if (_installed == value) return;
             _installed = value;
             Raise();
+            OrderChanged?.Invoke();
+        }
+    }
+
+    public bool Favorite
+    {
+        get => Entry.Favorite;
+        set
+        {
+            if (Entry.Favorite == value) return;
+            Entry.Favorite = value;
+            Raise();
+            OrderChanged?.Invoke();
         }
     }
 

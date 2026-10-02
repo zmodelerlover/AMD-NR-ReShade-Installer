@@ -60,7 +60,7 @@ public class UninstallInvariantTests
             RoundTrip($"x64 D3D11 ({tag})", game, game, Preset.Dx11,
                 () => Succeeded(Work.Install(game, src, Preset.Dx11, pins)), [pins.ReShade64Sha]);
 
-            foreach (var (preset, name) in new[] { (Preset.X86Dx8, "D3D8"), (Preset.X86Dx9, "D3D9"), (Preset.X86Dx11, "D3D11") })
+            foreach (var (preset, name) in new[] { (Preset.X86Dx8, "D3D8"), (Preset.X86Dx9, "D3D9"), (Preset.X86Dx11, "D3D11"), (Preset.X86OpenGL, "OpenGL") })
             {
                 var x86 = Game($"rt-{name}-{tag}", x64: false, theirs);
                 var exe = Path.Combine(x86, "Game.exe");
@@ -187,6 +187,20 @@ public class UninstallInvariantTests
             ReShade64Sha = Engine.Sha(reShade),
             ShaderSha = Engine.Sha(effect), ShaderSize = (ulong)effect.Length,
         });
+    }
+
+    /// <summary>The 32-bit OpenGL route puts the pinned 32-bit ReShade in as opengl32.dll, the name an
+    /// OpenGL game loads, and nothing under a D3D name.</summary>
+    [Fact]
+    public void The32BitOpenGLRouteLoadsReShadeAsOpengl32()
+    {
+        var game = Game("x86-opengl-name", x64: false, theirs: false);
+        var exe = Path.Combine(game, "Game.exe");
+        var (installer, pinned) = X86Release("opengl-name");
+        var plan = installer.Plan(exe, Preset.X86OpenGL.ManifestPreset());
+        Assert.Equal(pinned[0], Engine.Sha(plan["opengl32.dll"]));
+        Assert.DoesNotContain("dxgi.dll", plan.Keys);
+        Assert.DoesNotContain("d3d9.dll", plan.Keys);
     }
 
     /// <summary>An unpacked x86 release of stand-ins, and an installer pinned to them.</summary>

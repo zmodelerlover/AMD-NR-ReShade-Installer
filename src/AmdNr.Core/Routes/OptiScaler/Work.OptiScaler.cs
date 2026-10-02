@@ -33,7 +33,7 @@ public static partial class Work
     private static readonly string[] OptiFolders =
     [
         "OptiScaler/D3D12_OptiScaler", "OptiScaler", "experimental_lighting",
-        "lmxxf-modules", "native-game-tiled-assets", "shaders",
+        "lmxxf-modules", "lmxxf-modules-gfx1200", "native-game-tiled-assets", "shaders",
     ];
 
     /// <summary>The lmxxf runtime, which OptiScaler 0.2.0 and later install beside the danielblnc one.</summary>
@@ -108,7 +108,8 @@ public static partial class Work
     {
         payload = payload.Newest(PayloadManifest.OptiScalerComponent);
         var pinned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var name in new[] { PayloadManifest.OptiScalerComponent, PayloadManifest.LmxxfWeightsComponent })
+        foreach (var name in new[] { PayloadManifest.OptiScalerComponent, PayloadManifest.LmxxfWeightsComponent,
+                                     PayloadManifest.LmxxfGfx1200Component })
             if (payload.Has(name))
                 foreach (var file in payload.Component(name).Installed)
                     pinned[OptiDestination(file.RelativePath, OptiScalerDllPayload)] = Engine.Lower(file.Sha256);
@@ -420,7 +421,10 @@ public static partial class Work
             });
         if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
             report.Info(
-                "The lmxxf runtime went in too, with its weights. It runs on RDNA4 (gfx1201) cards only: "
+                "The lmxxf runtime went in too, with its weights. It runs on "
+                + (pins.OptiFiles.Keys.Any(k => k.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal))
+                    ? "RX 9070 and RX 9060 series cards: "
+                    : "RX 9070 series cards only: ")
                 + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
         if (mochizuki) report.Info(MochizukiInstalled + " " + MochizukiPickInOpti);
         else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);

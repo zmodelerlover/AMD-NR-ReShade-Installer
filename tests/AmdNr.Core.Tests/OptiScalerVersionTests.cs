@@ -112,7 +112,7 @@ public class OptiScalerVersionTests
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
         // The newest release is offered first, with its own opti-runtime: 0.4.5, 0.4.4 and 0.4.3 take danielblnc's
         // public 0.4.3, which no earlier OptiScaler accepts, so 0.4.2 keeps 0.4.1 and 0.4.1 keeps 0.4.0.
-        Assert.Equal("0.4.8-amd-nr", offered[0].Version);
+        Assert.Equal("0.4.9-amd-nr", offered[0].Version);
         var newestRuntime = shipped.With(offered[0]).Component(PayloadManifest.OptiRuntimeComponent);
         Assert.Equal("0.5.1", newestRuntime.Version);
         Assert.Equal("493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd", newestRuntime.Files.Single().Sha256);
@@ -144,6 +144,11 @@ public class OptiScalerVersionTests
             }
         }
         Assert.Contains("native-game-tiled-assets/block0-ffn.f16", shipped.With(offered[0]).Pins().OptiFiles.Keys);
+        // 0.4.9 brings the RX 9060 lmxxf kernels as a component of their own, never inside the optiscaler one that
+        // the installers already published install (they refuse the folder).
+        Assert.Contains("lmxxf-modules-gfx1200/c32-wave1.hsaco", shipped.With(offered[0]).Pins().OptiFiles.Keys);
+        Assert.DoesNotContain(offered[0].Components[PayloadManifest.OptiScalerComponent].Extract!,
+            f => f.RelativePath.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal));
 
         // The mochizuki runtime rides in 0.4.0 to 0.4.2 as one build, 0.4.3 carries its fix for a
         // render-resolution change and 0.4.4 the faster build, which 0.4.5 to 0.4.7 keep, and 0.4.8 its own (the game's
@@ -197,6 +202,8 @@ public class OptiScalerVersionTests
     {
         Assert.True(Engine.IsAllowed("LmxxfNrRuntime.dll"));
         Assert.True(Engine.IsAllowed("lmxxf-modules/c32_fast.hsaco"));
+        Assert.True(Engine.IsAllowed("lmxxf-modules-gfx1200/c32_fast.hsaco"));
+        Assert.False(Engine.IsAllowed("lmxxf-modules/gfx1200/c32_fast.hsaco"));
         Assert.True(Engine.IsAllowed("native-game-tiled-assets/noise.f32"));
         Assert.True(Engine.IsAllowed("shaders/native_codec_encode.hlsl"));
         Assert.True(Engine.IsAllowed("dxgi.dll"));

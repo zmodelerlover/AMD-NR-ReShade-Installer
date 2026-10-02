@@ -33,6 +33,7 @@
             <MenuFlyout Placement="BottomEdgeAlignedRight">
               <MenuItem Header="{DynamicResource Str.FilterShow}" IsEnabled="False" />
               <MenuItem x:Name="FilterAll" Tag="all" Header="{DynamicResource Str.FilterAll}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
+              <MenuItem x:Name="FilterFavorites" Tag="favorites" Header="{DynamicResource Str.FilterFavorites}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
               <MenuItem x:Name="FilterInstalled" Tag="installed" Header="{DynamicResource Str.FilterInstalled}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
               <MenuItem x:Name="FilterUpdates" Tag="updates" Header="{DynamicResource Str.FilterUpdates}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
               <MenuItem x:Name="FilterNotInstalled" Tag="notinstalled" Header="{DynamicResource Str.FilterNotInstalled}" ToggleType="Radio" GroupName="filter" Click="OnFilter" />
@@ -42,6 +43,8 @@
               <MenuItem x:Name="SortName" Tag="name" Header="{DynamicResource Str.SortName}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
               <MenuItem x:Name="SortRecent" Tag="recent" Header="{DynamicResource Str.SortRecent}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
               <MenuItem x:Name="SortAdded" Tag="added" Header="{DynamicResource Str.SortAdded}" ToggleType="Radio" GroupName="sort" Click="OnSort" />
+              <Separator />
+              <MenuItem x:Name="PinnedFirst" Header="{DynamicResource Str.SortPinnedFirst}" ToggleType="CheckBox" Click="OnPinnedFirst" />
             </MenuFlyout>
           </Button.Flyout>
         </Button>
@@ -125,6 +128,16 @@
             <Button Classes="card" Classes.selected="{Binding IsSelected}" Click="OnCardClick"
                     Tag="{Binding}" Margin="0,0,0,18" HorizontalAlignment="Left"
                     Width="{DynamicResource TileWidth}" AutomationProperties.Name="{Binding Name}">
+              <Button.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="{DynamicResource Str.AddFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding !Favorite}">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconStarOutline}" /></MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="{DynamicResource Str.RemoveFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding Favorite}">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconStar}" /></MenuItem.Icon>
+                  </MenuItem>
+                </ContextMenu>
+              </Button.ContextMenu>
               <!-- The name first: the tile cuts it, and the path alone did not say which game it was. -->
               <ToolTip.Tip>
                 <StackPanel Spacing="2" MaxWidth="380">
@@ -181,6 +194,15 @@
                         </Button>
                       </StackPanel>
                     </Border>
+                    <!-- Favourite: always there once pinned, under the pointer before. -->
+                    <Button Classes="star" Classes.on="{Binding Favorite}" Tag="{Binding}" Click="OnStar"
+                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="6"
+                            ToolTip.Tip="{DynamicResource Str.Favorite}" AutomationProperties.Name="{DynamicResource Str.Favorite}">
+                      <Panel>
+                        <PathIcon Data="{StaticResource IconStar}" IsVisible="{Binding Favorite}" />
+                        <PathIcon Data="{StaticResource IconStarOutline}" IsVisible="{Binding !Favorite}" />
+                      </Panel>
+                    </Button>
                     <!-- Colour says the state, the words say the route. -->
                     <Border Classes="state" Classes.update="{Binding Outdated}" Classes.pulse="{Binding Pulsing}"
                             HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
@@ -232,7 +254,17 @@
                  AutomationProperties.Name="{DynamicResource Str.Games}">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="local:GameCard">
-              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" ToolTip.Tip="{Binding Path}">
+              <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" ToolTip.Tip="{Binding Path}" Background="Transparent">
+                <Grid.ContextMenu>
+                  <ContextMenu>
+                  <MenuItem Header="{DynamicResource Str.AddFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding !Favorite}">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconStarOutline}" /></MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="{DynamicResource Str.RemoveFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding Favorite}">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconStar}" /></MenuItem.Icon>
+                  </MenuItem>
+                </ContextMenu>
+                </Grid.ContextMenu>
                 <Border Width="32" Height="42" CornerRadius="5" ClipToBounds="True">
                   <Panel>
                     <Border Background="{Binding Tile}" IsVisible="{Binding NoCover}">
@@ -243,8 +275,16 @@
                   </Panel>
                 </Border>
                 <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                <Button Grid.Column="2" Classes="star small" Classes.on="{Binding Favorite}" Tag="{Binding}" Click="OnStar"
+                        VerticalAlignment="Center" ToolTip.Tip="{DynamicResource Str.Favorite}"
+                        AutomationProperties.Name="{DynamicResource Str.Favorite}">
+                  <Panel>
+                    <PathIcon Data="{StaticResource IconStar}" IsVisible="{Binding Favorite}" />
+                    <PathIcon Data="{StaticResource IconStarOutline}" IsVisible="{Binding !Favorite}" />
+                  </Panel>
+                </Button>
                 <!-- Green once the mod is in, amber when it has an update waiting. -->
-                <Ellipse Grid.Column="2" Width="8" Height="8" VerticalAlignment="Center"
+                <Ellipse Grid.Column="3" Width="8" Height="8" VerticalAlignment="Center"
                          Fill="{DynamicResource Ok}" IsVisible="{Binding Installed}" Classes.update="{Binding Outdated}" />
               </Grid>
             </DataTemplate>

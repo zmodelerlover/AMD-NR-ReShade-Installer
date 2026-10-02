@@ -217,24 +217,26 @@
   <!-- Routes: the names and notes Core carries in English, said in this language. -->
   <sys:String x:Key="Str.Preset.Pcsx2">PCSX2</sys:String>
   <sys:String x:Key="Str.Preset.Rpcs3">RPCS3</sys:String>
-  <sys:String x:Key="Str.Preset.Dx11">D3D11 game</sys:String>
+  <sys:String x:Key="Str.Preset.Dx11">D3D10/D3D11 game</sys:String>
   <sys:String x:Key="Str.Preset.Dx12">D3D12 game</sys:String>
   <sys:String x:Key="Str.Preset.Vulkan">Vulkan game</sys:String>
   <sys:String x:Key="Str.Preset.OpenGL">OpenGL game</sys:String>
-  <sys:String x:Key="Str.Preset.X86Dx11">D3D11 game, 32-bit</sys:String>
+  <sys:String x:Key="Str.Preset.X86Dx11">D3D10/D3D11 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx9">D3D9 game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.X86Dx8">D3D8 game, 32-bit</sys:String>
+  <sys:String x:Key="Str.Preset.X86OpenGL">OpenGL game, 32-bit</sys:String>
   <sys:String x:Key="Str.Preset.OptiScaler">OptiScaler: D3D12 game with DLSS, FSR or XeSS</sys:String>
   <sys:String x:Key="Str.PresetNote.Pcsx2">Set the emulator to Direct3D 11: it is the renderer where the network gets the most — the emulator’s depth, and motion from the companion effect when it is installed. Watch for a per-game override, which beats the global setting silently.</sys:String>
   <sys:String x:Key="Str.PresetNote.Rpcs3">Experimental. ReShade on Vulkan is a layer, not a proxy DLL: the install registers it for your Windows user and turns it on for rpcs3.exe with a ReShade.ini. No depth on Vulkan, only colour and estimated motion.</sys:String>
-  <sys:String x:Key="Str.PresetNote.Dx11">The best route: D3D11 is the only one where the game’s own motion vectors reach the network, together with its depth.</sys:String>
+  <sys:String x:Key="Str.PresetNote.Dx11">The best route: D3D11 is the only one where the game’s own motion vectors reach the network, together with its depth. A D3D10 game takes this route too, with colour only.</sys:String>
   <sys:String x:Key="Str.PresetNote.Dx12">Degraded. On D3D12 the add-on finds the game’s depth but not its motion vectors, so the network gets colour and depth and estimates the motion. It works; expect less from it. A game with DLSS, FSR or XeSS in its settings is better served by the OptiScaler route.</sys:String>
   <sys:String x:Key="Str.PresetNote.OptiScaler">Recommended for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS and runs the network inside it, with the game's own depth and motion vectors. The game has to offer one of those upscalers, switched on in its settings. In game, press Insert, open the Neural tab and turn on Enable NR; a game with Ray Reconstruction needs "After the finished frame" as the processing point.</sys:String>
   <sys:String x:Key="Str.PresetNote.Vulkan">Experimental. ReShade on Vulkan is a layer: the install registers it for your Windows user and turns it on for this program with a ReShade.ini beside its .exe. There is no depth on Vulkan.</sys:String>
-  <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this is an ordinary proxy DLL: ReShade goes in as opengl32.dll beside the game, with no separate installer run. Colour and estimated motion only; the game’s own depth is reachable on this API but is not wired up yet. A 32-bit OpenGL game has no route.</sys:String>
-  <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.OpenGL">Experimental. Unlike Vulkan this is an ordinary proxy DLL: ReShade goes in as opengl32.dll beside the game, with no separate installer run. Colour and estimated motion only; the game’s own depth is reachable on this API but is not wired up yet. A 32-bit OpenGL game takes the 32-bit OpenGL route.</sys:String>
+  <sys:String x:Key="Str.PresetNote.X86Dx11">Experimental. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair sharing frames on one adapter. Install ReShade with add-on support as the 32-bit dxgi.dll. A D3D10 game takes this route too, with colour only.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx9">Experimental. The same 32-bit pair as D3D11, through a private D3D9/D3D11 stage. Plain D3D9 costs a fixed few milliseconds per frame; D3D9Ex does not. Install ReShade as the 32-bit d3d9.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.X86Dx8">Experimental. D3D8 is translated to D3D9 and then takes the D3D9 route above, with the same 32-bit pair. Install ReShade as the 32-bit d3d9.dll.</sys:String>
+  <sys:String x:Key="Str.PresetNote.X86OpenGL">Experimental. The same 32-bit pair, inside the game’s OpenGL context: colour and estimated motion only. Install ReShade as the 32-bit opengl32.dll.</sys:String>
   <sys:String x:Key="Str.PresetNote.FiveM">FiveM has its own anti-cheat: at your own risk, and check your server’s rules. The add-on and ReShade go in FiveM.app\plugins, the runtime and weights beside the game process in data\cache\subprocess. What you already have in plugins — ReShade.ini, presets, shaders, other add-ons, ENB — stays as it is.</sys:String>
 
   <!-- First run -->
@@ -429,6 +431,11 @@
   <sys:String x:Key="Str.SortName">Name</sys:String>
   <sys:String x:Key="Str.SortRecent">Recently played</sys:String>
   <sys:String x:Key="Str.SortAdded">Recently added</sys:String>
+  <sys:String x:Key="Str.FilterFavorites">Favourites</sys:String>
+  <sys:String x:Key="Str.SortPinnedFirst">Favourites and installed first</sys:String>
+  <sys:String x:Key="Str.Favorite">Favourite</sys:String>
+  <sys:String x:Key="Str.AddFavorite">Add to favourites</sys:String>
+  <sys:String x:Key="Str.RemoveFavorite">Remove from favourites</sys:String>
   <sys:String x:Key="Str.NoFilterMatch">No game in the list matches this filter.</sys:String>
   <sys:String x:Key="Str.WhatsNew">What's new</sys:String>
   <sys:String x:Key="Str.WhatsNewOnGitHub">Open on GitHub</sys:String>

@@ -56,7 +56,7 @@ public sealed class X86Installer(string release)
     /// moves.</summary>
     public SortedDictionary<string, byte[]> Plan(string target, string preset, string? proxyName = null)
     {
-        Engine.Require(preset is "D3D11" or "D3D9" or "D3D8", "Unsupported x86 preset");
+        Engine.Require(preset is "D3D11" or "D3D9" or "D3D8" or "OpenGL", "Unsupported x86 preset");
         Engine.SafePath(target);
         Engine.Require(Engine.Machine(Engine.Read(target)) == Engine.MachineX86,
             "Target must be PE32/x86; x64 targets are not supported");
@@ -160,6 +160,8 @@ public sealed class X86Installer(string release)
         var desired = Plan(Engine.Absolute(target), preset, proxyName);
         foreach (var (name, bytes) in extra ?? new Dictionary<string, byte[]>()) desired[name] = bytes;
         Transaction.Apply(dir, preset, Route.X86, desired, Log, retire, displace);
+        if (GameQuirks.Seal(Engine.Absolute(target), dir, proxyName is { Length: > 0 } ? proxyName : Engine.X86ProxyName(preset)) is { } sealedLine)
+            Note(sealedLine);
         // The same sweep the x64 route has done since the rename, and this route needs it more:
         // a 32-bit folder set up before v0.6.5 still has dlss5-neural.addon32 in it, ReShade loads
         // every .addon32 it finds, and two add-ons on one present is two overlays and two helpers.

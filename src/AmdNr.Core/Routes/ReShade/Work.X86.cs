@@ -21,6 +21,10 @@ public static partial class Work
         var found = Directory.EnumerateFiles(path, "*.exe")
             .Where(p => Engine.MachineOfFile(p) == Engine.MachineX86)
             .ToList();
+        // Servers, launchers and crash reporters beside the game do not make it ambiguous: Half-Life
+        // keeps hlds.exe and hltv.exe beside hl.exe.
+        if (found.Count(GraphicsDetector.LooksLikeTheGame) == 1)
+            found = found.Where(GraphicsDetector.LooksLikeTheGame).ToList();
 
         switch (found.Count)
         {

@@ -19,6 +19,8 @@ public static partial class GraphicsDetector
         "settings", "editor", "server.exe", "dedicated", "languageselect", "_trial", "trial.exe",
         "activation", "register", "patcher", "repair", "diagnostic", "support", "feedback",
         "bootstrap", "startup", "splash", "vrmonitor", "handler", "service", "agent",
+        // Dedicated servers and relays that sit beside the game they serve: GoldSrc's and Source's.
+        "hlds", "hltv", "srcds",
         // Ours: the 64-bit host the bridge route puts beside a 32-bit game.
         "amd-nr",
     ];

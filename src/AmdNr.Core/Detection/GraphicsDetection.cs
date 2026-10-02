@@ -12,6 +12,8 @@ public enum GraphicsApi
     D3D12,
     Vulkan,
     OpenGL,
+    // Last, so a name already written anywhere keeps its number.
+    D3D10,
 }
 
 public sealed record GraphicsDetection(
@@ -44,6 +46,10 @@ public sealed record GraphicsDetection(
     /// bin\ for add-ons. Everything has to go there together.</summary>
     public string? InstallTarget { get; init; }
 
+    /// <summary>A game known to need something its files do not say (GameQuirks). Its API is the
+    /// quirk's, and no database record replaces it.</summary>
+    public GameQuirk? Quirk { get; init; }
+
     /// <summary>The DLSS, FSR or XeSS files the game ships, by name. Empty when none
     /// were found, which is what decides whether a game that also runs D3D11 is recommended the
     /// OptiScaler route: OptiScaler only has something to do in a game that calls one of them.</summary>
@@ -62,11 +68,12 @@ public sealed record GraphicsDetection(
     /// where the game's own depth and motion reach the network; D3D12, Vulkan and OpenGL get colour
     /// only. OpenGL sits behind Vulkan because it is the newest of the three and has been proved on
     /// fewer hosts, not because it is worse per frame -- where a game offers both, Vulkan is the
-    /// one with the miles on it.</summary>
+    /// one with the miles on it. D3D10 goes over the D3D11 route with a hop in front, colour only,
+    /// and ahead of D3D9 because it shares on the GPU where plain D3D9 goes through the CPU.</summary>
     private static readonly GraphicsApi[] Preference =
     [
         GraphicsApi.D3D11, GraphicsApi.D3D12, GraphicsApi.Vulkan, GraphicsApi.OpenGL,
-        GraphicsApi.D3D9, GraphicsApi.D3D8,
+        GraphicsApi.D3D10, GraphicsApi.D3D9, GraphicsApi.D3D8,
     ];
 
     public static Preset? RouteFor(Route? width, GraphicsApi api) => (width, api) switch
@@ -74,17 +81,18 @@ public sealed record GraphicsDetection(
         (Route.X64, GraphicsApi.D3D11) => Core.Preset.Dx11,
         (Route.X64, GraphicsApi.D3D12) => Core.Preset.Dx12,
         (Route.X64, GraphicsApi.Vulkan) => Core.Preset.Vulkan,
-        // 64-bit only: the 32-bit pair has a D3D8, D3D9 and D3D11 frontend and no OpenGL one, so a
-        // 32-bit OpenGL game falls through to null and is told so.
         (Route.X64, GraphicsApi.OpenGL) => Core.Preset.OpenGL,
-        (Route.X86, GraphicsApi.D3D11) => Core.Preset.X86Dx11,
+        // D3D10 is installed as D3D11 is, ReShade as dxgi.dll; the add-on tells the two apart.
+        (Route.X64, GraphicsApi.D3D10) => Core.Preset.Dx11,
+        (Route.X86, GraphicsApi.D3D11 or GraphicsApi.D3D10) => Core.Preset.X86Dx11,
+        (Route.X86, GraphicsApi.OpenGL) => Core.Preset.X86OpenGL,
         (Route.X86, GraphicsApi.D3D9) => Core.Preset.X86Dx9,
         (Route.X86, GraphicsApi.D3D8) => Core.Preset.X86Dx8,
         _ => null,
     };
 
     /// <summary>The best route among everything the game supports, or null when none of it has one
-    /// -- a 64-bit D3D9 game, a 32-bit D3D12 or OpenGL one, a software renderer.</summary>
+    /// -- a 64-bit D3D9 game, a 32-bit D3D12 one, a software renderer.</summary>
     public Preset? Preset
     {
         get
@@ -155,6 +163,7 @@ public sealed record GraphicsDetection(
     {
         GraphicsApi.D3D8 => "DX8",
         GraphicsApi.D3D9 => "DX9",
+        GraphicsApi.D3D10 => "DX10",
         GraphicsApi.D3D11 => "DX11",
         GraphicsApi.D3D12 => "DX12",
         GraphicsApi.Vulkan => "Vulkan",
@@ -164,18 +173,19 @@ public sealed record GraphicsDetection(
 
     /// <summary>Whether what the files link can say anything against this API. D3D11 and D3D12 come through
     /// the same DXGI and a game that imports one routinely loads the other at run time -- Need for Speed
-    /// (2016) imports d3d12.dll and renders D3D11 -- so one of them linked is no evidence against the other.</summary>
+    /// (2016) imports d3d12.dll and renders D3D11 -- so one of them linked is no evidence against the other.
+    /// D3D10 is the same family, and installs as D3D11 does.</summary>
     public static bool Reachable(GraphicsApi wanted, IEnumerable<GraphicsApi> linked) =>
         linked.Any(a => a == wanted || Dxgi(a) && Dxgi(wanted));
 
-    private static bool Dxgi(GraphicsApi a) => a is GraphicsApi.D3D11 or GraphicsApi.D3D12;
+    private static bool Dxgi(GraphicsApi a) => a is GraphicsApi.D3D10 or GraphicsApi.D3D11 or GraphicsApi.D3D12;
 
     /// <summary>What PCGamingWiki says replaces what the files suggested about *which* APIs exist;
     /// the executable, and so the bitness, still comes from the files, because only the installed
     /// copy can say which build is on this disk.</summary>
     public GraphicsDetection With(PcgwApi? wiki)
     {
-        if (wiki is null || wiki.Supported.Count == 0) return this;
+        if (wiki is null || wiki.Supported.Count == 0 || Quirk is not null) return this;
 
         // A record that says this build does not exist is not a record of this copy. The wiki page
         // for a remaster carries the same title as the original, and one of them being 64-bit D3D12

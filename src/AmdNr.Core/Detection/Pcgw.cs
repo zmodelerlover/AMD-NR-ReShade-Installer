@@ -50,9 +50,10 @@ public static partial class PcgwParser
             {
                 "8" => GraphicsApi.D3D8,
                 "9" => GraphicsApi.D3D9,
+                "10" => GraphicsApi.D3D10,
                 "11" => GraphicsApi.D3D11,
                 "12" => GraphicsApi.D3D12,
-                _ => GraphicsApi.Unknown, // 7 and 10 have no route here
+                _ => GraphicsApi.Unknown, // 7 has no route here
             };
             if (api != GraphicsApi.Unknown && !supported.Contains(api)) supported.Add(api);
         }

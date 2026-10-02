@@ -321,7 +321,11 @@ public static partial class Transaction
             try
             {
                 if (c.Existed) Engine.Write(Path.Combine(dir, c.Name), c.Before);
-                else File.Delete(Path.Combine(dir, c.Name));
+                else
+                {
+                    Engine.Writable(Path.Combine(dir, c.Name));
+                    File.Delete(Path.Combine(dir, c.Name));
+                }
             }
             catch
             {

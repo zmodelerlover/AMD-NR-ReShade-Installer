@@ -76,6 +76,9 @@ public sealed class GameEntry
     /// <summary>When the game came into the list, for sorting by it. Null for games added before this was kept.</summary>
     public DateTime? Added { get; set; }
 
+    /// <summary>Pinned by the person: shown first in the library, and on its own under the Favourites filter.</summary>
+    public bool Favorite { get; set; }
+
     [JsonIgnore]
     public string Display => CustomName ?? Name ?? System.IO.Path.GetFileName(Path.TrimEnd('\\', '/')) ?? Path;
 

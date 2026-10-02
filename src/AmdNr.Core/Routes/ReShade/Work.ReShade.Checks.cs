@@ -24,7 +24,7 @@ public static partial class Work
         // An OpenGL game never loads dxgi.dll, so looking for the D3D names there would report
         // "no ReShade proxy found" about a folder with ReShade sitting in it -- the same mistake
         // the 32-bit line above was added to fix.
-        Preset.OpenGL => ["opengl32.dll", "dinput8.dll"],
+        Preset.OpenGL or Preset.X86OpenGL => ["opengl32.dll", "dinput8.dll"],
         _ => ["dxgi.dll", "d3d11.dll", "d3d12.dll"],
     };
 

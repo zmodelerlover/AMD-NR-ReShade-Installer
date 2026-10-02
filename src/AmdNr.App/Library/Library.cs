@@ -307,6 +307,13 @@ public sealed class Library(Session session)
         return Bitmap.DecodeToWidth(stream, width, BitmapInterpolationMode.HighQuality);
     });
 
+    /// <summary>A game pinned to the top of the library, or unpinned.</summary>
+    public void SetFavorite(GameCard card, bool favorite)
+    {
+        card.Favorite = favorite;
+        Save();
+    }
+
     /// <summary>The name the person gives a game here. Empty, or the name it already had, goes back to that
     /// one. A tile still without a cover looks again under the new name.</summary>
     public void Rename(GameCard card, string? name)

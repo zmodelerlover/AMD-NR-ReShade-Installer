@@ -232,11 +232,11 @@ public static partial class Engine
         "version.dll",
     };
 
-    /// <summary>Folders whose every plain file is ours: the lmxxf runtime's HIP modules and its
-    /// weights. The names inside come from upstream and change with it, so listing each one here
+    /// <summary>Folders whose every plain file is ours: the lmxxf runtime's HIP modules (the RX 9060
+    /// series' in their own folder, since a path may hold one folder level only) and its weights. The names inside come from upstream and change with it, so listing each one here
     /// would tie every weights update to a new build of this app. The folder names are the
     /// runtime's own and nothing else uses them.</summary>
-    private static readonly string[] OwnedFolders = ["lmxxf-modules", "native-game-tiled-assets"];
+    private static readonly string[] OwnedFolders = ["lmxxf-modules", "lmxxf-modules-gfx1200", "native-game-tiled-assets"];
 
     /// <summary>Whether this installer may create, back up or remove a file under this name:
     /// everything in <see cref="Allowed"/>, one plain file directly inside an
@@ -307,7 +307,8 @@ public static partial class Engine
 
     /// <summary>The name the 32-bit route loads ReShade under when nobody has chosen one. D3D8 is
     /// translated to D3D9 before anything else, so it is the D3D9 name there too.</summary>
-    public static string X86ProxyName(string preset) => preset == "D3D11" ? "dxgi.dll" : "d3d9.dll";
+    public static string X86ProxyName(string preset) =>
+        preset switch { "D3D11" => "dxgi.dll", "OpenGL" => "opengl32.dll", _ => "d3d9.dll" };
 
     /// <summary>By file name, so plugins/ReShade.ini on the FiveM route is the person's too.
     /// dlss5-neural.ini is the tuning file's name before v0.6.5, and the Rust installer's is_config marked

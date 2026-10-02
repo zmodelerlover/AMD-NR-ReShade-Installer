@@ -193,6 +193,11 @@ public static partial class GraphicsDetector
         var exeName = Path.GetFileName(exe);
         var folder = Path.GetDirectoryName(exe)!;
 
+        // A game known to need more than its files say comes first: Just Cause 2's imports name
+        // D3D9, which it never renders with.
+        if (GameQuirks.For(exe) is { } quirk)
+            return new GraphicsDetection(exe, width, quirk.Api, false, quirk.Why) { Quirk = quirk };
+
         // 1. The executable's own imports.
         var imports = PeImports.Read(exe);
         var fromExe = Decide(imports);
@@ -223,7 +228,11 @@ public static partial class GraphicsDetector
             var evidence = fromExe.Both && !both
                 ? $"{fromExe.Evidence}; outside Unreal the D3D11 import is interop, not a second renderer"
                 : fromExe.Evidence;
-            return new GraphicsDetection(exe, width, fromExe.Api, both, $"{exeName} imports {evidence}.");
+            var also = fromExe.Api == GraphicsApi.D3D9 && NamesD3D10(exe)
+                ? " It also names d3d10.dll, which it may load itself: if the game runs DX10, pick the "
+                  + "D3D10/D3D11 route."
+                : "";
+            return new GraphicsDetection(exe, width, fromExe.Api, both, $"{exeName} imports {evidence}.{also}");
         }
 
         // 2. The engine module beside it.
@@ -264,6 +273,36 @@ public static partial class GraphicsDetector
 
     private sealed record Decision(GraphicsApi Api, bool Both, string Evidence);
 
+    /// <summary>Whether an executable that imports D3D9 names d3d10.dll or d3d10_1.dll in its own
+    /// bytes, the way a game that loads D3D10 at run time does (Just Cause 2). Said, never acted on:
+    /// a D3D9 game probing for D3D10 names it too. Executables past 128 MB are not read.</summary>
+    private static bool NamesD3D10(string exe)
+    {
+        try
+        {
+            if (new FileInfo(exe).Length > 128L << 20) return false;
+            var bytes = File.ReadAllBytes(exe);
+            return Contains(bytes, "d3d10.dll"u8) || Contains(bytes, "d3d10_1.dll"u8);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+
+        // ASCII case-insensitive, as an import name or a LoadLibrary argument can be spelled.
+        static bool Contains(byte[] hay, ReadOnlySpan<byte> needle)
+        {
+            static byte Lower(byte c) => c is >= (byte)'A' and <= (byte)'Z' ? (byte)(c + 32) : c;
+            for (var i = 0; i + needle.Length <= hay.Length; ++i)
+            {
+                var j = 0;
+                while (j < needle.Length && Lower(hay[i + j]) == needle[j]) ++j;
+                if (j == needle.Length) return true;
+            }
+            return false;
+        }
+    }
+
     /// <summary>What a set of imported module names says. D3D12 outranks D3D11 because a D3D12 game
     /// usually still imports D3D11 for video or UI interop, while the reverse never happens -- but the
     /// pair is reported, because several engines do genuinely offer both.</summary>
@@ -281,6 +320,8 @@ public static partial class GraphicsDetector
         if (vulkan) return new Decision(GraphicsApi.Vulkan, false, "vulkan-1.dll");
         if (Has("d3d9.dll")) return new Decision(GraphicsApi.D3D9, false, "d3d9.dll");
         if (Has("d3d8.dll")) return new Decision(GraphicsApi.D3D8, false, "d3d8.dll");
+        if (Has("d3d10_1.dll")) return new Decision(GraphicsApi.D3D10, false, "d3d10_1.dll");
+        if (Has("d3d10.dll")) return new Decision(GraphicsApi.D3D10, false, "d3d10.dll");
         // dxgi alone is D3D10/11/12 without saying which; on its own it is a D3D11 game far more
         // often than not, but it is reported as such rather than dressed up as certainty.
         if (Has("dxgi.dll")) return new Decision(GraphicsApi.D3D11, false, "dxgi.dll only (D3D10/11 family)");

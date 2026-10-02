@@ -37,5 +37,26 @@ internal static class LibraryFlow
         check(main.Library.Restore(main.Library.Ignored.First(i => i.Name == "Kept Game")) && Listed("Kept Game")
               && !main.Library.Ignored.Any(i => i.Name == "Kept Game"),
             "until it is brought back, which takes it off the ignored list");
+
+        // The default order: favourites, then the games with NR installed, then the rest, by name in each.
+        foreach (var name in new[] { "Alpha Pin", "Bravo Pin", "Charlie Pin" })
+        {
+            Directory.CreateDirectory(Path.Combine(lib, name));
+            File.WriteAllBytes(Path.Combine(lib, name, name.Replace(" ", "") + ".exe"), exe);
+        }
+        var fourth = page.SearchFolderAsync(lib);
+        check(until(() => fourth.IsCompleted && !main.Session.Busy && Listed("Charlie Pin"), 20), "three more games to order");
+        GameCard Card(string name) => main.Library.Cards.First(c => c.Name == name);
+        main.Library.SetFavorite(Card("Charlie Pin"), true);
+        Card("Bravo Pin").Installed = true;
+        var shown = (System.Collections.Generic.IList<GameCard>)page.GetVisualDescendants().OfType<Avalonia.Controls.ItemsControl>().First(i => i.Name == "CardList").ItemsSource!;
+        List<string> Order() => shown.Select(c => c.Name).Where(n => n.EndsWith(" Pin")).ToList();
+        check(until(() => Order().SequenceEqual(["Charlie Pin", "Bravo Pin", "Alpha Pin"]), 5),
+            "a favourite comes first and an installed game before the rest: " + string.Join(", ", Order()));
+        check(GameStore.Load().Any(e => e.Favorite && e.Path.EndsWith("Charlie Pin")), "the favourite is saved with the game");
+        main.Library.SetFavorite(Card("Charlie Pin"), false);
+        Card("Bravo Pin").Installed = false;
+        check(until(() => Order().SequenceEqual(["Alpha Pin", "Bravo Pin", "Charlie Pin"]), 5),
+            "unpinned and uninstalled, they go back to the name order");
     }
 }

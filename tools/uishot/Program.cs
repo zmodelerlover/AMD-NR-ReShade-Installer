@@ -103,7 +103,8 @@ void SeedLibrary(int count)
         Directory.CreateDirectory(dir);
         // Something that is not ours, or the library takes the folder for a game that was uninstalled.
         File.WriteAllText(Path.Combine(dir, "data.pak"), "game data");
-        games.Add(new GameEntry { Path = dir, Name = $"Some Game With A Long Title {i + 1:00}" });
+        // Two favourites further down the names, so the shots show the star and the pinned order.
+        games.Add(new GameEntry { Path = dir, Name = $"Some Game With A Long Title {i + 1:00}", Favorite = i is 6 or 11 });
     }
     GameStore.Save(games);
 }

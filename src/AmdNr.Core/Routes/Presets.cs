@@ -20,6 +20,7 @@ public enum Preset
     // Last, so every games.json written before it still reads the same names.
     OptiScaler,
     FiveM,
+    X86OpenGL,
 }
 
 /// <summary>The two ways into a game. They are alternatives rather than layers: both write the
@@ -36,7 +37,7 @@ public static class Presets
     public static readonly Preset[] All =
     [
         Preset.Pcsx2, Preset.Rpcs3, Preset.Dx11, Preset.OptiScaler, Preset.Dx12, Preset.Vulkan, Preset.OpenGL,
-        Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8, Preset.FiveM,
+        Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8, Preset.X86OpenGL, Preset.FiveM,
     ];
 
     private static readonly Preset[] X64 =
@@ -56,10 +57,10 @@ public static class Presets
 
     public static RouteFamily Family(this Preset p) => p.IsOptiScaler() ? RouteFamily.OptiScaler : RouteFamily.ReShade;
 
-    private static readonly Preset[] X86 = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8];
+    private static readonly Preset[] X86 = [Preset.X86Dx11, Preset.X86Dx9, Preset.X86Dx8, Preset.X86OpenGL];
 
     public static Route Route(this Preset p) =>
-        p is Preset.X86Dx11 or Preset.X86Dx9 or Preset.X86Dx8 ? AmdNr.Core.Route.X86 : AmdNr.Core.Route.X64;
+        p is Preset.X86Dx11 or Preset.X86Dx9 or Preset.X86Dx8 or Preset.X86OpenGL ? AmdNr.Core.Route.X86 : AmdNr.Core.Route.X64;
 
     /// <summary>What the target row offers: the routes the detected width says can work, first, and
     /// then every other one.
@@ -100,6 +101,7 @@ public static class Presets
         Preset.X86Dx11 => "D3D11",
         Preset.X86Dx9 => "D3D9",
         Preset.X86Dx8 => "D3D8",
+        Preset.X86OpenGL => "OpenGL",
         Preset.OptiScaler => "OptiScaler",
         Preset.FiveM => "FiveM",
         _ => throw new ArgumentOutOfRangeException(nameof(p)),
@@ -111,13 +113,14 @@ public static class Presets
         Preset.OptiScaler => "OptiScaler: D3D12 game with DLSS, FSR or XeSS",
         Preset.Pcsx2 => "PCSX2",
         Preset.Rpcs3 => "RPCS3",
-        Preset.Dx11 => "D3D11 game",
+        Preset.Dx11 => "D3D10/D3D11 game",
         Preset.Dx12 => "D3D12 game",
         Preset.Vulkan => "Vulkan game",
         Preset.OpenGL => "OpenGL game",
-        Preset.X86Dx11 => "D3D11 game, 32-bit",
+        Preset.X86Dx11 => "D3D10/D3D11 game, 32-bit",
         Preset.X86Dx9 => "D3D9 game, 32-bit",
         Preset.X86Dx8 => "D3D8 game, 32-bit",
+        Preset.X86OpenGL => "OpenGL game, 32-bit",
         _ => throw new ArgumentOutOfRangeException(nameof(p)),
     };
 
@@ -151,7 +154,7 @@ public static class Presets
             + "beside it. The network gets colour and estimated motion only -- there is no depth on Vulkan.",
         Preset.Dx11 =>
             "The best case. D3D11 is the only route where the game's own motion vectors reach the "
-            + "network, together with its depth.",
+            + "network, together with its depth. A D3D10 game takes this route too, with colour only.",
         Preset.Dx12 =>
             "The degraded case. On D3D12 the add-on finds the game's depth but not its motion "
             + "vectors, so the network gets colour and depth and estimates the motion. It works; "
@@ -181,12 +184,12 @@ public static class Presets
             "EXPERIMENTAL. Unlike Vulkan this one is an ordinary proxy DLL: ReShade goes in as "
             + "opengl32.dll beside the game, no separate installer run. The network gets colour "
             + "and estimated motion; the game's own depth is reachable on this API but is not "
-            + "wired up yet. A 32-bit OpenGL game has no route at all -- the 32-bit pair covers "
-            + "D3D8, D3D9 and D3D11 only.",
+            + "wired up yet. A 32-bit OpenGL game takes the 32-bit pair's OpenGL route.",
         Preset.X86Dx11 =>
             "EXPERIMENTAL. A 32-bit game cannot load the 64-bit runtime, so the add-on runs as a pair: "
             + "a 32-bit frontend inside the game and a 64-bit helper beside it, sharing frames on the "
-            + "same adapter. Install ReShade with full add-on support as the 32-bit dxgi.dll.",
+            + "same adapter. Install ReShade with full add-on support as the 32-bit dxgi.dll. A D3D10 "
+            + "game takes this route too, with colour only.",
         Preset.X86Dx9 =>
             "EXPERIMENTAL. The same 32-bit pair as D3D11, reached through a private D3D9/D3D11 stage. "
             + "D3D9Ex shares GPU textures; plain D3D9 falls back to a CPU round trip that costs a fixed "
@@ -197,6 +200,10 @@ public static class Presets
             + "D3D9 route above; there is no second renderer here. A game that already ships its own "
             + "d3d8.dll wrapper keeps it, and the translator is installed beside it as d3d8R.dll. "
             + "Install ReShade as the 32-bit d3d9.dll.",
+        Preset.X86OpenGL =>
+            "EXPERIMENTAL. The same 32-bit pair, its frontend inside the game's OpenGL context: the "
+            + "frame crosses through D3D11 textures the context imports, colour only. ReShade goes in "
+            + "as the 32-bit opengl32.dll.",
         _ => throw new ArgumentOutOfRangeException(nameof(p)),
     };
 }

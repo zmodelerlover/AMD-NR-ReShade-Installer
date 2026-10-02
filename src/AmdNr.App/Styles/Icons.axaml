@@ -35,6 +35,9 @@
   <StreamGeometry x:Key="IconCoffee">M20 3H4v10a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-3h2a3 3 0 0 0 0-6zm0 5h-2V5h2a1 1 0 0 1 0 3zM4 19h16v2H4z</StreamGeometry>
   <StreamGeometry x:Key="IconHeart">M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z</StreamGeometry>
 
+  <StreamGeometry x:Key="IconStar">M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z</StreamGeometry>
+  <StreamGeometry x:Key="IconStarOutline">M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z</StreamGeometry>
+
   <!-- Added with the sheet's route cards, the payload panel and the Add menu. -->
   <StreamGeometry x:Key="IconLayers">M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z</StreamGeometry>
   <StreamGeometry x:Key="IconSparkle">M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z</StreamGeometry>
