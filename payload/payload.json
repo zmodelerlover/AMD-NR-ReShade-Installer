@@ -122,12 +122,12 @@
       "files": [
         {
           "name": "AMD_Neural_Feed.fx",
+          "size": 18415,
+          "sha256": "9f53875221c130903bdd205d15011a924ab0f1c0c85b17191e4f39b140e7848e",
           "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/AMD_Neural_Feed.fx",
           "mirrors": [
             "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.6.6/AMD_Neural_Feed.fx"
-          ],
-          "size": 18415,
-          "sha256": "9f53875221c130903bdd205d15011a924ab0f1c0c85b17191e4f39b140e7848e"
+          ]
         }
       ]
     },
