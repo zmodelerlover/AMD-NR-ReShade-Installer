@@ -65,11 +65,14 @@ public static unsafe class GpuService
             || System.Text.RegularExpressions.Regex.IsMatch(name, @"\bRX\s*9\d{3}|\bAI\s*PRO\s*R9\d{3}",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase));
 
-    /// <summary>amdhip64_7.dll on the search path. HIP 6 does not count, which is why the name is
-    /// checked rather than "some HIP".</summary>
+    /// <summary>amdhip64_7.dll on the search path, or in the bin folder of the AMD HIP SDK that RX 6000 cards need,
+    /// which sets HIP_PATH and leaves PATH alone. HIP 6 does not count, which is why the name is checked rather than
+    /// "some HIP".</summary>
     public static string? FindHip7()
     {
         var places = new List<string> { Environment.SystemDirectory };
+        if (Environment.GetEnvironmentVariable("HIP_PATH") is { Length: > 0 } hipPath)
+            places.Add(Path.Combine(hipPath, "bin"));
         places.AddRange((Environment.GetEnvironmentVariable("PATH") ?? "").Split(';',
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 

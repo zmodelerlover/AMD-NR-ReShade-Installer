@@ -104,4 +104,19 @@ public class DetectedWidthTests
         var launcher = Path.Combine(game, "BeamNG.drive.exe");
         Assert.Equal(Route.X86, GraphicsDetector.Detect(game, "BeamNG.drive", launcher).Width);
     }
+
+    /// <summary>Assetto Corsa: AssettoCorsa.exe in the root is the 32-bit launcher and acs.exe beside it is
+    /// the game. A player got the launcher, and ReShade went into its WPF window instead of the game.</summary>
+    [Fact]
+    public void AssettoCorsaIsTheGameBesideItsLauncher()
+    {
+        var game = Fixture.Temp("assettocorsa");
+        File.WriteAllBytes(Path.Combine(game, "AssettoCorsa.exe"), Fixture.Pe(x64: false));
+        var acs = Path.Combine(game, "acs.exe");
+        File.WriteAllBytes(acs, Fixture.PeWithImports(x64: true, ["d3d11.dll"]));
+
+        var found = GraphicsDetector.Detect(game, "Assetto Corsa");
+        Assert.Equal(acs, found.Executable);
+        Assert.Equal(Route.X64, found.Width);
+    }
 }

@@ -80,6 +80,9 @@ public static partial class GraphicsDetector
             // down to the three 32-bit routes, none of which can work, with no way to pick another.
             if (Engine.MachineOfFile(exe) == Engine.MachineX86 && SixtyFourTwin(root, hints) is { } real)
                 return real;
+            if (LauncherOf.TryGetValue(Path.GetFileName(exe), out var started)
+                && Path.Combine(Path.GetDirectoryName(exe)!, started) is var game && File.Exists(game))
+                return game;
             return exe;
         }
 
@@ -131,6 +134,13 @@ public static partial class GraphicsDetector
 
         return exes.OrderByDescending(e => Engine.SizeOf(e) ?? 0).First();
     }
+
+    /// <summary>Launchers named after their game, beside the executable they start. Assetto Corsa's
+    /// AssettoCorsa.exe is a 32-bit WPF launcher; the game is acs.exe, 64-bit, in the same folder.</summary>
+    private static readonly Dictionary<string, string> LauncherOf = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["AssettoCorsa.exe"] = "acs.exe",
+    };
 
     /// <summary>Folders a game keeps its 64-bit build in when the root holds only a launcher.</summary>
     private static readonly string[] WideFolders =
