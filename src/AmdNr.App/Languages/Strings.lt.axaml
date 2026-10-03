@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Vaizdo plokštė</sys:String>
   <sys:String x:Key="Str.Driver">Tvarkyklė</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 vykdymo aplinka</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll nerastas. Jį pateikia naujausia Adrenalin tvarkyklė; HIP 6 netinka.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Tai neatrodo kaip Radeon. Tinklas veikia tik su RDNA3 ir RDNA4.</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll nerastas. RX 7000 ir RX 9000 kortelėms jį pateikia naujausia Adrenalin tvarkyklė; RX 6000 (RDNA2) kortelėms reikia AMD HIP SDK 7.2. HIP 6 netinka.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Tai neatrodo kaip Radeon. Tinklas veikia tik su RDNA2, RDNA3 ir RDNA4.</sys:String>
   <sys:String x:Key="Str.Ready">Paruošta</sys:String>
   <sys:String x:Key="Str.Payloads">Failai</sys:String>
   <sys:String x:Key="Str.Downloading">Atsisiunčiama</sys:String>

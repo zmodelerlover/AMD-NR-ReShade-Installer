@@ -16,13 +16,13 @@
       ]
     },
     "runtime": {
-      "version": "0.5.1",
+      "version": "0.6.0",
       "files": [
         {
           "name": "dlssnr_amd_pass1.dll",
-          "size": 38569472,
-          "sha256": "af67f066a250da5cabce87d8c70ddb148b5149eaaf0225279dd8489773bc79b0",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/runtime/0.5.1/dlssnr_amd_pass1.dll"
+          "size": 56677888,
+          "sha256": "430be589020685d03f0ad92194457bafe1a186bf658c8cfe2fb7a0bdb7592cc4",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/runtime/0.6.0/dlssnr_amd_pass1.dll"
         },
         {
           "name": "dlssnr_on_amd_weights.bin",
@@ -3630,13 +3630,13 @@
             ]
           },
           "opti-runtime": {
-            "version": "0.5.1",
+            "version": "0.6.0",
             "files": [
               {
-                "name": "dlssnr_amd_runtime-0.5.1.dll",
-                "size": 38569472,
-                "sha256": "493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd",
-                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.5.1.dll"
+                "name": "dlssnr_amd_runtime-0.6.0.dll",
+                "size": 56677888,
+                "sha256": "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.6.0.dll"
               }
             ]
           },
@@ -7196,13 +7196,13 @@
             ]
           },
           "opti-runtime": {
-            "version": "0.5.1",
+            "version": "0.6.0",
             "files": [
               {
-                "name": "dlssnr_amd_runtime-0.5.1.dll",
-                "size": 38569472,
-                "sha256": "493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd",
-                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.5.1.dll"
+                "name": "dlssnr_amd_runtime-0.6.0.dll",
+                "size": 56677888,
+                "sha256": "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.6.0.dll"
               }
             ]
           },
@@ -10726,13 +10726,13 @@
             ]
           },
           "opti-runtime": {
-            "version": "0.5.1",
+            "version": "0.6.0",
             "files": [
               {
-                "name": "dlssnr_amd_runtime-0.5.1.dll",
-                "size": 38569472,
-                "sha256": "493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd",
-                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.5.1.dll"
+                "name": "dlssnr_amd_runtime-0.6.0.dll",
+                "size": 56677888,
+                "sha256": "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721",
+                "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/opti-runtime/dlssnr_amd_runtime-0.6.0.dll"
               }
             ]
           },
@@ -41936,28 +41936,5 @@
       }
     ]
   },
-  "user_runtimes": [
-    {
-      "runtime": "DLSS-NR-on-AMD v0.6.0",
-      "name": "0.6.0",
-      "addon_since": "0.7.6",
-      "original_sha256": "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721",
-      "original_size": 56677888,
-      "patched_sha256": "430be589020685d03f0ad92194457bafe1a186bf658c8cfe2fb7a0bdb7592cc4",
-      "changes": [
-        {
-          "patch": "setup-thread",
-          "offset": "0x64ed",
-          "before": "ff157d800a00",
-          "after": "31c090909090"
-        },
-        {
-          "patch": "doubled-submit",
-          "offset": "0xa8c2",
-          "before": "ff1540380b00",
-          "after": "909090909090"
-        }
-      ]
-    }
-  ]
+  "user_runtimes": []
 }

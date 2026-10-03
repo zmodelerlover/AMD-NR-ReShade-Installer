@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Видеокарта</sys:String>
   <sys:String x:Key="Str.Driver">Драйвер</sys:String>
   <sys:String x:Key="Str.Hip">Среда HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">Не найден amdhip64_7.dll. Он входит в актуальный драйвер Adrenalin; HIP 6 не подойдёт.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Это не похоже на Radeon. Нейросеть работает только на RDNA3 и RDNA4.</sys:String>
+  <sys:String x:Key="Str.HipMissing">Не найден amdhip64_7.dll. Для RX 7000 и RX 9000 он входит в актуальный драйвер Adrenalin; картам RX 6000 (RDNA2) нужен HIP SDK 7.2 от AMD. HIP 6 не подойдёт.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Это не похоже на Radeon. Нейросеть работает только на RDNA2, RDNA3 и RDNA4.</sys:String>
   <sys:String x:Key="Str.Ready">Готово</sys:String>
   <sys:String x:Key="Str.Payloads">Файлы</sys:String>
   <sys:String x:Key="Str.Downloading">Загрузка</sys:String>

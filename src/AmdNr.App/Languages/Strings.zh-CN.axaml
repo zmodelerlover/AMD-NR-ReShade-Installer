@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">显卡</sys:String>
   <sys:String x:Key="Str.Driver">驱动程序</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 运行时</sys:String>
-  <sys:String x:Key="Str.HipMissing">未找到 amdhip64_7.dll。最新的 Adrenalin 驱动自带此文件；HIP 6 不行。</sys:String>
-  <sys:String x:Key="Str.NotRadeon">这看起来不是 Radeon 显卡。神经网络只能在 RDNA3 和 RDNA4 上运行。</sys:String>
+  <sys:String x:Key="Str.HipMissing">未找到 amdhip64_7.dll。RX 7000 和 RX 9000 的最新 Adrenalin 驱动自带此文件；RX 6000 (RDNA2) 显卡需要 AMD 的 HIP SDK 7.2。HIP 6 不行。</sys:String>
+  <sys:String x:Key="Str.NotRadeon">这看起来不是 Radeon 显卡。神经网络只能在 RDNA2、RDNA3 和 RDNA4 上运行。</sys:String>
   <sys:String x:Key="Str.Ready">就绪</sys:String>
   <sys:String x:Key="Str.Payloads">文件</sys:String>
   <sys:String x:Key="Str.Downloading">正在下载</sys:String>

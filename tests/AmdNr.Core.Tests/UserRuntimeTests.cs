@@ -338,35 +338,44 @@ public class UserRuntimeTests
         Assert.True(Fixture.HasAny(report, "no patch for it yet"), report.ToLog("incomplete"));
     }
 
-    /// <summary>The shipped list carries 0.6.0 alone now that 0.5.1 is public and the download: offered on the ReShade
-    /// routes from add-on v0.7.6 and on OptiScaler from 0.4.7, which runs it as it is.</summary>
+    /// <summary>The shipped list is empty now that 0.6.0 is public and the download, so no route offers a
+    /// supporter build and the sheet hides the block.</summary>
     [Fact]
-    public void TheShippedListOffersTheSupporterBuildOnlyWhereItRuns()
+    public void TheShippedListIsEmptyOnceTheNewestBuildIsPublic()
     {
         var shipped = PayloadManifest.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "payload.json")));
-        var build = Assert.Single(shipped.Pins().UserRuntimes);
-        Assert.Equal(("0.6.0", "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", 56_677_888UL, "0.7.6"),
-            (build.Name, build.OriginalSha256, build.OriginalSize, build.AddonSince));
-        Assert.Same(build, Assert.Single(Work.OfferedRuntimes(shipped.Pins(), Preset.Dx11)));
-
+        Assert.Empty(shipped.Pins().UserRuntimes);
+        Assert.Empty(Work.OfferedRuntimes(shipped.Pins(), Preset.Dx11));
         var opti = shipped.Newest(PayloadManifest.OptiScalerComponent).Pins();
         Assert.Equal("0.4.9-amd-nr", opti.OptiScalerVersion);
-        Assert.Same(build, Assert.Single(Work.OfferedRuntimes(opti, Preset.OptiScaler)));
-        Assert.Empty(Work.OfferedRuntimes(shipped.With(shipped.Offered(PayloadManifest.OptiScalerComponent)
-            .First(r => r.Version == "0.4.6-amd-nr")).Pins(), Preset.OptiScaler));
+        Assert.Empty(Work.OfferedRuntimes(opti, Preset.OptiScaler));
     }
 
+    /// <summary>0.6.0 as the list named it while it was a supporter build: what the real-setup check reads against.</summary>
+    private static readonly IReadOnlyList<UserRuntime> Listed060 =
+    [
+        new UserRuntime
+        {
+            Runtime = "DLSS-NR-on-AMD v0.6.0", Name = "0.6.0", AddonSince = "0.7.6",
+            OriginalSha256 = "195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", OriginalSize = 56_677_888,
+            PatchedSha256 = "430be589020685d03f0ad92194457bafe1a186bf658c8cfe2fb7a0bdb7592cc4",
+            Changes =
+            [
+                new RuntimeChange { Patch = "setup-thread", Offset = "0x64ed", Before = "ff157d800a00", After = "31c090909090" },
+                new RuntimeChange { Patch = "doubled-submit", Offset = "0xa8c2", Before = "ff1540380b00", After = "909090909090" },
+            ],
+        },
+    ];
+
     /// <summary>Against the real setup, when AMDNR_TEST_RUNTIME_SETUP points at one (skipped otherwise: it is
-    /// danielblnc's, and a supporter build at that): the build inside is the one the shipped list names, and
+    /// danielblnc's): the build inside is 0.6.0 as the list named it while it was a supporter build, and
     /// the first OptiScaler that runs it takes it as its runtime.</summary>
     [Fact]
     public void ARealSetupGivesUpTheBuildTheListNames()
     {
         var setup = Environment.GetEnvironmentVariable("AMDNR_TEST_RUNTIME_SETUP");
         if (string.IsNullOrWhiteSpace(setup) || !File.Exists(setup)) return;
-        var shipped = PayloadManifest.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "payload.json")))
-            .Newest(PayloadManifest.OptiScalerComponent);
-        var (build, original) = UserRuntime.Read(setup, shipped.Pins().UserRuntimes);
+        var (build, original) = UserRuntime.Read(setup, Listed060);
         Assert.Equal(build.OriginalSha256, Engine.Sha(original));
         // And the patch the list gives it makes the very file the add-on accepts (its kSha256 for this build).
         Assert.Equal(build.PatchedSha256, Engine.Sha(build.Patched(original)));
@@ -379,7 +388,7 @@ public class UserRuntimeTests
             OptiFiles = pins.OptiFiles, OptiRuntimeName = pins.OptiRuntimeName, OptiRuntimeSha = pins.OptiRuntimeSha,
             OptiRuntimeSize = pins.OptiRuntimeSize, OptiScalerVersion = $"{Work.OptiScalerSince(build.OriginalSha256)}-amd-nr",
             OptiRuntimeVersion = "0.4.2",
-            UserRuntimes = shipped.Pins().UserRuntimes,
+            UserRuntimes = Listed060,
         };
         var report = Work.Install(game, src, Preset.OptiScaler, pins, ownRuntime: setup);
         Assert.False(report.Failed, report.ToLog("real"));
@@ -398,7 +407,7 @@ public class UserRuntimeTests
         {
             AddonSha = "", AddonSize = 0, RuntimeSha = bridge.RuntimeSha, WeightsSha = bridge.WeightsSha,
             ReShade32Sha = bridge.ReShadeSha, D3d8To9Sha = bridge.D3d8To9Sha, BridgeVersion = build.AddonSince,
-            UserRuntimes = shipped.Pins().UserRuntimes,
+            UserRuntimes = Listed060,
         };
         var bridged = Work.Install(exe, bridge.Release, Preset.X86Dx9, bridgePins, ownRuntime: setup);
         Assert.False(bridged.Failed, bridged.ToLog("real x86"));

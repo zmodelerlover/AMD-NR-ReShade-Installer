@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Videokártya</sys:String>
   <sys:String x:Key="Str.Driver">Illesztőprogram</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 futtatókörnyezet</sys:String>
-  <sys:String x:Key="Str.HipMissing">Az amdhip64_7.dll nem található. Egy friss Adrenalin illesztőprogram tartalmazza; a HIP 6 nem elég.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Ez nem tűnik Radeonnak. A hálózat csak RDNA3-on és RDNA4-en fut.</sys:String>
+  <sys:String x:Key="Str.HipMissing">Az amdhip64_7.dll nem található. RX 7000 és RX 9000 esetén egy friss Adrenalin illesztőprogram tartalmazza; az RX 6000 (RDNA2) kártyákhoz az AMD HIP SDK 7.2 kell. A HIP 6 nem elég.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Ez nem tűnik Radeonnak. A hálózat csak RDNA2-n, RDNA3-on és RDNA4-en fut.</sys:String>
   <sys:String x:Key="Str.Ready">Kész</sys:String>
   <sys:String x:Key="Str.Payloads">Fájlok</sys:String>
   <sys:String x:Key="Str.Downloading">Letöltés</sys:String>

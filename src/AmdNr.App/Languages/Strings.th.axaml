@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">กราฟิก</sys:String>
   <sys:String x:Key="Str.Driver">ไดรเวอร์</sys:String>
   <sys:String x:Key="Str.Hip">รันไทม์ HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">ไม่พบ amdhip64_7.dll ไฟล์นี้มากับไดรเวอร์ Adrenalin รุ่นใหม่ HIP 6 ใช้ไม่ได้</sys:String>
-  <sys:String x:Key="Str.NotRadeon">การ์ดนี้ดูไม่ใช่ Radeon เครือข่ายนิวรัลทำงานบน RDNA3 และ RDNA4 เท่านั้น</sys:String>
+  <sys:String x:Key="Str.HipMissing">ไม่พบ amdhip64_7.dll สำหรับ RX 7000 และ RX 9000 ไฟล์นี้มากับไดรเวอร์ Adrenalin รุ่นใหม่ ส่วนการ์ด RX 6000 (RDNA2) ต้องใช้ HIP SDK 7.2 ของ AMD HIP 6 ใช้ไม่ได้</sys:String>
+  <sys:String x:Key="Str.NotRadeon">การ์ดนี้ดูไม่ใช่ Radeon เครือข่ายนิวรัลทำงานบน RDNA2, RDNA3 และ RDNA4 เท่านั้น</sys:String>
   <sys:String x:Key="Str.Ready">พร้อม</sys:String>
   <sys:String x:Key="Str.Payloads">ไฟล์</sys:String>
   <sys:String x:Key="Str.Downloading">กำลังดาวน์โหลด</sys:String>

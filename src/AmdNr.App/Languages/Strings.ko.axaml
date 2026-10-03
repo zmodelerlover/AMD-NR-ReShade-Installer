@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">그래픽</sys:String>
   <sys:String x:Key="Str.Driver">드라이버</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 런타임</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll을 찾을 수 없습니다. 최신 Adrenalin 드라이버에 포함되어 있으며, HIP 6으로는 안 됩니다.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Radeon이 아닌 것 같습니다. 신경망은 RDNA3와 RDNA4에서만 동작합니다.</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll을 찾을 수 없습니다. RX 7000과 RX 9000은 최신 Adrenalin 드라이버에 포함되어 있고, RX 6000(RDNA2)은 AMD HIP SDK 7.2가 필요합니다. HIP 6으로는 안 됩니다.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Radeon이 아닌 것 같습니다. 신경망은 RDNA2, RDNA3, RDNA4에서만 동작합니다.</sys:String>
   <sys:String x:Key="Str.Ready">준비됨</sys:String>
   <sys:String x:Key="Str.Payloads">파일</sys:String>
   <sys:String x:Key="Str.Downloading">다운로드 중</sys:String>

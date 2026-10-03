@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">الرسوميات</sys:String>
   <sys:String x:Key="Str.Driver">برنامج التشغيل</sys:String>
   <sys:String x:Key="Str.Hip">بيئة تشغيل HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">لم يُعثر على amdhip64_7.dll. يأتي مع برنامج تشغيل Adrenalin حديث، ولا يكفي HIP 6.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">لا يبدو أن هذه بطاقة Radeon. تعمل الشبكة على RDNA3 وRDNA4 فقط.</sys:String>
+  <sys:String x:Key="Str.HipMissing">لم يُعثر على amdhip64_7.dll. في RX 7000 وRX 9000 يأتي مع برنامج تشغيل Adrenalin حديث؛ أما بطاقات RX 6000 (RDNA2) فتحتاج إلى HIP SDK 7.2 من AMD. ولا يكفي HIP 6.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">لا يبدو أن هذه بطاقة Radeon. تعمل الشبكة على RDNA2 وRDNA3 وRDNA4 فقط.</sys:String>
   <sys:String x:Key="Str.Ready">جاهز</sys:String>
   <sys:String x:Key="Str.Payloads">الملفات</sys:String>
   <sys:String x:Key="Str.Downloading">جارٍ التنزيل</sys:String>

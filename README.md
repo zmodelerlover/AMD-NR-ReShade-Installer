@@ -13,7 +13,8 @@ and checks everything including ReShade itself, installs it, and takes it all ba
 problem** collects the logs, the folder listing and what ReShade wrote into one zip that goes
 nowhere until you hand it over.
 
-Radeon **RDNA3 or RDNA4** with **HIP 7** (`amdhip64_7.dll`, from a current Adrenalin driver). The
+Radeon **RDNA2, RDNA3 or RDNA4** with **HIP 7** (`amdhip64_7.dll`, from a current Adrenalin driver on RX 7000 and RX 9000;
+RX 6000 cards, RDNA2, need AMD's HIP SDK 7.2). The
 first-run wizard checks both, the **This machine** page keeps showing them, and the app fetches the
 rest itself.
 
@@ -108,8 +109,8 @@ folder is the one to pick.
 
 ## danielblnc's supporter builds: your own files
 
-Some of danielblnc's runtime builds go to his supporters only, 0.6.0 among them (the one that adds RX 6000,
-RDNA2, cards, which also need AMD's HIP SDK 7.2 runtime). **This app does not
+Some of danielblnc's runtime builds go to his supporters first (0.6.0 did until 2026-10-03; it is now the public
+download, and the payload list is empty, so the block below is hidden). **This app does not
 distribute them, now or later, and neither does this repository or its payload.** Somebody who has
 one supplies it themselves. While the payload list names one (`user_runtimes` in
 `payload/payload.json`), the game's sheet has a block of its own under the route, on every ReShade

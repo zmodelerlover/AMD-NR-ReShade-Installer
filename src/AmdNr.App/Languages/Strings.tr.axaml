@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Ekran kartı</sys:String>
   <sys:String x:Key="Str.Driver">Sürücü</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 çalışma zamanı</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll bulunamadı. Güncel bir Adrenalin sürücüsüyle birlikte gelir; HIP 6 yeterli değildir.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Bu bir Radeon gibi görünmüyor. Ağ yalnızca RDNA3 ve RDNA4 üzerinde çalışır.</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll bulunamadı. RX 7000 ve RX 9000'de güncel bir Adrenalin sürücüsüyle gelir; RX 6000 (RDNA2) kartları AMD'nin HIP SDK 7.2'sine ihtiyaç duyar. HIP 6 yeterli değildir.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Bu bir Radeon gibi görünmüyor. Ağ yalnızca RDNA2, RDNA3 ve RDNA4 üzerinde çalışır.</sys:String>
   <sys:String x:Key="Str.Ready">Hazır</sys:String>
   <sys:String x:Key="Str.Payloads">Dosyalar</sys:String>
   <sys:String x:Key="Str.Downloading">İndiriliyor</sys:String>

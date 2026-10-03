@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Karta graficzna</sys:String>
   <sys:String x:Key="Str.Driver">Sterownik</sys:String>
   <sys:String x:Key="Str.Hip">Środowisko HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">Nie znaleziono amdhip64_7.dll. Dostarcza go aktualny sterownik Adrenalin; HIP 6 nie wystarczy.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">To nie wygląda na Radeona. Sieć działa tylko na RDNA3 i RDNA4.</sys:String>
+  <sys:String x:Key="Str.HipMissing">Nie znaleziono amdhip64_7.dll. Na RX 7000 i RX 9000 dostarcza go aktualny sterownik Adrenalin; karty RX 6000 (RDNA2) potrzebują HIP SDK 7.2 od AMD. HIP 6 nie wystarczy.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">To nie wygląda na Radeona. Sieć działa tylko na RDNA2, RDNA3 i RDNA4.</sys:String>
   <sys:String x:Key="Str.Ready">Gotowe</sys:String>
   <sys:String x:Key="Str.Payloads">Pliki</sys:String>
   <sys:String x:Key="Str.Downloading">Pobieranie</sys:String>

@@ -32,11 +32,11 @@ public static partial class Engine
     public const string Notice =
         "Install official ReShade Full Add-on Support for the translated API. D3D8 uses the pinned d3d8to9 compatibility layer and the native D3D9 frontend.";
 
-    /// <summary>danielblnc's 0.5.1, public since 2026-10-01, as patched for add-on v0.7.2 (38,569,472 bytes).</summary>
-    public const string RuntimeSha = "af67f066a250da5cabce87d8c70ddb148b5149eaaf0225279dd8489773bc79b0";
-    /// <summary>The builds the add-on still runs besides it, patched for earlier releases: v0.4.1, v0.4.2, v0.4.3
-    /// and 0.5.0. An older install holds one, and so do the runtime copies the add-on made of it.</summary>
-    public static readonly string[] EarlierRuntimeShas = ["c8808716c286a34fe25b8cf5b41a6b0f40ac1e1237b3ac39b903f0a90cd4f2e9", "f9aa21a2fb56971895dbe4a35cd832074941cc8079069d03b44523250390949d", "f3d9f2e53b775e4870917572f1f87a28c73068a4dc97252d6fb52360ddf8597a", "c808cdb04b4cf99e806f2989bb5b258696a51c89c084c500c957b055a66479b6"];
+    /// <summary>danielblnc's 0.6.0, public since 2026-10-03, as patched for add-on v0.7.6 (56,677,888 bytes).</summary>
+    public const string RuntimeSha = "430be589020685d03f0ad92194457bafe1a186bf658c8cfe2fb7a0bdb7592cc4";
+    /// <summary>The builds the add-on still runs besides it, patched for earlier releases: v0.4.1, v0.4.2, v0.4.3,
+    /// 0.5.0 and 0.5.1. An older install holds one, and so do the runtime copies the add-on made of it.</summary>
+    public static readonly string[] EarlierRuntimeShas = ["c8808716c286a34fe25b8cf5b41a6b0f40ac1e1237b3ac39b903f0a90cd4f2e9", "f9aa21a2fb56971895dbe4a35cd832074941cc8079069d03b44523250390949d", "f3d9f2e53b775e4870917572f1f87a28c73068a4dc97252d6fb52360ddf8597a", "c808cdb04b4cf99e806f2989bb5b258696a51c89c084c500c957b055a66479b6", "af67f066a250da5cabce87d8c70ddb148b5149eaaf0225279dd8489773bc79b0"];
     public const string WeightsSha = "6bf8dc931ef3ccffe18c82de26ab374156e7f19539ffcf8eabaa25dca5cf15ab";
     public const string ReShadeSha = "da430e0a9c6eecefa0d1b27d05e16c426fb5d04e808b194d914eaac4b31bc0f8";
 

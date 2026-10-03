@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Відеокарта</sys:String>
   <sys:String x:Key="Str.Driver">Драйвер</sys:String>
   <sys:String x:Key="Str.Hip">Середовище HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">Не знайдено amdhip64_7.dll. Він постачається з актуальним драйвером Adrenalin; HIP 6 не підійде.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Це не схоже на Radeon. Мережа працює лише на RDNA3 і RDNA4.</sys:String>
+  <sys:String x:Key="Str.HipMissing">Не знайдено amdhip64_7.dll. Для RX 7000 і RX 9000 він постачається з актуальним драйвером Adrenalin; картам RX 6000 (RDNA2) потрібен HIP SDK 7.2 від AMD. HIP 6 не підійде.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Це не схоже на Radeon. Мережа працює лише на RDNA2, RDNA3 і RDNA4.</sys:String>
   <sys:String x:Key="Str.Ready">Готово</sys:String>
   <sys:String x:Key="Str.Payloads">Файли</sys:String>
   <sys:String x:Key="Str.Downloading">Завантаження</sys:String>

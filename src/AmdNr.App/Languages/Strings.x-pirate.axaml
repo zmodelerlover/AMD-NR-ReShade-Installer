@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Graphics</sys:String>
   <sys:String x:Key="Str.Driver">Driver</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 runtime</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll be nowhere to be found. A fresh Adrenalin driver carries it aboard; HIP 6 won't do, matey.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">That don't look like no Radeon. The network sails on RDNA3 an' RDNA4 only.</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll be nowhere to be found. On RX 7000 an' RX 9000 a fresh Adrenalin driver carries it aboard; RX 6000 (RDNA2) ships need AMD's HIP SDK 7.2. HIP 6 won't do, matey.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">That don't look like no Radeon. The network sails on RDNA2, RDNA3 an' RDNA4 only.</sys:String>
   <sys:String x:Key="Str.Ready">Shipshape</sys:String>
   <sys:String x:Key="Str.Payloads">Cargo</sys:String>
   <sys:String x:Key="Str.Downloading">Haulin' aboard</sys:String>

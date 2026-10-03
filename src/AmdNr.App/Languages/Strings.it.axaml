@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">Scheda grafica</sys:String>
   <sys:String x:Key="Str.Driver">Driver</sys:String>
   <sys:String x:Key="Str.Hip">Runtime HIP 7</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll non è stato trovato. È incluso in un driver Adrenalin recente; HIP 6 non basta.</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Questa non sembra una Radeon. La rete funziona solo su RDNA3 e RDNA4.</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll non è stato trovato. Sulle RX 7000 e RX 9000 è incluso in un driver Adrenalin recente; le RX 6000 (RDNA2) richiedono l'HIP SDK 7.2 di AMD. HIP 6 non basta.</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Questa non sembra una Radeon. La rete funziona solo su RDNA2, RDNA3 e RDNA4.</sys:String>
   <sys:String x:Key="Str.Ready">Pronto</sys:String>
   <sys:String x:Key="Str.Payloads">File</sys:String>
   <sys:String x:Key="Str.Downloading">Download in corso</sys:String>

@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">ग्राफ़िक्स</sys:String>
   <sys:String x:Key="Str.Driver">ड्राइवर</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 रनटाइम</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll नहीं मिला। मौजूदा Adrenalin ड्राइवर इसके साथ आता है; HIP 6 से काम नहीं चलेगा।</sys:String>
-  <sys:String x:Key="Str.NotRadeon">यह Radeon नहीं लगता। नेटवर्क केवल RDNA3 और RDNA4 पर चलता है।</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll नहीं मिला। RX 7000 और RX 9000 पर मौजूदा Adrenalin ड्राइवर इसके साथ आता है; RX 6000 (RDNA2) कार्ड को AMD का HIP SDK 7.2 चाहिए। HIP 6 से काम नहीं चलेगा।</sys:String>
+  <sys:String x:Key="Str.NotRadeon">यह Radeon नहीं लगता। नेटवर्क केवल RDNA2, RDNA3 और RDNA4 पर चलता है।</sys:String>
   <sys:String x:Key="Str.Ready">तैयार</sys:String>
   <sys:String x:Key="Str.Payloads">फ़ाइलें</sys:String>
   <sys:String x:Key="Str.Downloading">डाउनलोड हो रहा है</sys:String>

@@ -31,8 +31,8 @@
   <sys:String x:Key="Str.Gpu">グラフィックス</sys:String>
   <sys:String x:Key="Str.Driver">ドライバー</sys:String>
   <sys:String x:Key="Str.Hip">HIP 7 ランタイム</sys:String>
-  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll が見つかりません。最新の Adrenalin ドライバーに含まれています。HIP 6 では動作しません。</sys:String>
-  <sys:String x:Key="Str.NotRadeon">Radeon ではないようです。ネットワークは RDNA3 と RDNA4 でのみ動作します。</sys:String>
+  <sys:String x:Key="Str.HipMissing">amdhip64_7.dll が見つかりません。RX 7000 と RX 9000 では最新の Adrenalin ドライバーに含まれています。RX 6000 (RDNA2) には AMD の HIP SDK 7.2 が必要です。HIP 6 では動作しません。</sys:String>
+  <sys:String x:Key="Str.NotRadeon">Radeon ではないようです。ネットワークは RDNA2、RDNA3、RDNA4 でのみ動作します。</sys:String>
   <sys:String x:Key="Str.Ready">準備完了</sys:String>
   <sys:String x:Key="Str.Payloads">ファイル</sys:String>
   <sys:String x:Key="Str.Downloading">ダウンロード中</sys:String>

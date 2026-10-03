@@ -104,8 +104,8 @@ public class SupporterRoutesTests
         Assert.False(File.Exists(Path.Combine(dir, Work.RuntimeName)));
     }
 
-    /// <summary>An OptiScaler folder whose three passes are danielblnc's 0.6.0 supporter build, supplied or taken
-    /// from his version.dll, is not out of date against the shipped payload's 0.5.1; one on 0.5.0 or 0.4.1 is.</summary>
+    /// <summary>An OptiScaler folder whose three passes are danielblnc's 0.6.0, supplied or taken from his version.dll,
+    /// is not out of date against the shipped payload's 0.6.0; one on 0.5.1, 0.5.0 or 0.4.1 is.</summary>
     [Fact]
     public void OptiScalerOnTheSupporterBuildIsNotOutOfDate()
     {
@@ -113,6 +113,7 @@ public class SupporterRoutesTests
         foreach (var (sha, outdated) in new[]
                  {
                      ("195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", false),
+                     ("493b4a3b80a21f7255109172ab7bb01ba08d35f2941718f441768f1abfc48acd", true),
                      ("cddfb09e019347957bf7b96c95c0e900e8d3062dfaed697a8a96b0a039aec31a", true),
                      ("823063eb4c76b1334fd1800c41798873ae61d4016af0406f1f0b9dce57b1d376", true),
                  })
