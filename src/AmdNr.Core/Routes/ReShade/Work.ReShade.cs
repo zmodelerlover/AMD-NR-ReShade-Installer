@@ -44,12 +44,7 @@ public static partial class Work
         var held = new[] { AddonName, RuntimeName, WeightsName }.Concat(moves)
             .Where(n => Engine.IsLocked(Path.Combine(dir, n)))
             .Concat(mochizuki || retiring ? MochizukiHeld(dir) : []).ToList();
-        if (held.Count > 0)
-        {
-            report.Err(
-                $"{string.Join(", ", held)} {(held.Count == 1 ? "is" : "are")} open by another program. "
-                + "The game or emulator is almost certainly still running -- close it and this line goes away.");
-        }
+        if (held.Count > 0) report.Err(Engine.OpenElsewhere(dir, held));
 
         // --- room for the weights ----------------------------------------------------------------
         ulong need = 0;
@@ -294,6 +289,7 @@ public static partial class Work
         if (SweepDead(dir, report.Warn) is { Count: > 0 } swept)
             report.Ok($"removed {swept.Count} file(s) an older install left behind: {string.Join(", ", swept)}");
 
+        if (pins.RuntimeAsync) GoesInAsync(dir, "amd-nr.ini", "amd-nr", "Inline", "0", report);
         if (mochizuki) report.Info(MochizukiInstalled + " " + MochizukiPickInAddon);
         else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);
         if (supplied is { } kept) report.Info(SuppliedInstalled(kept.Build));

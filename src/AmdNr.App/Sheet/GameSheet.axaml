@@ -401,17 +401,18 @@
                       </StackPanel>
                     </Border>
 
-                    <!-- The third runtime, on either route, only where the version chosen carries it.
-                         Off until ticked: experimental, RDNA4 only, and a 141 MB model to download. -->
+                    <!-- The danielblnc version, and on RX 9000 what goes in beside it and runs by default. -->
                     <StackPanel x:Name="MochizukiSection" Spacing="6" IsVisible="False">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{DynamicResource Str.MochizukiSection}" Classes="section" />
                         <Border Classes="info" ToolTip.Tip="{Binding #MochizukiNote.Text}" IsVisible="{Binding #MochizukiNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
                       </StackPanel>
-                      <CheckBox x:Name="MochizukiBox" IsCheckedChanged="OnMochizukiChanged"
-                                AutomationProperties.Name="{DynamicResource Str.MochizukiCheck}">
-                        <TextBlock x:Name="MochizukiCheckText" Text="{DynamicResource Str.MochizukiCheck}" TextWrapping="Wrap" />
-                      </CheckBox>
+                      <Grid x:Name="DanielVersionRow" ColumnDefinitions="Auto,Auto,12,*">
+                        <TextBlock Text="{DynamicResource Str.DanielVersion}" VerticalAlignment="Center" />
+                        <Border Grid.Column="1" Classes="info" ToolTip.Tip="{DynamicResource Str.DanielVersionTip}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
+                        <ComboBox Grid.Column="3" x:Name="DanielVersionBox" HorizontalAlignment="Stretch" SelectionChanged="OnDanielVersionChanged"
+                                  AutomationProperties.Name="{DynamicResource Str.DanielVersion}" />
+                      </Grid>
                       <TextBlock x:Name="MochizukiNote" IsVisible="False" />
                     </StackPanel>
                   </StackPanel>

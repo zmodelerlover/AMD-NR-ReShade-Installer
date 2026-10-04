@@ -336,7 +336,7 @@ public class EngineTests
             var log = new List<string>();
             var error = Assert.Throws<InstallException>(() =>
                 Transaction.Apply(root, "D3D11", Route.X64, files, log));
-            Assert.Contains("open by another program", error.Message, StringComparison.Ordinal);
+            Assert.Contains("this line goes away", error.Message, StringComparison.Ordinal);
 
             // The journal must not exist: the guard runs before anything is recorded or written.
             Assert.False(File.Exists(Path.Combine(root, Route.X64.ManifestFileName())));

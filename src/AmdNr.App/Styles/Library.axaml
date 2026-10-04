@@ -353,4 +353,20 @@
     <Setter Property="Foreground" Value="{DynamicResource Err}" />
   </Style>
 
+  <!-- danielblnc's version box on an RX 9000 card: the build to use, and the ones that froze games there. -->
+  <Style Selector="Border.tag.good">
+    <Setter Property="Background" Value="{DynamicResource OkSoft}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Ok}" />
+  </Style>
+  <Style Selector="Border.tag.good TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Ok}" />
+  </Style>
+  <Style Selector="Border.tag.warn">
+    <Setter Property="Background" Value="{DynamicResource WarnSoft}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Warn}" />
+  </Style>
+  <Style Selector="Border.tag.warn TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Warn}" />
+  </Style>
+
 </Styles>

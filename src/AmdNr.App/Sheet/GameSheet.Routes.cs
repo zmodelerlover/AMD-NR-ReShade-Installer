@@ -339,34 +339,32 @@ public partial class GameSheet
         opti.Components.ContainsKey(PayloadManifest.MochizukiComponent)
         && opti.Components.ContainsKey(PayloadManifest.MochizukiModelComponent);
 
-    /// <summary>The mochizuki choice: shown when the OptiScaler version chosen carries it, remembered
-    /// per game, and not offered on a card known not to be RDNA4 -- where it could only stay off in
-    /// game. A card this app could not read is given the benefit of the doubt, and the note says so.</summary>
+    /// <summary>The NR runtime section: which danielblnc version goes in, from the versions the add-on or
+    /// OptiScaler version chosen runs, and on an RX 9000 card a word on what goes in beside it.</summary>
     private void ShowMochizuki()
     {
         if (_card is not { } card) return;
-        var machine = Session.Machine;
         var addon = !card.Entry.Preset.IsOptiScaler();
-        MochizukiSection.IsVisible = OffersMochizuki(card);
-        MochizukiCheckText.Text = Ui.Text(addon ? "Str.MochizukiCheckAddon" : "Str.MochizukiCheck");
-        var note = Ui.Text(addon ? "Str.MochizukiNoteAddon" : "Str.MochizukiNote");
+        _runtimeChoices = Session.Manifest is { } manifest ? RuntimeChoices(Versioned(manifest)) : [];
+        MochizukiSection.IsVisible = _runtimeChoices.Count > 0 || WantsMochizuki(card);
         _setting = true;
-        MochizukiBox.IsEnabled = machine?.Rdna4 != false;
-        MochizukiBox.IsChecked = ChoseMochizuki(card) && machine?.Rdna4 != false;
+        DanielVersionRow.IsVisible = _runtimeChoices.Count > 0;
+        DanielVersionBox.ItemTemplate ??= RuntimeOption.Template;
+        DanielVersionBox.ItemsSource = _runtimeChoices.Select(r => new RuntimeOption(r.Version, Work.BadgeFor(r.Version, Rdna4)))
+            .ToList();
+        var pick = Work.RuntimePick(_runtimeChoices, card.Entry.DanielRuntime, Rdna4);
+        DanielVersionBox.SelectedIndex = _runtimeChoices.Count == 0 ? -1 : Math.Max(_runtimeChoices.FindIndex(r => r.Version == pick), 0);
         _setting = false;
-        MochizukiNote.Text = machine?.Rdna4 switch
-        {
-            false => Ui.Format("Str.MochizukiNotRdna4", machine!.Gpu),
-            null => note + " " + Ui.Text("Str.MochizukiUnknownGpu"),
-            _ => note,
-        };
+        MochizukiNote.Text = WantsMochizuki(card) ? Ui.Text(addon ? "Str.RuntimeRdna4Addon" : "Str.RuntimeRdna4Opti") : "";
     }
 
-    /// <summary>Whether an install from this sheet brings mochizuki: a version that carries it, ticked
-    /// for this game, and not a card known not to be RDNA4. An install without it takes out what an
-    /// earlier one put in, so this is also what stays in the folder.</summary>
-    private bool WantsMochizuki(GameCard card) =>
-        OffersMochizuki(card) && ChoseMochizuki(card) && Session.Machine?.Rdna4 != false;
+    /// <summary>The danielblnc versions <see cref="DanielVersionBox"/> lists, in its order.</summary>
+    private List<ComponentRelease> _runtimeChoices = [];
+
+    /// <summary>Whether an install from this sheet brings mochizuki: on an RX 9000 card, wherever the version
+    /// chosen carries it. Any other card, or one this app could not read, gets none, and an install takes out
+    /// what an earlier one put in.</summary>
+    private bool WantsMochizuki(GameCard card) => OffersMochizuki(card) && Session.Machine?.Rdna4 == true;
 
     /// <summary>The first add-on that can drive the mochizuki runtime (its NR runtime choice).</summary>
     private static readonly Version MochizukiAddon = new(0, 6, 8);
@@ -384,22 +382,20 @@ public partial class GameSheet
         return version >= MochizukiAddon && manifest.Pins().MochizukiFiles.Count > 0;
     }
 
-    /// <summary>The box as the person last set it for this game, or, until they touch it, what the
-    /// folder has: on where this app installed mochizuki. Read off the folder's manifest, like the
-    /// tile's out-of-date badge, and wrapped the same way: a folder that cannot be read is "no".</summary>
-    private static bool ChoseMochizuki(GameCard card)
-    {
-        if (card.Entry.Mochizuki is { } chosen) return chosen;
-        try { return Work.HasMochizuki(TargetFor(card)); }
-        catch (Exception) { return false; }
-    }
-
-    private void OnMochizukiChanged(object? sender, RoutedEventArgs e)
+    /// <summary>The card's default is kept as no pick, so a later default comes with an update.</summary>
+    private void OnDanielVersionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (_setting || _card is not { } card) return;
-        card.Entry.Mochizuki = MochizukiBox.IsChecked == true;
+        var index = DanielVersionBox.SelectedIndex;
+        if (index < 0 || index >= _runtimeChoices.Count) return;
+        var version = _runtimeChoices[index].Version;
+        card.Entry.DanielRuntime = version == (Work.RuntimeDefault(_runtimeChoices, Rdna4) ?? _runtimeChoices[0].Version)
+            ? null
+            : version;
         Library.Save();
-        // A different set of files to download and to install: the pre-flight says so again.
+        ShowRuntime();
+        ShowInstallLabel();
+        // A different runtime is a different file to download and to install: the pre-flight says so again.
         _ = RefreshAsync();
     }
 

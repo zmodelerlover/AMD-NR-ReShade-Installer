@@ -102,6 +102,17 @@ public sealed class PayloadManifest
     [JsonPropertyName("user_runtimes")]
     public List<UserRuntime>? UserRuntimes { get; init; }
 
+    /// <summary>The danielblnc version a person picked for a game (<see cref="WithRuntime"/>), or null for the one
+    /// each release pins. Kept on the manifest so a release applied after it (an add-on or OptiScaler version)
+    /// does not put its own runtime back.</summary>
+    [JsonIgnore]
+    public string? RuntimeChoice { get; init; }
+
+    /// <summary>The install switches danielblnc's runtime to async (<see cref="WithRuntime"/>): an unstable build on
+    /// an RX 9000 card (Work.AsyncByDefault).</summary>
+    [JsonIgnore]
+    public bool RuntimeAsync { get; init; }
+
     public const string AddonComponent = "addon";
     public const string RuntimeComponent = "runtime";
     public const string X86ExtrasComponent = "x86-extras";
@@ -218,8 +229,15 @@ public sealed class PayloadManifest
         return offered;
     }
 
-    /// <summary>This manifest with one release's components in place of its own.</summary>
+    /// <summary>This manifest with one release's components in place of its own. A runtime picked with
+    /// <see cref="WithRuntime"/> stays picked.</summary>
     public PayloadManifest With(ComponentRelease release)
+    {
+        var merged = Merge(release);
+        return RuntimeRelease(RuntimeChoice) is { } runtime ? merged.Merge(runtime) : merged;
+    }
+
+    private PayloadManifest Merge(ComponentRelease release)
     {
         var components = new Dictionary<string, PayloadComponent>(Components, StringComparer.Ordinal);
         foreach (var (name, component) in release.Components) components[name] = component;
@@ -232,7 +250,42 @@ public sealed class PayloadManifest
             Components = components,
             Releases = Releases,
             UserRuntimes = UserRuntimes,
+            RuntimeChoice = RuntimeChoice,
+            RuntimeAsync = RuntimeAsync,
         };
+    }
+
+    /// <summary>danielblnc's runtime versions a person can pick, newest first: each carries the build patched
+    /// for the add-on (<see cref="RuntimeComponent"/>) and the one OptiScaler runs as it is
+    /// (<see cref="OptiRuntimeComponent"/>). Empty on a payload from before the choice.</summary>
+    public IReadOnlyList<ComponentRelease> RuntimeVersions() =>
+        (Releases?.GetValueOrDefault(RuntimeComponent) ?? [])
+        .Where(r => !IsPlaceholder(r) && r.Components.ContainsKey(OptiRuntimeComponent))
+        .OrderByDescending(r => AddonReleases.Version(r.Version) ?? new Version())
+        .ToList();
+
+    private ComponentRelease? RuntimeRelease(string? version) =>
+        version is null ? null : RuntimeVersions().FirstOrDefault(r => r.Version == version);
+
+    /// <summary>This manifest with danielblnc's runtime at a version a person picked, on every route, from now
+    /// on and through any release applied after. Null, or a version this payload does not list, keeps what
+    /// each release pins. <paramref name="async"/>: the install switches that runtime to async.</summary>
+    public PayloadManifest WithRuntime(string? version, bool async = false)
+    {
+        var runtime = RuntimeRelease(version);
+        var manifest = new PayloadManifest
+        {
+            Schema = Schema,
+            Owner = Owner,
+            Repo = Repo,
+            Tag = Tag,
+            Components = Components,
+            Releases = Releases,
+            UserRuntimes = UserRuntimes,
+            RuntimeChoice = runtime is null ? RuntimeChoice : version,
+            RuntimeAsync = async,
+        };
+        return runtime is null ? manifest : manifest.Merge(runtime);
     }
 
     /// <summary>This manifest with the mochizuki runtime and its model, for the ReShade routes. The
@@ -366,6 +419,8 @@ public sealed class PayloadManifest
             AddonVersion = Component(AddonComponent).Version,
             BridgeVersion = Components.TryGetValue(BridgeComponent, out var bridge) ? bridge.Version : string.Empty,
             UserRuntimes = UserRuntimes ?? [],
+            RuntimeChosen = RuntimeChoice is not null,
+            RuntimeAsync = RuntimeAsync,
         };
     }
 

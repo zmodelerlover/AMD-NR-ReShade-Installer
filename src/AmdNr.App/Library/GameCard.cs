@@ -129,6 +129,9 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
     /// question.</summary>
     public static PayloadManifest? Payload { get; set; }
 
+    /// <summary>The card is an RX 9000: danielblnc's default there is Work.Rdna4Recommended.</summary>
+    public static bool Rdna4 { get; set; }
+
     /// <summary>An install older than what the payload pins now. It is not an error and nothing
     /// is broken -- it is the tile saying that pressing Install again would bring something new,
     /// which is the only way somebody who installed last week finds out.</summary>
@@ -282,7 +285,8 @@ public sealed class GameCard(GameEntry entry) : INotifyPropertyChanged
         try
         {
             Outdated = Installed && Payload is { } payload
-                                 && folders.Any(folder => Work.PayloadMovedOn(folder, payload));
+                                 && folders.Any(folder => Work.PayloadMovedOn(folder, payload.WithRuntime(
+                                     Rdna4 ? Entry.DanielRuntime ?? Work.Rdna4Recommended : null)));
         }
         catch (Exception)
         {

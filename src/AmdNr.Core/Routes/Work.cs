@@ -51,6 +51,13 @@ public sealed class PayloadPins
     public string OptiScalerVersion { get; init; } = string.Empty;
     public string OptiRuntimeVersion { get; init; } = string.Empty;
 
+    /// <summary>The person picked danielblnc's version for this game: it goes in as pinned, in place of a
+    /// newer build already in the folder.</summary>
+    public bool RuntimeChosen { get; init; }
+
+    /// <summary>danielblnc's runtime goes in async: Inline=0 in amd-nr.ini, AmdAsync=true in OptiScaler.ini.</summary>
+    public bool RuntimeAsync { get; init; }
+
     /// <summary>The mochizuki runtime's files -- the runtime, its shaders, its prewarm list and its
     /// model -- by their path in the payload folder. Empty when the OptiScaler version chosen does
     /// not carry it; installed only when it is asked for.</summary>

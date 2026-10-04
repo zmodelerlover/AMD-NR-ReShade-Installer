@@ -347,7 +347,7 @@ public class UserRuntimeTests
         Assert.Empty(shipped.Pins().UserRuntimes);
         Assert.Empty(Work.OfferedRuntimes(shipped.Pins(), Preset.Dx11));
         var opti = shipped.Newest(PayloadManifest.OptiScalerComponent).Pins();
-        Assert.Equal("0.4.9-amd-nr", opti.OptiScalerVersion);
+        Assert.Equal("0.4.10-amd-nr", opti.OptiScalerVersion);
         Assert.Empty(Work.OfferedRuntimes(opti, Preset.OptiScaler));
     }
 

@@ -101,11 +101,11 @@ public class PreflightTests
         {
             var report = Work.Preflight(game, src, Preset.Dx11, pins);
             Assert.True(report.Failed);
-            Assert.True(Fixture.HasErr(report, "still running"), report.ToLog("locked"));
+            Assert.True(Fixture.HasErr(report, "this line goes away"), report.ToLog("locked"));
         }
 
         var after = Work.Preflight(game, src, Preset.Dx11, pins);
-        Assert.False(Fixture.HasErr(after, "still running"), "closing it should clear the line");
+        Assert.False(Fixture.HasErr(after, "this line goes away"), "closing it should clear the line");
     }
 
     /// <summary>The 32-bit route never installs the 64-bit add-on, so a payload folder without it is

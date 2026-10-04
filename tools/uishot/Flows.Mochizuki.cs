@@ -1,9 +1,8 @@
-// mochizuki as a person meets it: a version of OptiScaler that carries it shows the choice, off until
-// ticked; ticked, Install puts the runtime and its dlssnr-amd folder beside OptiScaler, danielblnc stays
-// the NR runtime in OptiScaler.ini, and the game remembers the choice; with no choice on record the box
-// follows the folder, and unticked, Install takes it out again. Run by the flows in Program.cs with
-// OptiScaler 1.0.2 installed from "releases"; it leaves 1.0.3 installed with mochizuki, for the
-// uninstall flow to take back.
+// mochizuki as a person meets it: on an RX 9000 card a version of OptiScaler that carries it shows the NR
+// runtime section with a word on it, and Install puts the runtime and its dlssnr-amd folder beside OptiScaler
+// with no box to tick; OptiScaler.ini keeps the runtime it names when this OptiScaler has no lmxxf for every
+// RX 9000 card. On any other card nothing of it goes in. Run by the flows in Program.cs with OptiScaler 1.0.2
+// installed from "releases"; it leaves 1.0.3 installed with mochizuki, for the uninstall flow to take back.
 
 using System.Text.Json.Nodes;
 using Avalonia;
@@ -19,26 +18,25 @@ internal static class MochizukiFlow
     {
         T Named<T>(string name) where T : Control => sheet.FindControl<T>(name)!;
         var section = Named<StackPanel>("MochizukiSection");
-        var box = Named<CheckBox>("MochizukiBox");
         var note = Named<TextBlock>("MochizukiNote");
         var versions = Named<ComboBox>("OptiVersionBox");
         var install = Named<Button>("InstallButton");
         var ini = Path.Combine(game, Work.OptiScalerIni);
 
-        check(!section.IsVisible, "a version of OptiScaler without mochizuki does not offer it");
+        check(string.IsNullOrEmpty(note.Text), "a version of OptiScaler without mochizuki says nothing of it");
         Seed("1.0.2", "1.0.3");
         var reload = main.Session.LoadManifestAsync();
         check(until(() => reload.IsCompleted && versions.ItemCount == 3, 10), $"the menu lists the version that carries it ({versions.ItemCount})");
         versions.SelectedIndex = 0;
-        check(until(() => section.IsVisible, 5), "and picking that version offers mochizuki");
-        check(box.IsChecked != true && card.Entry.Mochizuki is null, "off until ticked");
 
         var machine = main.Session.Machine;
-        check(box.IsEnabled == (machine?.Rdna4 != false) && note.Text is { Length: > 0 },
-            $"tickable unless the card is known not to be RDNA4 ({machine?.Gpu}, rdna4 {machine?.Rdna4?.ToString() ?? "unknown"}): {note.Text}");
-        if (machine?.Rdna4 == false) return; // the rest needs a card it is offered on
-        box.IsChecked = true;
-        check(card.Entry.Mochizuki == true, "ticking it is remembered for the game");
+        if (machine?.Rdna4 != true)
+        {
+            check(until(() => string.IsNullOrEmpty(note.Text), 5),
+                $"not offered on a card that is not RX 9000 ({machine?.Gpu}, rdna4 {machine?.Rdna4?.ToString() ?? "unknown"})");
+            return; // the rest needs a card it goes in on
+        }
+        check(until(() => section.IsVisible && note.Text is { Length: > 0 }, 5), $"on RX 9000 the section says what goes in: {note.Text}");
         until(() => false, 1); // a second of layout and render ticks before the picture
         if (section.FindAncestorOfType<ScrollViewer>() is { Content: Visual content } scroll
             && section.TranslatePoint(new Point(0, 0), content) is { } at)
@@ -53,37 +51,13 @@ internal static class MochizukiFlow
                      "dlssnr-amd/shaders/g_attn.spv", "dlssnr-amd/shaders/runtime/cascade_blur.spv" })
             check(File.Exists(Path.Combine(game, file)), $"with {file}");
         check(Engine.GetIni(File.ReadAllText(ini), "DlssNr", "NrBackend").Trim() != "mochizuki",
-            "and OptiScaler.ini leaves danielblnc the NR runtime");
+            "and OptiScaler.ini keeps the runtime it names");
+        check(!card.Outdated, "and the folder is not out of date");
 
-        // The choice forgotten -- the game added again, the app on another PC: the box follows the folder.
-        card.Entry.Mochizuki = null;
-        versions.SelectedIndex = 1;
-        versions.SelectedIndex = 0;
-        check(until(() => section.IsVisible && box.IsChecked == true, 5), "with no choice on record, the box follows the folder: on");
-
-        // Unticked, the next install takes it out, and the package's ini no longer names it.
-        box.IsChecked = false;
-        check(card.Entry.Mochizuki == false, "unticking it is remembered too");
-        until(() => false, 1);
-        click(install);
-        check(until(() => !main.Session.Busy, 30) && card.InstalledVia == RouteFamily.OptiScaler
-              && !File.Exists(Path.Combine(game, "MochizukiNrRuntime.dll")) && !Directory.Exists(Path.Combine(game, "dlssnr-amd"))
-              && Engine.GetIni(File.ReadAllText(ini), "DlssNr", "NrBackend").Trim() != "mochizuki",
-            "unticked, Install takes mochizuki out and OptiScaler.ini is the package's again");
-        check(!card.Outdated, "and the folder is not out of date over files it no longer has");
-
-        // Ticked again, for the uninstall flow to take back.
-        box.IsChecked = true;
-        until(() => false, 1);
-        click(install);
-        check(until(() => !main.Session.Busy, 30) && File.Exists(Path.Combine(game, "MochizukiNrRuntime.dll")),
-            "ticked again, Install brings it back");
-
-        // On the ReShade route the same box, for the add-on (v0.6.8 on) to drive the build. Installer
-        // v0.6.2 kept it inside the OptiScaler panel, hidden with it, so IsVisible alone proved nothing.
+        // On the ReShade route the same section, for the add-on (v0.6.8 on) to run mochizuki by default.
         var route = sheet.FindControl<RadioButton>("RouteReShade")!;
         route.IsChecked = true;
-        check(until(() => section.IsEffectivelyVisible, 5), "the ReShade route shows the mochizuki box too");
+        check(until(() => section.IsEffectivelyVisible, 5), "the ReShade route shows the NR runtime section too");
         until(() => false, 1);
         if (section.FindAncestorOfType<ScrollViewer>() is { Content: Visual reshadeContent } reshadeScroll
             && section.TranslatePoint(new Point(0, 0), reshadeContent) is { } reshadeAt)

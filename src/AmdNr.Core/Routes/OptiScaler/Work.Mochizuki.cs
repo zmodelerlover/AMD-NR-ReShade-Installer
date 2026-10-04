@@ -1,12 +1,12 @@
 // The mochizuki runtime, the third one OptiScaler can drive from 0.4.0 on, and the second one the
 // ReShade add-on can drive from v0.6.8 on: DLSS 5's NR network as
 // Vulkan compute shaders (mochizuki0323/DLSSNR-AMD), run on a Vulkan device of its own beside the
-// game's D3D12. It needs RDNA4's FP8 matrix instructions. Unlike the other two it goes in only when
-// somebody asks for it -- it is experimental and its model is 141 MB. An install that does not ask for
-// it takes out what an earlier one put in, so the choice is what the folder holds. On every route it
-// only puts the files in, and danielblnc stays the NR runtime: OptiScaler.ini is written as the
-// package has it (NrBackend unset, which OptiScaler reads as daniel), amd-nr.ini is the person's, and
-// mochizuki is picked under NR runtime in OptiScaler's Neural tab or the add-on's panel.
+// game's D3D12. It needs RDNA4's FP8 matrix instructions, and it goes in on every RX 9000 card (the
+// app decides, by the card it reads) and on no other. An install without it takes out what an earlier
+// one put in, so the card is what the folder holds. On the ReShade routes the add-on runs it when
+// amd-nr.ini names no runtime; on OptiScaler a fresh OptiScaler.ini runs lmxxf, with danielblnc and
+// mochizuki beside it. Either is switched under NR runtime in the add-on's panel or OptiScaler's
+// Neural tab.
 //
 // Everything else is the OptiScaler route's own: the same transaction and manifest, every file
 // pinned, and uninstall taking back what went in.
@@ -119,8 +119,8 @@ public static partial class Work
         + "or leave mochizuki off.";
 
     private const string MochizukiPickInAddon =
-        "To use it, open the add-on's panel (Home), pick mochizuki (Vulkan) under NR runtime and restart the game. "
-        + "It stays on danielblnc until then.";
+        "It runs the network unless amd-nr.ini names another runtime: NR runtime in the add-on's panel (Home) "
+        + "switches to danielblnc, from the next start of the game.";
 
     /// <summary>Every mochizuki file, verified against its pin, under the name it takes in the game.</summary>
     private static void AddMochizuki(SortedDictionary<string, byte[]> files, string src, PayloadPins pins, Report report)
@@ -129,10 +129,6 @@ public static partial class Work
             if (VerifiedPayload(src, path, sha, report) is { } bytes)
                 files[MochizukiDestination(path)] = bytes;
     }
-
-    private const string MochizukiPickInOpti =
-        "danielblnc stays the NR runtime: to use mochizuki, pick it under NR runtime in OptiScaler's Neural tab "
-        + "and restart the game.";
 
     private const string MochizukiInstalled =
         "The mochizuki runtime went in too: MochizukiNrRuntime.dll, and dlssnr-amd\\ with its shaders, its prewarm "

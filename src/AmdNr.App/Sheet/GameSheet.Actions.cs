@@ -405,12 +405,42 @@ public partial class GameSheet
     /// <summary>The manifest this sheet installs from: the published one, with the chosen release's
     /// add-on swapped in when that is not the version the manifest already pins, or the chosen
     /// OptiScaler version's components in place of the ones it pins. The ReShade routes also carry
-    /// the mochizuki build the newest OptiScaler release has (PayloadManifest.WithMochizuki).</summary>
-    private PayloadManifest? Selected() =>
-        Session.Manifest is not { } manifest ? null
-        : _version?.Opti is { } opti ? manifest.With(opti)
+    /// the mochizuki build the newest OptiScaler release has (PayloadManifest.WithMochizuki). danielblnc's
+    /// runtime is the version picked for this game, when the version chosen runs it, or the card's default; an
+    /// unstable one on an RX 9000 card goes in async.</summary>
+    private PayloadManifest? Selected()
+    {
+        if (Session.Manifest is not { } manifest) return null;
+        var versioned = Versioned(manifest);
+        var offer = RuntimeChoices(versioned);
+        var runtime = Work.RuntimePick(offer, _card?.Entry.DanielRuntime, Rdna4);
+        return versioned.WithRuntime(runtime, offer.Count > 0 && Work.AsyncByDefault(runtime, Rdna4));
+    }
+
+    private bool Rdna4 => Session.Machine?.Rdna4 == true;
+
+    /// <summary>The published manifest at the add-on or OptiScaler version chosen, before any runtime choice.</summary>
+    private PayloadManifest Versioned(PayloadManifest manifest) =>
+        _version?.Opti is { } opti ? manifest.With(opti)
         : _card?.Entry.Preset.IsOptiScaler() == true ? manifest
         : (_version?.Release is { } release ? AddonReleases.With(manifest, release) : manifest).WithMochizuki();
+
+    /// <summary>The danielblnc versions offered (Work.RuntimeOffer) of those the add-on or OptiScaler version chosen
+    /// runs, newest first.</summary>
+    private List<ComponentRelease> RuntimeChoices(PayloadManifest versioned)
+    {
+        if (_card is not { } card) return [];
+        var opti = card.Entry.Preset.IsOptiScaler();
+        var pins = versioned.Pins();
+        var version = opti ? pins.OptiScalerVersion
+                      : card.Entry.Preset.Route() == Route.X86 ? pins.BridgeVersion : pins.AddonVersion;
+        return Work.RuntimeOffer(versioned.RuntimeVersions().Where(r => Work.RuntimeRunsOn(r, opti, version)).ToList(), Rdna4)
+            .ToList();
+    }
+
+    /// <summary>The version that goes in for this game (Work.RuntimePick); null keeps the pinned one.</summary>
+    private string? ChosenRuntime(PayloadManifest versioned) =>
+        Work.RuntimePick(RuntimeChoices(versioned), _card?.Entry.DanielRuntime, Rdna4);
 
     private PayloadPins Pins()
     {

@@ -105,6 +105,10 @@ public static partial class Engine
             Writable(path);
             File.WriteAllBytes(path, bytes);
         }
+        catch (IOException) when (IsLocked(path))
+        {
+            throw new InstallException(OpenElsewhere(Path.GetDirectoryName(path)!, [Path.GetFileName(path)]));
+        }
         catch (Exception e) { throw new InstallException($"Cannot write {path}: {e.Message}"); }
     }
 

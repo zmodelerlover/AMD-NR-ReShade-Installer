@@ -40,16 +40,13 @@ public sealed class GameEntry
     /// a game can move between the routes.</summary>
     public string? OptiScalerVersion { get; set; }
 
-    /// <summary>Whether this game's OptiScaler goes in with the mochizuki runtime beside it (danielblnc
-    /// stays the NR runtime), as the person last set the box. Null until they touch it, and then it follows the folder: on
-    /// where this app installed mochizuki, off everywhere else, since it is experimental, RDNA4 only,
-    /// and 141 MB of model. Following the folder is what keeps a game added again, or this app on
-    /// another PC, from taking mochizuki out at the next update.</summary>
-    public bool? Mochizuki { get; set; }
+    /// <summary>The danielblnc runtime version picked for this game ("0.4.3"), or null for the one the add-on or
+    /// OptiScaler version pins, the newest. One the version chosen does not run is left aside.</summary>
+    public string? DanielRuntime { get; set; }
 
     /// <summary>Which danielblnc runtime this game's install takes: the original SHA-256 of a build the
     /// person supplies (payload.json's user_runtimes), or empty for the download. Null until they pick,
-    /// and then it follows the folder, like <see cref="Mochizuki"/>: the build an install put in, or his own
+    /// and then it follows the folder, like the mochizuki files do: the build an install put in, or his own
     /// version.dll -- which keeps an update on the build -- or else a build this machine kept a copy of,
     /// preselected, and the download everywhere else.</summary>
     public string? UserRuntime { get; set; }

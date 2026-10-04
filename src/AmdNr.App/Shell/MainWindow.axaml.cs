@@ -72,6 +72,7 @@ public partial class MainWindow : Window
         ShowWhatsNewOnce();
 
         var machine = await Session.ReadMachineAsync();
+        GameCard.Rdna4 = machine.Rdna4 == true;
         GamesPage.ShowMachine(machine);
         SystemPage.Show(machine);
 

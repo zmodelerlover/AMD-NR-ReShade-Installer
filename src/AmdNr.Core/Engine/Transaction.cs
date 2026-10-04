@@ -23,9 +23,7 @@ public static partial class Transaction
             + "administrator rights -- run this installer as administrator, or move the game.");
 
         var held = desired.Keys.Concat(displace ?? []).Where(n => Engine.IsLocked(Path.Combine(dir, n))).ToList();
-        Engine.Require(held.Count == 0,
-            $"{string.Join(", ", held)} {(held.Count == 1 ? "is" : "are")} open by another program. "
-            + "The game or emulator is almost certainly still running -- close it and this line goes away.");
+        if (held.Count > 0) throw new InstallException(Engine.OpenElsewhere(dir, held));
 
         // Size is a cheap stand-in for "already the file we want": hashing every payload here would
         // read the 141 MB of weights twice, once to decide and once to install. A file whose size

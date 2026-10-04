@@ -55,6 +55,71 @@ public static partial class Work
         ("195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", new(0, 6, 0), new(0, 4, 7)),
     ];
 
+    /// <summary>The builds patched for the add-on that the add-on and its 32-bit pair run, by the first release
+    /// that does: danielblnc's 0.4.3, 0.5.0, 0.5.1 and 0.6.0, the versions a person can pick.</summary>
+    private static readonly (string Sha, Version Since)[] AddonAcceptedRuntimes =
+    [
+        ("f3d9f2e53b775e4870917572f1f87a28c73068a4dc97252d6fb52360ddf8597a", new(0, 7, 0)),
+        ("c808cdb04b4cf99e806f2989bb5b258696a51c89c084c500c957b055a66479b6", new(0, 7, 0)),
+        ("af67f066a250da5cabce87d8c70ddb148b5149eaaf0225279dd8489773bc79b0", new(0, 7, 2)),
+        ("430be589020685d03f0ad92194457bafe1a186bf658c8cfe2fb7a0bdb7592cc4", new(0, 7, 6)),
+    ];
+
+    /// <summary>Whether a runtime version from the payload's list runs on this add-on (or bridge) version, or
+    /// on this OptiScaler release.</summary>
+    /// <summary>On an RX 9000 card, the danielblnc build that has not frozen a game there; every other one is
+    /// unstable on those cards (single jobs held for seconds, then a locked PC).</summary>
+    public const string Rdna4Recommended = "0.4.3";
+
+    public enum RuntimeBadge { None, Recommended, Unstable }
+
+    /// <summary>The versions offered, from those the add-on or OptiScaler version runs (newest first): all of them
+    /// on an RX 9000 card, only the newest on any other.</summary>
+    public static IReadOnlyList<ComponentRelease> RuntimeOffer(IReadOnlyList<ComponentRelease> runs, bool rdna4) =>
+        rdna4 ? runs : runs.Take(1).ToList();
+
+    /// <summary>The version that goes in with nothing picked: <see cref="Rdna4Recommended"/> on an RX 9000 card when
+    /// it is offered, otherwise null, which keeps the one the release pins.</summary>
+    public static string? RuntimeDefault(IReadOnlyList<ComponentRelease> offer, bool rdna4) =>
+        rdna4 && offer.Any(r => r.Version == Rdna4Recommended) ? Rdna4Recommended : null;
+
+    /// <summary>The version that goes in: the one picked when it is offered, otherwise the default.</summary>
+    public static string? RuntimePick(IReadOnlyList<ComponentRelease> offer, string? picked, bool rdna4) =>
+        picked is not null && offer.Any(r => r.Version == picked) ? picked : RuntimeDefault(offer, rdna4);
+
+    public static RuntimeBadge BadgeFor(string version, bool rdna4) =>
+        !rdna4 ? RuntimeBadge.None : version == Rdna4Recommended ? RuntimeBadge.Recommended : RuntimeBadge.Unstable;
+
+    /// <summary>An unstable build on an RX 9000 card goes in async, where the game's queue does not wait on HIP.
+    /// <paramref name="version"/> null is the one the release pins, which is not the recommended one.</summary>
+    public static bool AsyncByDefault(string? version, bool rdna4) => rdna4 && version != Rdna4Recommended;
+
+    /// <summary>After an install that goes in async: that one key set in the game's ini, every other byte as it
+    /// was. The ini is the person's from the first time the game saves it, so the install sets the key rather
+    /// than writing the file.</summary>
+    internal static void GoesInAsync(string dir, string ini, string section, string key, string value, Report report)
+    {
+        var path = Path.Combine(dir, ini);
+        Engine.SafePath(path);
+        var before = File.Exists(path) ? File.ReadAllText(path) : "";
+        if (Engine.Lower(Engine.Trim(Engine.GetIni(before, section, key))) != value)
+            File.WriteAllText(path, Engine.SetIni(before, section, key, value));
+        report.Info($"danielblnc's runtime runs async ({key}={value} in {ini}): this build is unstable on RX 9000 cards, "
+                    + "and async keeps the game's GPU queue from waiting on it. The result lands one frame later. "
+                    + $"{Rdna4Recommended} is the one recommended on these cards.");
+    }
+
+    public static bool RuntimeRunsOn(ComponentRelease runtime, bool optiScaler, string version)
+    {
+        var name = optiScaler ? PayloadManifest.OptiRuntimeComponent : PayloadManifest.RuntimeComponent;
+        if (!runtime.Components.TryGetValue(name, out var component)
+            || component.Files.FirstOrDefault(f => f.Name != WeightsName) is not { } file)
+            return false;
+        var sha = Engine.Lower(file.Sha256);
+        if (optiScaler) return AcceptedRuntime(sha, version) is not null;
+        return VersionOf(version) is { } v && AddonAcceptedRuntimes.Any(r => r.Sha == sha && v >= r.Since);
+    }
+
     /// <summary>"0.4.3-amd-nr" or "0.4.2" as a version, or null.</summary>
     private static Version? VersionOf(string text) =>
         Version.TryParse(text.Split('-')[0], out var v) ? v : null;
@@ -71,6 +136,7 @@ public static partial class Work
     /// across updates). Null when the payload's is the one.</summary>
     private static (byte[] Bytes, Version Runtime, string From)? OwnRuntime(string dir, PayloadPins pins)
     {
+        if (pins.RuntimeChosen) return null;
         foreach (var name in new[] { AuthorRuntimeName, OptiPasses[0] })
         {
             var path = Path.Combine(dir, name);
@@ -87,7 +153,7 @@ public static partial class Work
     /// another build: one that release runs and newer than the one it ships (<see cref="OwnRuntime"/>).</summary>
     internal static bool OwnRuntimeIsCurrent(PayloadManifest payload, string name, string sha)
     {
-        if (!OptiPasses.Contains(name)) return false;
+        if (!OptiPasses.Contains(name) || payload.RuntimeChoice is not null) return false;
         payload = payload.Newest(PayloadManifest.OptiScalerComponent);
         return payload.Has(PayloadManifest.OptiScalerComponent) && payload.Has(PayloadManifest.OptiRuntimeComponent)
                && AcceptedRuntime(sha, payload.Component(PayloadManifest.OptiScalerComponent).Version) is { } own

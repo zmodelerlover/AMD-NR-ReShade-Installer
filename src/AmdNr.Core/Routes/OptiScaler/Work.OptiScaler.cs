@@ -72,6 +72,18 @@ public static partial class Work
         Launchers.Where(l => File.Exists(Path.Combine(dir, l.Launcher)) && File.Exists(Path.Combine(dir, l.Game)))
             .Select(l => ((string Launcher, string Game, string Why)?)l).FirstOrDefault();
 
+    /// <summary>Whether this OptiScaler carries lmxxf with the kernels of both RX 9000 series (9070 and 9060).</summary>
+    private static bool LmxxfEverywhere(PayloadPins pins) =>
+        pins.OptiFiles.ContainsKey(LmxxfRuntimeName)
+        && pins.OptiFiles.Keys.Any(k => k.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal));
+
+    /// <summary>On an RX 9000 card, the one mochizuki goes in on, a fresh OptiScaler.ini runs lmxxf.</summary>
+    private static byte[] RunsLmxxf(byte[] ini, bool wanted) =>
+        wanted
+            ? System.Text.Encoding.UTF8.GetBytes(
+                Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "NrBackend", "lmxxf"))
+            : ini;
+
     private static byte[] OnlyInTheGame(string dir, byte[] ini, Report report)
     {
         if (LauncherBeside(dir) is not { } l) return ini;
@@ -274,10 +286,7 @@ public static partial class Work
         var held = new[] { proxyName, WeightsName }.Concat(OptiPasses).Concat(AuthorsRuntimesHere(dir, pins).Select(f => f.Name))
             .Where(n => Engine.IsLocked(Path.Combine(dir, n)))
             .Concat(mochizuki || retiring ? MochizukiHeld(dir) : []).ToList();
-        if (held.Count > 0)
-            report.Err(
-                $"{string.Join(", ", held)} {(held.Count == 1 ? "is" : "are")} open by another program. "
-                + "The game is almost certainly still running. Close it and this line goes away.");
+        if (held.Count > 0) report.Err(Engine.OpenElsewhere(dir, held));
 
         if (src.Length > 0 && Directory.Exists(src))
         {
@@ -366,7 +375,7 @@ public static partial class Work
                 continue;
             }
             if (VerifiedPayload(src, path, sha, report) is { } bytes)
-                files[destination] = destination == OptiScalerIni ? OnlyInTheGame(dir, bytes, report) : bytes;
+                files[destination] = destination == OptiScalerIni ? RunsLmxxf(OnlyInTheGame(dir, bytes, report), mochizuki && LmxxfEverywhere(pins)) : bytes;
         }
         if (!files.ContainsKey(OptiScalerIni) && LauncherBeside(dir) is { } kept)
             report.Warn($"{kept.Launcher} sits beside the game and loads OptiScaler first, which breaks {kept.Why}. "
@@ -408,6 +417,7 @@ public static partial class Work
         }
 
         report.Info($"OptiScaler goes in as {proxyName}.");
+        if (pins.RuntimeAsync) GoesInAsync(dir, OptiScalerIni, "DlssNr", "AmdAsync", "true", report);
         if (own is { } o)
             report.Info(o.From switch
             {
@@ -419,14 +429,22 @@ public static partial class Work
                 _ => $"The runtime stays danielblnc's {o.Runtime}, already here and newer than the "
                      + $"{pins.OptiRuntimeVersion} the download carries.",
             });
-        if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
+        if (files.ContainsKey(OptiScalerIni) && mochizuki && LmxxfEverywhere(pins))
+            report.Info($"{OptiScalerIni} runs lmxxf (NrBackend=lmxxf), the default on RX 9000 cards. danielblnc and "
+                        + "mochizuki are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
+        else if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
             report.Info(
                 "The lmxxf runtime went in too, with its weights. It runs on "
                 + (pins.OptiFiles.Keys.Any(k => k.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal))
                     ? "RX 9070 and RX 9060 series cards: "
                     : "RX 9070 series cards only: ")
                 + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
-        if (mochizuki) report.Info(MochizukiInstalled + " " + MochizukiPickInOpti);
+        if (mochizuki)
+            report.Info(MochizukiInstalled
+                        + (files.ContainsKey(OptiScalerIni) && LmxxfEverywhere(pins)
+                            ? ""
+                            : $" {OptiScalerIni} keeps the NR runtime it names: to use mochizuki, pick it under NR runtime in "
+                              + "OptiScaler's Neural tab and restart the game."));
         else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);
         report.Info(Preset.OptiScaler.Note());
         return report;

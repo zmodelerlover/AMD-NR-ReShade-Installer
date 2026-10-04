@@ -42,9 +42,7 @@ public static partial class Transaction
                 log.Add($"WARNING modified after install; retained with backup: {name}");
                 continue;
             }
-            Engine.Require(!exists || !Engine.IsLocked(dst),
-                $"{name} is open by another program. The game is almost certainly still running -- "
-                + "close it and this line goes away.");
+            if (exists && Engine.IsLocked(dst)) throw new InstallException(Engine.OpenElsewhere(dir, [name]));
 
             // What the runtime rewrites has nothing of anybody's in its backup either: uninstall
             // discards that copy too (Work.Uninstall's Ours).

@@ -188,6 +188,7 @@ public static partial class Work
                         && File.Exists(Path.Combine(dir, n))
                         && IsReShadeFile(Path.Combine(dir, n), shipped))
             .ToList();
+        CheckForeignD3d11(dir, preset, report, keep);
         if (extra.Count == 0) return;
 
         report.Err(
@@ -198,6 +199,30 @@ public static partial class Work
             + ", and a process that loads two ReShades does not start at all -- the game closes before "
             + "a window appears and writes nothing anywhere saying why. Delete "
             + $"{string.Join(" and ", extra)} from the game folder and run this again.");
+    }
+
+    /// <summary>A d3d11.dll in the game's folder that is not ReShade: another mod wrapping Direct3D 11, usually
+    /// with Windows' own copy renamed beside it (ori_d3d11.dll), or a bare copy of Windows'. The game makes its
+    /// device through it, so ReShade loaded as dxgi.dll never sees that device ("created without a proxy Direct3D
+    /// device" in ReShade.log) and the add-on never runs. Batman: Arkham Knight with one froze and stayed running
+    /// with no window (2026-10-03).</summary>
+    internal static void CheckForeignD3d11(string dir, Preset preset, Report report, string? keep)
+    {
+        const string api = "d3d11.dll";
+        if (preset is not (Preset.Dx11 or Preset.X86Dx11) || string.Equals(api, keep, StringComparison.OrdinalIgnoreCase))
+            return;
+        var path = Path.Combine(dir, api);
+        if (!File.Exists(path)) return;
+        var (isReShade, product, _) = Identify(path);
+        if (isReShade) return;
+        var renamed = Directory.EnumerateFiles(dir, "*d3d11*.dll").Select(Path.GetFileName)
+            .Where(n => !string.Equals(n, api, StringComparison.OrdinalIgnoreCase)).ToList();
+        report.Warn(
+            $"{api} in this folder is not Windows' own{(product is null ? "" : $" ({product})")}: another mod wraps "
+            + $"Direct3D 11 here{(renamed.Count > 0 ? $", with {Joined(renamed!)} beside it" : "")}. The game makes its "
+            + $"device through it, so ReShade{(keep is null ? "" : $" as {keep}")} does not see that device and the add-on "
+            + $"does not run; two mods on one device can also freeze the game. Move {api}"
+            + (renamed.Count > 0 ? $" and {Joined(renamed!)}" : "") + " out of the game folder to use the add-on.");
     }
 
     /// <summary>The name this install will load ReShade under, whichever route it takes. Null only

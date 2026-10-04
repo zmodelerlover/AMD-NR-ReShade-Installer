@@ -231,7 +231,7 @@ public class WorkTests
         {
             var report = Work.Install(game, src, Preset.Dx11, pins);
             Assert.True(report.Failed);
-            Assert.True(Fixture.HasErr(report, "still running") || Fixture.HasErr(report, "open by another program"),
+            Assert.True(Fixture.HasErr(report, "this line goes away"),
                 report.ToLog("locked"));
             Assert.False(File.Exists(Path.Combine(game, Route.X64.ManifestFileName())));
         }

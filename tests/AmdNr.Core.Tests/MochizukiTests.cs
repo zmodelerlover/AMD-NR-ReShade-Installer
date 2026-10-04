@@ -159,7 +159,7 @@ public class MochizukiTests
     }
 
     [Fact]
-    public void InstallPutsEveryFileInPlaceAndLeavesDanielblncTheNrRuntime()
+    public void InstallPutsEveryFileInPlaceAndLeavesTheIniItsRuntime()
     {
         var game = Game("install");
         var (src, pins) = Staged("install");
@@ -176,9 +176,10 @@ public class MochizukiTests
         Assert.Equal("0.4.0 OptiScaler.dll", File.ReadAllText(Path.Combine(game, "dxgi.dll")));
         Assert.True(File.Exists(Path.Combine(game, "dlssnr_amd_pass3.dll")));
 
-        // The package's ini as it is: danielblnc stays the NR runtime, and the report says where to pick mochizuki.
+        // The package's ini as it is: this OptiScaler has no lmxxf for every RX 9000 card, so the runtime it names
+        // stays, and the report says where to pick mochizuki.
         Assert.Equal(Ini, File.ReadAllText(Path.Combine(game, Work.OptiScalerIni)));
-        Assert.True(Fixture.HasAny(report, "danielblnc stays the NR runtime"), report.ToLog("install"));
+        Assert.True(Fixture.HasAny(report, "keeps the NR runtime it names"), report.ToLog("install"));
 
         var m = Manifest.Decode(File.ReadAllText(Path.Combine(game, Route.X64.ManifestFileName())));
         foreach (var destination in Destinations)
@@ -189,6 +190,40 @@ public class MochizukiTests
         Assert.False(Work.Install(game, src, Preset.OptiScaler, pins, mochizuki: true).Failed);
         Assert.False(Work.PayloadMovedOn(game, Payload()));
         Assert.True(Work.PayloadMovedOn(game, Payload("0.4.1")));
+    }
+
+    /// <summary>On an RX 9000 card (mochizuki goes in) an OptiScaler that carries lmxxf with the RX 9060 kernels
+    /// too gets a fresh ini that runs lmxxf; without mochizuki the ini is the package's.</summary>
+    [Fact]
+    public void AFreshIniRunsLmxxfWhereMochizukiGoesInAndLmxxfRunsOnEveryRx9000()
+    {
+        var (src, staged) = Staged("lmxxf");
+        var opti = new Dictionary<string, string>(staged.OptiFiles, StringComparer.Ordinal);
+        foreach (var path in new[] { "LmxxfNrRuntime.dll", "lmxxf-modules-gfx1200/block0.hsaco" })
+        {
+            var full = Path.Combine(src, path);
+            Directory.CreateDirectory(Path.GetDirectoryName(full)!);
+            File.WriteAllText(full, $"stand-in {path}");
+            opti[path] = Engine.HashFile(full);
+        }
+        var pins = new PayloadPins
+        {
+            AddonSha = staged.AddonSha, AddonSize = staged.AddonSize, WeightsSha = staged.WeightsSha,
+            WeightsSize = staged.WeightsSize, OptiFiles = opti, OptiRuntimeName = staged.OptiRuntimeName,
+            OptiRuntimeSha = staged.OptiRuntimeSha, OptiRuntimeSize = staged.OptiRuntimeSize,
+            OptiScalerVersion = staged.OptiScalerVersion, OptiRuntimeVersion = staged.OptiRuntimeVersion,
+            MochizukiFiles = staged.MochizukiFiles,
+        };
+
+        var rx9000 = Game("lmxxf-rx9000");
+        var report = Work.Install(rx9000, src, Preset.OptiScaler, pins, mochizuki: true);
+        Assert.False(report.Failed, report.ToLog("install"));
+        Assert.Equal("lmxxf", Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(rx9000, Work.OptiScalerIni)), "DlssNr", "NrBackend")));
+        Assert.True(Fixture.HasAny(report, "runs lmxxf (NrBackend=lmxxf)"), report.ToLog("install"));
+
+        var other = Game("lmxxf-other");
+        Assert.False(Work.Install(other, src, Preset.OptiScaler, pins).Failed);
+        Assert.Equal(Ini, File.ReadAllText(Path.Combine(other, Work.OptiScalerIni)));
     }
 
     [Fact]
@@ -349,7 +384,7 @@ public class MochizukiTests
         using (File.Open(Path.Combine(game, "MochizukiNrRuntime.dll"), FileMode.Open, FileAccess.Read, FileShare.Read))
         {
             var held = Work.Install(game, newer, Preset.OptiScaler, newerPins);
-            Assert.True(Fixture.HasErr(held, "MochizukiNrRuntime.dll is open by another program"), held.ToLog("held"));
+            Assert.True(Fixture.HasErr(held, "MochizukiNrRuntime.dll is open"), held.ToLog("held"));
             Assert.Equal(recorded, File.ReadAllText(Path.Combine(game, Route.X64.ManifestFileName())));
             Assert.Equal(Ini, File.ReadAllText(Path.Combine(game, Work.OptiScalerIni)));
         }
