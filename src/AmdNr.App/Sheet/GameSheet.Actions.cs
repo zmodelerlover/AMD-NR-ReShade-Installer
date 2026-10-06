@@ -406,15 +406,14 @@ public partial class GameSheet
     /// add-on swapped in when that is not the version the manifest already pins, or the chosen
     /// OptiScaler version's components in place of the ones it pins. The ReShade routes also carry
     /// the mochizuki build the newest OptiScaler release has (PayloadManifest.WithMochizuki). danielblnc's
-    /// runtime is the version picked for this game, when the version chosen runs it, or the card's default; an
-    /// unstable one on an RX 9000 card goes in async.</summary>
+    /// runtime is the version picked for this game, when the version chosen runs it, or the card's default.</summary>
     private PayloadManifest? Selected()
     {
         if (Session.Manifest is not { } manifest) return null;
         var versioned = Versioned(manifest);
         var offer = RuntimeChoices(versioned);
         var runtime = Work.RuntimePick(offer, _card?.Entry.DanielRuntime, Rdna4);
-        return versioned.WithRuntime(runtime, offer.Count > 0 && Work.AsyncByDefault(runtime, Rdna4));
+        return versioned.WithRuntime(runtime);
     }
 
     private bool Rdna4 => Session.Machine?.Rdna4 == true;

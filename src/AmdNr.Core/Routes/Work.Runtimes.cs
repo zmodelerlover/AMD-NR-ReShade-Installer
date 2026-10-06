@@ -90,25 +90,6 @@ public static partial class Work
     public static RuntimeBadge BadgeFor(string version, bool rdna4) =>
         !rdna4 ? RuntimeBadge.None : version == Rdna4Recommended ? RuntimeBadge.Recommended : RuntimeBadge.Unstable;
 
-    /// <summary>An unstable build on an RX 9000 card goes in async, where the game's queue does not wait on HIP.
-    /// <paramref name="version"/> null is the one the release pins, which is not the recommended one.</summary>
-    public static bool AsyncByDefault(string? version, bool rdna4) => rdna4 && version != Rdna4Recommended;
-
-    /// <summary>After an install that goes in async: that one key set in the game's ini, every other byte as it
-    /// was. The ini is the person's from the first time the game saves it, so the install sets the key rather
-    /// than writing the file.</summary>
-    internal static void GoesInAsync(string dir, string ini, string section, string key, string value, Report report)
-    {
-        var path = Path.Combine(dir, ini);
-        Engine.SafePath(path);
-        var before = File.Exists(path) ? File.ReadAllText(path) : "";
-        if (Engine.Lower(Engine.Trim(Engine.GetIni(before, section, key))) != value)
-            File.WriteAllText(path, Engine.SetIni(before, section, key, value));
-        report.Info($"danielblnc's runtime runs async ({key}={value} in {ini}): this build is unstable on RX 9000 cards, "
-                    + "and async keeps the game's GPU queue from waiting on it. The result lands one frame later. "
-                    + $"{Rdna4Recommended} is the one recommended on these cards.");
-    }
-
     public static bool RuntimeRunsOn(ComponentRelease runtime, bool optiScaler, string version)
     {
         var name = optiScaler ? PayloadManifest.OptiRuntimeComponent : PayloadManifest.RuntimeComponent;

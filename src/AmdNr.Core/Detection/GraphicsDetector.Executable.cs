@@ -51,8 +51,9 @@ public static partial class GraphicsDetector
 
         yield return root;
         // bin\win_x64 is SCS (Euro Truck Simulator 2, American Truck Simulator); game\bin\win64 is
-        // Source 2 (Counter-Strike 2, Dota 2).
-        foreach (var sub in new[] { "bin", @"bin\x64", @"bin\win64", @"bin\win_x64", @"game\bin\win64", "x64",
+        // Source 2 (Counter-Strike 2, Dota 2). bin\x64_dx12 is The Witcher 3's DX12 build, the one with the
+        // upscalers, beside its DX11 one in bin\x64; the root holds only REDprelauncher.exe.
+        foreach (var sub in new[] { "bin", @"bin\x64_dx12", @"bin\x64", @"bin\win64", @"bin\win_x64", @"game\bin\win64", "x64",
                                     "Bin64", "Game", "bin_x64", "Binaries" })
             yield return Path.Combine(root, sub);
         foreach (var child in children) yield return child;

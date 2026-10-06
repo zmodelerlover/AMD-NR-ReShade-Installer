@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc verzió</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Ajánlott</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Instabil</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">A danielblnc runtime melyik verziója kerül ebbe a játékba. RX 9000 kártyákon a 0.4.3 az ajánlott: az újabbak lefagyasztottak rajtuk játékokat, ezért aszinkron móddal települnek, amelyben a játék nem várja meg a hálózatot, és az eredmény egy képkockával később érkezik. A többi kártya a legújabbat kapja.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">A danielblnc runtime melyik verziója kerül ebbe a játékba. RX 9000 kártyákon a 0.4.3 az ajánlott: az újabbak lefagyasztottak rajtuk játékokat. A többi kártya a legújabbat kapja.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: a mochizuki (mochizuki0323 Vulkan-portja, kb. 141 MB) is települ, és ez futtatja a hálózatot. danielblnc runtime-ja mellette marad: a kiegészítő paneljén az NR runtime alatt választható. Minden játék első indítása legfeljebb egy percig fordítja a hálózatot.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: egy új telepítés az lmxxf-et futtatja, a mochizuki (kb. 141 MB) pedig danielblnc runtime-ja mellé kerül. Másikat az OptiScaler Neural lapján, az NR runtime alatt választhatsz, utána indítsd újra a játékot.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Válassz telepítési útvonalat</sys:String>

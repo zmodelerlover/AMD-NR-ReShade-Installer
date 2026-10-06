@@ -105,6 +105,22 @@ public class DetectedWidthTests
         Assert.Equal(Route.X86, GraphicsDetector.Detect(game, "BeamNG.drive", launcher).Width);
     }
 
+    /// <summary>The Witcher 3: the root holds only REDprelauncher.exe, and the game is witcher3.exe twice, the DX12
+    /// build in bin\x64_dx12 and the DX11 one in bin\x64. The DX12 one has the upscalers OptiScaler takes.</summary>
+    [Fact]
+    public void TheWitcher3IsItsDx12BuildNotItsLauncher()
+    {
+        var game = Fixture.Temp("the-witcher-3");
+        File.WriteAllBytes(Path.Combine(game, "REDprelauncher.exe"), Fixture.Pe(x64: true));
+        Directory.CreateDirectory(Path.Combine(game, "bin", "x64"));
+        Directory.CreateDirectory(Path.Combine(game, "bin", "x64_dx12"));
+        File.WriteAllBytes(Path.Combine(game, "bin", "x64", "witcher3.exe"), Fixture.PeWithImports(x64: true, ["d3d11.dll"]));
+        var dx12 = Path.Combine(game, "bin", "x64_dx12", "witcher3.exe");
+        File.WriteAllBytes(dx12, Fixture.PeWithImports(x64: true, ["d3d12.dll"]));
+
+        Assert.Equal(dx12, GraphicsDetector.Detect(game, "The Witcher 3").Executable);
+    }
+
     /// <summary>Assetto Corsa: AssettoCorsa.exe in the root is the 32-bit launcher and acs.exe beside it is
     /// the game. A player got the launcher, and ReShade went into its WPF window instead of the game.</summary>
     [Fact]

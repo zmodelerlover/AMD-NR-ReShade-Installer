@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc versija</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Rekomenduojama</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Nestabili</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">Kuri danielblnc runtime versija įdiegiama šiam žaidimui. RX 9000 kortose rekomenduojama 0.4.3: naujesnės jose stabdė žaidimus, todėl diegiamos su įjungtu asinchroniniu režimu, kuriame žaidimas nelaukia tinklo, o rezultatas ateina vienu kadru vėliau. Kitos kortos gauna naujausią.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">Kuri danielblnc runtime versija įdiegiama šiam žaidimui. RX 9000 kortose rekomenduojama 0.4.3: naujesnės jose stabdė žaidimus. Kitos kortos gauna naujausią.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki (mochizuki0323 Vulkan prievadas, apie 141 MB) taip pat įdiegiamas ir paleidžia tinklą. danielblnc runtime lieka šalia: pasirinkite jį NR runtime priedo skydelyje. Pirmasis kiekvieno žaidimo paleidimas kompiliuoja tinklą iki minutės.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: naujas diegimas paleidžia lmxxf, o mochizuki (apie 141 MB) įdiegiamas šalia danielblnc runtime. Kitą pasirinkite NR runtime OptiScaler skirtuke Neural ir paleiskite žaidimą iš naujo.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Pasirinkite diegimo maršrutą</sys:String>

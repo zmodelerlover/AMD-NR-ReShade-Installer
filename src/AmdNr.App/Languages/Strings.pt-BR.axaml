@@ -125,7 +125,7 @@
   <sys:String x:Key="Str.DanielVersion">Versão do danielblnc</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Recomendado</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Instável</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">Qual versão do runtime do danielblnc vai neste jogo. Nas placas RX 9000 a 0.4.3 é a recomendada: as mais novas travaram jogos nelas, então são instaladas com o modo assíncrono ligado, em que o jogo não espera a rede e o resultado chega um quadro depois. As outras placas recebem a mais nova.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">Qual versão do runtime do danielblnc vai neste jogo. Nas placas RX 9000 a 0.4.3 é a recomendada: as mais novas travaram jogos nelas. As outras placas recebem a mais nova.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: o mochizuki (a versão em Vulkan do mochizuki0323, cerca de 141 MB) também é instalado e roda a rede. O runtime do danielblnc fica ao lado: escolha-o em Runtime da rede no painel do add-on. A primeira abertura de cada jogo compila a rede por até um minuto.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: uma instalação nova roda o lmxxf, e o mochizuki (cerca de 141 MB) vai ao lado do runtime do danielblnc. Escolha outro em NR runtime na aba Neural do OptiScaler e reinicie o jogo.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Escolha a rota de instalação</sys:String>

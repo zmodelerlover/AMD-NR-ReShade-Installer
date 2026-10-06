@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc sürümü</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Önerilen</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Kararsız</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">Bu oyuna danielblnc runtime'ının hangi sürümünün kurulacağı. RX 9000 kartlarda önerilen 0.4.3'tür: daha yenileri bu kartlarda oyunları dondurdu, bu yüzden oyunun ağı beklemediği ve sonucun bir kare sonra geldiği asenkron mod açık olarak kurulurlar. Diğer kartlar en yenisini alır.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">Bu oyuna danielblnc runtime'ının hangi sürümünün kurulacağı. RX 9000 kartlarda önerilen 0.4.3'tür: daha yenileri bu kartlarda oyunları dondurdu. Diğer kartlar en yenisini alır.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki (mochizuki0323'ün Vulkan portu, yaklaşık 141 MB) da kurulur ve ağı çalıştırır. danielblnc runtime'ı yanında kalır: eklenti panelindeki NR runtime'dan seçin. Her oyunun ilk açılışı ağı bir dakikaya kadar derler.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: yeni bir kurulum lmxxf çalıştırır ve mochizuki (yaklaşık 141 MB) danielblnc runtime'ının yanına kurulur. OptiScaler'ın Neural sekmesindeki NR runtime'dan başkasını seçip oyunu yeniden başlatın.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Kurulum yöntemini seçin</sys:String>

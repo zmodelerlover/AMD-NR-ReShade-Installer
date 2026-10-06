@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc संस्करण</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">अनुशंसित</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">अस्थिर</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">इस गेम में danielblnc रनटाइम का कौन-सा संस्करण जाएगा। RX 9000 कार्डों पर 0.4.3 अनुशंसित है: नए संस्करणों ने इन कार्डों पर गेम फ्रीज़ किए हैं, इसलिए वे एसिंक मोड चालू करके लगते हैं, जिसमें गेम नेटवर्क का इंतज़ार नहीं करता और नतीजा एक फ़्रेम बाद आता है। बाकी कार्डों को सबसे नया मिलता है।</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">इस गेम में danielblnc रनटाइम का कौन-सा संस्करण जाएगा। RX 9000 कार्डों पर 0.4.3 अनुशंसित है: नए संस्करणों ने इन कार्डों पर गेम फ्रीज़ किए हैं। बाकी कार्डों को सबसे नया मिलता है।</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki (mochizuki0323 का Vulkan पोर्ट, लगभग 141 MB) भी इंस्टॉल होता है और नेटवर्क चलाता है। danielblnc का रनटाइम साथ में रहता है: ऐड-ऑन के पैनल में NR runtime से उसे चुनें। हर गेम की पहली शुरुआत में नेटवर्क एक मिनट तक कंपाइल होता है।</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: नया इंस्टॉल lmxxf चलाता है, और mochizuki (लगभग 141 MB) danielblnc के रनटाइम के साथ जाता है। OptiScaler के Neural टैब में NR runtime से दूसरा चुनें और गेम फिर से शुरू करें।</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">इंस्टॉल करने के लिए रूट चुनें</sys:String>

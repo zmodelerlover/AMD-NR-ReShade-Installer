@@ -108,11 +108,6 @@ public sealed class PayloadManifest
     [JsonIgnore]
     public string? RuntimeChoice { get; init; }
 
-    /// <summary>The install switches danielblnc's runtime to async (<see cref="WithRuntime"/>): an unstable build on
-    /// an RX 9000 card (Work.AsyncByDefault).</summary>
-    [JsonIgnore]
-    public bool RuntimeAsync { get; init; }
-
     public const string AddonComponent = "addon";
     public const string RuntimeComponent = "runtime";
     public const string X86ExtrasComponent = "x86-extras";
@@ -251,7 +246,6 @@ public sealed class PayloadManifest
             Releases = Releases,
             UserRuntimes = UserRuntimes,
             RuntimeChoice = RuntimeChoice,
-            RuntimeAsync = RuntimeAsync,
         };
     }
 
@@ -269,8 +263,8 @@ public sealed class PayloadManifest
 
     /// <summary>This manifest with danielblnc's runtime at a version a person picked, on every route, from now
     /// on and through any release applied after. Null, or a version this payload does not list, keeps what
-    /// each release pins. <paramref name="async"/>: the install switches that runtime to async.</summary>
-    public PayloadManifest WithRuntime(string? version, bool async = false)
+    /// each release pins.</summary>
+    public PayloadManifest WithRuntime(string? version)
     {
         var runtime = RuntimeRelease(version);
         var manifest = new PayloadManifest
@@ -283,7 +277,6 @@ public sealed class PayloadManifest
             Releases = Releases,
             UserRuntimes = UserRuntimes,
             RuntimeChoice = runtime is null ? RuntimeChoice : version,
-            RuntimeAsync = async,
         };
         return runtime is null ? manifest : manifest.Merge(runtime);
     }
@@ -420,7 +413,6 @@ public sealed class PayloadManifest
             BridgeVersion = Components.TryGetValue(BridgeComponent, out var bridge) ? bridge.Version : string.Empty,
             UserRuntimes = UserRuntimes ?? [],
             RuntimeChosen = RuntimeChoice is not null,
-            RuntimeAsync = RuntimeAsync,
         };
     }
 

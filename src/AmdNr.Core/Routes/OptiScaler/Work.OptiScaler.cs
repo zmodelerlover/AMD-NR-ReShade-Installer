@@ -417,7 +417,6 @@ public static partial class Work
         }
 
         report.Info($"OptiScaler goes in as {proxyName}.");
-        if (pins.RuntimeAsync) GoesInAsync(dir, OptiScalerIni, "DlssNr", "AmdAsync", "true", report);
         if (own is { } o)
             report.Info(o.From switch
             {

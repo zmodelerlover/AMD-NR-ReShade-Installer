@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc のバージョン</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">推奨</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">不安定</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">このゲームに入れる danielblnc ランタイムのバージョン。RX 9000 では 0.4.3 が推奨です。新しいものはこのカードでゲームをフリーズさせたため、非同期モードをオンにして入れます。非同期ではゲームがネットワークを待たず、結果は 1 フレーム遅れて届きます。ほかのカードには最新版が入ります。</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">このゲームに入れる danielblnc ランタイムのバージョン。RX 9000 では 0.4.3 が推奨です。新しいものはこのカードでゲームをフリーズさせたことがあります。ほかのカードには最新版が入ります。</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki（mochizuki0323 による Vulkan 移植、約 141 MB）も入り、ネットワークを実行します。danielblnc のランタイムも横に残り、アドオンのパネルの NR runtime で選べます。各ゲームの初回起動ではネットワークのコンパイルに最大 1 分かかります。</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: 新規インストールでは lmxxf が動き、mochizuki（約 141 MB）が danielblnc のランタイムの横に入ります。OptiScaler の Neural タブの NR runtime で別のものを選び、ゲームを再起動してください。</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">導入方法を選んでください</sys:String>

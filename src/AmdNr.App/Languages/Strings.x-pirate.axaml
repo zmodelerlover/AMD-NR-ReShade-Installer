@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc's version</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Me pick</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Leaky</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">Which o' danielblnc's runtimes goes aboard this game. On RX 9000 cards 0.4.3 be the one t' trust: the newer ones have frozen games solid there, so they sail with async on, where the game waits fer no network an' the result lands a frame behind. Other cards get the newest.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">Which o' danielblnc's runtimes goes aboard this game. On RX 9000 cards 0.4.3 be the one t' trust: the newer ones have frozen games solid there. Other cards get the newest.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki (mochizuki0323's Vulkan port, 'bout 141 MB) comes aboard too an' runs the network. danielblnc's runtime stays alongside: pick it under NR runtime in the add-on's panel. The first start o' each game compiles the network fer up to a minute.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: a fresh install runs lmxxf, an' mochizuki ('bout 141 MB) goes in beside danielblnc's runtime. Pick another under NR runtime in OptiScaler's Neural tab an' restart the game, matey.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Pick a heading to hoist with</sys:String>

@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc 버전</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">권장</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">불안정</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">이 게임에 들어갈 danielblnc 런타임 버전입니다. RX 9000 카드에서는 0.4.3이 권장됩니다. 더 새로운 버전은 이 카드에서 게임을 멈추게 한 적이 있어 비동기 모드를 켠 채로 설치됩니다. 비동기에서는 게임이 네트워크를 기다리지 않고 결과가 한 프레임 늦게 도착합니다. 다른 카드는 최신 버전을 받습니다.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">이 게임에 들어갈 danielblnc 런타임 버전입니다. RX 9000 카드에서는 0.4.3이 권장됩니다. 더 새로운 버전은 이 카드에서 게임을 멈추게 한 적이 있습니다. 다른 카드는 최신 버전을 받습니다.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki(mochizuki0323의 Vulkan 이식판, 약 141MB)도 설치되어 네트워크를 실행합니다. danielblnc 런타임은 옆에 남으며 애드온 패널의 NR runtime에서 고를 수 있습니다. 각 게임의 첫 실행에서는 네트워크를 최대 1분간 컴파일합니다.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: 새로 설치하면 lmxxf가 실행되고, mochizuki(약 141MB)는 danielblnc 런타임 옆에 설치됩니다. OptiScaler의 Neural 탭 NR runtime에서 다른 것을 고른 뒤 게임을 다시 시작하세요.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">설치 방식을 선택하세요</sys:String>

@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">danielblnc 版本</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">推荐</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">不稳定</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">此游戏安装哪个版本的 danielblnc 运行时。在 RX 9000 显卡上推荐 0.4.3：更新的版本曾在这些显卡上让游戏卡死，因此会开启异步模式安装，游戏不再等待网络，结果晚一帧到达。其他显卡获得最新版本。</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">此游戏安装哪个版本的 danielblnc 运行时。在 RX 9000 显卡上推荐 0.4.3：更新的版本曾在这些显卡上让游戏卡死。其他显卡获得最新版本。</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000：mochizuki（mochizuki0323 的 Vulkan 移植版，约 141 MB）也会装入并运行网络。danielblnc 的运行时留在旁边：可在插件面板的 NR runtime 中选择。每个游戏首次启动会编译网络，最多一分钟。</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000：新安装运行 lmxxf，mochizuki（约 141 MB）装在 danielblnc 运行时旁边。在 OptiScaler 的 Neural 选项卡的 NR runtime 中选择其他运行时，然后重启游戏。</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">选择一种安装方式</sys:String>

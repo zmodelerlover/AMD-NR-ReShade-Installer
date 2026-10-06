@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">إصدار danielblnc</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">موصى به</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">غير مستقر</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">أي إصدار من بيئة تشغيل danielblnc يُثبَّت في هذه اللعبة. على بطاقات RX 9000 الإصدار 0.4.3 هو الموصى به: الإصدارات الأحدث جمّدت ألعابًا عليها، لذا تُثبَّت مع تشغيل الوضع غير المتزامن، حيث لا تنتظر اللعبة الشبكة وتصل النتيجة بعد إطار واحد. البطاقات الأخرى تحصل على الأحدث.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">أي إصدار من بيئة تشغيل danielblnc يُثبَّت في هذه اللعبة. على بطاقات RX 9000 الإصدار 0.4.3 هو الموصى به: الإصدارات الأحدث جمّدت ألعابًا عليها. البطاقات الأخرى تحصل على الأحدث.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: يُثبَّت mochizuki أيضًا (نسخة Vulkan من mochizuki0323، نحو 141 ميغابايت) ويشغّل الشبكة. تبقى بيئة تشغيل danielblnc بجانبه: اخترها من NR runtime في لوحة الإضافة. أول تشغيل لكل لعبة يترجم الشبكة لمدة تصل إلى دقيقة.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: التثبيت الجديد يشغّل lmxxf، ويُثبَّت mochizuki (نحو 141 ميغابايت) بجانب بيئة تشغيل danielblnc. اختر غيرها من NR runtime في تبويب Neural في OptiScaler ثم أعد تشغيل اللعبة.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">اختر طريقة التثبيت</sys:String>

@@ -289,7 +289,6 @@ public static partial class Work
         if (SweepDead(dir, report.Warn) is { Count: > 0 } swept)
             report.Ok($"removed {swept.Count} file(s) an older install left behind: {string.Join(", ", swept)}");
 
-        if (pins.RuntimeAsync) GoesInAsync(dir, "amd-nr.ini", "amd-nr", "Inline", "0", report);
         if (mochizuki) report.Info(MochizukiInstalled + " " + MochizukiPickInAddon);
         else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);
         if (supplied is { } kept) report.Info(SuppliedInstalled(kept.Build));

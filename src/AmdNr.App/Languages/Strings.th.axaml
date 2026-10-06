@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">เวอร์ชันของ danielblnc</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">แนะนำ</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">ไม่เสถียร</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">เวอร์ชันของรันไทม์ danielblnc ที่จะติดตั้งในเกมนี้ บนการ์ด RX 9000 แนะนำ 0.4.3 เวอร์ชันที่ใหม่กว่าเคยทำให้เกมค้างบนการ์ดเหล่านี้ จึงติดตั้งโดยเปิดโหมดอะซิงก์ ซึ่งเกมไม่ต้องรอเครือข่าย และผลลัพธ์จะมาช้าไปหนึ่งเฟรม การ์ดอื่นจะได้เวอร์ชันล่าสุด</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">เวอร์ชันของรันไทม์ danielblnc ที่จะติดตั้งในเกมนี้ บนการ์ด RX 9000 แนะนำ 0.4.3 เวอร์ชันที่ใหม่กว่าเคยทำให้เกมค้างบนการ์ดเหล่านี้ การ์ดอื่นจะได้เวอร์ชันล่าสุด</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: ติดตั้ง mochizuki (พอร์ต Vulkan ของ mochizuki0323 ประมาณ 141 MB) ด้วยและใช้รันเครือข่าย รันไทม์ของ danielblnc ยังอยู่ข้างกัน เลือกได้ที่ NR runtime ในแผงของแอดออน การเปิดเกมแต่ละเกมครั้งแรกจะคอมไพล์เครือข่ายนานสุดหนึ่งนาที</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: การติดตั้งใหม่ใช้ lmxxf และติดตั้ง mochizuki (ประมาณ 141 MB) ข้างรันไทม์ของ danielblnc เลือกตัวอื่นได้ที่ NR runtime ในแท็บ Neural ของ OptiScaler แล้วเริ่มเกมใหม่</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">เลือกวิธีติดตั้ง</sys:String>

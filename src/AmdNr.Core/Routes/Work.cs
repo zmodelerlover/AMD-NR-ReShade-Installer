@@ -55,9 +55,6 @@ public sealed class PayloadPins
     /// newer build already in the folder.</summary>
     public bool RuntimeChosen { get; init; }
 
-    /// <summary>danielblnc's runtime goes in async: Inline=0 in amd-nr.ini, AmdAsync=true in OptiScaler.ini.</summary>
-    public bool RuntimeAsync { get; init; }
-
     /// <summary>The mochizuki runtime's files -- the runtime, its shaders, its prewarm list and its
     /// model -- by their path in the payload folder. Empty when the OptiScaler version chosen does
     /// not carry it; installed only when it is asked for.</summary>

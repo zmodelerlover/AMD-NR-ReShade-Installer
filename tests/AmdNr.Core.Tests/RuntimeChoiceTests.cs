@@ -73,37 +73,6 @@ public class RuntimeChoiceTests
         Assert.Equal(Work.RuntimeBadge.Recommended, Work.BadgeFor("0.4.3", rdna4: true));
         Assert.Equal(Work.RuntimeBadge.Unstable, Work.BadgeFor("0.6.0", rdna4: true));
         Assert.Equal(Work.RuntimeBadge.None, Work.BadgeFor("0.6.0", rdna4: false));
-
-        Assert.False(Work.AsyncByDefault("0.4.3", rdna4: true));
-        Assert.True(Work.AsyncByDefault("0.5.0", rdna4: true));
-        Assert.True(Work.AsyncByDefault(null, rdna4: true));
-        Assert.False(Work.AsyncByDefault(null, rdna4: false));
-    }
-
-    /// <summary>The async flag rides on the manifest through a release applied after it, into the pins.</summary>
-    [Fact]
-    public void AsyncHoldsThroughAVersionAppliedAfterIt()
-    {
-        var shipped = Shipped();
-        Assert.True(shipped.WithRuntime("0.6.0", async: true).Newest(PayloadManifest.OptiScalerComponent).Pins().RuntimeAsync);
-        Assert.True(shipped.WithRuntime(null, async: true).Pins().RuntimeAsync);
-        Assert.False(shipped.WithRuntime("0.4.3").Pins().RuntimeAsync);
-    }
-
-    /// <summary>Only the timing key changes: every other line of the person's ini stays as it was, and an ini
-    /// that is not there yet is started with just that key.</summary>
-    [Fact]
-    public void GoingInAsyncSetsOnlyTheTimingKey()
-    {
-        var dir = Fixture.Temp("runtime-async");
-        File.WriteAllText(Path.Combine(dir, "amd-nr.ini"), "[amd-nr]\r\nScale=0.75\r\nInline=1\r\nStartOn=1\r\n");
-        var report = new Report();
-        Work.GoesInAsync(dir, "amd-nr.ini", "amd-nr", "Inline", "0", report);
-        Assert.Equal("[amd-nr]\r\nScale=0.75\r\nInline=0\r\nStartOn=1\r\n", File.ReadAllText(Path.Combine(dir, "amd-nr.ini")));
-
-        Work.GoesInAsync(dir, "OptiScaler.ini", "DlssNr", "AmdAsync", "true", report);
-        Assert.Equal("true", Engine.GetIni(File.ReadAllText(Path.Combine(dir, "OptiScaler.ini")), "DlssNr", "AmdAsync"));
-        Assert.False(report.Failed);
     }
 
     /// <summary>A folder on the newest runtime is out of date once its game is pinned to an older one, so the

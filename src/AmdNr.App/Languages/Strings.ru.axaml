@@ -119,7 +119,7 @@
   <sys:String x:Key="Str.DanielVersion">Версия danielblnc</sys:String>
   <sys:String x:Key="Str.RuntimeRecommended">Рекомендуется</sys:String>
   <sys:String x:Key="Str.RuntimeUnstable">Нестабильная</sys:String>
-  <sys:String x:Key="Str.DanielVersionTip">Какая версия рантайма danielblnc ставится в эту игру. На картах RX 9000 рекомендуется 0.4.3: более новые вызывали на них зависания игр, поэтому они ставятся с включённым асинхронным режимом, в котором игра не ждёт сеть, а результат приходит на кадр позже. Остальные карты получают самую новую.</sys:String>
+  <sys:String x:Key="Str.DanielVersionTip">Какая версия рантайма danielblnc ставится в эту игру. На картах RX 9000 рекомендуется 0.4.3: более новые вызывали на них зависания игр. Остальные карты получают самую новую.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Addon">RX 9000: mochizuki (Vulkan-порт от mochizuki0323, около 141 МБ) тоже устанавливается и запускает сеть. Рантайм danielblnc остаётся рядом: выберите его в NR runtime на панели аддона. Первый запуск каждой игры компилирует сеть до минуты.</sys:String>
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: новая установка запускает lmxxf, а mochizuki (около 141 МБ) ставится рядом с рантаймом danielblnc. Выберите другой в NR runtime на вкладке Neural OptiScaler и перезапустите игру.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Выберите способ установки</sys:String>
