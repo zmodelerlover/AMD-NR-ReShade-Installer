@@ -2,15 +2,15 @@
   "schema": 1,
   "components": {
     "addon": {
-      "version": "0.7.10",
+      "version": "0.7.11",
       "files": [
         {
           "name": "amd-nr.addon64",
-          "size": 867840,
-          "sha256": "660022ae2160a1577cb4d536b2d74b14487d5ae849f007c67f15c9a400f74c7b",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/addon/0.7.10/amd-nr.addon64",
+          "size": 866816,
+          "sha256": "098a96cf26c43513c37332ec454991c80855c8d11fcee97d36e8a8190dbb5adf",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/addon/0.7.11/amd-nr.addon64",
           "mirrors": [
-            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.10/amd-nr.addon64"
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.11/amd-nr.addon64"
           ]
         }
       ]
@@ -59,35 +59,35 @@
       ]
     },
     "bridge": {
-      "version": "0.7.10",
+      "version": "0.7.11",
       "files": [
         {
           "name": "amd-nr.addon32",
           "path": "files/amd-nr.addon32",
-          "size": 316416,
-          "sha256": "f732266737e3dacd8782b826e443c2a60919df9ae19bf3190b6d9c13e5532547",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.10/amd-nr.addon32",
+          "size": 304640,
+          "sha256": "0e32a3abb11ccf6cf4b77b0a23d0ae2cd5e1b9d97efa726106dd90296046ed08",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.11/amd-nr.addon32",
           "mirrors": [
-            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.10/amd-nr.addon32"
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.11/amd-nr.addon32"
           ]
         },
         {
           "name": "amd-nr-host64.exe",
           "path": "files/amd-nr-host64.exe",
-          "size": 583168,
-          "sha256": "2ada464aa6648763fc7a2d0ebc6aac7a592289f797b0f7ed1759ca070e945d89",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.10/amd-nr-host64.exe",
+          "size": 581120,
+          "sha256": "4aabca14008cd40b1bc6bdaf8c30db37a1487dbbf910d1f13da4c38519ce3ae2",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.11/amd-nr-host64.exe",
           "mirrors": [
-            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.10/amd-nr-host64.exe"
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.11/amd-nr-host64.exe"
           ]
         },
         {
           "name": "payload.sha256",
           "size": 167,
-          "sha256": "e4db38a68310a1ed4b34d99fdf9de7ba58f8dd89644fa46a1582ae8c5da25c4f",
-          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.10/payload.sha256",
+          "sha256": "9162b5fe14efc220cf89a8ca9c9121ac618af6ac6cfda63e73469aba50a27e0a",
+          "url": "https://huggingface.co/datasets/zmodelerlover/amd-nr/resolve/main/bridge/0.7.11/payload.sha256",
           "mirrors": [
-            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.10/payload.sha256"
+            "https://github.com/zmodelerlover/dlss5-neural-amd/releases/download/v0.7.11/payload.sha256"
           ]
         }
       ]
