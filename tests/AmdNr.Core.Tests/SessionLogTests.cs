@@ -98,6 +98,27 @@ public class SessionLogTests
     }
 
     [Fact]
+    public void MochizukiRefusingTheNetworkForWantOfVramFailed()
+    {
+        var r = SessionLog.Mochizuki("""
+            21:56:26.889 [mochizuki] Vulkan device AMD Radeon RX 9060 XT, queue family 0
+            21:56:27.105 [mochizuki] insufficient VRAM for 2 passes at 2560x1440
+            """, When);
+        Assert.Equal(SessionOutcome.Failed, r.Outcome);
+        Assert.Contains("insufficient VRAM", r.Line);
+    }
+
+    [Fact]
+    public void AReShadeThatLeftTheAddOnOutSaysWhy()
+    {
+        const string skipped = "WARN | Skipped loading add-on \"amd-nr.addon64\" because ReShade was built with limited add-on functionality.";
+        Assert.Equal(skipped, SessionLog.NotLoadedWhy("INFO | Initializing\n" + skipped + "\n"));
+        Assert.Contains("Another ReShade instance",
+            SessionLog.NotLoadedWhy(@"ERROR | Another ReShade instance was already loaded from ""C:\x\dxgi.dll""!" + "\n"));
+        Assert.Null(SessionLog.NotLoadedWhy("INFO | Searching for add-ons\n"));
+    }
+
+    [Fact]
     public void AFolderReadsItsNewestSessionAndAReShadeThatSkippedTheAddOn()
     {
         var dir = Directory.CreateTempSubdirectory("amdnr-session").FullName;

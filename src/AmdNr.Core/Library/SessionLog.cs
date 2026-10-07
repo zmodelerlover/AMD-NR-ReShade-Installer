@@ -90,7 +90,7 @@ public static partial class SessionLog
         {
             // Only when this folder carries the add-on at all: ReShade on its own is somebody else's.
             if (File.Exists(Path.Combine(folder, Work.AddonName)) || File.Exists(Path.Combine(folder, Work.Addon32Name)))
-                return new SessionResult(SessionOutcome.NotLoaded, started, null, null, null, null);
+                return new SessionResult(SessionOutcome.NotLoaded, started, null, null, null, NotLoadedWhy(reshade));
         }
         if (newest is null) return null;
 
@@ -116,6 +116,14 @@ public static partial class SessionLog
             engine.NetworkMs, engine.Runtime,
             outcome == SessionOutcome.Crashed ? engine.Line : addon.Line ?? engine.Line);
     }
+
+    /// <summary>ReShade's own line for leaving the add-on out, when it wrote one: a build with limited add-on
+    /// functionality (the normal build, or a global layer too old), or a second ReShade in the process.</summary>
+    internal static string? NotLoadedWhy(string reshade) =>
+        Lines(reshade).FirstOrDefault(l => NotLoadedReasons.Any(r => l.Contains(r, StringComparison.OrdinalIgnoreCase)))?.Trim();
+
+    private static readonly string[] NotLoadedReasons =
+        ["limited add-on functionality", "Another ReShade instance was already loaded"];
 
     /// <summary>danielblnc's runtime: "dlssnr_amd vX loaded into ..." starts a session, "network job N
     /// done" counts it, and CRASH, FAULT or a removed device ends it badly.</summary>
@@ -200,8 +208,12 @@ public static partial class SessionLog
         foreach (var line in session)
             if (MochizukiFrames().Match(line) is { Success: true } m && long.TryParse(m.Groups[1].Value, out var n))
                 frames = (frames ?? 0) + n;
-        var outcome = ready || frames > 0 ? SessionOutcome.Ran : SessionOutcome.NoFrames;
-        return new SessionResult(outcome, when, frames, null, "mochizuki", null);
+        // It refuses to build the network on a card without the room for it, and runs nothing.
+        var refused = session.FirstOrDefault(l => l.Contains("insufficient VRAM", StringComparison.OrdinalIgnoreCase));
+        var outcome = ready || frames > 0 ? SessionOutcome.Ran
+            : refused is not null ? SessionOutcome.Failed
+            : SessionOutcome.NoFrames;
+        return new SessionResult(outcome, when, frames, null, "mochizuki", outcome == SessionOutcome.Failed ? refused!.Trim() : null);
     }
 
     private static DateTime? Written(string path)
