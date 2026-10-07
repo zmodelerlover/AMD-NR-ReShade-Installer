@@ -42,9 +42,12 @@ public static unsafe class GpuService
                 name = best.Name;
                 driver = best.Driver ?? driver;
                 radeon = best.Vendor == AmdVendor || best.Name.Contains("Radeon", StringComparison.OrdinalIgnoreCase);
-                // No AMD adapter in sight (Remote Desktop, a driver being reinstalled, the Basic Render Driver) says
-                // nothing about the card, so it is unknown rather than "not RDNA4", which strips lmxxf.
-                rdna4 = best.Vendor == AmdVendor ? IsRdna4(best.Vendor, best.Device, best.Name) : null;
+                // A machine whose card is another maker's is not RDNA4, and lmxxf's 590 MB stay out. No real adapter
+                // in sight (Remote Desktop, a driver being reinstalled, the Basic Render Driver) says nothing about the
+                // card, so that is unknown rather than "not RDNA4", which would strip lmxxf from an RX 9070.
+                rdna4 = best.Vendor == AmdVendor ? IsRdna4(best.Vendor, best.Device, best.Name)
+                    : adapters.Any(IsOtherDiscrete) ? false
+                    : null;
             }
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or COMException
@@ -94,6 +97,13 @@ public static unsafe class GpuService
     }
 
     private sealed record Adapter(string Name, uint Vendor, uint Device, ulong Memory, string? Driver);
+
+    private const uint NvidiaVendor = 0x10de, IntelVendor = 0x8086;
+
+    /// <summary>Another maker's card with memory of its own: any NVIDIA, or an Intel Arc (an Intel adapter with a
+    /// gigabyte or more of its own; the integrated ones borrow the system's).</summary>
+    private static bool IsOtherDiscrete(Adapter a) =>
+        a.Vendor == NvidiaVendor || (a.Vendor == IntelVendor && a.Memory >= 1UL << 30);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct AdapterDesc1
