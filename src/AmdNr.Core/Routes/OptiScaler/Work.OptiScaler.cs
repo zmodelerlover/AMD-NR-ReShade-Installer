@@ -305,7 +305,7 @@ public static partial class Work
             return report;
         }
         report.Info($"target: {dir}");
-        report.Info($"preset: {Preset.OptiScaler.Label()}");
+        report.Info($"preset: {Preset.OptiScaler.Label()}{(api is { } a ? $", {GraphicsDetection.Short(a)} game" : "")}");
 
         if (pins.OptiFiles.Count == 0 || pins.OptiRuntimeName.Length == 0)
         {
@@ -349,6 +349,8 @@ public static partial class Work
         // runs on danielblnc's runtime only: lmxxf is the default only where the game has an upscaler.
         IReadOnlyList<string> upscalers = everywhere ? GraphicsDetector.UpscalersDeep(dir, null, GraphicsDetector.Detect(dir).Executable) : [];
         var lmxxf = mochizuki && LmxxfEverywhere(pins) && (!everywhere || upscalers.Count > 0);
+        if (everywhere && upscalers.Count == 0)
+            report.Info("No DLSS, FSR or XeSS found in this game: OptiScaler runs the network on its finished frame (NR without upscaling).");
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         foreach (var (path, sha) in pins.OptiFiles)
         {

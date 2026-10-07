@@ -68,6 +68,7 @@ public static class SupportReport
             .Concat(Recent(AppPaths.Logs, "*uninstall*.log", 8))
             .Concat(Recent(AppPaths.Logs, "*-download-*.log", 8))
             .Concat(Recent(AppPaths.Logs, "amd-nr-installer.log", 1))
+            .Concat(Recent(AppPaths.Logs, Path.GetFileName(AppPaths.CrashLog), 1))
             .DistinctBy(f => f.FullName);
         foreach (var log in logs)
             Copy(zip, log, $"logs/{log.Name}");

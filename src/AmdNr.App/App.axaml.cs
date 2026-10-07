@@ -64,14 +64,36 @@ public partial class App : Application
         // Windows opened after a language change take its direction too.
         Window.WindowOpenedEvent.AddClassHandler<Window>((window, _) => window.FlowDirection = Flow);
 
-        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        // Every way an exception can end the app is written down, each one added to the crash log rather than
+        // over the last, and named in the rolling log too: a window that closed right after an install had left
+        // nothing anywhere to say why (Digimon World: Next Order, 2026-10-07).
+        AppDomain.CurrentDomain.UnhandledException += (_, args) => Crashed("unhandled", args.ExceptionObject);
+        // One escaping a UI handler is written down and the window kept: what it was doing is lost, the app is not.
+        Avalonia.Threading.Dispatcher.UIThread.UnhandledException += (_, args) =>
         {
-            try { File.WriteAllText(AppPaths.CrashLog, args.ExceptionObject.ToString()); }
-            catch
-            {
-                // Last resort: there is nothing left to try if writing the crash log fails.
-            }
+            Crashed("ui thread", args.Exception);
+            args.Handled = true;
         };
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Crashed("unobserved task", args.Exception);
+            args.SetObserved();
+        };
+    }
+
+    private static void Crashed(string where, object exception)
+    {
+        try
+        {
+            File.AppendAllText(AppPaths.CrashLog, $"{DateTime.Now:s} v{Version} {where}{Environment.NewLine}{exception}"
+                                                  + Environment.NewLine + Environment.NewLine);
+        }
+        catch
+        {
+            // Last resort: there is nothing left to try if writing the crash log fails.
+        }
+        InstallLog.Append($"{DateTime.Now:s} crash ({where}): {(exception as Exception)?.GetType().Name}: "
+                          + $"{(exception as Exception)?.Message ?? exception.ToString()} -- the whole of it is in crash.log");
     }
 
     public override void OnFrameworkInitializationCompleted()

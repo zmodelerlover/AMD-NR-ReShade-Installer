@@ -300,6 +300,7 @@ void Flows()
         "an unreadable games.json is kept aside, word for word");
     Until(() => !fresh.Session.Busy);
     fresh.Close();
+    LeftoversFlow.Run(Check, Until, Click, (w, n) => Save(w, n));
 }
 
 // `uishot <out> perf`: how long a big library takes to open, from the window being built to every

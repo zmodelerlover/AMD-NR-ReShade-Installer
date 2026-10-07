@@ -110,7 +110,9 @@ public static class Presets
     public static string Label(this Preset p) => p switch
     {
         Preset.FiveM => "FiveM",
-        Preset.OptiScaler => "OptiScaler: D3D12 game with DLSS, FSR or XeSS",
+        // Not "D3D12 game with DLSS, FSR or XeSS": from 0.5.0 on it is any 64-bit D3D9 to D3D12, Vulkan or OpenGL
+        // game, and the install says which API and whether the network runs inside an upscaler or on the frame.
+        Preset.OptiScaler => "OptiScaler",
         Preset.Pcsx2 => "PCSX2",
         Preset.Rpcs3 => "RPCS3",
         Preset.Dx11 => "D3D10/D3D11 game",
