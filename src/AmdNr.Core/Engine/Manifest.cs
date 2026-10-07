@@ -73,7 +73,9 @@ public sealed class Manifest(string preset, Route route)
         if (m.Route == Route.X64) o.Append("\"route\":\"x64\",\n");
         o.Append($"\"bridge_protocol\":{m.BridgeProtocol},\n")
             // Serialized, because a layer's path has backslashes; the pinned one comes out as it always did.
-            .Append("\"dgVoodoo\":\"none\",\n\"ReShade\":").Append(JsonSerializer.Serialize(m.ReShade)).Append(",\n\"files\":[\n");
+            // Through CoreJson: without type info the trimmed build throws here, on every install and uninstall.
+            .Append("\"dgVoodoo\":\"none\",\n\"ReShade\":").Append(JsonSerializer.Serialize(m.ReShade, CoreJson.Default.String))
+            .Append(",\n\"files\":[\n");
         for (var i = 0; i < m.Entries.Count; i++)
         {
             var e = m.Entries[i];
