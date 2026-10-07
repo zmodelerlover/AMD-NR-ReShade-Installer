@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} działa z tego folderu</sys:String>
   <sys:String x:Key="Str.CloseGame">Zamknij {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Zakończyć {0}? Wszystko, co nie zostało zapisane, przepadnie. Instalacja i odinstalowanie wymagają zamknięcia: nie da się podmienić plików, które wczytał.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Wyczyść i spróbuj ponownie</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Przeszkadza wcześniejsza instalacja</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Jej zapis nie pasuje do tej instalacji. Wyczyść i spróbuj ponownie usuwa pliki tej aplikacji, zachowuje ustawienia i instaluje od nowa.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows nie pozwolił stąd wyczyścić pamięci podręcznej DNS. Otwórz wiersz polecenia, uruchom ipconfig /flushdns i spróbuj ponownie.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Problemy znalezione w tym folderze: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Gotowe do instalacji; uwagi do przeczytania: {0}</sys:String>

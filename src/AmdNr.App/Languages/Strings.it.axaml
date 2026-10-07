@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} è in esecuzione da questa cartella</sys:String>
   <sys:String x:Key="Str.CloseGame">Chiudi {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Terminare {0}? Ciò che non è stato salvato va perso. Installa e Disinstalla richiedono che sia chiuso: non possono sostituire file che ha caricato.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Pulisci e riprova</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Un'installazione precedente è d'intralcio</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Il suo registro non corrisponde a questa installazione. Pulisci e riprova rimuove i file di questa app, mantiene le impostazioni e installa di nuovo.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows non ha permesso di svuotare la cache DNS da qui. Apri un Prompt dei comandi, esegui ipconfig /flushdns e riprova.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problemi trovati in questa cartella</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Pronto per l'installazione, con {0} note da leggere</sys:String>

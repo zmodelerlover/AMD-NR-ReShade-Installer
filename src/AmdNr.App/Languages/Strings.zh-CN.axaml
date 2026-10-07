@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} 正在从此文件夹运行</sys:String>
   <sys:String x:Key="Str.CloseGame">关闭 {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">结束 {0}？未保存的内容将丢失。安装和卸载需要先关闭它：它已加载的文件无法替换。</sys:String>
+  <sys:String x:Key="Str.CleanRetry">清理并重试</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">之前的安装挡住了</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">它的记录与本次安装不符。清理并重试会移除本应用的文件，保留你的设置，然后重新安装。</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows 不允许从这里清除 DNS 缓存。请打开命令提示符，运行 ipconfig /flushdns，然后重试。</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">在此文件夹中发现 {0} 个问题</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">可以安装，有 {0} 条提示需要查看</sys:String>

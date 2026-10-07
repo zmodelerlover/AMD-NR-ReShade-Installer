@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0}이(가) 이 폴더에서 실행 중입니다</sys:String>
   <sys:String x:Key="Str.CloseGame">{0} 닫기</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">{0}을(를) 종료할까요? 저장하지 않은 내용은 사라집니다. 설치와 제거를 하려면 닫아야 합니다: 불러온 파일은 바꿀 수 없습니다.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">정리 후 다시 시도</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">이전 설치가 방해하고 있습니다</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">그 기록이 이번 설치와 맞지 않습니다. 정리 후 다시 시도는 이 앱의 파일을 빼고 설정은 남긴 뒤 다시 설치합니다.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">여기서는 Windows의 DNS 캐시를 지울 수 없었습니다. 명령 프롬프트를 열고 ipconfig /flushdns를 실행한 뒤 다시 시도하세요.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">이 폴더에서 문제 {0}개를 발견했습니다</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">설치 준비 완료, 확인할 내용 {0}개</sys:String>

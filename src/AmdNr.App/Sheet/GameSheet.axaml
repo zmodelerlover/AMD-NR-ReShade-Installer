@@ -129,6 +129,8 @@
                         <Button x:Name="DnsRetryButton" Classes="link" Click="OnFlushDns" IsVisible="False"
                                 Content="{DynamicResource Str.DnsRetry}" />
                         <Button x:Name="CloseGameButton" Classes="link" Click="OnCloseGame" IsVisible="False" />
+                        <Button x:Name="CleanRetryButton" Classes="link" Click="OnCleanRetry" IsVisible="False"
+                                Content="{DynamicResource Str.CleanRetry}" />
                       </StackPanel>
                     </Grid>
                   </Border>

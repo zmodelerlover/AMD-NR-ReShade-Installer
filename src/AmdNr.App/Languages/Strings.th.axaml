@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} กำลังทำงานจากโฟลเดอร์นี้</sys:String>
   <sys:String x:Key="Str.CloseGame">ปิด {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">ปิด {0} หรือไม่? สิ่งที่ยังไม่ได้บันทึกจะหายไป การติดตั้งและถอนการติดตั้งต้องปิดก่อน: ไฟล์ที่โหลดอยู่ไม่สามารถแทนที่ได้</sys:String>
+  <sys:String x:Key="Str.CleanRetry">ล้างแล้วลองใหม่</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">การติดตั้งก่อนหน้าขวางอยู่</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">บันทึกของมันไม่ตรงกับการติดตั้งนี้ ล้างแล้วลองใหม่จะเอาไฟล์ของแอปนี้ออก เก็บการตั้งค่าไว้ แล้วติดตั้งใหม่</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows ไม่ยอมให้ล้างแคช DNS จากที่นี่ เปิด Command Prompt รัน ipconfig /flushdns แล้วลองอีกครั้ง</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">พบปัญหา {0} รายการในโฟลเดอร์นี้</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">พร้อมติดตั้ง มีหมายเหตุ {0} รายการให้อ่าน</sys:String>

@@ -372,6 +372,9 @@
   <sys:String x:Key="Str.GameRunning">{0} is running from this folder</sys:String>
   <sys:String x:Key="Str.CloseGame">Close {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">End {0}? Whatever it has not saved is lost. Install and Uninstall need it closed: they cannot replace files it has loaded.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Clean up and retry</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">An earlier install here is in the way</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Its record does not match this install. Clean up and retry takes this app's files from it out, keeps your settings, and installs again.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows would not clear its DNS cache from here. Open a Command Prompt, run ipconfig /flushdns, and try again.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problems found in this folder</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Ready to install, with {0} notes to read</sys:String>

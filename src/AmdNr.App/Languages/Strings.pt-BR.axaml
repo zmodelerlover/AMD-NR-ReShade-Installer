@@ -390,6 +390,9 @@
   <sys:String x:Key="Str.GameRunning">{0} está rodando desta pasta</sys:String>
   <sys:String x:Key="Str.CloseGame">Fechar {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Encerrar {0}? O que não foi salvo se perde. Instalar e Desinstalar precisam dele fechado: não dá para trocar arquivos que ele carregou.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Limpar e tentar de novo</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Uma instalação anterior está atrapalhando</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">O registro dela não bate com esta instalação. Limpar e tentar de novo tira os arquivos deste app dela, mantém suas configurações e instala de novo.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">O Windows não deixou limpar o cache de DNS daqui. Abra o Prompt de Comando, rode ipconfig /flushdns e tente de novo.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problemas encontrados nesta pasta</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Pronto para instalar, com {0} avisos para ler</sys:String>

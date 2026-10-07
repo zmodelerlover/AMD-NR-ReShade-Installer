@@ -181,6 +181,7 @@ public partial class GameSheet
             }
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
             ShowOutcome(report, "Str.Install", card.Name);
+            if (report.Failed) OfferCleanUp(report);
             if (report.Failed) await OfferCloseAsync(card, preset);
             if (!report.Failed && card.Installed) card.Pulse();
             Status(report.Failed ? Ui.Text("Str.LogSaved") : Ui.Text("Str.Ready"));

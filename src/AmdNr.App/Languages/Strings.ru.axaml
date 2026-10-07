@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} запущен из этой папки</sys:String>
   <sys:String x:Key="Str.CloseGame">Закрыть {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Завершить {0}? Всё несохранённое пропадёт. Для установки и удаления его нужно закрыть: загруженные им файлы нельзя заменить.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Очистить и повторить</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Мешает предыдущая установка</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Её запись не совпадает с этой установкой. «Очистить и повторить» уберёт файлы этого приложения, сохранит настройки и установит заново.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows не разрешила очистить кэш DNS отсюда. Откройте командную строку, выполните ipconfig /flushdns и попробуйте снова.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Найдено проблем в этой папке: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Готово к установке, примечаний: {0}</sys:String>

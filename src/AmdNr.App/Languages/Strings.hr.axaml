@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} je pokrenut iz ove mape</sys:String>
   <sys:String x:Key="Str.CloseGame">Zatvori {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Prekinuti {0}? Ono što nije spremljeno se gubi. Instalacija i deinstalacija trebaju da je zatvoren: ne mogu zamijeniti datoteke koje je učitao.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Očisti i pokušaj ponovno</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Prethodna instalacija smeta</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Njezin zapis ne odgovara ovoj instalaciji. Očisti i pokušaj ponovno uklanja datoteke ove aplikacije, zadržava postavke i ponovno instalira.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows odavde nije dopustio čišćenje DNS predmemorije. Otvorite naredbeni redak, pokrenite ipconfig /flushdns i pokušajte ponovno.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Problemi pronađeni u ovoj mapi: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Spremno za instalaciju; napomene za pročitati: {0}</sys:String>

@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} bu klasörden çalışıyor</sys:String>
   <sys:String x:Key="Str.CloseGame">{0} kapat</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">{0} sonlandırılsın mı? Kaydedilmemiş her şey kaybolur. Kurma ve kaldırma için kapalı olması gerekir: yüklediği dosyalar değiştirilemez.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Temizle ve yeniden dene</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Önceki bir kurulum engel oluyor</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Kaydı bu kurulumla uyuşmuyor. Temizle ve yeniden dene bu uygulamanın dosyalarını kaldırır, ayarlarını korur ve yeniden kurar.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows, DNS önbelleğinin buradan temizlenmesine izin vermedi. Bir Komut İstemi açın, ipconfig /flushdns komutunu çalıştırın ve tekrar deneyin.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Bu klasörde {0} sorun bulundu</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Kuruluma hazır, okunacak {0} not var</sys:String>

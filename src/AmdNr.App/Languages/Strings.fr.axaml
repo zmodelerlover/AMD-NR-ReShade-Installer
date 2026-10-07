@@ -347,6 +347,9 @@
   <sys:String x:Key="Str.GameRunning">{0} est en cours d'exécution depuis ce dossier</sys:String>
   <sys:String x:Key="Str.CloseGame">Fermer {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Terminer {0} ? Ce qui n'a pas été enregistré est perdu. Installer et Désinstaller ont besoin qu'il soit fermé : ils ne peuvent pas remplacer des fichiers qu'il a chargés.</sys:String>
+  <sys:String x:Key="Str.CleanRetry">Nettoyer et réessayer</sys:String>
+  <sys:String x:Key="Str.CleanRetryTitle">Une installation précédente gêne</sys:String>
+  <sys:String x:Key="Str.CleanRetryDetail">Son enregistrement ne correspond pas à cette installation. Nettoyer et réessayer retire les fichiers de cette app, garde vos réglages et réinstalle.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows n'a pas voulu vider son cache DNS depuis ici. Ouvrez une invite de commandes, lancez ipconfig /flushdns et réessayez.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problèmes trouvés dans ce dossier</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Prêt à installer, avec {0} remarques à lire</sys:String>

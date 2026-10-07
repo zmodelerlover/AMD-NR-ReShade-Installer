@@ -149,10 +149,36 @@ public partial class GameSheet
         ShowDetailsButton.IsVisible = details;
         DnsRetryButton.IsVisible = false;
         CloseGameButton.IsVisible = false;
+        CleanRetryButton.IsVisible = false;
         // Off and on again, so the entrance plays even when the banner was already up.
         ResultBanner.IsVisible = false;
         ResultBanner.IsVisible = true;
     }
+
+    /// <summary>The engine's refusals that mean an earlier install's record is in the way: another API's install
+    /// it did not clear, or a record whose settings entries an older build wrote differently.</summary>
+    private static readonly string[] RecordInTheWay = ["Uninstall previous preset before changing API", "Manifest config mismatch"];
+
+    /// <summary>After a failed install: when an earlier install's record was what refused it, says so in plain words
+    /// and offers to take that install out, keeping the settings, and install again.</summary>
+    private void OfferCleanUp(Report report)
+    {
+        if (!report.Lines.Any(l => l.Level == Level.Err && RecordInTheWay.Any(r => l.Text.Contains(r, StringComparison.Ordinal))))
+            return;
+        SetVerdict(Level.Err, Ui.Text("Str.CleanRetryTitle"), Ui.Text("Str.CleanRetryDetail"), details: true);
+        CleanRetryButton.IsVisible = true;
+    }
+
+    private void OnCleanRetry(object? sender, RoutedEventArgs e) => _shell.Run("clean up", async () =>
+    {
+        if (_card is not { } card || Session.Busy) return;
+        Busy(true, UninstallButton);
+        Report removed;
+        try { removed = await RunUninstallAsync(card, InstalledPreset(card), removeConfig: false); }
+        finally { Busy(false); }
+        if (removed.Failed) ShowOutcome(removed, "Str.Uninstall", card.Name);
+        else await InstallAsync();
+    });
 
     private void OnShowDetails(object? sender, RoutedEventArgs e)
     {
