@@ -12,4 +12,5 @@ namespace AmdNr.Core;
 [JsonSerializable(typeof(PayloadManifest))]
 [JsonSerializable(typeof(ApiDatabase))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
+[JsonSerializable(typeof(string))]
 internal sealed partial class CoreJson : JsonSerializerContext;
