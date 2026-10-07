@@ -13,10 +13,11 @@ public static partial class Engine
     public static IReadOnlyList<string> HoldersOf(IEnumerable<string> paths) =>
         ProcessesHolding(paths).Select(p => p.Name).ToList();
 
-    /// <summary>Every process holding one of <paramref name="paths"/>, its id and "BatmanAK.exe (PID 1234)", or
+    /// <summary>Every process holding one of <paramref name="paths"/>: its id, when it started (UTC, which with the id
+    /// tells it from a later process given the same id) and "BatmanAK.exe (PID 1234)", or
     /// nothing when Windows cannot say. Never this one: run from a game's folder, or with a file of it open, the app
     /// would refuse every install there and offer to end itself.</summary>
-    public static IReadOnlyList<(int Pid, string Name)> ProcessesHolding(IEnumerable<string> paths)
+    public static IReadOnlyList<(int Pid, DateTime Started, string Name)> ProcessesHolding(IEnumerable<string> paths)
     {
         var files = paths.Where(File.Exists).ToArray();
         if (files.Length == 0 || RmStartSession(out var session, 0, Guid.NewGuid().ToString("N")) != 0) return [];
@@ -30,7 +31,8 @@ public static partial class Engine
             count = needed;
             if (RmGetList(session, out needed, ref count, found, out _) != 0) return [];
             return found.Take((int)count).Where(p => p.Process.ProcessId != Environment.ProcessId)
-                .Select(p => (p.Process.ProcessId, Named(p.Process.ProcessId, p.AppName))).Distinct().ToList();
+                .Select(p => (p.Process.ProcessId, Started(p.Process.StartTime), Named(p.Process.ProcessId, p.AppName)))
+                .Distinct().ToList();
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException)
         {
@@ -64,6 +66,20 @@ public static partial class Engine
         catch (Exception e) when (e is ArgumentException or InvalidOperationException)
         {
             return $"{appName} (PID {pid})";
+        }
+    }
+
+    private static DateTime Started(System.Runtime.InteropServices.ComTypes.FILETIME t) =>
+        DateTime.FromFileTimeUtc(((long)t.dwHighDateTime << 32) | (uint)t.dwLowDateTime);
+
+    /// <summary>Whether the process with this id is still the one that started then: an id Windows has handed to a
+    /// later process is not it.</summary>
+    public static bool SameProcess(Process process, DateTime started)
+    {
+        try { return Math.Abs((process.StartTime.ToUniversalTime() - started).TotalSeconds) < 1; }
+        catch (Exception e) when (e is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+            return false;
         }
     }
 

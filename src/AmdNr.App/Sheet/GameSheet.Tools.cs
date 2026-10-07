@@ -141,13 +141,17 @@ public partial class GameSheet
     });
 
     /// <summary>The game running from the folder an install writes to, as the last check found it.</summary>
-    private IReadOnlyList<(int Pid, string Name)> _running = [];
+    private IReadOnlyList<(int Pid, DateTime Started, string Name)> _running = [];
+
+    /// <summary>Where and for which route <see cref="_running"/> was read, to read it again before ending anything.</summary>
+    private (string Target, Preset Preset) _runningFrom;
 
     /// <summary>When the game is running, the banner says so and offers to close it: an install or an uninstall
     /// cannot replace what it has loaded (Cyberpunk 2077, left running, failed eleven times in a row).</summary>
     private async Task OfferCloseAsync(GameCard card, Preset preset)
     {
         var target = TargetFor(card);
+        _runningFrom = (target, preset);
         _running = await Task.Run(() => Work.RunningFrom(target, preset));
         if (_running.Count == 0 || _card != card) return;
         var names = string.Join(", ", _running.Select(p => p.Name));
@@ -164,13 +168,19 @@ public partial class GameSheet
         if (await ChoiceDialog.ShowAsync(_shell, Ui.Format("Str.CloseGame", names), Ui.Format("Str.CloseGameAsk", names),
                 [("close", Ui.Format("Str.CloseGame", names), ""), ("keep", Ui.Text("Str.Dismiss"), "")]) != "close")
             return;
+        // Read again after the question, and only what still holds the folder and is still the process that was
+        // named: an id Windows has handed to another program since is left alone.
+        var confirmed = _running;
+        var (target, preset) = _runningFrom;
         await Task.Run(() =>
         {
-            foreach (var (pid, _) in _running)
+            foreach (var (pid, started, _) in Work.RunningFrom(target, preset)
+                         .Where(p => confirmed.Any(c => c.Pid == p.Pid && c.Started == p.Started)))
             {
                 try
                 {
                     using var process = Process.GetProcessById(pid);
+                    if (!Engine.SameProcess(process, started)) continue;
                     process.Kill();
                     process.WaitForExit(10_000);
                 }

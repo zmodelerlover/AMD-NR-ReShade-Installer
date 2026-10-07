@@ -389,7 +389,7 @@ public static partial class Work
     /// <summary>The programs running out of the executables in the folder an install writes to: the game, or an
     /// emulator. Files it has loaded cannot be replaced or taken out, and Cyberpunk 2077 left running failed six
     /// installs and five rollbacks in a row. FiveM is left out: its game process runs from another folder.</summary>
-    public static IReadOnlyList<(int Pid, string Name)> RunningFrom(string gameDir, Preset preset)
+    public static IReadOnlyList<(int Pid, DateTime Started, string Name)> RunningFrom(string gameDir, Preset preset)
     {
         try
         {

@@ -17,7 +17,10 @@ public class RunningGameTests
         using var process = Process.Start(new ProcessStartInfo(exe, "-n 60 127.0.0.1") { CreateNoWindow = true, UseShellExecute = false })!;
         try
         {
-            Assert.Contains(Work.RunningFrom(game, Preset.Dx11), p => p.Pid == process.Id);
+            var found = Work.RunningFrom(game, Preset.Dx11).Single(p => p.Pid == process.Id);
+            // The start time is what tells the game from a later process Windows gives the same id.
+            Assert.True(Engine.SameProcess(process, found.Started));
+            Assert.False(Engine.SameProcess(process, found.Started.AddMinutes(-5)));
             var preflight = Work.Preflight(game, src, Preset.Dx11, pins);
             Assert.True(preflight.Failed && Fixture.HasAny(preflight, $"(PID {process.Id}) is running"), preflight.ToLog("preflight"));
             var install = Work.Install(game, src, Preset.Dx11, pins);
