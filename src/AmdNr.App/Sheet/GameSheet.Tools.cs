@@ -189,7 +189,7 @@ public partial class GameSheet
                     // Gone already, or not ours to end: the check that follows says which.
                 }
             }
-            return Work.RunningFrom(target, preset).Where(p => confirmed.Any(c => c.Pid == p.Pid)).ToList();
+            return Work.RunningFrom(target, preset).Where(p => confirmed.Any(c => c.Pid == p.Pid && c.Started == p.Started)).ToList();
         });
         // One that could not be verified or ended is still there: said, rather than left to look like nothing happened.
         if (left.Count > 0)
