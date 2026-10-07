@@ -337,12 +337,19 @@ public class PayloadTests
         var (manifest, blob, component) = OneFileManifest($"cl-{Guid.NewGuid():N}"[..12]);
         await new PayloadCache(new HttpClient(new BlobServer(blob))).EnsureAsync(manifest, component);
         Assert.True(PayloadCache.IsComplete(manifest, component));
+        // A downloaded cover goes; one the person picked stays, because games.json points at it.
+        Directory.CreateDirectory(Path.Combine(CoverCache.Folder, "custom"));
+        File.WriteAllText(Path.Combine(CoverCache.Folder, "123.jpg"), "steam's");
+        var picked = Path.Combine(CoverCache.Folder, "custom", "mine.png");
+        File.WriteAllText(picked, "mine");
 
         var freed = PayloadCache.Clear();
 
         Assert.True(freed >= (ulong)blob.Length, $"{freed} bytes freed should cover the {blob.Length} cached");
         Assert.False(PayloadCache.IsComplete(manifest, component));
-        Assert.Empty(Directory.GetFileSystemEntries(AppPaths.Cache));
+        Assert.True(File.Exists(picked), "a cover the person picked is kept");
+        File.Delete(picked);
+        Assert.Empty(Directory.EnumerateFiles(AppPaths.Cache, "*", SearchOption.AllDirectories));
         Assert.True(Directory.Exists(AppPaths.Cache), "the cache folder itself has to survive being emptied");
     }
 

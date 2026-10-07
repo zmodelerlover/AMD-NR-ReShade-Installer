@@ -60,7 +60,10 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
     ///
     /// The staging folders are deleted but not counted: their files are hard links into the
     /// component folders beside them, so counting both would report twice the disk that is
-    /// actually coming back.</summary>
+    /// actually coming back.
+    ///
+    /// The covers a person picked are kept: they live in covers\custom, games.json points at them, and nothing
+    /// downloads them again.</summary>
     public static ulong Clear()
     {
         var freed = 0UL;
@@ -70,7 +73,15 @@ public sealed partial class PayloadCache(HttpClient http, IReadOnlyList<string>?
         // a cache on a drive that went away -- and this is called through an async void handler, so
         // an exception escaping here is the window closing rather than a toast.
         string[] entries;
-        try { entries = Directory.GetFileSystemEntries(AppPaths.Cache); }
+        try
+        {
+            var custom = Path.Combine(CoverCache.Folder, "custom");
+            entries = Directory.GetFileSystemEntries(AppPaths.Cache)
+                .SelectMany(e => Engine.SamePath(e, CoverCache.Folder)
+                    ? Directory.GetFileSystemEntries(e).Where(c => !Engine.SamePath(c, custom))
+                    : [e])
+                .ToArray();
+        }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             return 0;
