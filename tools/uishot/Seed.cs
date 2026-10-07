@@ -15,6 +15,38 @@ internal static class Seed
         return b;
     }
 
+    // An executable that imports one DLL, which is what detection reads the API from: the import table in
+    // one section, as tests\AmdNr.Core.Tests\Fixture.PeWithImports lays it out.
+    public static byte[] PeImporting(bool x64, string import)
+    {
+        const int peAt = 0x80, sectionRva = 0x1000, sectionRaw = 0x200;
+        var optional = peAt + 24;
+        var body = new byte[40 + import.Length + 1];
+        BitConverter.GetBytes(1).CopyTo(body, 0);
+        BitConverter.GetBytes(sectionRva + 40).CopyTo(body, 12);
+        BitConverter.GetBytes(1).CopyTo(body, 16);
+        System.Text.Encoding.ASCII.GetBytes(import).CopyTo(body, 40);
+        var b = new byte[sectionRaw + body.Length];
+        b[0] = 0x4d; b[1] = 0x5a;
+        BitConverter.GetBytes(peAt).CopyTo(b, 0x3c);
+        b[peAt] = 0x50; b[peAt + 1] = 0x45;
+        BitConverter.GetBytes(x64 ? Engine.MachineX64 : Engine.MachineX86).CopyTo(b, peAt + 4);
+        BitConverter.GetBytes((ushort)1).CopyTo(b, peAt + 6);
+        BitConverter.GetBytes((ushort)(x64 ? 240 : 224)).CopyTo(b, peAt + 20);
+        BitConverter.GetBytes((ushort)(x64 ? 0x20b : 0x10b)).CopyTo(b, optional);
+        var dirs = optional + (x64 ? 112 : 96);
+        BitConverter.GetBytes(16).CopyTo(b, optional + (x64 ? 108 : 92));
+        BitConverter.GetBytes(sectionRva).CopyTo(b, dirs + 8);
+        BitConverter.GetBytes(40).CopyTo(b, dirs + 12);
+        var section = optional + (x64 ? 240 : 224);
+        BitConverter.GetBytes(body.Length).CopyTo(b, section + 8);
+        BitConverter.GetBytes(sectionRva).CopyTo(b, section + 12);
+        BitConverter.GetBytes(body.Length).CopyTo(b, section + 16);
+        BitConverter.GetBytes(sectionRaw).CopyTo(b, section + 20);
+        body.CopyTo(b, sectionRaw);
+        return b;
+    }
+
     // A payload list whose every file is already in the cache. No ReShade component, whose hash is pinned
     // in the engine and cannot be stood in for; the add-on route installs without it. An OptiScaler release
     // goes under "releases", the way v0.5.0 lists every OptiScaler beyond the one older apps read.

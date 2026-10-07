@@ -46,7 +46,7 @@ internal static class MochizukiFlow
 
         click(install);
         check(until(() => !main.Session.Busy, 30) && card.InstalledVia == RouteFamily.OptiScaler
-              && card.Entry.OptiScalerVersion == "1.0.3", "Install brings OptiScaler 1.0.3");
+              && card.Entry.OptiScalerVersion is null, "Install brings OptiScaler 1.0.3, the newest, kept as no pick");
         foreach (var file in new[] { "MochizukiNrRuntime.dll", "dlssnr-amd/dlssnr.bin", "dlssnr-amd/prewarm/manifest.txt",
                      "dlssnr-amd/shaders/g_attn.spv", "dlssnr-amd/shaders/runtime/cascade_blur.spv" })
             check(File.Exists(Path.Combine(game, file)), $"with {file}");

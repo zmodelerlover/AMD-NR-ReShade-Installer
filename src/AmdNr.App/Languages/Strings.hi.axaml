@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: नया इंस्टॉल lmxxf चलाता है, और mochizuki (लगभग 141 MB) danielblnc के रनटाइम के साथ जाता है। OptiScaler के Neural टैब में NR runtime से दूसरा चुनें और गेम फिर से शुरू करें।</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">इंस्टॉल करने के लिए रूट चुनें</sys:String>
   <sys:String x:Key="Str.PickRouteBody">यह ऐप पता नहीं लगा सका कि {0} किस ग्राफ़िक्स API से रेंडर करता है, इसलिए यह आपके लिए रूट नहीं चुनता। OptiScaler उस D3D12 गेम के लिए है जिसकी सेटिंग्स में DLSS, FSR या XeSS है; ReShade, D3D11 या D3D12 पर, बाकी सबके लिए है। जब तक आप नहीं चुनते, इंस्टॉल रुका रहेगा।</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">यह ऐप पता नहीं लगा सका कि {0} किस ग्राफ़िक्स API से चलता है, इसलिए यह आपके लिए रास्ता नहीं चुनता। OptiScaler 64-बिट D3D9, D3D11, D3D12, Vulkan और OpenGL गेम पर चलता है, गेम में DLSS, FSR या XeSS हो तो उसके अंदर; ReShade 32-बिट गेम, एमुलेटर और D3D10 भी संभालता है। इंस्टॉल आपके चुनने तक रुकता है।</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">ग्राफ़िक्स API अज्ञात है, इसलिए रूट नीचे आपको चुनना है।</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc का रनटाइम</sys:String>
   <sys:String x:Key="Str.SupporterChoose">इस गेम में रनटाइम का कौन-सा बिल्ड जाएगा। हाइलाइट किया गया कार्ड इस्तेमाल होता है।</sys:String>

@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: nowa instalacja uruchamia lmxxf, a mochizuki (około 141 MB) trafia obok runtime'u danielblnc. Wybierz inny w NR runtime w zakładce Neural OptiScalera i uruchom grę ponownie.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Wybierz ścieżkę instalacji</sys:String>
   <sys:String x:Key="Str.PickRouteBody">Aplikacja nie ustaliła, jakiego API graficznego używa {0}, więc nie wybiera ścieżki za Ciebie. OptiScaler jest dla gry na D3D12, która ma w ustawieniach DLSS, FSR lub XeSS; ReShade, na D3D11 lub D3D12, jest dla każdej innej. Instalacja poczeka, aż wybierzesz.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">Ta aplikacja nie rozpoznała, z jakiego API graficznego korzysta {0}, więc nie wybiera za ciebie ścieżki. OptiScaler działa w 64-bitowych grach D3D9, D3D11, D3D12, Vulkan i OpenGL, wewnątrz DLSS, FSR lub XeSS gry, gdy ją ma; ReShade obejmuje też gry 32-bitowe, emulatory i D3D10. Instalacja czeka na twój wybór.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">API graficzne jest nieznane, więc ścieżkę wybierasz poniżej.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">Runtime danielblnc</sys:String>
   <sys:String x:Key="Str.SupporterChoose">Która wersja runtime’u trafi do tej gry. Używana jest wyróżniona karta.</sys:String>

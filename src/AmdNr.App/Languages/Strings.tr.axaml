@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: yeni bir kurulum lmxxf çalıştırır ve mochizuki (yaklaşık 141 MB) danielblnc runtime'ının yanına kurulur. OptiScaler'ın Neural sekmesindeki NR runtime'dan başkasını seçip oyunu yeniden başlatın.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Kurulum yöntemini seçin</sys:String>
   <sys:String x:Key="Str.PickRouteBody">Bu uygulama oyunun hangi grafik API'siyle görüntü oluşturduğunu anlayamadı ({0}), bu yüzden sizin yerinize yöntem seçmiyor. Ayarlarında DLSS, FSR veya XeSS sunan bir D3D12 oyunu için doğru seçim OptiScaler'dır; diğer tüm oyunlar için D3D11 veya D3D12 üzerinde ReShade. Siz seçene kadar «Kur» bekler.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">Bu uygulama {0} oyununun hangi grafik API'siyle çalıştığını anlayamadı, bu yüzden senin yerine yol seçmiyor. OptiScaler 64 bit D3D9, D3D11, D3D12, Vulkan ve OpenGL oyunlarında, oyunun DLSS, FSR veya XeSS'i varsa onun içinde çalışır; ReShade ayrıca 32 bit oyunları, emülatörleri ve D3D10'u da kapsar. Kurulum seçmeni bekler.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">Grafik API'si bilinmiyor, bu yüzden yöntemi aşağıdan siz seçin.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc çalışma zamanı</sys:String>
   <sys:String x:Key="Str.SupporterChoose">Bu oyuna hangi çalışma zamanı sürümünün gireceği. Vurgulanan kart kullanılandır.</sys:String>

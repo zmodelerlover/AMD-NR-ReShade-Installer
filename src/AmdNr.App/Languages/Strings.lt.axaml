@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: naujas diegimas paleidžia lmxxf, o mochizuki (apie 141 MB) įdiegiamas šalia danielblnc runtime. Kitą pasirinkite NR runtime OptiScaler skirtuke Neural ir paleiskite žaidimą iš naujo.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Pasirinkite diegimo maršrutą</sys:String>
   <sys:String x:Key="Str.PickRouteBody">Programa negalėjo nustatyti, kokia grafikos API atvaizduoja {0}, todėl maršruto už jus nepasirenka. OptiScaler skirtas D3D12 žaidimui, kurio nustatymuose yra DLSS, FSR arba XeSS; ReShade, su D3D11 arba D3D12, skirtas visiems kitiems. Diegimas palauks, kol pasirinksite.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">Programa negalėjo nustatyti, kokią grafikos API naudoja {0}, todėl neparenka kelio už tave. OptiScaler veikia 64 bitų D3D9, D3D11, D3D12, Vulkan ir OpenGL žaidimuose, žaidimo DLSS, FSR ar XeSS viduje, kai jis yra; ReShade taip pat apima 32 bitų žaidimus, emuliatorius ir D3D10. Diegimas laukia, kol pasirinksi.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">Grafikos API nežinoma, todėl maršrutą pasirenkate patys žemiau.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc vykdymo aplinka</sys:String>
   <sys:String x:Key="Str.SupporterChoose">Kuri vykdymo aplinkos versija bus įdiegta į šį žaidimą. Naudojama paryškinta kortelė.</sys:String>

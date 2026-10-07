@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: новая установка запускает lmxxf, а mochizuki (около 141 МБ) ставится рядом с рантаймом danielblnc. Выберите другой в NR runtime на вкладке Neural OptiScaler и перезапустите игру.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Выберите способ установки</sys:String>
   <sys:String x:Key="Str.PickRouteBody">Приложение не смогло определить, на каком графическом API рендерит {0}, поэтому не выбирает способ за вас. OptiScaler подходит для игры на D3D12 с DLSS, FSR или XeSS в настройках; ReShade на D3D11 или D3D12 — для всех остальных. Кнопка «Установить» ждёт вашего выбора.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">Приложение не смогло определить, на каком графическом API работает {0}, поэтому не выбирает путь за вас. OptiScaler работает в 64-битных играх на D3D9, D3D11, D3D12, Vulkan и OpenGL, внутри DLSS, FSR или XeSS игры, если он есть; ReShade также охватывает 32-битные игры, эмуляторы и D3D10. Установка ждёт вашего выбора.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">Графический API неизвестен, поэтому способ выбираете вы ниже.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">Рантайм danielblnc</sys:String>
   <sys:String x:Key="Str.SupporterChoose">Какая сборка рантайма ставится в эту игру. Выделенная карточка — та, что используется.</sys:String>

@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: التثبيت الجديد يشغّل lmxxf، ويُثبَّت mochizuki (نحو 141 ميغابايت) بجانب بيئة تشغيل danielblnc. اختر غيرها من NR runtime في تبويب Neural في OptiScaler ثم أعد تشغيل اللعبة.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">اختر طريقة التثبيت</sys:String>
   <sys:String x:Key="Str.PickRouteBody">لم يتمكن هذا التطبيق من معرفة واجهة الرسوميات البرمجية التي تستخدمها {0} في العرض، لذا لا يختار طريقة نيابةً عنك. OptiScaler هو المناسب للعبة D3D12 توفّر DLSS أو FSR أو XeSS في إعداداتها؛ وReShade على D3D11 أو D3D12 هو المناسب لغير ذلك. ينتظر زر «تثبيت» حتى تختار.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">لم يتمكن هذا التطبيق من معرفة واجهة الرسوميات التي يعمل بها {0}، لذلك لا يختار مسارًا نيابةً عنك. يعمل OptiScaler على ألعاب 64 بت بواجهات D3D9 وD3D11 وD3D12 وVulkan وOpenGL، داخل DLSS أو FSR أو XeSS في اللعبة عند توفرها؛ ويغطي ReShade أيضًا ألعاب 32 بت والمحاكيات وD3D10. ينتظر التثبيت حتى تختار.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">واجهة الرسوميات البرمجية غير معروفة، لذا اختر الطريقة بنفسك أدناه.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">بيئة تشغيل danielblnc</sys:String>
   <sys:String x:Key="Str.SupporterChoose">أي إصدار من بيئة التشغيل يدخل هذه اللعبة. البطاقة المميَّزة هي المستخدَمة.</sys:String>

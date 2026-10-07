@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000：新安装运行 lmxxf，mochizuki（约 141 MB）装在 danielblnc 运行时旁边。在 OptiScaler 的 Neural 选项卡的 NR runtime 中选择其他运行时，然后重启游戏。</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">选择一种安装方式</sys:String>
   <sys:String x:Key="Str.PickRouteBody">本应用无法判断 {0} 使用哪种图形 API 渲染，因此不会替你选择安装方式。OptiScaler 适用于在设置中提供 DLSS、FSR 或 XeSS 的 D3D12 游戏；ReShade（D3D11 或 D3D12）适用于其他所有游戏。在你选择之前，“安装”会一直等待。</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">此应用无法判断 {0} 使用哪种图形 API，因此不会替你选择方案。OptiScaler 支持 64 位 D3D9、D3D11、D3D12、Vulkan 和 OpenGL 游戏，游戏有 DLSS、FSR 或 XeSS 时在其中运行；ReShade 还支持 32 位游戏、模拟器和 D3D10。安装会等你选择。</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">图形 API 未知，请在下方自行选择安装方式。</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc 的运行时</sys:String>
   <sys:String x:Key="Str.SupporterChoose">为这款游戏安装哪个运行时版本。高亮的卡片就是正在使用的版本。</sys:String>

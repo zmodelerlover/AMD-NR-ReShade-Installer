@@ -32,7 +32,6 @@ public partial class GameSheet
     private void ShowRoutes(GameCard card, GraphicsDetection graphics)
     {
         _lastReShade = card.Entry.Preset.IsOptiScaler() ? graphics.ReShadeRoute : card.Entry.Preset;
-        ShowRecommendation(card, graphics);
 
         // Neither card is checked while the route is the person's to pick.
         var undecided = RouteUndecided(card);
@@ -42,6 +41,8 @@ public partial class GameSheet
         _setting = false;
         FillPresets(graphics);
         ShowChosenRoute();
+        // After the route's versions are listed: the recommendation follows the OptiScaler version this game is on.
+        ShowRecommendation(card, graphics);
     }
 
     /// <summary>Whether the OptiScaler version in question also runs on games without an upscaler (from 0.5.0
@@ -135,7 +136,8 @@ public partial class GameSheet
         var opti = preset.IsOptiScaler();
         var undecided = RouteUndecided(card);
         PickRouteBox.IsVisible = undecided;
-        PickRouteText.Text = Ui.Format("Str.PickRouteBody", Path.GetFileName(card.Graphics?.Executable ?? card.Path));
+        PickRouteText.Text = Ui.Format(OptiEverywhere(card) ? "Str.PickRouteBodyAll" : "Str.PickRouteBody",
+            Path.GetFileName(card.Graphics?.Executable ?? card.Path));
         ReShadePanel.IsVisible = !undecided && !opti;
         OptiPanel.IsVisible = !undecided && opti;
 

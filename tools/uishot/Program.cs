@@ -208,7 +208,7 @@ void Flows()
     main.Relabel();
     Click(install);
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated, $"Update brings OptiScaler in line ({verdict.Text})");
-    Check(card.Entry.OptiScalerVersion == "1.0.1", "and the game remembers the OptiScaler version it has");
+    Check(card.Entry.OptiScalerVersion is null, "and the newest version is no pick, so the game follows the next release");
 
     // A newer OptiScaler listed only under "releases": out of date, the menu opens on it, and Update installs it.
     SeedPayload("1.0.0", "1.0.1", optiRelease: "1.0.2");
@@ -225,7 +225,7 @@ void Flows()
     Settle(6);
     Click(install);
     Check(Until(() => !session.Busy) && card.InstalledVia == RouteFamily.OptiScaler && !card.Outdated
-          && card.Entry.OptiScalerVersion == "1.0.2", $"Update installs the newer one ({verdict.Text})");
+          && card.Entry.OptiScalerVersion is null, $"Update installs the newer one ({verdict.Text})");
 
     MochizukiFlow.Run(main, sheet, card, game, Check, Until, Click, (w, n) => Save(w, n)); // leaves 1.0.3 with mochizuki
     UninstallFlow.Run(main, sheet, card, game, TileSays, Check, Until, Click, (w, n) => Save(w, n)); // the installed route, whatever is selected
@@ -366,6 +366,54 @@ if (args.Length > 1 && args[1] == "perf")
         using (main.CaptureRenderedFrame()) { }
         Console.WriteLine($"  search \"{text}\": {clock.ElapsedMilliseconds} ms");
     }
+    main.Close();
+    return 0;
+}
+
+// `uishot <out> routes`: the sheet of a 64-bit OpenGL, D3D11, Vulkan, D3D9, a D3D12 game with DLSS and a 32-bit D3D9
+// game, on the OptiScaler version the shipped payload list offers first, then with 0.4.11 picked: which route is
+// recommended and what each card says. Against an AMDNR_HOME of its own, like the rest.
+if (args.Length > 1 && args[1] == "routes")
+{
+    // The payload list beside the app, the one this build ships, rather than the published one.
+    File.WriteAllText(Path.Combine(AppPaths.Root, "config.json"), """
+        { "App": { "Owner": "", "Repo": "" }, "Addon": { "Owner": "", "Repo": "" },
+          "Payload": { "ManifestUrl": "https://127.0.0.1:1/payload.json",
+                       "ApiDbUrl": "https://127.0.0.1:1/api-db.json" } }
+        """);
+    var root = Path.Combine(AppPaths.Root, "route-games");
+    var games = new List<GameEntry>();
+    foreach (var (name, x64, import, dlss) in new (string, bool, string, bool)[]
+    {
+        ("OpenGL Game", true, "opengl32.dll", false), ("D3D11 Game", true, "d3d11.dll", false),
+        ("Vulkan Game", true, "vulkan-1.dll", false), ("D3D9 Game", true, "d3d9.dll", false),
+        ("D3D12 Game With DLSS", true, "d3d12.dll", true), ("Old D3D9 Game", false, "d3d9.dll", false),
+    })
+    {
+        var dir = Path.Combine(root, name);
+        Directory.CreateDirectory(dir);
+        File.WriteAllBytes(Path.Combine(dir, "Game.exe"), PeImporting(x64, import));
+        if (dlss) File.WriteAllText(Path.Combine(dir, "nvngx_dlss.dll"), "dlss");
+        games.Add(new GameEntry { Path = dir, Name = name });
+    }
+    GameStore.Save(games);
+    var main = new MainWindow { Width = 1240, Height = 820 };
+    main.Show();
+    Settle(15);
+    Until(() => main.Session.Manifest is not null && main.Library.Cards.All(c => c.Graphics is not null), 30);
+    var sheet = main.GetVisualDescendants().OfType<GameSheet>().First();
+    foreach (var version in new string?[] { null, "0.4.11-amd-nr" })
+        foreach (var card in main.Library.Cards.ToList())
+        {
+            card.Entry.OptiScalerVersion = version;
+            card.Entry.PresetChosen = false;
+            main.Library.Apply(card, card.Graphics!);
+            sheet.Open(card);
+            Settle(20);
+            var tag = (version is null ? "newest" : "0.4.11") + "-" + card.Name.Replace(' ', '-');
+            Save(main, $"route-{tag}");
+            Console.WriteLine($"{tag}: preset {card.Entry.Preset}");
+        }
     main.Close();
     return 0;
 }

@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: การติดตั้งใหม่ใช้ lmxxf และติดตั้ง mochizuki (ประมาณ 141 MB) ข้างรันไทม์ของ danielblnc เลือกตัวอื่นได้ที่ NR runtime ในแท็บ Neural ของ OptiScaler แล้วเริ่มเกมใหม่</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">เลือกวิธีติดตั้ง</sys:String>
   <sys:String x:Key="Str.PickRouteBody">แอปนี้บอกไม่ได้ว่า {0} ใช้ API กราฟิกใดเรนเดอร์ จึงไม่เลือกวิธีติดตั้งให้ OptiScaler เหมาะกับเกม D3D12 ที่มี DLSS, FSR หรือ XeSS ในการตั้งค่า ส่วน ReShade บน D3D11 หรือ D3D12 เหมาะกับเกมอื่นทั้งหมด ปุ่ม «ติดตั้ง» จะรอจนกว่าคุณจะเลือก</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">แอปนี้ไม่สามารถบอกได้ว่า {0} ใช้ API กราฟิกใด จึงไม่เลือกเส้นทางให้คุณ OptiScaler ทำงานกับเกม 64 บิตที่ใช้ D3D9, D3D11, D3D12, Vulkan และ OpenGL โดยทำงานภายใน DLSS, FSR หรือ XeSS ของเกมเมื่อมี ส่วน ReShade ครอบคลุมเกม 32 บิต อีมูเลเตอร์ และ D3D10 ด้วย การติดตั้งจะรอจนกว่าคุณจะเลือก</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">ไม่ทราบ API กราฟิก คุณจึงต้องเลือกวิธีติดตั้งด้านล่างเอง</sys:String>
   <sys:String x:Key="Str.SupporterTitle">รันไทม์ของ danielblnc</sys:String>
   <sys:String x:Key="Str.SupporterChoose">รันไทม์บิลด์ไหนจะถูกใส่ในเกมนี้ การ์ดที่ไฮไลต์คือตัวที่ใช้</sys:String>

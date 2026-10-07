@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: 新規インストールでは lmxxf が動き、mochizuki（約 141 MB）が danielblnc のランタイムの横に入ります。OptiScaler の Neural タブの NR runtime で別のものを選び、ゲームを再起動してください。</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">導入方法を選んでください</sys:String>
   <sys:String x:Key="Str.PickRouteBody">{0} がどのグラフィックス API で描画するのか判断できなかったため、このアプリは導入方法を自動では選びません。設定に DLSS、FSR、XeSS がある D3D12 のゲームには OptiScaler、それ以外には D3D11 または D3D12 の ReShade が適しています。選ぶまで「インストール」は待機します。</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">このアプリは {0} が使うグラフィックス API を判別できなかったため、方法を自動では選びません。OptiScaler は 64 ビットの D3D9、D3D11、D3D12、Vulkan、OpenGL のゲームで動き、ゲームに DLSS・FSR・XeSS があればその中で動作します。ReShade は 32 ビットのゲーム、エミュレーター、D3D10 にも対応します。選ぶまでインストールは待機します。</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">グラフィックス API が不明なため、下で導入方法を選んでください。</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc のランタイム</sys:String>
   <sys:String x:Key="Str.SupporterChoose">このゲームに入れるランタイムのビルドです。強調表示されたカードが使われます。</sys:String>

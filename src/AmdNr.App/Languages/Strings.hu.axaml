@@ -124,6 +124,7 @@
   <sys:String x:Key="Str.RuntimeRdna4Opti">RX 9000: egy új telepítés az lmxxf-et futtatja, a mochizuki (kb. 141 MB) pedig danielblnc runtime-ja mellé kerül. Másikat az OptiScaler Neural lapján, az NR runtime alatt választhatsz, utána indítsd újra a játékot.</sys:String>
   <sys:String x:Key="Str.PickRouteTitle">Válassz telepítési útvonalat</sys:String>
   <sys:String x:Key="Str.PickRouteBody">Az alkalmazás nem tudta megállapítani, milyen grafikus API-val renderel ez a játék: {0}, ezért nem választ helyetted útvonalat. Az OptiScaler az olyan D3D12-es játékhoz való, amelynek beállításaiban van DLSS, FSR vagy XeSS; a ReShade, D3D11-en vagy D3D12-n, minden máshoz. A telepítés vár, amíg választasz.</sys:String>
+  <sys:String x:Key="Str.PickRouteBodyAll">Az alkalmazás nem tudta megállapítani, milyen grafikus API-val fut a(z) {0}, ezért nem választ helyetted utat. Az OptiScaler 64 bites D3D9, D3D11, D3D12, Vulkan és OpenGL játékokon fut, a játék DLSS, FSR vagy XeSS felskálázójában, ha van ilyen; a ReShade a 32 bites játékokat, az emulátorokat és a D3D10-et is lefedi. A telepítés megvárja, amíg választasz.</sys:String>
   <sys:String x:Key="Str.PickRouteDetail">A grafikus API ismeretlen, így az útvonalat lent te választod ki.</sys:String>
   <sys:String x:Key="Str.SupporterTitle">danielblnc futtatókörnyezete</sys:String>
   <sys:String x:Key="Str.SupporterChoose">Melyik futtatókörnyezet-build kerül ebbe a játékba. A kiemelt kártya van használatban.</sys:String>
