@@ -158,6 +158,14 @@ public class GraphicsTests
         Assert.Equal(GraphicsApi.Unknown, GraphicsDetector.Detect(root).Api);
     }
 
+    /// <summary>Firestorm imports dxgi.dll only to read the adapter's VRAM; it renders with OpenGL.</summary>
+    [Fact]
+    public void AnOpenGLGameThatAlsoImportsDxgiIsOpenGL()
+    {
+        var root = Game("opengl-dxgi", "Firestorm-Releasex64.exe", Fixture.PeWithImports(true, ["dxgi.dll", "opengl32.dll"]));
+        Assert.Equal(GraphicsApi.OpenGL, GraphicsDetector.Detect(root).Api);
+    }
+
     [Fact]
     public void A64BitOpenGLGameTakesTheOpenGLRoute()
     {

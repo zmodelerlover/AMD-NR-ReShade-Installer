@@ -420,10 +420,12 @@ public static partial class GraphicsDetector
         if (Has("d3d8.dll")) return new Decision(GraphicsApi.D3D8, false, "d3d8.dll");
         if (Has("d3d10_1.dll")) return new Decision(GraphicsApi.D3D10, false, "d3d10_1.dll");
         if (Has("d3d10.dll")) return new Decision(GraphicsApi.D3D10, false, "d3d10.dll");
+        // opengl32 beside a lone dxgi is an OpenGL game that asks DXGI for the adapter and its VRAM
+        // (Firestorm, the Second Life viewer): no D3D device is made from dxgi alone.
+        if (Has("opengl32.dll")) return new Decision(GraphicsApi.OpenGL, false, Has("dxgi.dll") ? "opengl32.dll (dxgi.dll for the adapter only)" : "opengl32.dll");
         // dxgi alone is D3D10/11/12 without saying which; on its own it is a D3D11 game far more
         // often than not, but it is reported as such rather than dressed up as certainty.
         if (Has("dxgi.dll")) return new Decision(GraphicsApi.D3D11, false, "dxgi.dll only (D3D10/11 family)");
-        if (Has("opengl32.dll")) return new Decision(GraphicsApi.OpenGL, false, "opengl32.dll");
         return null;
     }
 
