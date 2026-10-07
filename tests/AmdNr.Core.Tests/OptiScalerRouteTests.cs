@@ -19,7 +19,7 @@ public class OptiScalerRouteTests
     private const string RuntimeFile = "dlssnr_amd_runtime-0.3.1.dll";
 
     /// <summary>A staging folder the way PayloadCache.Stage lays one out for this route, and the pins.</summary>
-    internal static (string Dir, PayloadPins Pins) Payloads(string tag, string version = "")
+    internal static (string Dir, PayloadPins Pins) Payloads(string tag, string version = "", string runtimeVersion = "")
     {
         var dir = Fixture.Temp($"opti-payload-{tag}");
         var opti = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -47,6 +47,7 @@ public class OptiScalerRouteTests
             OptiRuntimeSha = Engine.Sha(runtime),
             OptiRuntimeSize = (ulong)runtime.Length,
             OptiScalerVersion = version,
+            OptiRuntimeVersion = runtimeVersion,
         });
     }
 

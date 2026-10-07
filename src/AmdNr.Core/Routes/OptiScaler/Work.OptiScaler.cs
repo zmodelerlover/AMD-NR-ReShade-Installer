@@ -406,6 +406,7 @@ public static partial class Work
         }
 
         report.Info($"OptiScaler goes in as {proxyName}.");
+        NoPreExposure(dir, own?.Runtime ?? VersionOf(pins.OptiRuntimeVersion), report);
         if (own is { } o)
             report.Info(o.From switch
             {

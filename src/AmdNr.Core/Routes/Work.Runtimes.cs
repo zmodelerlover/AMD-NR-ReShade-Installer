@@ -407,6 +407,35 @@ public static partial class Work
     private static string SuppliedInstalled(UserRuntime build) =>
         $"The runtime is danielblnc's {build.Name} from your own file, patched for the add-on, in place of the download's.";
 
+    /// <summary>The first danielblnc build that reads a pre-exposure from the record OptiScaler hands it.</summary>
+    private static readonly Version ReadsPreExposure = new(0, 6, 0);
+
+    /// <summary>danielblnc 0.6.0 reads a pre-exposure at 0x60 of the record OptiScaler hands it ([DlssNrOnAmd]
+    /// UsePreExposure, on by default), and OptiScaler 0.5.0's record ends at 0x60: it read the stack there and the frame
+    /// came out green noise (GTA V Enhanced). UsePreExposure=0 in the runtime's own ini is the pre-2026-10-01 behaviour,
+    /// which ignores it; OptiScaler writes nothing to that file, and the rest of it is kept. An OptiScaler that sends 1
+    /// there (0.5.1) makes this redundant, not wrong. The file is swept by name on uninstall, as the runtime's.</summary>
+    internal static void NoPreExposure(string dir, Version? runtime, Report report)
+    {
+        if (runtime is null || runtime < ReadsPreExposure) return;
+        var path = Path.Combine(dir, RuntimeIni);
+        try
+        {
+            var before = File.Exists(path) ? File.ReadAllText(path) : "";
+            var after = Engine.SetIni(before, "DlssNrOnAmd", "UsePreExposure", "0");
+            if (after != before) File.WriteAllText(path, after);
+            report.Info($"{RuntimeIni} has UsePreExposure=0: danielblnc {runtime} would read a pre-exposure OptiScaler does not "
+                        + "send, and the frame would come out green noise.");
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            report.Warn($"{RuntimeIni} could not be given UsePreExposure=0 ({e.Message}): danielblnc {runtime} may show green "
+                        + "noise until it is set under [DlssNrOnAmd].");
+        }
+    }
+
+    internal const string RuntimeIni = "dlssnr_on_amd.ini";
+
     private const string AuthorsLoaderMoves =
         "version.dll here is danielblnc's own loader for his runtime, the way his setup installs it. Beside the "
         + "add-on it would be two drivers on one runtime, so an install moves it to the backup, and uninstall puts it back.";
