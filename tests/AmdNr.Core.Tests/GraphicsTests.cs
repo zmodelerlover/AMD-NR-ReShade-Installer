@@ -98,6 +98,29 @@ public class GraphicsTests
         Assert.Contains("Unity", d.Why, StringComparison.Ordinal);
     }
 
+    /// <summary>Godot 4 imports opengl32.dll for its Compatibility renderer and renders with Vulkan by default (Until
+    /// Then read as OpenGL). Its pack says which Godot it is, beside the executable or embedded at its end; Godot 3
+    /// has no Vulkan and stays OpenGL.</summary>
+    [Fact]
+    public void AGodot4GameIsVulkanNotOpenGL()
+    {
+        static byte[] Pack(int major) => [.. "GDPC"u8, .. BitConverter.GetBytes(2), .. BitConverter.GetBytes(major), 0, 0, 0, 0];
+        var exe = Fixture.PeWithImports(true, ["opengl32.dll", "KERNEL32.dll"]);
+        var beside = Game("godot4", "UntilThen.exe", exe);
+        File.WriteAllBytes(Path.Combine(beside, "UntilThen.pck"), Pack(4));
+        var d = GraphicsDetector.Detect(beside);
+        Assert.Equal(GraphicsApi.Vulkan, d.Api);
+        Assert.Contains("Compatibility", d.Why, StringComparison.Ordinal);
+
+        var pack = Pack(4);
+        var embedded = Game("godot4-embedded", "Game.exe", [.. exe, .. pack, .. BitConverter.GetBytes((long)pack.Length), .. "GDPC"u8]);
+        Assert.Equal(GraphicsApi.Vulkan, GraphicsDetector.Detect(embedded).Api);
+
+        var godot3 = Game("godot3", "Old.exe", exe);
+        File.WriteAllBytes(Path.Combine(godot3, "Old.pck"), Pack(3));
+        Assert.Equal(GraphicsApi.OpenGL, GraphicsDetector.Detect(godot3).Api);
+    }
+
     /// <summary>The 32-bit pair has an OpenGL frontend since add-on v0.7.8, so a 32-bit OpenGL game
     /// has a route and ReShade goes in as its opengl32.dll.</summary>
     [Fact]

@@ -175,6 +175,43 @@ public static partial class GraphicsDetector
         Directory.Exists(Path.Combine(Path.GetDirectoryName(exe)!, Path.GetFileNameWithoutExtension(exe) + "_Data"))
         || File.Exists(Path.Combine(Path.GetDirectoryName(exe)!, "UnityPlayer.dll"));
 
+    /// <summary>The Godot major version a game was exported with, read from its pack's header: the &lt;exe name&gt;.pck
+    /// beside it, or the one embedded at the end of the executable (its last 12 bytes are the pack's size and
+    /// "GDPC"). The header is "GDPC", the pack format, then the engine's major, minor and patch. Null when there is
+    /// no Godot pack.</summary>
+    internal static int? GodotMajor(string exe)
+    {
+        try
+        {
+            var pck = Path.ChangeExtension(exe, ".pck");
+            if (File.Exists(pck))
+            {
+                using var f = File.OpenRead(pck);
+                return GodotHeader(f, 0);
+            }
+            using var e = File.OpenRead(exe);
+            if (e.Length < 12) return null;
+            e.Seek(-12, SeekOrigin.End);
+            var tail = new byte[12];
+            e.ReadExactly(tail);
+            if (!tail.AsSpan(8).SequenceEqual("GDPC"u8)) return null;
+            var start = e.Length - 12 - BitConverter.ToInt64(tail, 0);
+            return start >= 0 ? GodotHeader(e, start) : null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+
+        static int? GodotHeader(Stream s, long at)
+        {
+            s.Seek(at, SeekOrigin.Begin);
+            var head = new byte[12];
+            if (s.Read(head) < 12 || !head.AsSpan(0, 4).SequenceEqual("GDPC"u8)) return null;
+            return BitConverter.ToInt32(head, 8);
+        }
+    }
+
     private static readonly Dictionary<string, string> Roman = new(StringComparer.OrdinalIgnoreCase)
     {
         ["ii"] = "2", ["iii"] = "3", ["iv"] = "4", ["v"] = "5", ["vi"] = "6", ["vii"] = "7", ["viii"] = "8",
