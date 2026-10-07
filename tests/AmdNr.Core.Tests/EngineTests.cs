@@ -174,9 +174,9 @@ public class EngineTests
     public void AManifestInAnotherLayoutStillReads()
     {
         var captured = Manifest.Decode(CapturedManifest());
-        var compact = System.Text.Json.JsonSerializer.Serialize(System.Text.Json.JsonDocument.Parse(CapturedManifest()).RootElement);
+        var compact = System.Text.Json.JsonSerializer.Serialize(System.Text.Json.JsonDocument.Parse(CapturedManifest()).RootElement, new System.Text.Json.JsonSerializerOptions { TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver() });
         var pretty = (char)0xFEFF + System.Text.Json.JsonSerializer.Serialize(System.Text.Json.JsonDocument.Parse(CapturedManifest()).RootElement,
-            new System.Text.Json.JsonSerializerOptions { WriteIndented = true }).ReplaceLineEndings("\r\n");
+            new System.Text.Json.JsonSerializerOptions { WriteIndented = true, TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver() }).ReplaceLineEndings("\r\n");
         foreach (var text in new[] { compact, pretty, CapturedManifest().Replace("\"schema\":1,", "\"schema\": 1,") })
         {
             var m = Manifest.Decode(text);

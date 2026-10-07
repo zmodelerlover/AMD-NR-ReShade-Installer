@@ -21,6 +21,9 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
+    <!-- A trim warning in this app's own code is a crash in the published exe: v0.8.1 shipped one
+         (JsonSerializer.Serialize in Manifest.Encode, IL2026) that failed every install. They fail the build. -->
+    <WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2046;IL2057;IL2060;IL2067;IL2070;IL2072;IL2075;IL2077;IL2087;IL2091;IL2111;IL3050</WarningsAsErrors>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- What the file says about itself. An executable with no publisher, no description and no

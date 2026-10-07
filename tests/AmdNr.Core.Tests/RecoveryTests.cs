@@ -75,7 +75,7 @@ public class RecoveryTests
 
             // Another layout: read as it is, nothing to clear.
             File.WriteAllText(manifest, (char)0xFEFF + System.Text.Json.JsonSerializer.Serialize(
-                System.Text.Json.JsonDocument.Parse(written).RootElement).ReplaceLineEndings("\r\n"));
+                System.Text.Json.JsonDocument.Parse(written).RootElement, new System.Text.Json.JsonSerializerOptions { TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver() }).ReplaceLineEndings("\r\n"));
             var relaid = c.Install();
             Clean(relaid, $"{c.Name}: over a reformatted record");
             Assert.False(Fixture.HasAny(relaid, Work.ClearsTheWay), relaid.ToLog($"{c.Name}: nothing was in the way"));

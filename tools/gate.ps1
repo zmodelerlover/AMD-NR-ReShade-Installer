@@ -28,6 +28,9 @@ $env:AMDNR_HOME = $scratch
 Gate 'build' { dotnet build AmdNrInstaller.slnx -c Debug -nologo -v q } ' 0 Erro| 0 Error'
 Gate 'test' { dotnet test AmdNrInstaller.slnx --no-build -nologo -v q } 'Aprovado!|Passed!'
 Gate 'line-limit' { powershell -NoProfile -ExecutionPolicy Bypass -File tools\line-limit.ps1 } 'OK:'
+# The exe people run is trimmed with JSON reflection off, which the Debug build and the tests above are not
+# (v0.8.1 failed every install over that). A trim warning in this app's code fails this publish (AmdNr.App.csproj).
+Gate 'publish' { dotnet publish src\AmdNr.App\AmdNr.App.csproj -c Release -r win-x64 -o (Join-Path $scratch 'publish') -nologo -v q } '(?s).*'
 if ($Ui) {
     $shots = Join-Path $scratch 'shots'
     Gate 'ui' { dotnet run --project tools\uishot -- $shots } 'every scroll reaches its end'
