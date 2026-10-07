@@ -215,7 +215,7 @@ public static partial class Work
     {
         var asis = new[] { "", "scripts", "plugins" }.Select(s => Path.Combine(dir, s)).Where(Directory.Exists)
             .SelectMany(d => Directory.EnumerateFiles(d, "*.asi"))
-            .Where(f => Path.GetFileName(f).Contains("reshade", StringComparison.OrdinalIgnoreCase) || Identify(f).IsReShade)
+            .Where(f => Identify(f).IsReShade)
             .Select(f => Path.GetRelativePath(dir, f)).ToList();
         if (asis.Count == 0) return;
         var loaders = AsiLoaders.Where(n => File.Exists(Path.Combine(dir, n)) && IsAsiLoader(Path.Combine(dir, n))).ToList();
@@ -230,25 +230,10 @@ public static partial class Work
                         + "Move it out of the game folder.");
     }
 
-    /// <summary>An ASI loader by its version resource, or by naming .asi plugins in its bytes (ASCII or UTF-16).
-    /// Files past 16 MB are not read: no loader is that big.</summary>
-    private static bool IsAsiLoader(string path)
-    {
-        var (isReShade, product, _) = Identify(path);
-        if (isReShade) return false;
-        if (product?.Contains("ASI", StringComparison.OrdinalIgnoreCase) == true) return true;
-        try
-        {
-            if (new FileInfo(path).Length > 16L << 20) return false;
-            var bytes = File.ReadAllBytes(path);
-            return bytes.AsSpan().IndexOf(".asi"u8) >= 0
-                   || bytes.AsSpan().IndexOf(System.Text.Encoding.Unicode.GetBytes(".asi")) >= 0;
-        }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-        {
-            return false;
-        }
-    }
+    /// <summary>Ultimate ASI Loader, by its version resource ("Ultimate ASI Loader"). Not by naming .asi in its bytes:
+    /// OptiScaler's dxgi.dll does that too.</summary>
+    private static bool IsAsiLoader(string path) =>
+        Identify(path) is { IsReShade: false, Product: { } product } && product.Contains("ASI Loader", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>A d3d11.dll in the game's folder that is not ReShade: another mod wrapping Direct3D 11, usually
     /// with Windows' own copy renamed beside it (ori_d3d11.dll), or a bare copy of Windows'. The game makes its
