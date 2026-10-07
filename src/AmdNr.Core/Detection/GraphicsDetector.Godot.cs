@@ -23,7 +23,7 @@ public static partial class GraphicsDetector
     internal sealed record GodotRenderer(GraphicsApi Api, string Why, bool Guessed);
 
     private const uint PackEncrypted = 1, PackRelativeBase = 2;
-    private const int MaxPackFiles = 200_000, MaxPathBytes = 4096, MaxProjectBytes = 1 << 20;
+    private const int MaxPackFiles = 200_000, MaxPathBytes = 4096, MaxProjectBytes = 1 << 20, MaxDirectoryBytes = 32 << 20;
 
     /// <summary>What a Godot 4 game renders with, or null when the executable is not one.</summary>
     internal static GodotRenderer? Godot4(string exe)
@@ -100,10 +100,14 @@ public static partial class GraphicsDetector
 
         var count = r.ReadUInt32();
         if (count > MaxPackFiles) return null;
+        // However many files the count allows, no more than this much directory is walked.
+        long walked = 0;
         for (var i = 0; i < count; i++)
         {
             var length = r.ReadInt32();
             if (length is < 0 or > MaxPathBytes) return null;
+            walked += 4 + length + 8 + 8 + 16 + 4;
+            if (walked > MaxDirectoryBytes) return null;
             var path = Encoding.UTF8.GetString(r.ReadBytes(length)).TrimEnd('\0');
             var offset = r.ReadInt64();
             var size = r.ReadInt64();
