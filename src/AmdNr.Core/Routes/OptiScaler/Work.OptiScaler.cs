@@ -245,6 +245,7 @@ public static partial class Work
         CheckOptiInTheWay(dir, proxyName, manifest, report, preflight: true);
         CheckForeignMod(dir, manifest, report);
         CheckRuntimeAsVersionDll(dir, pins, report);
+        CheckLocalHip(dir, report);
         CheckAuthorsRuntime(dir, pins, Preset.OptiScaler, report);
         CheckUpscaler(dir, report, everywhere, GraphicsDetector.Detect(dir).Executable);
         CheckOptiRouteIsReachable(dir, report, everywhere);
@@ -303,6 +304,7 @@ public static partial class Work
         var foreign = ForeignNrMod(dir, manifest);
         CheckForeignMod(dir, manifest, report);
         CheckRuntimeAsVersionDll(dir, pins, report);
+        CheckLocalHip(dir, report);
         var moves = CheckAuthorsRuntime(dir, pins, Preset.OptiScaler, report);
         if (report.Failed)
         {

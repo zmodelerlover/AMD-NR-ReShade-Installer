@@ -29,6 +29,9 @@ public static partial class Diagnosis
             l => GpuReset().IsMatch(l),
             "The GPU was reset while the network ran (HIP error 719 or DEVICE_HUNG). On an RX 9000 card, use danielblnc "
             + Work.Rdna4Recommended + "; otherwise lower the resolution the network runs at, and check the driver is current."),
+        new(["amd_presr.log", SessionLog.AddonLog], l => l.Contains("HIP device enumeration failed", StringComparison.OrdinalIgnoreCase),
+            "HIP found no GPU, so the network never ran. Usually an amdhip64_7.dll copied into the game folder that does "
+            + "not match the driver: move it out (the driver has its own in System32), or reinstall the AMD driver."),
         new([SessionLog.RuntimeLog], l => l.StartsWith("CRASH:", StringComparison.Ordinal),
             "danielblnc's runtime caught the game crashing in several sessions: the first CRASH line is the evidence, and "
             + "the report's dlssnr_on_amd.log has them all.", AtLeast: 3),

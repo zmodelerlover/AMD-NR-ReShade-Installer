@@ -152,6 +152,28 @@ public static partial class Work
                && own > shipped;
     }
 
+    /// <summary>An amdhip64_7.dll in the game folder: a copy someone put there (the HIP SDK's, say) to fix a missing
+    /// HIP. The runtimes load it before the driver's own in System32, and one that does not match the driver finds no
+    /// device ("HIP device enumeration failed: code=100 devices=0"), so NR never runs and nothing says why. Shadow of
+    /// the Tomb Raider with the SDK 7.2 copy on driver 32.0.32015 (2026-10-07). The same file as System32's is fine.</summary>
+    internal static void CheckLocalHip(string dir, Report report, string? system = null)
+    {
+        const string hip = "amdhip64_7.dll";
+        var local = Path.Combine(dir, hip);
+        if (!File.Exists(local)) return;
+        system ??= Path.Combine(Environment.SystemDirectory, hip);
+        try
+        {
+            if (File.Exists(system) && Engine.SizeOf(local) == Engine.SizeOf(system)
+                && Engine.HashFile(local) == Engine.HashFile(system))
+                return;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        report.Warn($"{hip} in this folder is a copy that is not the AMD driver's. NR loads it before the driver's own, "
+                    + "and a copy that does not match the driver finds no GPU, so NR never runs. Move it out of the "
+                    + "game folder: the driver already has one in System32.");
+    }
+
     private static void CheckRuntimeAsVersionDll(string dir, PayloadPins pins, Report report)
     {
         var path = Path.Combine(dir, AuthorRuntimeName);

@@ -89,6 +89,7 @@ public static partial class Work
         CheckDoubleReShade(dir, preset, report, ProxyNameFor(preset, dir, proxy), shipped);
 
         CheckDisabledAddons(dir, report);
+        CheckLocalHip(dir, report);
         if (retiring) report.Info(MochizukiComesOut);
 
         var dead = DeadFiles().Where(n => File.Exists(Path.Combine(dir, n))).ToList();
@@ -187,6 +188,7 @@ public static partial class Work
         if (src.Length == 0 || !File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) || preset.IsVulkan())
             CheckReShade(dir, preset, report);
         CheckDoubleReShade(dir, preset, report, ReShadeProxyFor(preset, dir, proxy), ShippedReShade(src, preset));
+        CheckLocalHip(dir, report);
         var layer = preset.IsVulkan() ? FindReShadeLayer() : null;
         if (ForeignLayerProblem(layer) is { } problem) report.Err(problem);
         var moves = CheckAuthorsRuntime(dir, pins, preset, report);

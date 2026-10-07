@@ -25,6 +25,12 @@ public class DiagnosisTests
         Assert.Contains(found, f => f.Cause.Contains("several sessions") && f.Evidence.Contains("(3 lines)"));
         Assert.DoesNotContain(found, f => f.Cause.Contains("Two ReShades"));
 
+        // Shadow of the Tomb Raider: the HIP SDK's amdhip64_7.dll in the game folder found no GPU.
+        var hip = Fixture.Temp("diagnosis-hip");
+        File.WriteAllText(Path.Combine(hip, "amd_presr.log"),
+            "1506500 HIP runtime: amdhip64_7.dll source=default\n1514187 HIP device enumeration failed: code=100 devices=0\n");
+        Assert.Contains(Diagnosis.Of(hip, null, true), f => f.Cause.Contains("HIP found no GPU") && f.Evidence.StartsWith("amd_presr.log"));
+
         // Whole words only: "chip" and "relationship" beside a 719 are not a GPU reset.
         var quiet = Fixture.Temp("diagnosis-quiet");
         File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "chip temperature error 719\nrelationship error 719 frames\n");

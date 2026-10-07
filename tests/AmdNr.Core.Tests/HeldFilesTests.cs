@@ -57,4 +57,28 @@ public class HeldFilesTests
             Assert.Empty(quiet.Lines);
         }
     }
+
+    /// <summary>Shadow of the Tomb Raider had the HIP SDK's amdhip64_7.dll in its folder, which found no GPU on the
+    /// driver it ran with. A copy of a different file is warned about; the very same file as the driver's is not.</summary>
+    [Fact]
+    public void AnAmdhipCopyInTheGameFolderIsWarnedAboutUnlessItIsTheDriversOwn()
+    {
+        var dir = Fixture.Temp("local-hip");
+        var system = Path.Combine(Fixture.Temp("local-hip-system"), "amdhip64_7.dll");
+        File.WriteAllBytes(system, [1, 2, 3]);
+        File.WriteAllBytes(Path.Combine(dir, "amdhip64_7.dll"), [9, 9]);
+
+        var report = new Report();
+        Work.CheckLocalHip(dir, report, system);
+        Assert.Contains("amdhip64_7.dll in this folder", Assert.Single(report.Lines, l => l.Item1 == Level.Warn).Item2);
+
+        File.WriteAllBytes(Path.Combine(dir, "amdhip64_7.dll"), [1, 2, 3]);
+        var same = new Report();
+        Work.CheckLocalHip(dir, same, system);
+        Assert.Empty(same.Lines);
+
+        var none = new Report();
+        Work.CheckLocalHip(Fixture.Temp("no-hip"), none, system);
+        Assert.Empty(none.Lines);
+    }
 }
