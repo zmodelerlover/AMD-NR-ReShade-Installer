@@ -54,6 +54,11 @@ public class PreflightTests
                  {
                      ("d3d12.dll", Preset.Dx11, false), ("d3d11.dll", Preset.Dx12, false),
                      ("opengl32.dll", Preset.Dx11, true), ("opengl32.dll", Preset.X86Dx9, true),
+                     // OpenGL and Vulkan were never checked. Vulkan loaded at run time beside a D3D import is not
+                     // evidence against it; OpenGL alone is.
+                     ("d3d11.dll", Preset.OpenGL, true), ("opengl32.dll", Preset.OpenGL, false),
+                     ("d3d9.dll", Preset.X86OpenGL, true), ("opengl32.dll", Preset.Vulkan, true),
+                     ("d3d11.dll", Preset.Vulkan, false), ("vulkan-1.dll", Preset.Vulkan, false),
                  })
         {
             var game = Fixture.Temp("reachable");

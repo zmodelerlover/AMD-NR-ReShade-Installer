@@ -425,7 +425,9 @@ public static partial class Work
             Preset.Dx12 => GraphicsApi.D3D12,
             Preset.X86Dx9 => GraphicsApi.D3D9,
             Preset.X86Dx8 => GraphicsApi.D3D8,
-            _ => GraphicsApi.Unknown,   // Vulkan loads as a layer, and the emulator routes are settings.
+            Preset.OpenGL or Preset.X86OpenGL => GraphicsApi.OpenGL,
+            Preset.Vulkan => GraphicsApi.Vulkan,
+            _ => GraphicsApi.Unknown,   // The emulator routes are settings inside the emulator.
         };
         if (wanted == GraphicsApi.Unknown) return;
 
@@ -433,6 +435,9 @@ public static partial class Work
         var local = GraphicsDetector.Detect(dir);
         if (local.Api == GraphicsApi.Unknown || local.All.Count == 0) return;
         if (GraphicsDetection.Reachable(wanted, local.All)) return;
+        // Vulkan is mostly loaded at run time, beside a D3D import kept for something else: only files that
+        // show OpenGL and nothing else say anything against it (Godot 4 reads as Vulkan, see GraphicsDetector).
+        if (wanted == GraphicsApi.Vulkan && local.All.Any(a => a != GraphicsApi.OpenGL)) return;
 
         var found = string.Join(", ", local.All.Select(GraphicsDetection.Short));
         report.Warn(
