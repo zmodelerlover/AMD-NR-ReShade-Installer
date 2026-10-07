@@ -267,38 +267,7 @@ void Flows()
     Save(main, "flow-5-files-download-failed");
     DownloadFlow.Run(main, Check, Until, Click); FilesFlow.Run(main, Pe64(), Check, Until, Click, (w, n) => Save(w, n));
 
-    main.ShowPage(MainWindow.Page.Settings);
-    var update = typeof(Session).GetProperty(nameof(Session.Update))!;
-    Check(Until(() => session.Update.State == UpdateState.Failed, 10), "an update check with nowhere to ask fails");
-    foreach (var check in new UpdateCheck[]
-             {
-                 new(UpdateState.Checking), new(UpdateState.UpToDate, When: DateTimeOffset.Now),
-                 new(UpdateState.Available, new AppRelease("9.9.9", "", "https://example.invalid", new Dictionary<string, string>())),
-                 new(UpdateState.Available, new AppRelease("9.9.9", "", "https://example.invalid",
-                     new Dictionary<string, string> { [AppUpdate.ExeAsset] = "", [AppUpdate.SumsAsset] = "" })),
-                 new(UpdateState.Failed),
-             })
-    {
-        update.SetValue(session, check);
-        main.Relabel();
-        Settle(6);
-        Save(main, $"flow-4-update-{check.State.ToString().ToLowerInvariant()}{(check.Release?.CanSelfUpdate == true ? "-self" : "")}");
-        if (check.Release is { } r)
-            Check(main.FindControl<Button>("UpdateButton")!.Content as string == S(r.ActionKey) && S(r.ActionKey) != r.ActionKey,
-                $"the update button says what it does: \"{S(r.ActionKey)}\"");
-        Check(main.FindControl<Control>("UpdateDot")!.IsVisible == (check.State == UpdateState.Available),
-            $"update {check.State}: the dot on the gear only when there is one");
-    }
-    // A hotfix of the release running is said as one, not as a version of its own.
-    var hotfix = $"{AppVersion.Release(App.Version)}.{AppVersion.Hotfix(App.Version) + 1}";
-    update.SetValue(session, new UpdateCheck(UpdateState.Available, new AppRelease(hotfix, "", "https://example.invalid",
-        new Dictionary<string, string> { [AppUpdate.ExeAsset] = "", [AppUpdate.SumsAsset] = "" })));
-    main.Relabel();
-    Settle(6);
-    Save(main, "flow-4-update-hotfix");
-    Check(main.FindControl<TextBlock>("UpdateText")!.Text == App.UpdateOut(hotfix) && !App.UpdateOut(hotfix).Contains("Str."),
-        $"a hotfix is offered as one: \"{App.UpdateOut(hotfix)}\"");
-    update.SetValue(session, new UpdateCheck(UpdateState.Failed));
+    UpdateFlow.Run(main, Check, Until, n => Settle(n), (w, n) => Save(w, n));
     main.Relabel();
 
     // Busy went on and off while the sheet was closed; a sheet opened afterwards has to work.
