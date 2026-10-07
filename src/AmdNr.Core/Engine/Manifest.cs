@@ -51,6 +51,11 @@ public sealed class Manifest(string preset, Route route)
     public const int Current = 3;
     public int BridgeProtocol { get; set; } = Current;
 
+    /// <summary>The ReShade this install runs with: the pinned build unless it is somebody else's Vulkan layer,
+    /// which is named with its version and path. Read back as written; nothing decides anything on it.</summary>
+    public const string PinnedReShade = "6.8.0.2156 Full Add-on Support";
+    public string ReShade { get; set; } = PinnedReShade;
+
     public override bool Equals(object? o) =>
         o is Manifest m && m.Preset == Preset && m.State == State && m.Route == Route
         && m.Entries.SequenceEqual(Entries);
@@ -67,7 +72,8 @@ public sealed class Manifest(string preset, Route route)
         // Emitted only for x64, so every x86 manifest already on disk still round-trips byte for byte.
         if (m.Route == Route.X64) o.Append("\"route\":\"x64\",\n");
         o.Append($"\"bridge_protocol\":{m.BridgeProtocol},\n")
-            .Append("\"dgVoodoo\":\"none\",\n\"ReShade\":\"6.8.0.2156 Full Add-on Support\",\n\"files\":[\n");
+            // Serialized, because a layer's path has backslashes; the pinned one comes out as it always did.
+            .Append("\"dgVoodoo\":\"none\",\n\"ReShade\":").Append(JsonSerializer.Serialize(m.ReShade)).Append(",\n\"files\":[\n");
         for (var i = 0; i < m.Entries.Count; i++)
         {
             var e = m.Entries[i];
@@ -148,6 +154,7 @@ public sealed class Manifest(string preset, Route route)
         Engine.Require(state is "installed" or "installing", "Bad manifest state");
 
         var m = new Manifest(preset, route) { State = state, BridgeProtocol = Protocol(root) };
+        if (Text(root, "ReShade") is { Length: > 0 } reShade) m.ReShade = reShade;
         var seen = new HashSet<string>(StringComparer.Ordinal);
 
         List<JsonElement> rows = [];

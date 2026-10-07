@@ -101,8 +101,10 @@ not touched either: FiveM ignores graphics mods there.
 
 Both are under **Add > Emulator**, found by their executables, and go on the Vulkan route, which
 registers ReShade as a Vulkan layer like any other Vulkan program. A ReShade layer already registered
-is used as it is, and the pre-flight says so when the add-on cannot load in it (older than 6.8.0, or
-the normal build). Neither imports Vulkan statically, and the add-on hooks them anyway since v0.5.3.
+is used as it is, and the install stops when the add-on cannot load in it (older than 6.8.0, or the
+normal build: ReShade's log says "limited add-on functionality"), naming the layer: update it with the
+6.8.0 setup as administrator, or uninstall it and the app registers its own. The install record names
+the ReShade it ran with. Neither imports Vulkan statically, and the add-on hooks them anyway since v0.5.3.
 shadPS4's Qt launcher keeps each build in a folder of its own; pointed at the launcher, the pre-flight
 names the folders the builds are in. Kyty's `launcher.exe` only starts `kyty_emulator.exe`, whose
 folder is the one to pick.

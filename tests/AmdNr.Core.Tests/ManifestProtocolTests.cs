@@ -41,6 +41,17 @@ public class ManifestProtocolTests
         Assert.Contains($"\"bridge_protocol\":{Manifest.Current},", Manifest.Encode(m), StringComparison.Ordinal);
     }
 
+    /// <summary>An install on somebody else's Vulkan layer records that ReShade, path and all, and reads it back.</summary>
+    [Fact]
+    public void TheReShadeInUseIsRecordedAndReadBack()
+    {
+        var m = new Manifest("Vulkan", Route.X64) { ReShade = @"6.9.1 Vulkan layer C:\ProgramData\ReShade\ReShade64.dll" };
+        var text = Manifest.Encode(m);
+        Assert.Contains(@"""ReShade"":""6.9.1 Vulkan layer C:\\ProgramData\\ReShade\\ReShade64.dll""", text, StringComparison.Ordinal);
+        Assert.Equal(m.ReShade, Manifest.Decode(text).ReShade);
+        Assert.Equal(Manifest.PinnedReShade, Manifest.Decode(WrittenByAnOlderInstall).ReShade);
+    }
+
     /// <summary>Installing over a folder set up by an older release is the ordinary upgrade, and it
     /// is where the orphaned manifest would have shown up first: the install reads what is there
     /// before it writes, and a refusal there is an upgrade nobody can perform.</summary>

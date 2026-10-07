@@ -187,6 +187,8 @@ public static partial class Work
         if (src.Length == 0 || !File.Exists(Path.Combine(PayloadDir(src), "ReShade64.dll")) || preset.IsVulkan())
             CheckReShade(dir, preset, report);
         CheckDoubleReShade(dir, preset, report, ReShadeProxyFor(preset, dir, proxy), ShippedReShade(src, preset));
+        var layer = preset.IsVulkan() ? FindReShadeLayer() : null;
+        if (ForeignLayerProblem(layer) is { } problem) report.Err(problem);
         var moves = CheckAuthorsRuntime(dir, pins, preset, report);
 
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
@@ -233,7 +235,7 @@ public static partial class Work
         // Vulkan it is a layer, registered once the files are in (Work.VulkanLayer.cs).
         var shipsReShade = false;
         byte[]? vulkanReShade = null;
-        if (preset.IsVulkan() && File.Exists(Path.Combine(payloads, "ReShade64.dll")) && FindReShadeLayer() is not { Ours: false })
+        if (preset.IsVulkan() && File.Exists(Path.Combine(payloads, "ReShade64.dll")) && layer is not { Ours: false })
             vulkanReShade = VerifiedPayload(payloads, "ReShade64.dll", pins.ReShade64Sha, report);
         if (File.Exists(Path.Combine(payloads, "ReShade64.dll"))
             && ReShadeProxyFor(preset, dir, proxy) is { } proxyName
@@ -274,7 +276,8 @@ public static partial class Work
         var log = new List<string>();
         try
         {
-            Transaction.Apply(dir, preset.ManifestPreset(), Route.X64, files, log, recorded, moves);
+            Transaction.Apply(dir, preset.ManifestPreset(), Route.X64, files, log, recorded, moves,
+                layer is { Ours: false } ? LayerReShade(layer) : null);
             foreach (var line in log) Narrate(line, report);
         }
         catch (InstallException e)

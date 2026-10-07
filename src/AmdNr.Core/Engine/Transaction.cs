@@ -88,10 +88,11 @@ public static partial class Transaction
     /// names recorded files the route no longer wants here, taken out in the same transaction
     /// (<see cref="PlanRetire"/>); a name that is also in <paramref name="desired"/> is not one.
     /// <paramref name="displace"/> names files somebody else put here that the route takes out: each
-    /// goes to the backup, and uninstall puts it back.</summary>
+    /// goes to the backup, and uninstall puts it back. <paramref name="reShade"/> is what the manifest records
+    /// as the ReShade in use, the pinned build unless told.</summary>
     public static void Apply(string dir, string preset, Route route,
         SortedDictionary<string, byte[]> desired, List<string> log, IEnumerable<string>? retire = null,
-        IEnumerable<string>? displace = null)
+        IEnumerable<string>? displace = null, string? reShade = null)
     {
         Guard(dir, desired, displace);
         MigrateLegacyManifest(dir, route);
@@ -117,6 +118,7 @@ public static partial class Transaction
             Engine.Require(m.Route == route,
                 "That folder already has an install for the other architecture; uninstall it first");
         }
+        m.ReShade = reShade ?? Manifest.PinnedReShade;
 
         var changes = new List<Change>();
         var superseded = new List<string>();

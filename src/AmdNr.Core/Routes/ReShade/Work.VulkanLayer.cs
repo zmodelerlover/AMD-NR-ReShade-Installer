@@ -75,17 +75,35 @@ public static partial class Work
         return null;
     }
 
+    /// <summary>Why the add-on cannot load in somebody else's ReShade layer, or null when it can, or when the layer
+    /// is this app's or there is none. Somebody else's layer is used as it is and nothing is registered beside it, so
+    /// a build the add-on does not fit fails the install: it went in quietly before, and the game ran ReShade with
+    /// "limited add-on functionality" and no NR (Until Then, ReShade 6.1.1 from C:\ProgramData\ReShade).</summary>
+    internal static string? ForeignLayerProblem(ReShadeLayer? layer)
+    {
+        if (layer is not { Ours: false }) return null;
+        var version = Identify(layer.Library).Version;
+        var signed = Engine.IsSignedFile(layer.Library);
+        if (FitOf(version, signed) is ReShadeFit.Fits) return null;
+        return $"ReShade is already a Vulkan layer on this PC ({layer.Library}), and it is "
+               + (signed ? "the normal build, not the one with full add-on support"
+                   : $"{version ?? "an unknown version"}, older than {MinReShade}")
+               + ". Every Vulkan program loads that layer, and the add-on does not load in it: ReShade.log says it "
+               + "skipped loading the add-on for limited add-on functionality. Run the ReShade 6.8.0 setup with full "
+               + "add-on support as administrator and pick Vulkan, which updates that layer, or uninstall that ReShade "
+               + "with its setup, and installing here again registers this app's own for your Windows user.";
+    }
+
+    /// <summary>What the manifest records as the ReShade an install on somebody else's layer runs with.</summary>
+    private static string LayerReShade(ReShadeLayer layer) =>
+        $"{Identify(layer.Library).Version} Vulkan layer {layer.Library}";
+
     /// <summary>What the pre-flight says about ReShade on a Vulkan route.</summary>
     private static void NoteVulkanLayer(bool shipsReShade, Report report)
     {
         var layer = FindReShadeLayer();
-        // Somebody else's layer is used as it is, so say when the add-on cannot load in it.
-        if (layer is { Ours: false } && Identify(layer.Library).Version is var version
-            && FitOf(version, Engine.IsSignedFile(layer.Library)) is not ReShadeFit.Fits)
-            report.Warn($"ReShade is already a Vulkan layer on this PC ({layer.Library}), and it is "
-                        + (Engine.IsSignedFile(layer.Library) ? "the normal build, not the one with full add-on support"
-                            : $"{version ?? "an unknown version"}, older than {MinReShade}") + ": the add-on does not load in it. "
-                        + "Run the ReShade 6.8.0 setup with full add-on support and pick Vulkan, which replaces it.");
+        if (ForeignLayerProblem(layer) is { } problem)
+            report.Err(problem);
         else if (layer is { Ours: false })
             report.Ok($"ReShade is already a Vulkan layer on this PC ({layer.Library}). This install puts a ReShade.ini "
                       + "beside the executable, which is what turns it on for this program. The add-on needs that ReShade "
