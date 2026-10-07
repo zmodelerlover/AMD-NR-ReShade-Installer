@@ -14,7 +14,8 @@ public static partial class Engine
         ProcessesHolding(paths).Select(p => p.Name).ToList();
 
     /// <summary>Every process holding one of <paramref name="paths"/>, its id and "BatmanAK.exe (PID 1234)", or
-    /// nothing when Windows cannot say.</summary>
+    /// nothing when Windows cannot say. Never this one: run from a game's folder, or with a file of it open, the app
+    /// would refuse every install there and offer to end itself.</summary>
     public static IReadOnlyList<(int Pid, string Name)> ProcessesHolding(IEnumerable<string> paths)
     {
         var files = paths.Where(File.Exists).ToArray();
@@ -28,7 +29,8 @@ public static partial class Engine
             var found = new RmProcessInfo[needed];
             count = needed;
             if (RmGetList(session, out needed, ref count, found, out _) != 0) return [];
-            return found.Take((int)count).Select(p => (p.Process.ProcessId, Named(p.Process.ProcessId, p.AppName))).Distinct().ToList();
+            return found.Take((int)count).Where(p => p.Process.ProcessId != Environment.ProcessId)
+                .Select(p => (p.Process.ProcessId, Named(p.Process.ProcessId, p.AppName))).Distinct().ToList();
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException)
         {

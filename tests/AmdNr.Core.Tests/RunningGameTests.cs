@@ -32,6 +32,17 @@ public class RunningGameTests
         Assert.Empty(Work.RunningFrom(game, Preset.Dx11));
     }
 
+    /// <summary>This app is never "the game": run from inside the game folder, or holding a file there itself, it would
+    /// refuse every install and offer to end itself.</summary>
+    [Fact]
+    public void ThisProcessIsNeverOneHoldingTheFolder()
+    {
+        var file = Path.Combine(Fixture.Temp("running-self"), "held.exe");
+        File.WriteAllText(file, "x");
+        using var held = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        Assert.DoesNotContain(Engine.ProcessesHolding([file]), p => p.Pid == Environment.ProcessId);
+    }
+
     /// <summary>A log the game still writes is not a file of ours left installed: it goes with the next uninstall.</summary>
     [Fact]
     public void ALogTheGameHoldsOpenIsAWarningOnUninstall()
