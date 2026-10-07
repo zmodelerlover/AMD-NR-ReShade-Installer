@@ -69,10 +69,14 @@ public partial class App : Application
         // nothing anywhere to say why (Digimon World: Next Order, 2026-10-07).
         AppDomain.CurrentDomain.UnhandledException += (_, args) => Crashed("unhandled", args.ExceptionObject);
         // One escaping a UI handler is written down and the window kept: what it was doing is lost, the app is not.
+        // Five in ten seconds is a loop, not a slip, and the app is let go once it is written down.
         Avalonia.Threading.Dispatcher.UIThread.UnhandledException += (_, args) =>
         {
             Crashed("ui thread", args.Exception);
-            args.Handled = true;
+            var now = DateTime.UtcNow;
+            UiFaults.Enqueue(now);
+            while (UiFaults.Count > 0 && now - UiFaults.Peek() > TimeSpan.FromSeconds(10)) UiFaults.Dequeue();
+            args.Handled = UiFaults.Count < 5;
         };
         TaskScheduler.UnobservedTaskException += (_, args) =>
         {
@@ -81,10 +85,18 @@ public partial class App : Application
         };
     }
 
+    /// <summary>When the last exceptions on the UI thread came, to tell a slip from a loop.</summary>
+    private static readonly Queue<DateTime> UiFaults = new();
+
+    /// <summary>crash.log never grows past this: past it, the file becomes crash.log.old and a new one starts.</summary>
+    private const long CrashLogCap = 1024 * 1024;
+
     private static void Crashed(string where, object exception)
     {
         try
         {
+            if (File.Exists(AppPaths.CrashLog) && new FileInfo(AppPaths.CrashLog).Length > CrashLogCap)
+                File.Move(AppPaths.CrashLog, AppPaths.CrashLog + ".old", overwrite: true);
             File.AppendAllText(AppPaths.CrashLog, $"{DateTime.Now:s} v{Version} {where}{Environment.NewLine}{exception}"
                                                   + Environment.NewLine + Environment.NewLine);
         }
