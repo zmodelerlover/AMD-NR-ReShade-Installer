@@ -47,13 +47,15 @@ public static class SupportReport
 
     /// <summary>Builds the zip and returns its path. Throws nothing the caller has to handle beyond
     /// IO: a report that cannot be written reports that.</summary>
-    public static string Build(GameCard? card, string? installFolder)
+    /// <param name="payload">The payload list read, which names the runtime build in the game folder by its hash.</param>
+    public static string Build(GameCard? card, string? installFolder, PayloadManifest? payload = null)
     {
         var path = Path.Combine(Folder, $"amd-nr-report-{DateTime.Now:yyyyMMdd-HHmmss}.zip");
         using var zip = ZipFile.Open(path, ZipArchiveMode.Create);
 
-        Text(zip, "report.txt", Summary(card, installFolder));
-        Text(zip, "system.txt", Machine());
+        var state = GpuService.Read();
+        Text(zip, "report.txt", Summary(card, installFolder, payload, state));
+        Text(zip, "system.txt", Machine(state));
 
         // Every per-action log, newest first, plus the rolling one. These carry the route, who chose
         // it, the detection evidence and the payload hashes.
@@ -138,7 +140,8 @@ public static class SupportReport
 
     /// <summary>Saves the report and shows it in Explorer, selected. Returns the path, or null when
     /// it could not be written.</summary>
-    public static string? Save(GameCard? card, string? installFolder) => Save(() => Build(card, installFolder));
+    public static string? Save(GameCard? card, string? installFolder, PayloadManifest? payload = null) =>
+        Save(() => Build(card, installFolder, payload));
 
     public static string? SaveDownloads(string diagnosis) => Save(() => BuildDownloads(diagnosis));
 
@@ -166,13 +169,15 @@ public static class SupportReport
 
     // -- What goes in ------------------------------------------------------------------------------
 
-    private static string Summary(GameCard? card, string? installFolder)
+    private static string Summary(GameCard? card, string? installFolder, PayloadManifest? payload, SystemState state)
     {
         var o = new StringBuilder();
         o.AppendLine("AMD-NR ReShade Installer -- problem report");
         o.AppendLine(new string('=', 74));
         o.AppendLine($"made            {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz}");
         o.AppendLine($"app             v{App.Version}  (language {App.CurrentLanguage})");
+        o.AppendLine($"gpu             {state.Gpu}  (RDNA4 {state.Rdna4?.ToString() ?? "unknown"})");
+        o.AppendLine($"driver          {state.Driver}");
         o.AppendLine();
 
         if (card is null)
@@ -206,6 +211,15 @@ public static class SupportReport
                 o.AppendLine($"  emulator      {(g.Emulator is { } e ? $"{e.Name} ({e.System})" : "-")}");
                 o.AppendLine($"  why           {g.Why}");
             }
+
+            // What the folder runs: the record, the runtime build, OptiScaler's NR settings, the ReShade loaded.
+            if (installFolder is { Length: > 0 })
+            {
+                o.AppendLine();
+                o.AppendLine("in the folder");
+                var dir = File.Exists(installFolder) ? Path.GetDirectoryName(installFolder)! : installFolder;
+                foreach (var line in InstallState.Lines(dir, payload, state.Rdna4)) o.AppendLine($"  {line}");
+            }
         }
 
         o.AppendLine();
@@ -219,9 +233,8 @@ public static class SupportReport
         return o.ToString();
     }
 
-    private static string Machine()
+    private static string Machine(SystemState state)
     {
-        var state = GpuService.Read();
         var o = new StringBuilder();
         o.AppendLine($"os              {Environment.OSVersion.VersionString}");
         o.AppendLine($"64-bit          {Environment.Is64BitOperatingSystem}");

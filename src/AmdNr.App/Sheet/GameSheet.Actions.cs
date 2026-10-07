@@ -88,6 +88,7 @@ public partial class GameSheet
         if (check != _checks || _card != card || Session.Busy) return;
 
         NoteRuntime(report, wanted, runtime);
+        if (preset.IsOptiScaler() && Work.UnstableOnRdna4(pins.OptiRuntimeVersion, Rdna4) is { } unstable) report.Warn(unstable);
         Show(report);
         card.RefreshInstalled();
         ShowVerdict(report, card);
@@ -165,6 +166,7 @@ public partial class GameSheet
                 // worse answer than a line saying so.
                 report = Failure(ex);
             }
+            if (preset.IsOptiScaler() && Work.UnstableOnRdna4(pins.OptiRuntimeVersion, Rdna4) is { } unstable) report.Warn(unstable);
             Show(report);
             WriteLog(report, $"install {preset.Label()} -> {card.Path}");
             InstallLog.Write("install", card, target, report, Selected(), pins, folder);

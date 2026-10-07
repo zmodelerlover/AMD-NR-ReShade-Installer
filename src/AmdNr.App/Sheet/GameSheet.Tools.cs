@@ -124,7 +124,7 @@ public partial class GameSheet
             var card = _card;
             var target = card is null ? null : TargetFor(card);
             // Reading a whole game folder and a ReShade log is disk work, not UI work.
-            var path = await Task.Run(() => SupportReport.Save(card, target));
+            var path = await Task.Run(() => SupportReport.Save(card, target, Session.Manifest));
             if (path is null)
             {
                 Status(Ui.Format("Str.ReportFailed", AppPaths.Logs));

@@ -90,6 +90,16 @@ public static partial class Work
     public static RuntimeBadge BadgeFor(string version, bool rdna4) =>
         !rdna4 ? RuntimeBadge.None : version == Rdna4Recommended ? RuntimeBadge.Recommended : RuntimeBadge.Unstable;
 
+    /// <summary>Said on the OptiScaler route when an RX 9000 card gets a build other than <see cref="Rdna4Recommended"/>:
+    /// OptiScaler runs it inline, and danielblnc 0.6.0 there held the GPU for seconds at a time until the driver reset
+    /// it (DEVICE_HUNG, RX 9070 XT). Null on any other card or build.</summary>
+    public static string? UnstableOnRdna4(string version, bool rdna4) =>
+        version.Length > 0 && BadgeFor(version, rdna4) == RuntimeBadge.Unstable
+            ? $"danielblnc {version} is unstable on RX 9000 cards: OptiScaler runs it inline, and it can hold the GPU for "
+              + "seconds at a time, stall the game and crash it with a driver reset (DEVICE_HUNG). "
+              + $"{Rdna4Recommended} is the stable one there: pick it under danielblnc version."
+            : null;
+
     public static bool RuntimeRunsOn(ComponentRelease runtime, bool optiScaler, string version)
     {
         var name = optiScaler ? PayloadManifest.OptiRuntimeComponent : PayloadManifest.RuntimeComponent;
