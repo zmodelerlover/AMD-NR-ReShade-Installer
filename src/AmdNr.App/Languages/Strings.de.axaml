@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Der Grund steht unter Details. Es wurde nichts installiert.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Die Dateien können auch mit einem Browser geholt und übergeben werden: Dieser PC &gt; Dateien &gt; Manuell herunterladen, dann Dateien importieren. Dateien in deinem Downloads-Ordner werden von selbst gefunden.</sys:String>
   <sys:String x:Key="Str.DnsRetry">DNS leeren und erneut versuchen</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} läuft aus diesem Ordner</sys:String>
+  <sys:String x:Key="Str.CloseGame">{0} schließen</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">{0} beenden? Was nicht gespeichert ist, geht verloren. Installieren und Deinstallieren brauchen es geschlossen: geladene Dateien lassen sich nicht ersetzen.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows ließ seinen DNS-Cache von hier aus nicht leeren. Öffne eine Eingabeaufforderung, führe ipconfig /flushdns aus und versuche es erneut.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} Probleme in diesem Ordner gefunden</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Bereit zur Installation, mit {0} Hinweisen zum Lesen</sys:String>

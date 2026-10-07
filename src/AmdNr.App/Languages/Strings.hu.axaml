@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Az ok a „Részletek” alatt van. Semmi sem települt.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">A fájlokat böngészővel is le lehet tölteni és átadni: „Ez a gép” &gt; „Fájlok” &gt; „Kézi letöltés”, majd „Fájlok importálása”. A Letöltések mappában lévő fájlokat magától megtalálja.</sys:String>
   <sys:String x:Key="Str.DnsRetry">DNS törlése és újrapróbálás</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} fut ebből a mappából</sys:String>
+  <sys:String x:Key="Str.CloseGame">{0} bezárása</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Leállítod: {0}? Ami nincs mentve, elvész. A telepítéshez és az eltávolításhoz be kell zárni: a betöltött fájlokat nem lehet lecserélni.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">A Windows innen nem engedte törölni a DNS-gyorsítótárat. Nyiss egy parancssort, futtasd az ipconfig /flushdns parancsot, és próbáld újra.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} probléma található ebben a mappában</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Telepítésre kész, {0} megjegyzéssel</sys:String>

@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">कारण “विवरण” में है। कुछ भी इंस्टॉल नहीं हुआ।</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">फ़ाइलें ब्राउज़र से भी डाउनलोड करके दी जा सकती हैं: “यह कंप्यूटर” &gt; “फ़ाइलें” &gt; “खुद डाउनलोड करें”, फिर “फ़ाइलें इम्पोर्ट करें”। आपके Downloads फ़ोल्डर की फ़ाइलें अपने-आप मिल जाती हैं।</sys:String>
   <sys:String x:Key="Str.DnsRetry">DNS साफ़ करें और फिर से कोशिश करें</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} इस फ़ोल्डर से चल रहा है</sys:String>
+  <sys:String x:Key="Str.CloseGame">{0} बंद करें</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">{0} बंद करें? जो सहेजा नहीं गया वह खो जाएगा। इंस्टॉल और अनइंस्टॉल के लिए इसे बंद होना चाहिए: लोड की गई फ़ाइलें बदली नहीं जा सकतीं।</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows ने यहाँ से DNS कैश साफ़ नहीं करने दिया। कमांड प्रॉम्प्ट खोलें, ipconfig /flushdns चलाएँ, और फिर से कोशिश करें।</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">इस फ़ोल्डर में {0} समस्याएँ मिलीं</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">इंस्टॉल के लिए तैयार, पढ़ने के लिए {0} नोट के साथ</sys:String>

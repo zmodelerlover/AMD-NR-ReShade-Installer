@@ -92,6 +92,7 @@ public partial class GameSheet
         Show(report);
         card.RefreshInstalled();
         ShowVerdict(report, card);
+        await OfferCloseAsync(card, preset);
         ShowInstallLabel();
         Status(staged is null ? Ui.Text("Str.WillDownload") : Ui.Text("Str.PayloadsReady"));
     }
@@ -180,6 +181,7 @@ public partial class GameSheet
             }
             ShowStep(report.Failed ? StepInstall : StepDone, report.Failed);
             ShowOutcome(report, "Str.Install", card.Name);
+            if (report.Failed) await OfferCloseAsync(card, preset);
             if (!report.Failed && card.Installed) card.Pulse();
             Status(report.Failed ? Ui.Text("Str.LogSaved") : Ui.Text("Str.Ready"));
         }
@@ -241,6 +243,7 @@ public partial class GameSheet
                     : Ui.Format("Str.UninstallKeptSettings", card.Name, string.Join(", ", kept)), "");
             else
                 ShowOutcome(report, "Str.Uninstall", card.Name);
+            if (report.Failed) await OfferCloseAsync(card, preset);
             Status(report.Failed ? Ui.Text("Str.LogSaved") : Ui.Text("Str.Ready"));
         }
         finally

@@ -139,4 +139,48 @@ public partial class GameSheet
             ReportButton.IsEnabled = true;
         }
     });
+
+    /// <summary>The game running from the folder an install writes to, as the last check found it.</summary>
+    private IReadOnlyList<(int Pid, string Name)> _running = [];
+
+    /// <summary>When the game is running, the banner says so and offers to close it: an install or an uninstall
+    /// cannot replace what it has loaded (Cyberpunk 2077, left running, failed eleven times in a row).</summary>
+    private async Task OfferCloseAsync(GameCard card, Preset preset)
+    {
+        var target = TargetFor(card);
+        _running = await Task.Run(() => Work.RunningFrom(target, preset));
+        if (_running.Count == 0 || _card != card) return;
+        var names = string.Join(", ", _running.Select(p => p.Name));
+        SetVerdict(Level.Err, Ui.Format("Str.GameRunning", names), "", details: true);
+        CloseGameButton.Content = Ui.Format("Str.CloseGame", names);
+        CloseGameButton.IsVisible = true;
+    }
+
+    /// <summary>Ends the game, only after asking: whatever it has not saved is lost.</summary>
+    private void OnCloseGame(object? sender, RoutedEventArgs e) => _shell.Run("close game", async () =>
+    {
+        if (_running.Count == 0 || Session.Busy) return;
+        var names = string.Join(", ", _running.Select(p => p.Name));
+        if (await ChoiceDialog.ShowAsync(_shell, Ui.Format("Str.CloseGame", names), Ui.Format("Str.CloseGameAsk", names),
+                [("close", Ui.Format("Str.CloseGame", names), ""), ("keep", Ui.Text("Str.Dismiss"), "")]) != "close")
+            return;
+        await Task.Run(() =>
+        {
+            foreach (var (pid, _) in _running)
+            {
+                try
+                {
+                    using var process = Process.GetProcessById(pid);
+                    process.Kill();
+                    process.WaitForExit(10_000);
+                }
+                catch (Exception x) when (x is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+                {
+                    // Gone already, or not ours to end: the check that follows says which.
+                }
+            }
+        });
+        _running = [];
+        await RefreshAsync();
+    });
 }

@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Nedeni «Ayrıntılar» bölümünde. Hiçbir şey kurulmadı.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Dosyalar bir tarayıcıyla da indirilip uygulamaya verilebilir: Bu bilgisayar &gt; Dosyalar &gt; Elle indir, ardından «Dosyaları içe aktar». İndirilenler klasörünüzdeki dosyalar kendiliğinden bulunur.</sys:String>
   <sys:String x:Key="Str.DnsRetry">DNS'i temizle ve tekrar dene</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} bu klasörden çalışıyor</sys:String>
+  <sys:String x:Key="Str.CloseGame">{0} kapat</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">{0} sonlandırılsın mı? Kaydedilmemiş her şey kaybolur. Kurma ve kaldırma için kapalı olması gerekir: yüklediği dosyalar değiştirilemez.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows, DNS önbelleğinin buradan temizlenmesine izin vermedi. Bir Komut İstemi açın, ipconfig /flushdns komutunu çalıştırın ve tekrar deneyin.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Bu klasörde {0} sorun bulundu</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Kuruluma hazır, okunacak {0} not var</sys:String>

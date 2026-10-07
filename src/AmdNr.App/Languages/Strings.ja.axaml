@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">理由は「詳細」にあります。何もインストールしていません。</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">ファイルはブラウザーで取得して渡すこともできます：このPC &gt; ファイル &gt; 手動でダウンロード、次に「ファイルをインポート」。ダウンロードフォルダーにあるファイルは自動で見つかります。</sys:String>
   <sys:String x:Key="Str.DnsRetry">DNS をクリアして再試行</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} がこのフォルダーから実行中です</sys:String>
+  <sys:String x:Key="Str.CloseGame">{0} を閉じる</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">{0} を終了しますか？保存していない内容は失われます。インストールとアンインストールには終了が必要です：読み込まれたファイルは置き換えられません。</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">ここからは Windows の DNS キャッシュをクリアできませんでした。コマンドプロンプトを開いて ipconfig /flushdns を実行し、もう一度お試しください。</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">このフォルダーで問題が {0} 件見つかりました</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">インストールできます（確認事項 {0} 件）</sys:String>

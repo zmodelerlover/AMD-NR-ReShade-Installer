@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Причина — в «Подробностях». Ничего не установлено.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Файлы можно скачать и браузером, а затем передать приложению: «Этот компьютер» &gt; «Файлы» &gt; «Скачать вручную», затем «Импорт файлов». Файлы в папке «Загрузки» находятся автоматически.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Очистить DNS и повторить</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} запущен из этой папки</sys:String>
+  <sys:String x:Key="Str.CloseGame">Закрыть {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Завершить {0}? Всё несохранённое пропадёт. Для установки и удаления его нужно закрыть: загруженные им файлы нельзя заменить.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows не разрешила очистить кэш DNS отсюда. Откройте командную строку, выполните ipconfig /flushdns и попробуйте снова.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Найдено проблем в этой папке: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Готово к установке, примечаний: {0}</sys:String>

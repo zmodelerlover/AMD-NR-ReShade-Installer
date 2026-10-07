@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Priežastis — skiltyje „Išsami informacija“. Niekas neįdiegta.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Failus taip pat galima atsisiųsti naršykle ir perduoti programai: „Šis kompiuteris“ &gt; „Failai“ &gt; „Atsisiųsti ranka“, tada „Importuoti failus“. Failai aplanke „Atsisiuntimai“ randami patys.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Išvalyti DNS ir bandyti dar kartą</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} veikia iš šio aplanko</sys:String>
+  <sys:String x:Key="Str.CloseGame">Uždaryti {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Užbaigti {0}? Tai, kas neišsaugota, bus prarasta. Diegimui ir šalinimui jis turi būti uždarytas: įkeltų failų pakeisti negalima.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows neleido iš čia išvalyti DNS podėlio. Atverkite komandų eilutę, paleiskite ipconfig /flushdns ir bandykite dar kartą.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Šiame aplanke rasta problemų: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Paruošta diegti; pastabų: {0}</sys:String>

@@ -386,6 +386,31 @@ public static partial class Work
         return removed;
     }
 
+    /// <summary>The programs running out of the executables in the folder an install writes to: the game, or an
+    /// emulator. Files it has loaded cannot be replaced or taken out, and Cyberpunk 2077 left running failed six
+    /// installs and five rollbacks in a row. FiveM is left out: its game process runs from another folder.</summary>
+    public static IReadOnlyList<(int Pid, string Name)> RunningFrom(string gameDir, Preset preset)
+    {
+        try
+        {
+            return preset != Preset.FiveM && InstallFolder(gameDir, preset) is { } dir
+                ? Engine.ProcessesHolding(Directory.EnumerateFiles(dir, "*.exe"))
+                : [];
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InstallException)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>The error a running game is, or null when nothing runs from the folder.</summary>
+    private static string? Running(string gameDir, Preset preset) =>
+        RunningFrom(gameDir, preset) is { Count: > 0 } running
+            ? $"{Joined(running.Select(p => p.Name).ToList())} is running from this folder. Files it has loaded cannot be "
+              + "replaced or taken out while it runs: close it first. A game that crashed or froze can stay running with "
+              + "no window; end it in Task Manager (Details tab)."
+            : null;
+
     // -- Pre-flight ------------------------------------------------------------------------------
     // Everything that can be known before a single byte is written, and cheap enough to redo while
     // a path is still being pasted: metadata, one open(), one free-space call.
@@ -411,6 +436,7 @@ public static partial class Work
             ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy, api)
             : preset == Preset.FiveM ? PreflightFiveM(gameDir, payloadDir, pins, ownRuntime, wantedRuntime)
             : PreflightReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime);
+        if (Running(gameDir, preset) is { } running) report.Err(running);
         // Said before Install is pressed, as what Install does about it rather than as a problem.
         try
         {
@@ -432,6 +458,13 @@ public static partial class Work
         string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null,
         string? suggestedProxy = null, GraphicsApi? api = null)
     {
+        if (Running(gameDir, preset) is { } running)
+        {
+            var refused = new Report();
+            refused.Err(running);
+            refused.Info("Nothing was written.");
+            return refused;
+        }
         // What would make the transaction refuse, cleared first, on every route: see InTheWay.
         var report = ClearTheWay(gameDir, preset, pins) ?? new Report();
         if (report.Failed)

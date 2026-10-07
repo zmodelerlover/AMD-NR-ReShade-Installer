@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">El motivo está en Detalles. No se instaló nada.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Los archivos también se pueden bajar con un navegador y entregarlos: Este equipo &gt; Archivos &gt; Descargar manualmente, y luego Importar archivos. Los archivos de tu carpeta Descargas se encuentran solos.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Limpiar DNS y reintentar</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} se está ejecutando desde esta carpeta</sys:String>
+  <sys:String x:Key="Str.CloseGame">Cerrar {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">¿Terminar {0}? Lo que no haya guardado se pierde. Instalar y Desinstalar necesitan que esté cerrado: no pueden reemplazar archivos que tiene cargados.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows no dejó limpiar su caché DNS desde aquí. Abre un Símbolo del sistema, ejecuta ipconfig /flushdns e inténtalo de nuevo.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problemas encontrados en esta carpeta</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Listo para instalar, con {0} notas para leer</sys:String>

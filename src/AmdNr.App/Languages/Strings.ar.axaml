@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">السبب موجود في «التفاصيل». لم يُثبَّت شيء.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">يمكن أيضًا جلب الملفات بمتصفح وتسليمها للتطبيق: هذا الجهاز &gt; الملفات &gt; التنزيل يدويًا، ثم «استيراد الملفات». الملفات الموجودة في مجلد التنزيلات يُعثر عليها تلقائيًا.</sys:String>
   <sys:String x:Key="Str.DnsRetry">امسح DNS وحاول مرة أخرى</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} قيد التشغيل من هذا المجلد</sys:String>
+  <sys:String x:Key="Str.CloseGame">إغلاق {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">إنهاء {0}؟ سيضيع كل ما لم يُحفظ. يحتاج التثبيت وإلغاء التثبيت إلى إغلاقه: لا يمكن استبدال الملفات التي حمّلها.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">لم يسمح Windows بمسح ذاكرة DNS المؤقتة من هنا. افتح موجّه الأوامر، ونفّذ ipconfig /flushdns، ثم حاول مرة أخرى.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">المشكلات التي عُثر عليها في هذا المجلد: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">جاهز للتثبيت، مع ملاحظات للقراءة (العدد: {0})</sys:String>

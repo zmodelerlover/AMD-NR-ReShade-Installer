@@ -35,6 +35,12 @@ public static partial class Work
         var report = new Report();
         if (UninstallFolder(gameDir, preset, report) is not { } dir) return report;
         report.Info($"target: {dir}");
+        if (Running(gameDir, preset) is { } running)
+        {
+            report.Err(running);
+            report.Info("Nothing was taken out.");
+            return report;
+        }
 
         var builds = new HashSet<string>([Engine.ReShadeSha, Engine.ReShade64Sha, Engine.D3d8To9Sha, .. pinned ?? []],
             StringComparer.OrdinalIgnoreCase);
@@ -381,7 +387,11 @@ public static partial class Work
         }
         catch (Exception e)
         {
-            report.Err($"could not remove {name}: {e.Message}");
+            // A log the game still writes is the game's, not a file of ours left installed: it goes next time.
+            if (name.EndsWith(".log", StringComparison.OrdinalIgnoreCase) && e is IOException or UnauthorizedAccessException)
+                report.Warn($"{name} is still open, so it stays for now and goes with the next uninstall: {e.Message}");
+            else
+                report.Err($"could not remove {name}: {e.Message}");
             return 0;
         }
     }

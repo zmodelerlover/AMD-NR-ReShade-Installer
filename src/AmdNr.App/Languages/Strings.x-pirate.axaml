@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Why be in the Ship's log. Nothin' was hoisted.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">The cargo can also be fetched with a browser an' handed over: This here vessel &gt; Cargo &gt; Haul by hand, then Import cargo. Files in yer Downloads folder be found on their own.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Swab the DNS an' try again</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} be sailin' from this hold</sys:String>
+  <sys:String x:Key="Str.CloseGame">Scuttle {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Scuttle {0}? What ain't saved goes to Davy Jones. Install an' Uninstall need her ashore: they can't swap planks she's standin' on.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows wouldn't swab its DNS cache from here. Open a Command Prompt, run ipconfig /flushdns, an' try again.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">{0} problems found in this hold</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Ready to hoist, with {0} notes to read</sys:String>

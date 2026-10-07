@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Motivul este la „Detalii”. Nu s-a instalat nimic.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Fișierele pot fi descărcate și cu un browser și predate aplicației: „Acest PC” &gt; „Fișiere” &gt; „Descarcă manual”, apoi „Importă fișiere”. Fișierele din folderul Descărcări sunt găsite singure.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Golește DNS-ul și încearcă din nou</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} rulează din acest folder</sys:String>
+  <sys:String x:Key="Str.CloseGame">Închide {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Închizi {0}? Ce nu a fost salvat se pierde. Instalarea și dezinstalarea au nevoie ca el să fie închis: nu pot înlocui fișiere pe care le-a încărcat.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows nu a permis golirea cache-ului DNS de aici. Deschide un Command Prompt, rulează ipconfig /flushdns și încearcă din nou.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Probleme găsite în acest folder: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Gata de instalare; note de citit: {0}</sys:String>

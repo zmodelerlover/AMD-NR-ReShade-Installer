@@ -10,7 +10,12 @@ public static partial class Engine
 {
     /// <summary>"BatmanAK.exe (PID 1234)" for every process holding one of <paramref name="paths"/>, or nothing
     /// when Windows cannot say.</summary>
-    public static IReadOnlyList<string> HoldersOf(IEnumerable<string> paths)
+    public static IReadOnlyList<string> HoldersOf(IEnumerable<string> paths) =>
+        ProcessesHolding(paths).Select(p => p.Name).ToList();
+
+    /// <summary>Every process holding one of <paramref name="paths"/>, its id and "BatmanAK.exe (PID 1234)", or
+    /// nothing when Windows cannot say.</summary>
+    public static IReadOnlyList<(int Pid, string Name)> ProcessesHolding(IEnumerable<string> paths)
     {
         var files = paths.Where(File.Exists).ToArray();
         if (files.Length == 0 || RmStartSession(out var session, 0, Guid.NewGuid().ToString("N")) != 0) return [];
@@ -23,7 +28,7 @@ public static partial class Engine
             var found = new RmProcessInfo[needed];
             count = needed;
             if (RmGetList(session, out needed, ref count, found, out _) != 0) return [];
-            return found.Take((int)count).Select(p => Named(p.Process.ProcessId, p.AppName)).Distinct().ToList();
+            return found.Take((int)count).Select(p => (p.Process.ProcessId, Named(p.Process.ProcessId, p.AppName))).Distinct().ToList();
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException)
         {

@@ -344,6 +344,9 @@
   <sys:String x:Key="Str.DownloadFailedDetail">Przyczyna jest w „Szczegółach”. Nic nie zostało zainstalowane.</sys:String>
   <sys:String x:Key="Str.DownloadFailedHelp">Pliki można też pobrać przeglądarką i przekazać aplikacji: „Ten komputer” &gt; „Pliki” &gt; „Pobierz ręcznie”, a potem „Importuj pliki”. Pliki w folderze Pobrane zostaną znalezione same.</sys:String>
   <sys:String x:Key="Str.DnsRetry">Wyczyść DNS i spróbuj ponownie</sys:String>
+  <sys:String x:Key="Str.GameRunning">{0} działa z tego folderu</sys:String>
+  <sys:String x:Key="Str.CloseGame">Zamknij {0}</sys:String>
+  <sys:String x:Key="Str.CloseGameAsk">Zakończyć {0}? Wszystko, co nie zostało zapisane, przepadnie. Instalacja i odinstalowanie wymagają zamknięcia: nie da się podmienić plików, które wczytał.</sys:String>
   <sys:String x:Key="Str.DnsFlushFailed">Windows nie pozwolił stąd wyczyścić pamięci podręcznej DNS. Otwórz wiersz polecenia, uruchom ipconfig /flushdns i spróbuj ponownie.</sys:String>
   <sys:String x:Key="Str.PreflightErr.Many">Problemy znalezione w tym folderze: {0}</sys:String>
   <sys:String x:Key="Str.PreflightWarn.Many">Gotowe do instalacji; uwagi do przeczytania: {0}</sys:String>
