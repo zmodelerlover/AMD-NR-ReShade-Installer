@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Скасувати</sys:String>
   <sys:String x:Key="Str.ChangeCover">Обкладинка</sys:String>
   <sys:String x:Key="Str.CoverPick">Вибрати зображення…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Змінити обкладинку…</sys:String>
   <sys:String x:Key="Str.CoverReset">Використати обкладинку з інтернету</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Виберіть обкладинку для цієї гри</sys:String>
   <sys:String x:Key="Str.CoverFiles">Зображення</sys:String>

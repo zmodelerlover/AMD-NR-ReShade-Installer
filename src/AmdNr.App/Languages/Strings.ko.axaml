@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">취소</sys:String>
   <sys:String x:Key="Str.ChangeCover">커버</sys:String>
   <sys:String x:Key="Str.CoverPick">이미지 선택…</sys:String>
+  <sys:String x:Key="Str.CoverChange">표지 바꾸기…</sys:String>
   <sys:String x:Key="Str.CoverReset">온라인에서 찾은 커버 사용</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">이 게임의 커버 선택</sys:String>
   <sys:String x:Key="Str.CoverFiles">이미지</sys:String>

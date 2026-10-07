@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Annuler</sys:String>
   <sys:String x:Key="Str.ChangeCover">Jaquette</sys:String>
   <sys:String x:Key="Str.CoverPick">Choisir une image…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Changer la jaquette…</sys:String>
   <sys:String x:Key="Str.CoverReset">Utiliser la jaquette trouvée en ligne</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Choisissez une jaquette pour ce jeu</sys:String>
   <sys:String x:Key="Str.CoverFiles">Images</sys:String>

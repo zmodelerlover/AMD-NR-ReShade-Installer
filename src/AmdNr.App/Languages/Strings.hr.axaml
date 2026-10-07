@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Odustani</sys:String>
   <sys:String x:Key="Str.ChangeCover">Naslovnica</sys:String>
   <sys:String x:Key="Str.CoverPick">Odaberi sliku…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Promijeni naslovnicu…</sys:String>
   <sys:String x:Key="Str.CoverReset">Koristi naslovnicu pronađenu na internetu</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Odaberite naslovnicu za ovu igru</sys:String>
   <sys:String x:Key="Str.CoverFiles">Slike</sys:String>

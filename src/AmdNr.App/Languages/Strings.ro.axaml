@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Anulează</sys:String>
   <sys:String x:Key="Str.ChangeCover">Copertă</sys:String>
   <sys:String x:Key="Str.CoverPick">Alege o imagine…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Schimbă coperta…</sys:String>
   <sys:String x:Key="Str.CoverReset">Folosește coperta găsită online</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Alege o copertă pentru acest joc</sys:String>
   <sys:String x:Key="Str.CoverFiles">Imagini</sys:String>

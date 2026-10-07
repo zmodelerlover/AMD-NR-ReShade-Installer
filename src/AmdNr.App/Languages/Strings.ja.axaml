@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">キャンセル</sys:String>
   <sys:String x:Key="Str.ChangeCover">カバー</sys:String>
   <sys:String x:Key="Str.CoverPick">画像を選択…</sys:String>
+  <sys:String x:Key="Str.CoverChange">カバーを変更…</sys:String>
   <sys:String x:Key="Str.CoverReset">オンラインで見つけたカバーを使う</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">このゲームのカバーを選択</sys:String>
   <sys:String x:Key="Str.CoverFiles">画像</sys:String>

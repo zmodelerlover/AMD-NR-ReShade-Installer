@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">إلغاء</sys:String>
   <sys:String x:Key="Str.ChangeCover">الغلاف</sys:String>
   <sys:String x:Key="Str.CoverPick">اختر صورة…</sys:String>
+  <sys:String x:Key="Str.CoverChange">تغيير الغلاف…</sys:String>
   <sys:String x:Key="Str.CoverReset">استخدم الغلاف الموجود على الإنترنت</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">اختر غلافًا لهذه اللعبة</sys:String>
   <sys:String x:Key="Str.CoverFiles">الصور</sys:String>

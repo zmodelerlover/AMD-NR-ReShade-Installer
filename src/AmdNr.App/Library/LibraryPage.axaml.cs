@@ -71,6 +71,16 @@ public partial class LibraryPage : UserControl
         if (sender is Control { Tag: GameCard card }) Library.SetFavorite(card, !card.Favorite);
     }
 
+    /// <summary>The tile's own way to a cover of the person's (issue #21): the game's sheet opens on it and the same
+    /// picker its Customize menu has comes up.</summary>
+    private void OnChangeCover(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is not Control { Tag: GameCard card }) return;
+        _shell.OpenSheet(card);
+        if (_shell.Sheet.Card == card) _shell.Sheet.OnPickCover(sender, e);
+    }
+
     private void OnPinnedFirst(object? sender, RoutedEventArgs e)
     {
         _pinnedFirst = !_pinnedFirst;

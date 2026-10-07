@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Belay that</sys:String>
   <sys:String x:Key="Str.ChangeCover">Cover</sys:String>
   <sys:String x:Key="Str.CoverPick">Choose a picture…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Paint a new flag…</sys:String>
   <sys:String x:Key="Str.CoverReset">Use the cover found on the seven seas</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Choose a cover for this game</sys:String>
   <sys:String x:Key="Str.CoverFiles">Pictures</sys:String>

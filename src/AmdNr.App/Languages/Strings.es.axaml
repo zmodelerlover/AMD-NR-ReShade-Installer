@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Cancelar</sys:String>
   <sys:String x:Key="Str.ChangeCover">Portada</sys:String>
   <sys:String x:Key="Str.CoverPick">Elegir una imagen…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Cambiar portada…</sys:String>
   <sys:String x:Key="Str.CoverReset">Usar la portada encontrada en línea</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Elige una portada para este juego</sys:String>
   <sys:String x:Key="Str.CoverFiles">Imágenes</sys:String>

@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">ยกเลิก</sys:String>
   <sys:String x:Key="Str.ChangeCover">ภาพปก</sys:String>
   <sys:String x:Key="Str.CoverPick">เลือกรูปภาพ…</sys:String>
+  <sys:String x:Key="Str.CoverChange">เปลี่ยนปก…</sys:String>
   <sys:String x:Key="Str.CoverReset">ใช้ภาพปกที่พบออนไลน์</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">เลือกภาพปกสำหรับเกมนี้</sys:String>
   <sys:String x:Key="Str.CoverFiles">รูปภาพ</sys:String>

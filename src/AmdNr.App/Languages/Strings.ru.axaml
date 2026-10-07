@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Отмена</sys:String>
   <sys:String x:Key="Str.ChangeCover">Обложка</sys:String>
   <sys:String x:Key="Str.CoverPick">Выбрать изображение…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Сменить обложку…</sys:String>
   <sys:String x:Key="Str.CoverReset">Использовать обложку из интернета</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Выберите обложку для этой игры</sys:String>
   <sys:String x:Key="Str.CoverFiles">Изображения</sys:String>

@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Annulla</sys:String>
   <sys:String x:Key="Str.ChangeCover">Copertina</sys:String>
   <sys:String x:Key="Str.CoverPick">Scegli un'immagine…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Cambia copertina…</sys:String>
   <sys:String x:Key="Str.CoverReset">Usa la copertina trovata online</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Scegli una copertina per questo gioco</sys:String>
   <sys:String x:Key="Str.CoverFiles">Immagini</sys:String>

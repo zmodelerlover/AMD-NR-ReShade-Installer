@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Anuluj</sys:String>
   <sys:String x:Key="Str.ChangeCover">Okładka</sys:String>
   <sys:String x:Key="Str.CoverPick">Wybierz obraz…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Zmień okładkę…</sys:String>
   <sys:String x:Key="Str.CoverReset">Użyj okładki znalezionej w sieci</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Wybierz okładkę dla tej gry</sys:String>
   <sys:String x:Key="Str.CoverFiles">Obrazy</sys:String>

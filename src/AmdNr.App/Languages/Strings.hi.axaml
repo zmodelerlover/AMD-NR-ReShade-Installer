@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">रद्द करें</sys:String>
   <sys:String x:Key="Str.ChangeCover">कवर</sys:String>
   <sys:String x:Key="Str.CoverPick">कोई चित्र चुनें…</sys:String>
+  <sys:String x:Key="Str.CoverChange">कवर बदलें…</sys:String>
   <sys:String x:Key="Str.CoverReset">ऑनलाइन मिला कवर इस्तेमाल करें</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">इस गेम के लिए कवर चुनें</sys:String>
   <sys:String x:Key="Str.CoverFiles">चित्र</sys:String>

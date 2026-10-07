@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">取消</sys:String>
   <sys:String x:Key="Str.ChangeCover">封面</sys:String>
   <sys:String x:Key="Str.CoverPick">选择图片…</sys:String>
+  <sys:String x:Key="Str.CoverChange">更换封面…</sys:String>
   <sys:String x:Key="Str.CoverReset">使用在线找到的封面</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">为这款游戏选择封面</sys:String>
   <sys:String x:Key="Str.CoverFiles">图片</sys:String>

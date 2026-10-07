@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Atšaukti</sys:String>
   <sys:String x:Key="Str.ChangeCover">Viršelis</sys:String>
   <sys:String x:Key="Str.CoverPick">Pasirinkti paveikslėlį…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Keisti viršelį…</sys:String>
   <sys:String x:Key="Str.CoverReset">Naudoti internete rastą viršelį</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Pasirinkite šio žaidimo viršelį</sys:String>
   <sys:String x:Key="Str.CoverFiles">Paveikslėliai</sys:String>

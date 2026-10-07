@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Abbrechen</sys:String>
   <sys:String x:Key="Str.ChangeCover">Cover</sys:String>
   <sys:String x:Key="Str.CoverPick">Bild auswählen…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Cover ändern…</sys:String>
   <sys:String x:Key="Str.CoverReset">Das online gefundene Cover verwenden</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Wähle ein Cover für dieses Spiel</sys:String>
   <sys:String x:Key="Str.CoverFiles">Bilder</sys:String>

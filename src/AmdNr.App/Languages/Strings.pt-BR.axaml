@@ -280,6 +280,7 @@
   <sys:String x:Key="Str.Cancel">Cancelar</sys:String>
   <sys:String x:Key="Str.ChangeCover">Capa</sys:String>
   <sys:String x:Key="Str.CoverPick">Escolher uma imagem…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Trocar a capa…</sys:String>
   <sys:String x:Key="Str.CoverReset">Usar a capa encontrada online</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Escolha uma capa para este jogo</sys:String>
   <sys:String x:Key="Str.CoverFiles">Imagens</sys:String>

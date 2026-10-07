@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">İptal</sys:String>
   <sys:String x:Key="Str.ChangeCover">Kapak</sys:String>
   <sys:String x:Key="Str.CoverPick">Bir resim seç…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Kapağı değiştir…</sys:String>
   <sys:String x:Key="Str.CoverReset">İnternette bulunan kapağı kullan</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Bu oyun için bir kapak seçin</sys:String>
   <sys:String x:Key="Str.CoverFiles">Resimler</sys:String>

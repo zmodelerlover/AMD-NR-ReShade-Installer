@@ -136,6 +136,9 @@
                   <MenuItem Header="{DynamicResource Str.RemoveFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding Favorite}">
                     <MenuItem.Icon><PathIcon Data="{StaticResource IconStar}" /></MenuItem.Icon>
                   </MenuItem>
+                  <MenuItem Header="{DynamicResource Str.CoverChange}" Tag="{Binding}" Click="OnChangeCover">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconImage}" /></MenuItem.Icon>
+                  </MenuItem>
                 </ContextMenu>
               </Button.ContextMenu>
               <!-- The name first: the tile cuts it, and the path alone did not say which game it was. -->
@@ -262,6 +265,9 @@
                   </MenuItem>
                   <MenuItem Header="{DynamicResource Str.RemoveFavorite}" Tag="{Binding}" Click="OnStar" IsVisible="{Binding Favorite}">
                     <MenuItem.Icon><PathIcon Data="{StaticResource IconStar}" /></MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="{DynamicResource Str.CoverChange}" Tag="{Binding}" Click="OnChangeCover">
+                    <MenuItem.Icon><PathIcon Data="{StaticResource IconImage}" /></MenuItem.Icon>
                   </MenuItem>
                 </ContextMenu>
                 </Grid.ContextMenu>

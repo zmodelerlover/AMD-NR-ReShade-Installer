@@ -263,6 +263,7 @@
   <sys:String x:Key="Str.Cancel">Mégse</sys:String>
   <sys:String x:Key="Str.ChangeCover">Borító</sys:String>
   <sys:String x:Key="Str.CoverPick">Kép kiválasztása…</sys:String>
+  <sys:String x:Key="Str.CoverChange">Borító cseréje…</sys:String>
   <sys:String x:Key="Str.CoverReset">Az online talált borító használata</sys:String>
   <sys:String x:Key="Str.CoverPickTitle">Válassz borítót ehhez a játékhoz</sys:String>
   <sys:String x:Key="Str.CoverFiles">Képek</sys:String>
