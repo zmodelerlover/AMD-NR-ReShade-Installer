@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} rulează din acest folder</sys:String>
   <sys:String x:Key="Str.CloseGame">Închide {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Închizi {0}? Ce nu a fost salvat se pierde. Instalarea și dezinstalarea au nevoie ca el să fie închis: nu pot înlocui fișiere pe care le-a încărcat.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} nu a putut fi închis de aici. Închide jocul tu sau oprește-l din Managerul de activități (fila Detalii).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Curăță și reîncearcă</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">O instalare anterioară stă în cale</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Înregistrarea ei nu se potrivește cu această instalare. Curăță și reîncearcă scoate fișierele acestei aplicații, păstrează setările și instalează din nou.</sys:String>

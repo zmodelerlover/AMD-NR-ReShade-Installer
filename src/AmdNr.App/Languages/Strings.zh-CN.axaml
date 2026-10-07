@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} 正在从此文件夹运行</sys:String>
   <sys:String x:Key="Str.CloseGame">关闭 {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">结束 {0}？未保存的内容将丢失。安装和卸载需要先关闭它：它已加载的文件无法替换。</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">无法从这里关闭 {0}。请自行关闭游戏，或在任务管理器（详细信息选项卡）中结束它。</sys:String>
   <sys:String x:Key="Str.CleanRetry">清理并重试</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">之前的安装挡住了</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">它的记录与本次安装不符。清理并重试会移除本应用的文件，保留你的设置，然后重新安装。</sys:String>

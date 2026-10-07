@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} запущен из этой папки</sys:String>
   <sys:String x:Key="Str.CloseGame">Закрыть {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Завершить {0}? Всё несохранённое пропадёт. Для установки и удаления его нужно закрыть: загруженные им файлы нельзя заменить.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">Не удалось закрыть {0} отсюда. Закройте игру сами или завершите её в Диспетчере задач (вкладка «Подробности»).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Очистить и повторить</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Мешает предыдущая установка</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Её запись не совпадает с этой установкой. «Очистить и повторить» уберёт файлы этого приложения, сохранит настройки и установит заново.</sys:String>

@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} se está ejecutando desde esta carpeta</sys:String>
   <sys:String x:Key="Str.CloseGame">Cerrar {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">¿Terminar {0}? Lo que no haya guardado se pierde. Instalar y Desinstalar necesitan que esté cerrado: no pueden reemplazar archivos que tiene cargados.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">No se pudo cerrar {0} desde aquí. Cierra el juego tú mismo o termínalo en el Administrador de tareas (pestaña Detalles).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Limpiar y reintentar</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Una instalación anterior estorba</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Su registro no coincide con esta instalación. Limpiar y reintentar quita los archivos de esta app, conserva tus ajustes e instala de nuevo.</sys:String>

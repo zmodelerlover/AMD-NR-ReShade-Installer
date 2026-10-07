@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} veikia iš šio aplanko</sys:String>
   <sys:String x:Key="Str.CloseGame">Uždaryti {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Užbaigti {0}? Tai, kas neišsaugota, bus prarasta. Diegimui ir šalinimui jis turi būti uždarytas: įkeltų failų pakeisti negalima.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} nepavyko uždaryti iš čia. Uždarykite žaidimą patys arba užbaikite jį Užduočių tvarkytuvėje (skirtukas Išsami informacija).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Išvalyti ir bandyti dar kartą</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Trukdo ankstesnis įdiegimas</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Jo įrašas neatitinka šio įdiegimo. Išvalyti ir bandyti dar kartą pašalina šios programos failus, palieka nustatymus ir įdiegia iš naujo.</sys:String>

@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0}이(가) 이 폴더에서 실행 중입니다</sys:String>
   <sys:String x:Key="Str.CloseGame">{0} 닫기</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">{0}을(를) 종료할까요? 저장하지 않은 내용은 사라집니다. 설치와 제거를 하려면 닫아야 합니다: 불러온 파일은 바꿀 수 없습니다.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">여기서 {0}을(를) 닫을 수 없었습니다. 게임을 직접 닫거나 작업 관리자(세부 정보 탭)에서 끝내세요.</sys:String>
   <sys:String x:Key="Str.CleanRetry">정리 후 다시 시도</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">이전 설치가 방해하고 있습니다</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">그 기록이 이번 설치와 맞지 않습니다. 정리 후 다시 시도는 이 앱의 파일을 빼고 설정은 남긴 뒤 다시 설치합니다.</sys:String>

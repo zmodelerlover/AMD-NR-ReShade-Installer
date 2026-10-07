@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} läuft aus diesem Ordner</sys:String>
   <sys:String x:Key="Str.CloseGame">{0} schließen</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">{0} beenden? Was nicht gespeichert ist, geht verloren. Installieren und Deinstallieren brauchen es geschlossen: geladene Dateien lassen sich nicht ersetzen.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} konnte von hier nicht geschlossen werden. Schließe das Spiel selbst oder beende es im Task-Manager (Registerkarte Details).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Aufräumen und erneut versuchen</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Eine frühere Installation steht im Weg</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Ihr Eintrag passt nicht zu dieser Installation. Aufräumen und erneut versuchen entfernt die Dateien dieser App, behält deine Einstellungen und installiert neu.</sys:String>

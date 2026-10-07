@@ -391,6 +391,7 @@
   <sys:String x:Key="Str.GameRunning">{0} está rodando desta pasta</sys:String>
   <sys:String x:Key="Str.CloseGame">Fechar {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Encerrar {0}? O que não foi salvo se perde. Instalar e Desinstalar precisam dele fechado: não dá para trocar arquivos que ele carregou.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">Não foi possível fechar {0} daqui. Feche o jogo você mesmo, ou encerre-o no Gerenciador de Tarefas (aba Detalhes).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Limpar e tentar de novo</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Uma instalação anterior está atrapalhando</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">O registro dela não bate com esta instalação. Limpar e tentar de novo tira os arquivos deste app dela, mantém suas configurações e instala de novo.</sys:String>

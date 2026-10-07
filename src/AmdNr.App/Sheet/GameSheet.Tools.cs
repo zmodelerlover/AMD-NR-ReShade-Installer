@@ -172,7 +172,7 @@ public partial class GameSheet
         // named: an id Windows has handed to another program since is left alone.
         var confirmed = _running;
         var (target, preset) = _runningFrom;
-        await Task.Run(() =>
+        var left = await Task.Run(() =>
         {
             foreach (var (pid, started, _) in Work.RunningFrom(target, preset)
                          .Where(p => confirmed.Any(c => c.Pid == p.Pid && c.Started == p.Started)))
@@ -189,7 +189,11 @@ public partial class GameSheet
                     // Gone already, or not ours to end: the check that follows says which.
                 }
             }
+            return Work.RunningFrom(target, preset).Where(p => confirmed.Any(c => c.Pid == p.Pid)).ToList();
         });
+        // One that could not be verified or ended is still there: said, rather than left to look like nothing happened.
+        if (left.Count > 0)
+            _shell.Toast(Ui.Format("Str.CloseGameFailed", string.Join(", ", left.Select(p => p.Name))), Level.Warn);
         _running = [];
         await RefreshAsync();
     });

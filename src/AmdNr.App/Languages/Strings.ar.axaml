@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} قيد التشغيل من هذا المجلد</sys:String>
   <sys:String x:Key="Str.CloseGame">إغلاق {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">إنهاء {0}؟ سيضيع كل ما لم يُحفظ. يحتاج التثبيت وإلغاء التثبيت إلى إغلاقه: لا يمكن استبدال الملفات التي حمّلها.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">تعذّر إغلاق {0} من هنا. أغلق اللعبة بنفسك، أو أنهِها من إدارة المهام (علامة التبويب التفاصيل).</sys:String>
   <sys:String x:Key="Str.CleanRetry">تنظيف وإعادة المحاولة</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">تثبيت سابق يعترض الطريق</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">سجله لا يطابق هذا التثبيت. يزيل التنظيف وإعادة المحاولة ملفات هذا التطبيق ويحتفظ بإعداداتك ثم يثبّت من جديد.</sys:String>

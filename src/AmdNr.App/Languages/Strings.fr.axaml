@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} est en cours d'exécution depuis ce dossier</sys:String>
   <sys:String x:Key="Str.CloseGame">Fermer {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Terminer {0} ? Ce qui n'a pas été enregistré est perdu. Installer et Désinstaller ont besoin qu'il soit fermé : ils ne peuvent pas remplacer des fichiers qu'il a chargés.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} n'a pas pu être fermé d'ici. Fermez le jeu vous-même, ou terminez-le dans le Gestionnaire des tâches (onglet Détails).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Nettoyer et réessayer</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Une installation précédente gêne</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Son enregistrement ne correspond pas à cette installation. Nettoyer et réessayer retire les fichiers de cette app, garde vos réglages et réinstalle.</sys:String>

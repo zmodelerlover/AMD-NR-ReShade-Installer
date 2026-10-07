@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} je pokrenut iz ove mape</sys:String>
   <sys:String x:Key="Str.CloseGame">Zatvori {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Prekinuti {0}? Ono što nije spremljeno se gubi. Instalacija i deinstalacija trebaju da je zatvoren: ne mogu zamijeniti datoteke koje je učitao.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} nije moguće zatvoriti odavde. Zatvori igru sam ili je završi u Upravitelju zadataka (kartica Detalji).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Očisti i pokušaj ponovno</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Prethodna instalacija smeta</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Njezin zapis ne odgovara ovoj instalaciji. Očisti i pokušaj ponovno uklanja datoteke ove aplikacije, zadržava postavke i ponovno instalira.</sys:String>

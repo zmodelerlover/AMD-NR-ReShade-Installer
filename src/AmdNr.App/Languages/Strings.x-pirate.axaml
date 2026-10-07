@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} be sailin' from this hold</sys:String>
   <sys:String x:Key="Str.CloseGame">Scuttle {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Scuttle {0}? What ain't saved goes to Davy Jones. Install an' Uninstall need her ashore: they can't swap planks she's standin' on.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">{0} won't strike her colours from here. Scuttle her yerself, or sink her in Task Manager (the Details tab).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Swab the deck an' try again</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">An old install be in the way</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Its log don't match this one. Swab the deck takes this app's planks out, keeps yer settings, an' installs again.</sys:String>

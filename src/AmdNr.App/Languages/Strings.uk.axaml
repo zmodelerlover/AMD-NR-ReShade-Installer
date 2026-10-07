@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} запущено з цієї теки</sys:String>
   <sys:String x:Key="Str.CloseGame">Закрити {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Завершити {0}? Усе незбережене буде втрачено. Для встановлення й видалення його треба закрити: завантажені ним файли не можна замінити.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">Не вдалося закрити {0} звідси. Закрийте гру самі або завершіть її в Диспетчері завдань (вкладка «Подробиці»).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Очистити й повторити</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Заважає попереднє встановлення</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Його запис не збігається з цим встановленням. «Очистити й повторити» прибере файли цього застосунку, збереже налаштування й встановить знову.</sys:String>

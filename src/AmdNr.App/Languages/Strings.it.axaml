@@ -348,6 +348,7 @@
   <sys:String x:Key="Str.GameRunning">{0} è in esecuzione da questa cartella</sys:String>
   <sys:String x:Key="Str.CloseGame">Chiudi {0}</sys:String>
   <sys:String x:Key="Str.CloseGameAsk">Terminare {0}? Ciò che non è stato salvato va perso. Installa e Disinstalla richiedono che sia chiuso: non possono sostituire file che ha caricato.</sys:String>
+  <sys:String x:Key="Str.CloseGameFailed">Impossibile chiudere {0} da qui. Chiudi tu il gioco, o terminalo in Gestione attività (scheda Dettagli).</sys:String>
   <sys:String x:Key="Str.CleanRetry">Pulisci e riprova</sys:String>
   <sys:String x:Key="Str.CleanRetryTitle">Un'installazione precedente è d'intralcio</sys:String>
   <sys:String x:Key="Str.CleanRetryDetail">Il suo registro non corrisponde a questa installazione. Pulisci e riprova rimuove i file di questa app, mantiene le impostazioni e installa di nuovo.</sys:String>
