@@ -237,9 +237,12 @@ public sealed class Library(Session session)
 
     /// <summary>What the game renders with: its own files first, then what the API database knows
     /// about it. Only reads, so it runs on any thread.</summary>
-    public GraphicsDetection Detect(GameCard card) =>
-        GraphicsDetector.Detect(card.Path, card.Entry.LookupName, card.Entry.Executable)
+    public GraphicsDetection Detect(GameCard card)
+    {
+        var detected = GraphicsDetector.Detect(card.Path, card.Entry.LookupName, card.Entry.Executable)
             .With(session.ApiDb?.Lookup(card.Entry.AppId, card.Entry.LookupName));
+        return detected with { OptiAvoided = session.ApiDb?.OptiAvoided(detected.Executable) };
+    }
 
     /// <summary>A detection taken as the game's, and the route following it unless the person chose
     /// one. Every reader goes through here, so the tile, the sheet and the install agree.</summary>

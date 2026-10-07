@@ -55,6 +55,10 @@ public sealed record GraphicsDetection(
     /// OptiScaler route: OptiScaler only has something to do in a game that calls one of them.</summary>
     public IReadOnlyList<string> Upscalers { get; init; } = [];
 
+    /// <summary>Why the OptiScaler route is known not to work for this game (<see cref="ApiDatabase.OptiAvoided"/>),
+    /// or null. Set, the recommendation is the ReShade route.</summary>
+    public string? OptiAvoided { get; init; }
+
     /// <summary>What an install is pointed at: the renderer's folder when those differ, the
     /// executable otherwise.</summary>
     public string? Target => InstallTarget ?? Executable;
@@ -144,9 +148,11 @@ public sealed record GraphicsDetection(
     /// one of <see cref="OptiEverywhereApis"/>, ReShade for the rest -- emulators, 32-bit games, D3D10
     /// and D3D8. Without it, <see cref="Preset"/>.</summary>
     public Preset? PresetFor(bool optiEverywhere) =>
-        !optiEverywhere ? Preset
-        : Emulator is not null || Width == Route.X86 || !All.Any(OptiEverywhereApis.Contains) ? ReShadeRoute
-        : Core.Preset.OptiScaler;
+        (!optiEverywhere ? Preset
+            : Emulator is not null || Width == Route.X86 || !All.Any(OptiEverywhereApis.Contains) ? ReShadeRoute
+            : Core.Preset.OptiScaler) is var preset && preset == Core.Preset.OptiScaler && OptiAvoided is not null
+            ? ReShadeRoute
+            : preset;
 
     /// <summary>Whether this game can run the OptiScaler route at all: a 64-bit build that renders
     /// with D3D12. Unknown counts as yes -- a game nothing could be read from is not ruled out.</summary>

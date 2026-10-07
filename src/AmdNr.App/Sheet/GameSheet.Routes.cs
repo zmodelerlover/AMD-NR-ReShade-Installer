@@ -82,6 +82,7 @@ public partial class GameSheet
         RouteOpti.Classes.Set("misfit", !optiFits);
         OptiSummary.Text = !optiFits
             ? Ui.Format(everywhere ? "Str.RouteOptiMisfitAll" : "Str.RouteOptiMisfit", graphics.Tag)
+            : graphics.OptiAvoided is { } avoided ? avoided
             : graphics.Upscalers.Count > 0
                 ? Ui.Format("Str.RouteOptiFound", string.Join(", ", graphics.Upscalers.Take(2)))
                 : Ui.Text(everywhere ? "Str.RouteOptiSummaryAll" : "Str.RouteOptiSummary");

@@ -37,6 +37,14 @@ public sealed class ApiRecord
     };
 }
 
+/// <param name="Routes">The routes to avoid: "OptiScaler".</param>
+/// <param name="Note">What happens on them, as the sheet says it.</param>
+public sealed class RouteAvoidance
+{
+    [JsonPropertyName("routes")] public List<string> Routes { get; set; } = [];
+    [JsonPropertyName("note")] public string Note { get; set; } = "";
+}
+
 public sealed class ApiDatabase
 {
     // Settable, not init: the compile-time reader would hand a property the file leaves out its
@@ -52,6 +60,19 @@ public sealed class ApiDatabase
     /// to use first. Read out of the wiki's game pages and compatibility list by tools/ApiDbBuilder; an
     /// app older than this key ignores it.</summary>
     [JsonPropertyName("optiscaler")] public Dictionary<string, List<string>> OptiScaler { get; set; } = new(StringComparer.Ordinal);
+
+    /// <summary>Executable name -> a route a game is known not to run on, and why. Written by hand, from reports:
+    /// the recommendation takes the other route for that game, and the sheet says why. tools/ApiDbBuilder reads this
+    /// file and writes it back, so an entry stays; an app older than this key ignores it.</summary>
+    [JsonPropertyName("avoid")] public Dictionary<string, RouteAvoidance> Avoid { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Why the OptiScaler route is avoided for the game this executable is, or null.</summary>
+    public string? OptiAvoided(string? executable) =>
+        executable is null ? null
+        : Avoid.FirstOrDefault(a => string.Equals(a.Key, Path.GetFileName(executable), StringComparison.OrdinalIgnoreCase)).Value
+            is { } entry && entry.Routes.Contains(nameof(Preset.OptiScaler), StringComparer.OrdinalIgnoreCase)
+            ? entry.Note
+            : null;
 
     private Dictionary<string, ApiRecord>? _byTitle;
 
