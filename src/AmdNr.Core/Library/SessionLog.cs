@@ -223,7 +223,7 @@ public static partial class SessionLog
     }
 
     /// <summary>The end of a log, shared with whoever is still writing it.</summary>
-    private static string? Tail(string path)
+    internal static string? Tail(string path)
     {
         try
         {

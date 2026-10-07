@@ -180,6 +180,21 @@ public static class SupportReport
         o.AppendLine($"driver          {state.Driver}");
         o.AppendLine();
 
+        // What the game's logs already name as the cause, first: the rest of this file and the zip are the evidence.
+        if (installFolder is { Length: > 0 })
+        {
+            var dir = File.Exists(installFolder) ? Path.GetDirectoryName(installFolder)! : installFolder;
+            var findings = Diagnosis.Of(dir, payload, state.Rdna4);
+            o.AppendLine("Diagnosis");
+            if (findings.Count == 0) o.AppendLine("  nothing the logs name; read game/ReShade.log and the logs beside it");
+            foreach (var f in findings)
+            {
+                o.AppendLine($"  - {f.Cause}");
+                o.AppendLine($"    {f.Evidence}");
+            }
+            o.AppendLine();
+        }
+
         if (card is null)
         {
             o.AppendLine("No game was selected when this was made.");
