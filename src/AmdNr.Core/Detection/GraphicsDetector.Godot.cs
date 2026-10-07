@@ -63,14 +63,24 @@ public static partial class GraphicsDetector
         start = 0;
         var beside = Path.ChangeExtension(exe, ".pck");
         if (File.Exists(beside)) return File.OpenRead(beside);
+        // Closed on every way out but the one that hands it over: a handle left open on the game's executable would
+        // read as the game running (Work.RunningFrom).
         var f = File.OpenRead(exe);
-        if (f.Length >= 12)
+        try
         {
-            f.Seek(-12, SeekOrigin.End);
-            var tail = new byte[12];
-            f.ReadExactly(tail);
-            start = f.Length - 12 - BitConverter.ToInt64(tail, 0);
-            if (tail.AsSpan(8).SequenceEqual("GDPC"u8) && start >= 0 && start < f.Length) return f;
+            if (f.Length >= 12)
+            {
+                f.Seek(-12, SeekOrigin.End);
+                var tail = new byte[12];
+                f.ReadExactly(tail);
+                start = f.Length - 12 - BitConverter.ToInt64(tail, 0);
+                if (tail.AsSpan(8).SequenceEqual("GDPC"u8) && start >= 0 && start < f.Length) return f;
+            }
+        }
+        catch
+        {
+            f.Dispose();
+            throw;
         }
         f.Dispose();
         return null;
