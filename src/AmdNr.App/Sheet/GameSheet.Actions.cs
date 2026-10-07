@@ -429,7 +429,8 @@ public partial class GameSheet
         var versioned = Versioned(manifest);
         var offer = RuntimeChoices(versioned);
         var runtime = Work.RuntimePick(offer, _card?.Entry.DanielRuntime, Rdna4);
-        return versioned.WithRuntime(runtime);
+        // lmxxf runs on RX 9070 and RX 9060 cards only: on a card read as anything else its weights stay out.
+        return Session.Machine?.Rdna4 == false ? versioned.WithRuntime(runtime).WithoutLmxxf() : versioned.WithRuntime(runtime);
     }
 
     private bool Rdna4 => Session.Machine?.Rdna4 == true;

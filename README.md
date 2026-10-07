@@ -56,7 +56,7 @@ ships an upscaler, that route is the one selected. Every ReShade route stays in 
 | `dlssnr_amd_pass1-3.dll` | the neural runtime 0.3.1, once per pass |
 | `dlssnr_on_amd_weights.bin` | the same weights as the add-on |
 | `LmxxfNrRuntime.dll`, `lmxxf-modules\`, `shaders\` | the second runtime OptiScaler 0.2.0 can drive, lmxxf's open-source port (RDNA4) |
-| `native-game-tiled-assets\` | its weights, about 590 MB |
+| `native-game-tiled-assets\` | its weights, about 590 MB, on an RX 9070 or RX 9060 card only: elsewhere they are not downloaded, and the ini runs danielblnc |
 | `MochizukiNrRuntime.dll`, `dlssnr-amd\` | only when ticked: the third runtime OptiScaler 0.4.0 can drive, mochizuki's Vulkan port (RDNA4, experimental), with its shaders, prewarm list and model (`dlssnr.bin`, about 141 MB) |
 
 The game's OptiScaler panel has an **OptiScaler version** menu, beside the name it loads as, like the

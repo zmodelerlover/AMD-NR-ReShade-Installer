@@ -232,6 +232,21 @@ public sealed class PayloadManifest
         return RuntimeRelease(RuntimeChoice) is { } runtime ? merged.Merge(runtime) : merged;
     }
 
+    /// <summary>This manifest without lmxxf's weights and RX 9060 kernels, for a card lmxxf does not run on: about
+    /// 590 MB nobody there can use. Neither is downloaded, pinned or installed then.</summary>
+    public PayloadManifest WithoutLmxxf() => new()
+    {
+        Schema = Schema,
+        Owner = Owner,
+        Repo = Repo,
+        Tag = Tag,
+        Components = Components.Where(c => c.Key is not (LmxxfWeightsComponent or LmxxfGfx1200Component))
+            .ToDictionary(c => c.Key, c => c.Value, StringComparer.Ordinal),
+        Releases = Releases,
+        UserRuntimes = UserRuntimes,
+        RuntimeChoice = RuntimeChoice,
+    };
+
     private PayloadManifest Merge(ComponentRelease release)
     {
         var components = new Dictionary<string, PayloadComponent>(Components, StringComparer.Ordinal);

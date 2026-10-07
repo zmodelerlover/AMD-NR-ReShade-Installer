@@ -91,34 +91,6 @@ public static partial class Work
         Launchers.Where(l => File.Exists(Path.Combine(dir, l.Launcher)) && File.Exists(Path.Combine(dir, l.Game)))
             .Select(l => ((string Launcher, string Game, string Why)?)l).FirstOrDefault();
 
-    /// <summary>Whether this OptiScaler carries lmxxf with the kernels of both RX 9000 series (9070 and 9060).</summary>
-    private static bool LmxxfEverywhere(PayloadPins pins) =>
-        pins.OptiFiles.ContainsKey(LmxxfRuntimeName)
-        && pins.OptiFiles.Keys.Any(k => k.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal));
-
-    /// <summary>On an RX 9000 card, the one mochizuki goes in on, a fresh OptiScaler.ini runs lmxxf.</summary>
-    private static byte[] RunsLmxxf(byte[] ini, bool wanted) =>
-        wanted
-            ? System.Text.Encoding.UTF8.GetBytes(
-                Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "NrBackend", "lmxxf"))
-            : ini;
-
-    /// <summary>From OptiScaler 0.5.0 on, a fresh OptiScaler.ini runs the network on the finished frame of a
-    /// game with no upscaler running. It stands aside by itself while the game's upscaler runs.</summary>
-    private static byte[] WithoutUpscaler(byte[] ini, bool everywhere) =>
-        everywhere
-            ? System.Text.Encoding.UTF8.GetBytes(
-                Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "PresentWithoutUpscaler", "true"))
-            : ini;
-
-    private static byte[] OnlyInTheGame(string dir, byte[] ini, Report report)
-    {
-        if (LauncherBeside(dir) is not { } l) return ini;
-        report.Info($"{OptiScalerIni} names {l.Game} as the only process to hook: {l.Launcher} loads OptiScaler first.");
-        var text = System.Text.Encoding.UTF8.GetString(ini);
-        return System.Text.Encoding.UTF8.GetBytes(Engine.SetIni(text, "ProcessFilter", "TargetProcessName", l.Game));
-    }
-
     /// <summary>The name OptiScaler goes in as: the one picked, or else the first the OptiScaler wiki gives for
     /// the game, or else the one an install of it here already has, or else dxgi.dll. The wiki comes before the
     /// installed name: an install made before the app read the wiki went in as dxgi.dll, which the wiki can
@@ -391,7 +363,12 @@ public static partial class Work
         // the same transaction: all of it when it was left off, what an older build had when it is on.
         // So does OptiScaler under the name it had, when it now goes in under another: two of it would
         // both load, and whatever that name displaced comes back.
-        var recorded = MochizukiRecorded(manifest).Concat(InstalledOptiProxies(manifest).Where(n => n != proxyName)).ToList();
+        var recorded = MochizukiRecorded(manifest).Concat(InstalledOptiProxies(manifest).Where(n => n != proxyName))
+            // lmxxf's weights and RX 9060 kernels an earlier install put in, on a card that has no use for them.
+            .Concat(LmxxfWeighted(pins) ? [] : manifest?.Entries.Where(e => e.Owned && !files.ContainsKey(e.Name)
+                    && (e.Name.StartsWith(LmxxfWeightsFolder, StringComparison.Ordinal)
+                        || e.Name.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal))).Select(e => e.Name) ?? [])
+            .ToList();
         var log = new List<string>();
         try
         {
@@ -425,6 +402,14 @@ public static partial class Work
         if (files.ContainsKey(OptiScalerIni) && lmxxf)
             report.Info($"{OptiScalerIni} runs lmxxf (NrBackend=lmxxf), the default on RX 9000 cards. danielblnc and "
                         + "mochizuki are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
+        else if (!LmxxfWeighted(pins))
+        {
+            if (!files.ContainsKey(OptiScalerIni) && File.Exists(Path.Combine(dir, OptiScalerIni))
+                && Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(dir, OptiScalerIni)), "DlssNr", "NrBackend")) == "lmxxf")
+                report.Warn($"The {OptiScalerIni} kept here names lmxxf as the NR runtime, which runs on RX 9070 and RX 9060 "
+                            + "series cards only and is not installed on this one: pick daniel under NR runtime in OptiScaler's "
+                            + $"Neural tab, or delete {OptiScalerIni} and install again.");
+        }
         else if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
             report.Info(
                 "The lmxxf runtime went in too, with its weights. It runs on "
