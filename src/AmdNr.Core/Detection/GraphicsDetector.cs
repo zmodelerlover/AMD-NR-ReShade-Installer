@@ -309,12 +309,10 @@ public static partial class GraphicsDetector
                 $"{exeName} is a Unity player, which renders with D3D11 on Windows unless the game was built otherwise.");
         }
 
-        // Godot 4 imports opengl32.dll for its Compatibility renderer and loads Vulkan at run time, which its
-        // Forward+ and Mobile renderers use, and those are the default (Until Then read as OpenGL).
-        if (fromExe is null or { Api: GraphicsApi.OpenGL } && GodotMajor(exe) is 4)
-            return new GraphicsDetection(exe, width, GraphicsApi.Vulkan, false,
-                $"{exeName} is a Godot 4 game, which renders with Vulkan unless the project picked the Compatibility "
-                + "renderer, which is OpenGL.");
+        // Godot 4 imports opengl32.dll for its Compatibility renderer and loads Vulkan or D3D12 at run time: its
+        // project settings say which (GraphicsDetector.Godot.cs). Until Then read as OpenGL off the import.
+        if (fromExe is null or { Api: GraphicsApi.OpenGL } && Godot4(exe) is { } godot)
+            return new GraphicsDetection(exe, width, godot.Api, false, godot.Why) { Guessed = godot.Guessed };
 
         // An executable that links D3D11 and ships what only a D3D12 game loads: RE Engine's re9.exe
         // imports d3d11.dll and nothing else, and creates its D3D12 device at run time.

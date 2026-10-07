@@ -55,6 +55,10 @@ public sealed record GraphicsDetection(
     /// OptiScaler route: OptiScaler only has something to do in a game that calls one of them.</summary>
     public IReadOnlyList<string> Upscalers { get; init; } = [];
 
+    /// <summary>The API is an engine's default, not read from the game (a Godot 4 project whose settings could not be
+    /// read): no route is told it does not fit.</summary>
+    public bool Guessed { get; init; }
+
     /// <summary>Why the OptiScaler route is known not to work for this game (<see cref="ApiDatabase.OptiAvoided"/>),
     /// or null. Set, the recommendation is the ReShade route.</summary>
     public string? OptiAvoided { get; init; }

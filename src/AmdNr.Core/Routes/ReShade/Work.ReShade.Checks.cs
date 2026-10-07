@@ -433,10 +433,10 @@ public static partial class Work
 
         // Only the game's own files, never the database: the question is what this copy links.
         var local = GraphicsDetector.Detect(dir);
-        if (local.Api == GraphicsApi.Unknown || local.All.Count == 0) return;
+        if (local.Api == GraphicsApi.Unknown || local.All.Count == 0 || local.Guessed) return;
         if (GraphicsDetection.Reachable(wanted, local.All)) return;
         // Vulkan is mostly loaded at run time, beside a D3D import kept for something else: only files that
-        // show OpenGL and nothing else say anything against it (Godot 4 reads as Vulkan, see GraphicsDetector).
+        // show OpenGL and nothing else say anything against it (a Godot 4 game reads as its project's renderer).
         if (wanted == GraphicsApi.Vulkan && local.All.Any(a => a != GraphicsApi.OpenGL)) return;
 
         var found = string.Join(", ", local.All.Select(GraphicsDetection.Short));
