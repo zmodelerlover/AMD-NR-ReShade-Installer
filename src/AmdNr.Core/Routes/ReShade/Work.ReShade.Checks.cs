@@ -189,6 +189,7 @@ public static partial class Work
                         && IsReShadeFile(Path.Combine(dir, n), shipped))
             .ToList();
         CheckForeignD3d11(dir, preset, report, keep);
+        CheckAsiReShade(dir, report);
         if (extra.Count == 0) return;
 
         report.Err(
@@ -199,6 +200,54 @@ public static partial class Work
             + ", and a process that loads two ReShades does not start at all -- the game closes before "
             + "a window appears and writes nothing anywhere saying why. Delete "
             + $"{string.Join(" and ", extra)} from the game folder and run this again.");
+    }
+
+    /// <summary>The names an ASI loader (Ultimate ASI Loader) goes in as.</summary>
+    private static readonly string[] AsiLoaders =
+        ["dinput8.dll", "version.dll", "winmm.dll", "dsound.dll", "wininet.dll", "winhttp.dll", "xinput1_3.dll",
+         "xinput1_4.dll", "d3d9.dll", "d3d11.dll", "dxgi.dll", "binkw64.dll", "bink2w64.dll"];
+
+    /// <summary>A ReShade loaded as an .asi by an ASI loader, beside the game or in scripts\ or plugins\ where the
+    /// loader looks: the proxy this route puts in is a second ReShade in the same process, which is refused like a
+    /// second proxy (<see cref="CheckDoubleReShade"/>). Crimson Desert had ReShade.asi through version.dll and
+    /// winmm.dll. With no loader here the .asi loads nothing, which is a warning.</summary>
+    internal static void CheckAsiReShade(string dir, Report report)
+    {
+        var asis = new[] { "", "scripts", "plugins" }.Select(s => Path.Combine(dir, s)).Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.asi"))
+            .Where(f => Path.GetFileName(f).Contains("reshade", StringComparison.OrdinalIgnoreCase) || Identify(f).IsReShade)
+            .Select(f => Path.GetRelativePath(dir, f)).ToList();
+        if (asis.Count == 0) return;
+        var loaders = AsiLoaders.Where(n => File.Exists(Path.Combine(dir, n)) && IsAsiLoader(Path.Combine(dir, n))).ToList();
+        if (loaders.Count > 0)
+            report.Err($"ReShade is already loaded here as {Joined(asis)}, through the ASI loader {Joined(loaders)}. This "
+                       + "route puts ReShade in as well, and a process that loads two ReShades does not start or the add-on "
+                       + $"never runs. Move {Joined(asis)} out of the game folder, or remove that ReShade with its own setup, "
+                       + "and run this again.");
+        else
+            report.Warn($"{Joined(asis)} is ReShade as an ASI plugin. No ASI loader was found here, so it loads nothing now; "
+                        + "with one (Ultimate ASI Loader as dinput8.dll, version.dll or winmm.dll) it would be a second ReShade. "
+                        + "Move it out of the game folder.");
+    }
+
+    /// <summary>An ASI loader by its version resource, or by naming .asi plugins in its bytes (ASCII or UTF-16).
+    /// Files past 16 MB are not read: no loader is that big.</summary>
+    private static bool IsAsiLoader(string path)
+    {
+        var (isReShade, product, _) = Identify(path);
+        if (isReShade) return false;
+        if (product?.Contains("ASI", StringComparison.OrdinalIgnoreCase) == true) return true;
+        try
+        {
+            if (new FileInfo(path).Length > 16L << 20) return false;
+            var bytes = File.ReadAllBytes(path);
+            return bytes.AsSpan().IndexOf(".asi"u8) >= 0
+                   || bytes.AsSpan().IndexOf(System.Text.Encoding.Unicode.GetBytes(".asi")) >= 0;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     /// <summary>A d3d11.dll in the game's folder that is not ReShade: another mod wrapping Direct3D 11, usually
