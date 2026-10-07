@@ -31,5 +31,12 @@ public class DiagnosisTests
         Assert.DoesNotContain(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
         File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "HIP: hipErrorLaunchFailure on pass 2\n");
         Assert.Contains(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
+        foreach (var line in new[] { "hip: hipModuleLaunchKernel returned 719", "HIP launch failed, code=719", "device_hung after 3 frames" })
+        {
+            File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), line + "\n");
+            Assert.Contains(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
+        }
+        File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "CHIP code 719\n");
+        Assert.DoesNotContain(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
     }
 }

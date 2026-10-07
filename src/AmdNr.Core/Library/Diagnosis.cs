@@ -59,8 +59,10 @@ public static partial class Diagnosis
         return found;
     }
 
-    /// <summary>DEVICE_HUNG, hipErrorLaunchFailure, or error 719 on a line a HIP call or "HIP" wrote: whole words, so
-    /// "chip" and "relationship" next to some 719 are not a reset.</summary>
-    [GeneratedRegex(@"\b(DEVICE_HUNG|hipErrorLaunchFailure)\b|\b(HIP|hip[A-Z]\w*)\b.*\berror\s*[:=#]?\s*719\b")]
+    /// <summary>DEVICE_HUNG, hipErrorLaunchFailure, or 719 after "error", "code" or "returned" on a line a HIP call or
+    /// "HIP" wrote, in any case: whole words, so "chip" and "relationship" next to some 719 are not a reset, and a HIP
+    /// call is still told by its camel case.</summary>
+    [GeneratedRegex(@"\b(DEVICE_HUNG|hipErrorLaunchFailure)\b|\b(HIP|(?-i:hip[A-Z]\w*))\b.*\b(error|code|returned)\s*[:=#]?\s*719\b",
+        RegexOptions.IgnoreCase)]
     private static partial Regex GpuReset();
 }
