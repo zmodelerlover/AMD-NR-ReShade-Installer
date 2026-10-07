@@ -24,5 +24,12 @@ public class DiagnosisTests
         Assert.Contains(found, f => f.Cause.Contains("HIP error 719") && f.Evidence.Contains("error 719"));
         Assert.Contains(found, f => f.Cause.Contains("several sessions") && f.Evidence.Contains("(3 lines)"));
         Assert.DoesNotContain(found, f => f.Cause.Contains("Two ReShades"));
+
+        // Whole words only: "chip" and "relationship" beside a 719 are not a GPU reset.
+        var quiet = Fixture.Temp("diagnosis-quiet");
+        File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "chip temperature error 719\nrelationship error 719 frames\n");
+        Assert.DoesNotContain(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
+        File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "HIP: hipErrorLaunchFailure on pass 2\n");
+        Assert.Contains(Diagnosis.Of(quiet, null, true), f => f.Cause.Contains("HIP error 719"));
     }
 }

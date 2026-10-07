@@ -26,7 +26,7 @@ public static partial class Diagnosis
         new([SessionLog.MochizukiLog], l => l.Contains("insufficient VRAM", StringComparison.OrdinalIgnoreCase),
             "mochizuki refused the network: not enough VRAM. Lower Scale or Passes, or use danielblnc's runtime."),
         new([SessionLog.RuntimeLog, SessionLog.AddonLog, "OptiScaler.log", "amd_bridge.log"],
-            l => l.Contains("DEVICE_HUNG", StringComparison.Ordinal) || l.Contains("hip", StringComparison.OrdinalIgnoreCase) && Hip719().IsMatch(l),
+            l => GpuReset().IsMatch(l),
             "The GPU was reset while the network ran (HIP error 719 or DEVICE_HUNG). On an RX 9000 card, use danielblnc "
             + Work.Rdna4Recommended + "; otherwise lower the resolution the network runs at, and check the driver is current."),
         new([SessionLog.RuntimeLog], l => l.StartsWith("CRASH:", StringComparison.Ordinal),
@@ -59,6 +59,8 @@ public static partial class Diagnosis
         return found;
     }
 
-    [GeneratedRegex(@"\b719\b")]
-    private static partial Regex Hip719();
+    /// <summary>DEVICE_HUNG, hipErrorLaunchFailure, or error 719 on a line a HIP call or "HIP" wrote: whole words, so
+    /// "chip" and "relationship" next to some 719 are not a reset.</summary>
+    [GeneratedRegex(@"\b(DEVICE_HUNG|hipErrorLaunchFailure)\b|\b(HIP|hip[A-Z]\w*)\b.*\berror\s*[:=#]?\s*719\b")]
+    private static partial Regex GpuReset();
 }
