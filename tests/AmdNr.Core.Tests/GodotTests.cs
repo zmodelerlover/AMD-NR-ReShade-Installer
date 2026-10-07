@@ -139,5 +139,10 @@ public class GodotTests
         var huge = Pack(4, Project());
         BitConverter.GetBytes(int.MaxValue).CopyTo(huge, 5 * 4 + 4 + 8 + 64 + 4); // the first path's length
         Assert.Equal(GraphicsApi.Vulkan, Beside("godot-bounded", huge).Api);
+
+        // A directory cut short after a good header is still Godot 4, as a guess: never the OpenGL of its import.
+        var cut = Beside("godot-cut", Pack(4, Project())[..110]);
+        Assert.Equal(GraphicsApi.Vulkan, cut.Api);
+        Assert.True(cut.Guessed);
     }
 }

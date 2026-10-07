@@ -38,7 +38,14 @@ public static partial class GraphicsDetector
             var (major, minor) = (head.ReadInt32(), head.ReadInt32());
             if (major != 4) return null;
             head.ReadInt32(); // patch
-            var settings = format is 2 or 3 ? ProjectSettings(pack, head, start, format) : null;
+            // A header that says Godot 4 is enough to know the engine: a directory or project.binary that cannot be
+            // parsed after it is settings not read, a guess, never "not Godot" and the OpenGL its import says.
+            Dictionary<string, string>? settings;
+            try { settings = format is 2 or 3 ? ProjectSettings(pack, head, start, format) : null; }
+            catch (Exception e) when (e is IOException or EndOfStreamException or ArgumentException or OverflowException)
+            {
+                settings = null;
+            }
             return Renderer(Path.GetFileName(exe), minor, settings);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or EndOfStreamException
