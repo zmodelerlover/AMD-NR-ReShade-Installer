@@ -382,6 +382,8 @@ public partial class GameSheet
         DanielVersionBox.SelectedIndex = _runtimeChoices.Count == 0 ? -1 : Math.Max(_runtimeChoices.FindIndex(r => r.Version == pick), 0);
         _setting = false;
         MochizukiNote.Text = WantsMochizuki(card) ? Ui.Text(addon ? "Str.RuntimeRdna4Addon" : "Str.RuntimeRdna4Opti") : "";
+        // Said under the section, not in a tooltip: people took the missing mochizuki tick box for mochizuki gone.
+        MochizukiNote.IsVisible = MochizukiNote.Text.Length > 0;
     }
 
     /// <summary>The danielblnc versions <see cref="DanielVersionBox"/> lists, in its order.</summary>

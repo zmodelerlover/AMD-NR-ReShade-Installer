@@ -406,7 +406,6 @@
                     <StackPanel x:Name="MochizukiSection" Spacing="6" IsVisible="False">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{DynamicResource Str.MochizukiSection}" Classes="section" />
-                        <Border Classes="info" ToolTip.Tip="{Binding #MochizukiNote.Text}" IsVisible="{Binding #MochizukiNote.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><PathIcon Data="{StaticResource IconInfo}" /></Border>
                       </StackPanel>
                       <Grid x:Name="DanielVersionRow" ColumnDefinitions="Auto,Auto,12,*">
                         <TextBlock Text="{DynamicResource Str.DanielVersion}" VerticalAlignment="Center" />
@@ -414,7 +413,7 @@
                         <ComboBox Grid.Column="3" x:Name="DanielVersionBox" HorizontalAlignment="Stretch" SelectionChanged="OnDanielVersionChanged"
                                   AutomationProperties.Name="{DynamicResource Str.DanielVersion}" />
                       </Grid>
-                      <TextBlock x:Name="MochizukiNote" IsVisible="False" />
+                      <TextBlock x:Name="MochizukiNote" Classes="caption" TextWrapping="Wrap" IsVisible="False" />
                     </StackPanel>
                   </StackPanel>
                 </StackPanel>
