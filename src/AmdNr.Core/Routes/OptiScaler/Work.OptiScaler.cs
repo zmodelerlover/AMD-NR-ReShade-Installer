@@ -404,8 +404,7 @@ public static partial class Work
                         + "mochizuki are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
         else if (!LmxxfWeighted(pins))
         {
-            if (!files.ContainsKey(OptiScalerIni) && File.Exists(Path.Combine(dir, OptiScalerIni))
-                && Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(dir, OptiScalerIni)), "DlssNr", "NrBackend")) == "lmxxf")
+            if (!files.ContainsKey(OptiScalerIni) && KeptIniNames(dir) == "lmxxf")
                 report.Warn($"The {OptiScalerIni} kept here names lmxxf as the NR runtime, which runs on RX 9070 and RX 9060 "
                             + "series cards only and is not installed on this one: pick daniel under NR runtime in OptiScaler's "
                             + $"Neural tab, or delete {OptiScalerIni} and install again.");
@@ -426,6 +425,17 @@ public static partial class Work
         else if (recorded.Count > 0) AfterMochizukiRetired(dir, report);
         report.Info(Preset.OptiScaler.Note());
         return report;
+    }
+
+    /// <summary>The NR runtime the OptiScaler.ini kept here names, or null. Read after the install has committed, so a
+    /// file that cannot be read now is only not said about, never a failed install.</summary>
+    private static string? KeptIniNames(string dir)
+    {
+        try { return Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(dir, OptiScalerIni)), "DlssNr", "NrBackend")); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
     }
 
     /// <summary>The folders this route created, once uninstall has emptied them, and a word about an
