@@ -11,13 +11,15 @@ public static partial class Work
         pins.OptiFiles.ContainsKey(LmxxfRuntimeName)
         && pins.OptiFiles.Keys.Any(k => k.StartsWith("lmxxf-modules-gfx1200/", StringComparison.Ordinal));
 
-    /// <summary>On an RX 9000 card, the one mochizuki goes in on, a fresh OptiScaler.ini runs lmxxf; anywhere else a
-    /// package's ini that names lmxxf runs danielblnc instead: 0.4.9's did, and an RX 7900 XT got a runtime it cannot run.</summary>
-    private static byte[] RunsLmxxf(byte[] ini, bool wanted)
+    /// <summary>On an RX 9000 card, the one mochizuki goes in on, a fresh OptiScaler.ini runs lmxxf. Where lmxxf cannot
+    /// run at all -- its weights left out on a card known not to be RDNA4 (<see cref="LmxxfWeighted"/>) -- a package's
+    /// ini that names lmxxf runs danielblnc instead: 0.4.9's did, and an RX 7900 XT got a runtime it cannot run.
+    /// Anywhere else the package's choice stands.</summary>
+    private static byte[] RunsLmxxf(byte[] ini, bool wanted, bool cannotRun)
     {
         var text = System.Text.Encoding.UTF8.GetString(ini);
         if (wanted) return System.Text.Encoding.UTF8.GetBytes(Engine.SetIni(text, "DlssNr", "NrBackend", "lmxxf"));
-        return Engine.Trim(Engine.GetIni(text, "DlssNr", "NrBackend")) == "lmxxf"
+        return cannotRun && Engine.Trim(Engine.GetIni(text, "DlssNr", "NrBackend")) == "lmxxf"
             ? System.Text.Encoding.UTF8.GetBytes(Engine.SetIni(text, "DlssNr", "NrBackend", "daniel"))
             : ini;
     }

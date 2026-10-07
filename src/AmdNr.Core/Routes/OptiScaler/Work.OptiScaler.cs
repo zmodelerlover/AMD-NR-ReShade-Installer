@@ -335,7 +335,7 @@ public static partial class Work
             }
             if (VerifiedPayload(src, path, sha, report) is { } bytes)
                 files[destination] = destination == OptiScalerIni
-                    ? WithoutUpscaler(RunsLmxxf(OnlyInTheGame(dir, bytes, report), lmxxf), everywhere)
+                    ? WithoutUpscaler(RunsLmxxf(OnlyInTheGame(dir, bytes, report), lmxxf, !LmxxfWeighted(pins)), everywhere)
                     : bytes;
         }
         if (!files.ContainsKey(OptiScalerIni) && LauncherBeside(dir) is { } kept)

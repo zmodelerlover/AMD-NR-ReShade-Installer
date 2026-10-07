@@ -23,6 +23,16 @@ public class LmxxfCardTests
         Assert.Equal("daniel", Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(game, Work.OptiScalerIni)), "DlssNr", "NrBackend")));
         Assert.DoesNotContain(report.Lines, l => l.Text.Contains("went in too, with its weights"));
 
+        // With lmxxf's weights in the install -- an RX 9000 card, or one nobody could read -- the package's choice stands.
+        var rx9000 = Fixture.Temp("lmxxf-card-9000");
+        File.WriteAllBytes(Path.Combine(rx9000, "Game.exe"), Fixture.PeWithImports(true, ["d3d12.dll"]));
+        var weight = Encoding.UTF8.GetBytes("stand-in lmxxf weights");
+        Directory.CreateDirectory(Path.Combine(src, "native-game-tiled-assets"));
+        File.WriteAllBytes(Path.Combine(src, "native-game-tiled-assets", "noise.f32"), weight);
+        ((Dictionary<string, string>)pins.OptiFiles)["native-game-tiled-assets/noise.f32"] = Engine.Sha(weight);
+        Assert.False(Work.Install(rx9000, src, Preset.OptiScaler, pins, mochizuki: false).Failed);
+        Assert.Equal("lmxxf", Engine.Trim(Engine.GetIni(File.ReadAllText(Path.Combine(rx9000, Work.OptiScalerIni)), "DlssNr", "NrBackend")));
+
         var manifest = new PayloadManifest
         {
             Components = new()
