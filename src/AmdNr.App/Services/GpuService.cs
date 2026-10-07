@@ -42,7 +42,9 @@ public static unsafe class GpuService
                 name = best.Name;
                 driver = best.Driver ?? driver;
                 radeon = best.Vendor == AmdVendor || best.Name.Contains("Radeon", StringComparison.OrdinalIgnoreCase);
-                rdna4 = IsRdna4(best.Vendor, best.Device, best.Name);
+                // No AMD adapter in sight (Remote Desktop, a driver being reinstalled, the Basic Render Driver) says
+                // nothing about the card, so it is unknown rather than "not RDNA4", which strips lmxxf.
+                rdna4 = best.Vendor == AmdVendor ? IsRdna4(best.Vendor, best.Device, best.Name) : null;
             }
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or COMException
