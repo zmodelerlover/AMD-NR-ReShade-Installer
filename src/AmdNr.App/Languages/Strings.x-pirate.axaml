@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Sails inside the game's DLSS, FSR or XeSS, with its own depth an' motion. Replaces ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Sails inside the game's upscaler ({0} spotted here). Replaces ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Made for 64-bit D3D12 games; this one reads as {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Sails inside the game's DLSS, FSR or XeSS when she carries one, and on the finished frame when she don't. 64-bit D3D9, D3D11, D3D12, Vulkan and OpenGL. Makes ReShade walk the plank.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Built for 64-bit D3D9, D3D11, D3D12, Vulkan and OpenGL games, matey; this one reads as {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">Graphics API</sys:String>
   <sys:String x:Key="Str.Group64">64-bit games</sys:String>
   <sys:String x:Key="Str.Group32">32-bit games (experimental)</sys:String>

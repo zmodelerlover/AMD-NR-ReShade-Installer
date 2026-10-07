@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Veikia žaidimo DLSS, FSR arba XeSS viduje, su jo paties gyliu ir judesiu. Pakeičia ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Veikia žaidimo didinimo priemonės viduje (čia rasta {0}). Pakeičia ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Sukurta 64 bitų D3D12 žaidimams; šis atpažintas kaip {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Veikia žaidimo DLSS, FSR arba XeSS viduje, kai jis yra, o kai nėra – galutiniame vaizde. 64 bitų D3D9, D3D11, D3D12, Vulkan ir OpenGL. Pakeičia ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Skirta 64 bitų D3D9, D3D11, D3D12, Vulkan ir OpenGL žaidimams; šis atpažintas kaip {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">Grafikos API</sys:String>
   <sys:String x:Key="Str.Group64">64 bitų žaidimai</sys:String>
   <sys:String x:Key="Str.Group32">32 bitų žaidimai (eksperimentiniai)</sys:String>

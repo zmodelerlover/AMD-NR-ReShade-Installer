@@ -268,8 +268,10 @@ public static partial class Work
         _ when preset.IsVulkan() || preset == Preset.FiveM => [],
         // Not ReShade's list: every name OptiScaler's dllmain answers to. winmm.dll is the way in
         // when dxgi.dll has to stay something else's; the rest are what the OptiScaler wiki names
-        // for games that load neither (Forspoken wants d3d12.dll, No Man's Sky dbghelp.dll).
-        Preset.OptiScaler => ["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll"],
+        // for games that load neither (Forspoken wants d3d12.dll, No Man's Sky dbghelp.dll). d3d9.dll and
+        // opengl32.dll are the D3D9 and OpenGL games' own names, from OptiScaler 0.5.0 on.
+        Preset.OptiScaler =>
+            ["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll", "d3d9.dll", "opengl32.dll"],
         Preset.X86Dx9 or Preset.X86Dx8 => ["d3d9.dll", "dinput8.dll"],
         Preset.X86Dx11 => ["dxgi.dll", "d3d11.dll", "dinput8.dll"],
         Preset.Dx12 => ["dxgi.dll", "d3d12.dll", "dinput8.dll"],
@@ -394,12 +396,14 @@ public static partial class Work
     /// goes in, and the report says the build is not used and why.</param>
     /// <param name="suggestedProxy">The name the OptiScaler wiki gives for this game (<see cref="ApiDatabase.OptiScalerNames"/>):
     /// what OptiScaler goes in as when no name was picked and no install of it is here already.</param>
+    /// <param name="api">The API the game runs OptiScaler on (<see cref="GraphicsDetection.OptiApi"/>). From OptiScaler
+    /// 0.5.0 on it names OptiScaler's default name: opengl32.dll, d3d9.dll, winmm.dll for Vulkan, dxgi.dll otherwise.</param>
     public static Report Preflight(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
         string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null,
-        string? suggestedProxy = null)
+        string? suggestedProxy = null, GraphicsApi? api = null)
     {
         var report = preset.IsOptiScaler()
-            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
+            ? PreflightOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy, api)
             : preset == Preset.FiveM ? PreflightFiveM(gameDir, payloadDir, pins, ownRuntime, wantedRuntime)
             : PreflightReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime);
         // Said before Install is pressed, as what Install does about it rather than as a problem.
@@ -418,9 +422,10 @@ public static partial class Work
     /// <param name="ownRuntime">See <see cref="Preflight"/>.</param>
     /// <param name="wantedRuntime">See <see cref="Preflight"/>.</param>
     /// <param name="suggestedProxy">See <see cref="Preflight"/>.</param>
+    /// <param name="api">See <see cref="Preflight"/>.</param>
     public static Report Install(string gameDir, string payloadDir, Preset preset, PayloadPins pins,
         string? proxy = null, bool mochizuki = false, string? ownRuntime = null, UserRuntime? wantedRuntime = null,
-        string? suggestedProxy = null)
+        string? suggestedProxy = null, GraphicsApi? api = null)
     {
         // What would make the transaction refuse, cleared first, on every route: see InTheWay.
         var report = ClearTheWay(gameDir, preset, pins) ?? new Report();
@@ -430,7 +435,7 @@ public static partial class Work
             return report;
         }
         report.Append(preset.Route() == Route.X86 ? InstallX86(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime)
-            : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy)
+            : preset.IsOptiScaler() ? InstallOptiScaler(gameDir, payloadDir, pins, proxy, mochizuki, ownRuntime, wantedRuntime, suggestedProxy, api)
             : preset == Preset.FiveM ? InstallFiveM(gameDir, payloadDir, pins, ownRuntime, wantedRuntime)
             : InstallReShade(gameDir, payloadDir, preset, pins, proxy, mochizuki, ownRuntime, wantedRuntime));
         return report;

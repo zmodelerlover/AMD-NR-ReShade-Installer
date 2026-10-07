@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Radi unutar DLSS-a, FSR-a ili XeSS-a igre, s njezinom dubinom i kretanjem. Zamjenjuje ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Radi unutar upscalera igre (ovdje pronađen {0}). Zamjenjuje ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Napravljeno za 64-bitne igre na D3D12; ova se čita kao {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Radi unutar DLSS-a, FSR-a ili XeSS-a igre kad ga ima, a kad nema, na gotovoj slici. 64-bitni D3D9, D3D11, D3D12, Vulkan i OpenGL. Zamjenjuje ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Namijenjeno 64-bitnim igrama na D3D9, D3D11, D3D12, Vulkanu i OpenGL-u; ova se čita kao {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">Grafički API</sys:String>
   <sys:String x:Key="Str.Group64">64-bitne igre</sys:String>
   <sys:String x:Key="Str.Group32">32-bitne igre (eksperimentalno)</sys:String>

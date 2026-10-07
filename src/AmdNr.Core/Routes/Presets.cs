@@ -161,10 +161,12 @@ public static class Presets
             + "expect less from it. A game with DLSS, FSR or XeSS in its settings is better served by "
             + "the OptiScaler route.",
         Preset.OptiScaler =>
-            "The route for D3D12 games. Instead of ReShade this installs OptiScaler, which takes over "
-            + "the game's DLSS, FSR or XeSS call and runs the network inside it, with the game's own "
-            + "depth and motion vectors. The game has to offer one of those upscalers, and it has to be "
-            + "switched on in its settings. In game, open OptiScaler with Insert, go to the Neural tab "
+            "Instead of ReShade this installs OptiScaler, which takes over the game's DLSS, FSR or XeSS "
+            + "call and runs the network inside it, with the game's own depth and motion vectors, once that "
+            + "upscaler is switched on in the game's settings. From OptiScaler 0.5.0 on, a 64-bit D3D9, D3D11, "
+            + "D3D12, Vulkan or OpenGL game without one gets the network on its finished frame instead (NR "
+            + "without upscaling); before it, the route is for D3D12 games with an upscaler. In game, open "
+            + "OptiScaler with Insert, go to the Neural tab "
             + "and turn on Enable NR; a game that uses Ray Reconstruction needs \"After the finished "
             + "frame\" as the processing point.",
         // Since add-on v0.5.3 a host that loads vulkan-1.dll itself (shadPS4 and Kyty import none of

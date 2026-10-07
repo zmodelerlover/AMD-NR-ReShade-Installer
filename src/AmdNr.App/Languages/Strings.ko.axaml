@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">게임의 DLSS, FSR 또는 XeSS 안에서 동작하며, 게임 자체의 깊이와 움직임을 사용합니다. ReShade를 대체합니다.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">게임의 업스케일러 안에서 동작합니다(여기서 {0} 발견). ReShade를 대체합니다.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">64비트 D3D12 게임용입니다. 이 게임은 {0}(으)로 감지됩니다.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">게임에 DLSS, FSR, XeSS가 있으면 그 안에서, 없으면 최종 화면에서 동작합니다. 64비트 D3D9, D3D11, D3D12, Vulkan, OpenGL. ReShade를 대신합니다.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">64비트 D3D9, D3D11, D3D12, Vulkan, OpenGL 게임용입니다. 이 게임은 {0}(으)로 인식됩니다.</sys:String>
   <sys:String x:Key="Str.ApiSection">그래픽 API</sys:String>
   <sys:String x:Key="Str.Group64">64비트 게임</sys:String>
   <sys:String x:Key="Str.Group32">32비트 게임(실험적)</sys:String>

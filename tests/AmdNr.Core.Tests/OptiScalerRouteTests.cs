@@ -19,7 +19,7 @@ public class OptiScalerRouteTests
     private const string RuntimeFile = "dlssnr_amd_runtime-0.3.1.dll";
 
     /// <summary>A staging folder the way PayloadCache.Stage lays one out for this route, and the pins.</summary>
-    internal static (string Dir, PayloadPins Pins) Payloads(string tag)
+    internal static (string Dir, PayloadPins Pins) Payloads(string tag, string version = "")
     {
         var dir = Fixture.Temp($"opti-payload-{tag}");
         var opti = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -46,6 +46,7 @@ public class OptiScalerRouteTests
             OptiRuntimeName = RuntimeFile,
             OptiRuntimeSha = Engine.Sha(runtime),
             OptiRuntimeSize = (ulong)runtime.Length,
+            OptiScalerVersion = version,
         });
     }
 
@@ -144,10 +145,11 @@ public class OptiScalerRouteTests
         Assert.Equal("stand-in OptiScaler.dll", Bytes(game, "winmm.dll"));
         Assert.False(File.Exists(Path.Combine(game, "dxgi.dll")));
 
-        Assert.Equal(["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll"],
+        Assert.Equal(["dxgi.dll", "winmm.dll", "version.dll", "d3d12.dll", "dbghelp.dll", "wininet.dll", "winhttp.dll",
+                      "d3d9.dll", "opengl32.dll"],
             Work.ProxyChoicesFor(Preset.OptiScaler));
         Assert.All(Work.ProxyChoicesFor(Preset.OptiScaler), name => Assert.Contains(name, Engine.Allowed));
-        Assert.Equal("dxgi.dll", Work.OptiProxyFor("d3d9.dll"));
+        Assert.Equal("dxgi.dll", Work.OptiProxyFor("d3d11.dll"));
         Assert.Equal("d3d12.dll", Work.OptiProxyFor(null, suggested: "D3D12.dll"));
         Assert.Equal("winmm.dll", Work.OptiProxyFor("winmm.dll", suggested: "d3d12.dll"));
     }

@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">ทำงานภายใน DLSS, FSR หรือ XeSS ของเกม ด้วยค่าความลึกและการเคลื่อนไหวของเกมเอง ใช้แทน ReShade</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">ทำงานภายในตัวอัปสเกลของเกม (พบ {0} ที่นี่) ใช้แทน ReShade</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">ทำมาสำหรับเกม D3D12 64 บิต แต่เกมนี้ถูกตรวจพบเป็น {0}</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">ทำงานภายใน DLSS, FSR หรือ XeSS ของเกมเมื่อมี และทำงานบนภาพสุดท้ายเมื่อไม่มี รองรับ D3D9, D3D11, D3D12, Vulkan และ OpenGL แบบ 64 บิต ใช้แทน ReShade</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">สร้างมาสำหรับเกม 64 บิตที่ใช้ D3D9, D3D11, D3D12, Vulkan และ OpenGL เกมนี้อ่านได้เป็น {0}</sys:String>
   <sys:String x:Key="Str.ApiSection">API กราฟิก</sys:String>
   <sys:String x:Key="Str.Group64">เกม 64 บิต</sys:String>
   <sys:String x:Key="Str.Group32">เกม 32 บิต (ทดลอง)</sys:String>

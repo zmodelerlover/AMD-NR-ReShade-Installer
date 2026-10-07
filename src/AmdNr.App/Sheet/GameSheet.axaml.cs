@@ -190,17 +190,17 @@ public partial class GameSheet : UserControl
 
     private void ShowApiHint(GraphicsDetection graphics)
     {
-        ApiHint.Text = graphics switch
-        {
-            { Preset: null, All.Count: > 0 } => Ui.Text("Str.NoRoute"),
-            { NeedsRendererSwitch: true } => Ui.Format("Str.SwitchRenderer",
-                    GraphicsDetection.Short(graphics.Recommended),
-                    string.Join(", ", graphics.All.Select(GraphicsDetection.Short)))
-                + (graphics.Executable?.EndsWith("-Shipping.exe", StringComparison.OrdinalIgnoreCase) == true
-                    ? " " + Ui.Format("Str.SwitchRendererUnreal", GraphicsDetection.Short(graphics.Recommended).ToLowerInvariant())
-                    : ""),
-            _ => "",
-        };
+        var everywhere = _card is { } card && OptiEverywhere(card);
+        var recommended = graphics.RecommendedFor(everywhere);
+        ApiHint.Text = graphics.PresetFor(everywhere) is null && graphics.All.Count > 0 ? Ui.Text("Str.NoRoute")
+            : graphics.NeedsRendererSwitchFor(everywhere)
+                ? Ui.Format("Str.SwitchRenderer",
+                      GraphicsDetection.Short(recommended),
+                      string.Join(", ", graphics.All.Select(GraphicsDetection.Short)))
+                  + (graphics.Executable?.EndsWith("-Shipping.exe", StringComparison.OrdinalIgnoreCase) == true
+                      ? " " + Ui.Format("Str.SwitchRendererUnreal", GraphicsDetection.Short(recommended).ToLowerInvariant())
+                      : "")
+                : "";
         // An emulator's renderer is a setting inside it, and that sentence is the whole difference
         // between working and not, so it replaces the generic "switch the renderer" hint.
         if (graphics.Emulator is { } emulator)

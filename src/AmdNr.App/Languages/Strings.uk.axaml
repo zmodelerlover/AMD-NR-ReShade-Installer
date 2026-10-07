@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Працює всередині DLSS, FSR або XeSS гри, з її власною глибиною й рухом. Замінює ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Працює всередині апскейлера гри (тут знайдено {0}). Замінює ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Зроблено для 64-бітних ігор на D3D12; цю гру визначено як {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Працює всередині DLSS, FSR або XeSS гри, якщо він є, а якщо немає — на готовому кадрі. 64-бітні D3D9, D3D11, D3D12, Vulkan і OpenGL. Замінює ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Для 64-бітних ігор на D3D9, D3D11, D3D12, Vulkan і OpenGL; ця гра визначається як {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">Графічний API</sys:String>
   <sys:String x:Key="Str.Group64">64-бітні ігри</sys:String>
   <sys:String x:Key="Str.Group32">32-бітні ігри (експериментально)</sys:String>

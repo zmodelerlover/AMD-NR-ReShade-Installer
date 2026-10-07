@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">ゲームの DLSS、FSR、XeSS の中で動作し、ゲーム自身の深度と動きを使います。ReShade の代わりになります。</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">ゲームのアップスケーラーの中で動作します（ここで {0} を検出）。ReShade の代わりになります。</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">64 ビットの D3D12 ゲーム向けです。このゲームは {0} と判定されています。</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">ゲームに DLSS・FSR・XeSS があればその中で、なければ最終フレーム上で動作します。64 ビットの D3D9、D3D11、D3D12、Vulkan、OpenGL に対応。ReShade の代わりに入ります。</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">64 ビットの D3D9、D3D11、D3D12、Vulkan、OpenGL のゲーム向けです。このゲームは {0} と判定されました。</sys:String>
   <sys:String x:Key="Str.ApiSection">グラフィックス API</sys:String>
   <sys:String x:Key="Str.Group64">64 ビットのゲーム</sys:String>
   <sys:String x:Key="Str.Group32">32 ビットのゲーム（実験的）</sys:String>

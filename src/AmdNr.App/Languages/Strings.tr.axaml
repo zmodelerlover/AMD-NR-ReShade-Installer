@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Oyunun DLSS, FSR veya XeSS'i içinde, oyunun kendi derinlik ve hareket bilgisiyle çalışır. ReShade'in yerini alır.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Oyunun ölçekleyicisi içinde çalışır (burada bulunan: {0}). ReShade'in yerini alır.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">64 bit D3D12 oyunları için yapıldı; bu oyun şöyle algılandı: {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Oyunun DLSS, FSR veya XeSS'i varsa onun içinde, yoksa bitmiş görüntü üzerinde çalışır. 64 bit D3D9, D3D11, D3D12, Vulkan ve OpenGL. ReShade'in yerini alır.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">64 bit D3D9, D3D11, D3D12, Vulkan ve OpenGL oyunları için; bu oyun {0} olarak görünüyor.</sys:String>
   <sys:String x:Key="Str.ApiSection">Grafik API'si</sys:String>
   <sys:String x:Key="Str.Group64">64 bit oyunlar</sys:String>
   <sys:String x:Key="Str.Group32">32 bit oyunlar (deneysel)</sys:String>

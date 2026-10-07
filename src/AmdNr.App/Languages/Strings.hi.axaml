@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">गेम के DLSS, FSR या XeSS के अंदर चलता है, उसकी अपनी डेप्थ और मोशन के साथ। ReShade की जगह लेता है।</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">गेम के अपस्केलर के अंदर चलता है (यहाँ {0} मिला)। ReShade की जगह लेता है।</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">64-बिट D3D12 गेम के लिए बना है; यह गेम {0} के रूप में पढ़ा गया।</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">गेम में DLSS, FSR या XeSS हो तो उसके अंदर चलता है, और न हो तो अंतिम फ़्रेम पर। 64-बिट D3D9, D3D11, D3D12, Vulkan और OpenGL। ReShade की जगह लेता है।</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">64-बिट D3D9, D3D11, D3D12, Vulkan और OpenGL गेम के लिए बना है; यह गेम {0} के रूप में पढ़ा गया।</sys:String>
   <sys:String x:Key="Str.ApiSection">ग्राफ़िक्स API</sys:String>
   <sys:String x:Key="Str.Group64">64-बिट गेम</sys:String>
   <sys:String x:Key="Str.Group32">32-बिट गेम (प्रायोगिक)</sys:String>

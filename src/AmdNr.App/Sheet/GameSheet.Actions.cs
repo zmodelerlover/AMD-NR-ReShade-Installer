@@ -59,6 +59,7 @@ public partial class GameSheet
         // One offered here and not found is the check's error (NoteRuntime); anything else the engine explains.
         var unoffered = wanted is not null && !Offered(wanted);
         var wiki = WikiProxy(card);
+        var api = OptiApi(card);
 
         // A result belongs to the action that produced it; a new check replaces it.
         Steps.IsVisible = false;
@@ -74,7 +75,7 @@ public partial class GameSheet
                 var folder = CachedPayloadFolder(preset, mochizuki);
                 var own = wanted is null ? null : Work.FindUserRuntime(wanted, TargetFor(card));
                 return (Work.Preflight(TargetFor(card), folder ?? "", preset, pins, proxy, mochizuki, own,
-                    unoffered ? wanted : null, wiki), folder, own);
+                    unoffered ? wanted : null, wiki, api), folder, own);
             });
         }
         catch (Exception e)
@@ -155,7 +156,8 @@ public partial class GameSheet
             var target = TargetFor(card);
             Report report;
             var wiki = WikiProxy(card);
-            try { report = await WritingAsync(() => Work.Install(target, folder, preset, pins, proxy, mochizuki, runtime, wanted, wiki)); }
+            var api = OptiApi(card);
+            try { report = await WritingAsync(() => Work.Install(target, folder, preset, pins, proxy, mochizuki, runtime, wanted, wiki, api)); }
             catch (Exception ex)
             {
                 // The engine turns everything it expects into a report line, and rolls back before
@@ -208,6 +210,14 @@ public partial class GameSheet
         {
             var preset = InstalledPreset(card);
             var report = await RunUninstallAsync(card, preset, removeConfig: false);
+
+            // A version picked for an install that is gone is not a choice for the next one: that one
+            // starts on the newest again.
+            if (!report.Failed && !card.Installed)
+            {
+                card.Entry.OptiScalerVersion = card.Entry.AddonVersion = null;
+                Library.Save();
+            }
 
             // One question, asked once everything of this app's is already out, and only about what
             // is left: the settings files, by name. Nothing left, nothing asked.

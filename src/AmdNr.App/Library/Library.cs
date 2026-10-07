@@ -227,6 +227,14 @@ public sealed class Library(Session session)
         Save();
     }
 
+    /// <summary>Whether the OptiScaler this game would get also runs on games without an upscaler (from
+    /// 0.5.0 on, see <see cref="Work.OptiRunsEverywhere"/>): the version picked for it, else the newest the
+    /// payload offers. That decides whether OptiScaler is recommended on every API it runs on, or only for
+    /// D3D12 games with an upscaler.</summary>
+    public bool OptiEverywhere(GameCard card) =>
+        Work.OptiRunsEverywhere(card.Entry.OptiScalerVersion
+                                ?? session.Manifest?.Offered(PayloadManifest.OptiScalerComponent).FirstOrDefault()?.Version);
+
     /// <summary>What the game renders with: its own files first, then what the API database knows
     /// about it. Only reads, so it runs on any thread.</summary>
     public GraphicsDetection Detect(GameCard card) =>
@@ -235,10 +243,10 @@ public sealed class Library(Session session)
 
     /// <summary>A detection taken as the game's, and the route following it unless the person chose
     /// one. Every reader goes through here, so the tile, the sheet and the install agree.</summary>
-    public static void Apply(GameCard card, GraphicsDetection detection)
+    public void Apply(GameCard card, GraphicsDetection detection)
     {
         card.Graphics = detection;
-        if (!card.Entry.PresetChosen && detection.Preset is { } preset) card.Entry.Preset = preset;
+        if (!card.Entry.PresetChosen && detection.PresetFor(OptiEverywhere(card)) is { } preset) card.Entry.Preset = preset;
         // Nothing recommends a route and nobody chose one: the route installed there is the game's.
         else if (!card.Entry.PresetChosen && card.InstalledVia == RouteFamily.OptiScaler) card.Entry.Preset = Preset.OptiScaler;
     }

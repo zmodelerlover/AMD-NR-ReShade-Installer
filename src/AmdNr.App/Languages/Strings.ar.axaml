@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">يعمل داخل DLSS أو FSR أو XeSS في اللعبة، مع عمقها وحركتها الخاصة. يحلّ محلّ ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">يعمل داخل تقنية رفع الدقة في اللعبة (عُثر هنا على {0}). يحلّ محلّ ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">مصمَّم لألعاب D3D12 ذات 64 بت؛ وهذه اللعبة اكتُشفت على أنها {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">يعمل داخل DLSS أو FSR أو XeSS في اللعبة عندما يتوفر أحدها، وعلى الصورة النهائية عندما لا يتوفر. يدعم D3D9 وD3D11 وD3D12 وVulkan وOpenGL بنظام 64 بت. يحل محل ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">مصمم لألعاب 64 بت على D3D9 وD3D11 وD3D12 وVulkan وOpenGL؛ تُقرأ هذه اللعبة على أنها {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">واجهة الرسوميات البرمجية</sys:String>
   <sys:String x:Key="Str.Group64">ألعاب 64 بت</sys:String>
   <sys:String x:Key="Str.Group32">ألعاب 32 بت (تجريبي)</sys:String>

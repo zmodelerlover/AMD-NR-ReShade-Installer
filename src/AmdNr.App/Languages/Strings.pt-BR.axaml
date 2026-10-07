@@ -361,6 +361,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Roda dentro do DLSS, FSR ou XeSS do jogo, com a profundidade e o movimento dele. Substitui o ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Roda dentro do upscaler do jogo ({0} encontrado aqui). Substitui o ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Feito para jogos D3D12 de 64 bits; este aparece como {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Roda dentro do DLSS, FSR ou XeSS do jogo quando ele tem um, e na imagem final quando não tem. D3D9, D3D11, D3D12, Vulkan e OpenGL de 64 bits. Substitui o ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Feito para jogos de 64 bits em D3D9, D3D11, D3D12, Vulkan e OpenGL; este aparece como {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">API gráfica</sys:String>
   <sys:String x:Key="Str.Group64">Jogos 64-bit</sys:String>
   <sys:String x:Key="Str.Group32">Jogos 32-bit (experimental)</sys:String>

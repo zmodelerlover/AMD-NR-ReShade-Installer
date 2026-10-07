@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">A játék DLSS, FSR vagy XeSS felskálázóján belül fut, a saját mélységével és mozgásával. A ReShade-et váltja ki.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">A játék felskálázóján belül fut (itt ezt találta: {0}). A ReShade-et váltja ki.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">64 bites D3D12-es játékokhoz készült; ez a játék ennek tűnik: {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">A játék DLSS, FSR vagy XeSS felskálázójában fut, ha van ilyen, ha nincs, akkor a kész képen. 64 bites D3D9, D3D11, D3D12, Vulkan és OpenGL. A ReShade helyett.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">64 bites D3D9, D3D11, D3D12, Vulkan és OpenGL játékokhoz készült; ez a játék {0}-nak látszik.</sys:String>
   <sys:String x:Key="Str.ApiSection">Grafikus API</sys:String>
   <sys:String x:Key="Str.Group64">64 bites játékok</sys:String>
   <sys:String x:Key="Str.Group32">32 bites játékok (kísérleti)</sys:String>

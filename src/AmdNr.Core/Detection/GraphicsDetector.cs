@@ -149,6 +149,99 @@ public static partial class GraphicsDetector
         return [.. found];
     }
 
+    /// <summary>The marks DLSS, FSR 2/3 and XeSS leave inside an executable that builds them in: the NGX
+    /// entry points its loader looks up by name, the names FSR gives its resources (UTF-16), and XeSS's
+    /// entry points. Each is specific to the upscaler; FidelityFX on its own is not, CAS and SPD carry it.</summary>
+    private static readonly (string Upscaler, byte[] Mark)[] Marks =
+    [
+        ("DLSS", System.Text.Encoding.ASCII.GetBytes("NVSDK_NGX_D3D12_Init")),
+        ("DLSS", System.Text.Encoding.ASCII.GetBytes("NVSDK_NGX_D3D11_Init")),
+        ("DLSS", System.Text.Encoding.ASCII.GetBytes("NVSDK_NGX_VULKAN_Init")),
+        ("FSR", System.Text.Encoding.Unicode.GetBytes("FSR2_InputColor")),
+        ("FSR", System.Text.Encoding.Unicode.GetBytes("FSR3UPSCALER_InputColor")),
+        ("XeSS", System.Text.Encoding.ASCII.GetBytes("xessD3D12CreateContext")),
+        ("XeSS", System.Text.Encoding.ASCII.GetBytes("xessVKCreateContext")),
+    ];
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<(string, long, DateTime), string[]> MarkCache = new();
+
+    /// <summary><see cref="Upscalers"/>, and what that misses: the upscaler files anywhere under the
+    /// game's folder (a Unity game keeps them in <c>Game_Data\Plugins</c>, others in a subfolder), and an
+    /// upscaler built into the executable itself. Slower -- the executable is read through -- so it runs
+    /// when a game is installed, not for every game the library lists. Each entry names the upscaler and
+    /// where it was found.</summary>
+    public static IReadOnlyList<string> UpscalersDeep(string folder, string? root = null, string? executable = null)
+    {
+        var found = new SortedSet<string>(Upscalers(folder, root), StringComparer.OrdinalIgnoreCase);
+        var names = new HashSet<string>(Work.UpscalerFiles, StringComparer.OrdinalIgnoreCase);
+        foreach (var dir in new[] { folder, root }.OfType<string>().Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var seen = 0;
+            try
+            {
+                foreach (var dll in Directory.EnumerateFiles(dir, "*.dll", new EnumerationOptions
+                         {
+                             RecurseSubdirectories = true, MaxRecursionDepth = 4, IgnoreInaccessible = true,
+                         }))
+                {
+                    if (++seen > 20_000) break;
+                    if (names.Contains(Path.GetFileName(dll))) found.Add(Path.GetFileName(dll).ToLowerInvariant());
+                }
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // A tree that cannot be read says nothing either way.
+            }
+        }
+        if (executable is not null && File.Exists(executable))
+            foreach (var upscaler in BuiltIn(executable))
+                found.Add($"{upscaler} ({Path.GetFileName(executable)})");
+        return [.. found];
+    }
+
+    /// <summary>The upscalers <see cref="Marks"/> finds in a file, read once per size and date.</summary>
+    internal static string[] BuiltIn(string file)
+    {
+        try
+        {
+            var info = new FileInfo(file);
+            return MarkCache.GetOrAdd((info.FullName, info.Length, info.LastWriteTimeUtc), _ => ReadMarks(info.FullName));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return [];
+        }
+    }
+
+    private static string[] ReadMarks(string file)
+    {
+        var found = new HashSet<string>();
+        var longest = Marks.Max(m => m.Mark.Length);
+        var buffer = new byte[8 << 20];
+        try
+        {
+            using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete,
+                1, FileOptions.SequentialScan);
+            var kept = 0;
+            int read;
+            while ((read = stream.Read(buffer, kept, buffer.Length - kept)) > 0)
+            {
+                var span = buffer.AsSpan(0, kept + read);
+                foreach (var (upscaler, mark) in Marks)
+                    if (!found.Contains(upscaler) && span.IndexOf(mark) >= 0) found.Add(upscaler);
+                if (found.Count == 3) break;
+                // The tail goes to the front, so a mark across two reads is still whole once.
+                kept = Math.Min(longest - 1, span.Length);
+                span[^kept..].CopyTo(buffer);
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // An executable that cannot be read says nothing either way.
+        }
+        return [.. found.Order()];
+    }
+
     /// <summary>Unreal's plugin folders for an executable in <c>Project\Binaries\Win64</c>: the
     /// project's own and the engine's.</summary>
     private static IEnumerable<string> PluginFolders(string folder, string? root)

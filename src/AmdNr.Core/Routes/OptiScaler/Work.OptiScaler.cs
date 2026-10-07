@@ -48,10 +48,29 @@ public static partial class Work
     /// detection reads the same list to decide whether a D3D11 and D3D12 game is recommended this route.</summary>
     internal static readonly string[] UpscalerFiles =
     [
-        "nvngx_dlss.dll", "nvngx_dlssd.dll", "sl.dlss.dll", "libxess.dll", "amd_fidelityfx_dx12.dll",
-        "amd_fidelityfx_upscaler_dx12.dll", "ffx_fsr3upscaler_x64.dll", "ffx_fsr2_api_x64.dll",
-        "ffx_fsr2_api_dx12_x64.dll",
+        "nvngx_dlss.dll", "nvngx_dlssd.dll", "sl.dlss.dll", "libxess.dll", "libxess_dx11.dll", "amd_fidelityfx_dx12.dll",
+        "amd_fidelityfx_upscaler_dx12.dll", "amd_fidelityfx_vk.dll", "ffx_fsr3upscaler_x64.dll", "ffx_fsr2_api_x64.dll",
+        "ffx_fsr2_api_dx12_x64.dll", "ffx_fsr2_api_vk_x64.dll",
     ];
+
+    /// <summary>The first OptiScaler release that also runs the network on the finished frame of a game
+    /// without an upscaler (NR without upscaling), on every API in <see cref="GraphicsDetection.OptiEverywhereApis"/>.</summary>
+    public static readonly Version OptiEverywhere = new(0, 5, 0);
+
+    /// <summary>Whether this OptiScaler version ("0.5.0-amd-nr") runs on games without an upscaler too.</summary>
+    public static bool OptiRunsEverywhere(string? version) =>
+        version is not null && AddonReleases.Version(version) is { } v && v >= OptiEverywhere;
+
+    /// <summary>The name OptiScaler loads under in a game on this API when nothing else names one:
+    /// opengl32.dll and d3d9.dll take the API's own place, winmm.dll is loaded early by Vulkan games
+    /// that never touch DXGI, and dxgi.dll is what D3D11 and D3D12 games load.</summary>
+    internal static string OptiProxyForApi(GraphicsApi? api) => api switch
+    {
+        GraphicsApi.OpenGL => "opengl32.dll",
+        GraphicsApi.D3D9 => "d3d9.dll",
+        GraphicsApi.Vulkan => "winmm.dll",
+        _ => "dxgi.dll",
+    };
 
     /// <summary>Where one payload file goes in the game folder. OptiScaler takes the proxy name, and
     /// the Agility runtime sits one level deeper than a payload path may go.</summary>
@@ -84,6 +103,14 @@ public static partial class Work
                 Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "NrBackend", "lmxxf"))
             : ini;
 
+    /// <summary>From OptiScaler 0.5.0 on, a fresh OptiScaler.ini runs the network on the finished frame of a
+    /// game with no upscaler running. It stands aside by itself while the game's upscaler runs.</summary>
+    private static byte[] WithoutUpscaler(byte[] ini, bool everywhere) =>
+        everywhere
+            ? System.Text.Encoding.UTF8.GetBytes(
+                Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "PresentWithoutUpscaler", "true"))
+            : ini;
+
     private static byte[] OnlyInTheGame(string dir, byte[] ini, Report report)
     {
         if (LauncherBeside(dir) is not { } l) return ini;
@@ -97,11 +124,13 @@ public static partial class Work
     /// installed name: an install made before the app read the wiki went in as dxgi.dll, which the wiki can
     /// say the game refuses, and an update moves it the way picking a name does -- the old name is given back,
     /// so there is never a second OptiScaler beside the first.</summary>
-    internal static string OptiProxyFor(string? wanted, Manifest? installed = null, string? suggested = null)
+    /// <param name="api">The API the game runs OptiScaler on, which names the last fallback (<see cref="OptiProxyForApi"/>).</param>
+    internal static string OptiProxyFor(string? wanted, Manifest? installed = null, string? suggested = null,
+        GraphicsApi? api = null)
     {
         var choices = ProxyChoicesFor(Preset.OptiScaler);
         string? Named(string? name) => choices.FirstOrDefault(n => string.Equals(n, name, StringComparison.OrdinalIgnoreCase));
-        return Named(wanted) ?? Named(suggested) ?? InstalledOptiProxies(installed).FirstOrDefault() ?? choices[0];
+        return Named(wanted) ?? Named(suggested) ?? InstalledOptiProxies(installed).FirstOrDefault() ?? OptiProxyForApi(api);
     }
 
     /// <summary>The proxy names an OptiScaler install recorded writing. An entry of no bytes is a file the
@@ -203,8 +232,81 @@ public static partial class Work
                 + "puts it back. Pick winmm.dll as the name to keep it loading.");
     }
 
-    private static void CheckUpscaler(string dir, Report report)
+    /// <summary>Files only the AMD NR mods of other projects leave: the AMDNR mod's packed lmxxf weights and its
+    /// NGX shim.</summary>
+    private static readonly string[] ForeignNrFiles = ["LmxxfNrRuntime.pak", "nvngx.dll_dlssnr.dll"];
+
+    /// <summary>Sections only another project's OptiScaler.ini has.</summary>
+    private static readonly string[] ForeignIniSections = ["[AmdGi]", "[AmdRtgi]", "[AmdLook]"];
+
+    /// <summary>Another AMD NR mod in this folder, each file with what it is: an OptiScaler that is not this
+    /// project's build (every one of ours calls its version "...-amd-nr"), an lmxxf runtime that names
+    /// another product, and the files only those mods leave. Empty when there is none, or what is here was
+    /// installed by this app.</summary>
+    internal static List<string> ForeignNrMod(string dir, Manifest? m)
     {
+        bool Recorded(string name) =>
+            m?.Entries.Any(e => e.Owned && string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase)) == true;
+        var found = new List<string>();
+        foreach (var name in ProxyChoicesFor(Preset.OptiScaler).Where(n => !Recorded(n)))
+        {
+            var path = Path.Combine(dir, name);
+            if (!File.Exists(path)) continue;
+            var (_, product, version) = Identify(path);
+            if (product?.Contains("OptiScaler", StringComparison.OrdinalIgnoreCase) == true
+                && version?.Contains("amd-nr", StringComparison.OrdinalIgnoreCase) != true)
+                found.Add($"{name} ({product}{(version is null ? "" : $" {version}")})");
+        }
+        var lmxxf = Path.Combine(dir, LmxxfRuntimeName);
+        if (File.Exists(lmxxf) && !Recorded(LmxxfRuntimeName)
+            && Identify(lmxxf).Product is { } other && other.Contains("AMDNR", StringComparison.OrdinalIgnoreCase))
+            found.Add($"{LmxxfRuntimeName} ({other})");
+        found.AddRange(ForeignNrFiles.Where(n => File.Exists(Path.Combine(dir, n))));
+        return found;
+    }
+
+    /// <summary>Whether the OptiScaler.ini here is another project's: one beside a foreign OptiScaler, or one
+    /// with sections only another build has. Its settings are not this build's, so it is backed up and
+    /// replaced instead of kept.</summary>
+    private static bool ForeignIni(string dir, bool foreignMod)
+    {
+        var path = Path.Combine(dir, OptiScalerIni);
+        if (!File.Exists(path)) return false;
+        if (foreignMod) return true;
+        try
+        {
+            var text = File.ReadAllText(path);
+            return ForeignIniSections.Any(s => text.Contains(s, StringComparison.OrdinalIgnoreCase));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    private static void CheckForeignMod(string dir, Manifest? m, Report report)
+    {
+        if (ForeignNrMod(dir, m) is not { Count: > 0 } found) return;
+        report.Warn(
+            $"Another AMD NR mod is in this folder: {Joined(found)}. It is not this project's, and two of them in one "
+            + $"folder load over each other. Its OptiScaler and its {OptiScalerIni} are backed up and replaced, and "
+            + "uninstall puts them back; the rest of it stays, so remove that mod with its own uninstaller first.");
+    }
+
+    private static void CheckUpscaler(string dir, Report report, bool everywhere, string? executable)
+    {
+        if (everywhere)
+        {
+            var deep = GraphicsDetector.UpscalersDeep(dir, null, executable);
+            report.Info(deep.Count > 0
+                ? $"{Joined(deep)} found: in this game OptiScaler runs the network inside its upscaler, with the game's "
+                  + "own depth and motion, once that upscaler is switched on in the game's settings. With it off, the "
+                  + "network runs on the finished frame instead (NR without upscaling)."
+                : "No DLSS, FSR or XeSS found in the game's files, so OptiScaler runs the network on the finished frame "
+                  + "(NR without upscaling), with danielblnc's runtime. A game that does have one runs it inside that "
+                  + "upscaler as soon as it is switched on.");
+            return;
+        }
         var found = GraphicsDetector.Upscalers(dir);
         if (found.Count > 0)
             report.Ok(
@@ -218,9 +320,17 @@ public static partial class Work
                 + "only a warning.");
     }
 
-    private static void CheckOptiRouteIsReachable(string dir, Report report)
+    private static void CheckOptiRouteIsReachable(string dir, Report report, bool everywhere)
     {
         var local = GraphicsDetector.Detect(dir);
+        if (everywhere)
+        {
+            if (local.CanRunOptiScalerWith(true)) return;
+            report.Warn(
+                $"The files here read as {local.Tag}. OptiScaler runs on 64-bit D3D9, D3D11, D3D12, Vulkan and OpenGL "
+                + $"games. {local.Why}");
+            return;
+        }
         if (local.All.Count == 0 || local.All.Contains(GraphicsApi.D3D12)) return;
         report.Warn(
             $"The files here link {string.Join(", ", local.All.Select(GraphicsDetection.Short))}, not D3D12. "
@@ -234,7 +344,7 @@ public static partial class Work
             .Append((WeightsName, pins.WeightsSize));
 
     private static Report PreflightOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
-        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy)
+        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy, GraphicsApi? api)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -280,7 +390,8 @@ public static partial class Work
                 + "administrator rights. Run this installer as administrator, or move the game.");
 
         var manifest = InstalledManifest(dir);
-        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy);
+        var everywhere = OptiRunsEverywhere(pins.OptiScalerVersion);
+        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy, everywhere ? api : null);
         NoteProxy(proxyName, proxy, manifest, suggestedProxy, report);
         var retiring = !mochizuki && MochizukiRecorded(manifest).Count > 0;
         var held = new[] { proxyName, WeightsName }.Concat(OptiPasses).Concat(AuthorsRuntimesHere(dir, pins).Select(f => f.Name))
@@ -299,14 +410,16 @@ public static partial class Work
         }
 
         CheckOptiInTheWay(dir, proxyName, manifest, report, preflight: true);
+        CheckForeignMod(dir, manifest, report);
         CheckRuntimeAsVersionDll(dir, pins, report);
         CheckAuthorsRuntime(dir, pins, Preset.OptiScaler, report);
-        CheckUpscaler(dir, report);
-        CheckOptiRouteIsReachable(dir, report);
+        CheckUpscaler(dir, report, everywhere, GraphicsDetector.Detect(dir).Executable);
+        CheckOptiRouteIsReachable(dir, report, everywhere);
         if (!mochizuki && manifest?.Entries.Any(e => e.Name == MochizukiRuntimeName && e.Owned) == true)
             report.Info(MochizukiComesOut);
 
-        if (File.Exists(Path.Combine(dir, OptiScalerIni)) && manifest?.Entries.Any(e => e.Name == OptiScalerIni) != true)
+        if (File.Exists(Path.Combine(dir, OptiScalerIni)) && manifest?.Entries.Any(e => e.Name == OptiScalerIni) != true
+            && !ForeignIni(dir, ForeignNrMod(dir, manifest).Count > 0))
             report.Info($"{OptiScalerIni} is already here and stays as it is: it is your configuration.");
 
         if (!report.Failed) report.Ok("Nothing in the way.");
@@ -314,7 +427,7 @@ public static partial class Work
     }
 
     private static Report InstallOptiScaler(string gameDir, string payloadDir, PayloadPins pins, string? proxy,
-        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy)
+        bool mochizuki, string? ownRuntime, UserRuntime? wantedRuntime, string? suggestedProxy, GraphicsApi? api)
     {
         var report = new Report();
         var dir = ResolveSource(gameDir);
@@ -351,8 +464,11 @@ public static partial class Work
         }
 
         var manifest = InstalledManifest(dir);
-        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy);
+        var everywhere = OptiRunsEverywhere(pins.OptiScalerVersion);
+        var proxyName = OptiProxyFor(proxy, manifest, suggestedProxy, everywhere ? api : null);
         CheckOptiInTheWay(dir, proxyName, manifest, report);
+        var foreign = ForeignNrMod(dir, manifest);
+        CheckForeignMod(dir, manifest, report);
         CheckRuntimeAsVersionDll(dir, pins, report);
         var moves = CheckAuthorsRuntime(dir, pins, Preset.OptiScaler, report);
         if (report.Failed)
@@ -364,18 +480,28 @@ public static partial class Work
         // Somebody's configuration is kept: OptiScaler rewrites its ini whenever a setting is saved,
         // so one that is here and was not written by this route is the settings somebody chose.
         var iniIsOurs = manifest?.Entries.Any(e => e.Name == OptiScalerIni) == true;
+        var iniIsForeign = !iniIsOurs && ForeignIni(dir, foreign.Count > 0);
+        if (iniIsForeign)
+            report.Info($"The {OptiScalerIni} here is another build's: it is backed up and this one's goes in, and "
+                        + "uninstall puts it back.");
+        // From OptiScaler 0.5.0 on, a game with no upscaler gets the network on the finished frame, and that
+        // runs on danielblnc's runtime only: lmxxf is the default only where the game has an upscaler.
+        IReadOnlyList<string> upscalers = everywhere ? GraphicsDetector.UpscalersDeep(dir, null, GraphicsDetector.Detect(dir).Executable) : [];
+        var lmxxf = mochizuki && LmxxfEverywhere(pins) && (!everywhere || upscalers.Count > 0);
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         foreach (var (path, sha) in pins.OptiFiles)
         {
             var destination = OptiDestination(path, proxyName);
-            if (destination == OptiScalerIni && File.Exists(Path.Combine(dir, OptiScalerIni)) && !iniIsOurs)
+            if (destination == OptiScalerIni && File.Exists(Path.Combine(dir, OptiScalerIni)) && !iniIsOurs && !iniIsForeign)
             {
                 report.Info($"{OptiScalerIni} is already here and stays as it is: it is your configuration. "
                             + "Delete it before installing to start from the package's.");
                 continue;
             }
             if (VerifiedPayload(src, path, sha, report) is { } bytes)
-                files[destination] = destination == OptiScalerIni ? RunsLmxxf(OnlyInTheGame(dir, bytes, report), mochizuki && LmxxfEverywhere(pins)) : bytes;
+                files[destination] = destination == OptiScalerIni
+                    ? WithoutUpscaler(RunsLmxxf(OnlyInTheGame(dir, bytes, report), lmxxf), everywhere)
+                    : bytes;
         }
         if (!files.ContainsKey(OptiScalerIni) && LauncherBeside(dir) is { } kept)
             report.Warn($"{kept.Launcher} sits beside the game and loads OptiScaler first, which breaks {kept.Why}. "
@@ -428,7 +554,11 @@ public static partial class Work
                 _ => $"The runtime stays danielblnc's {o.Runtime}, already here and newer than the "
                      + $"{pins.OptiRuntimeVersion} the download carries.",
             });
-        if (files.ContainsKey(OptiScalerIni) && mochizuki && LmxxfEverywhere(pins))
+        if (files.ContainsKey(OptiScalerIni) && everywhere)
+            report.Info($"{OptiScalerIni} has NR without upscaling on: with no upscaler running, OptiScaler runs the network "
+                        + "on the finished frame, HUD included, on danielblnc's runtime. Where the game's DLSS, FSR or XeSS "
+                        + "is on, the network runs inside it instead.");
+        if (files.ContainsKey(OptiScalerIni) && lmxxf)
             report.Info($"{OptiScalerIni} runs lmxxf (NrBackend=lmxxf), the default on RX 9000 cards. danielblnc and "
                         + "mochizuki are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
         else if (pins.OptiFiles.ContainsKey(LmxxfRuntimeName))
@@ -440,7 +570,7 @@ public static partial class Work
                 + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
         if (mochizuki)
             report.Info(MochizukiInstalled
-                        + (files.ContainsKey(OptiScalerIni) && LmxxfEverywhere(pins)
+                        + (files.ContainsKey(OptiScalerIni) && lmxxf
                             ? ""
                             : $" {OptiScalerIni} keeps the NR runtime it names: to use mochizuki, pick it under NR runtime in "
                               + "OptiScaler's Neural tab and restart the game."));

@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Rulează în interiorul DLSS, FSR sau XeSS al jocului, cu adâncimea și mișcarea lui. Înlocuiește ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Rulează în interiorul upscalerului jocului ({0} găsit aici). Înlocuiește ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Făcut pentru jocuri D3D12 pe 64 de biți; acesta pare a fi {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Rulează în DLSS, FSR sau XeSS al jocului când acesta are unul, iar altfel pe imaginea finală. D3D9, D3D11, D3D12, Vulkan și OpenGL pe 64 de biți. Înlocuiește ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Făcut pentru jocuri pe 64 de biți cu D3D9, D3D11, D3D12, Vulkan și OpenGL; acesta apare ca {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">API grafic</sys:String>
   <sys:String x:Key="Str.Group64">Jocuri pe 64 de biți</sys:String>
   <sys:String x:Key="Str.Group32">Jocuri pe 32 de biți (experimental)</sys:String>

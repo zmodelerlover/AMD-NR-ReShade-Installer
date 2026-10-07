@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">Działa wewnątrz DLSS, FSR lub XeSS gry, z jej własną głębią i ruchem. Zastępuje ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">Działa wewnątrz upscalera gry (znaleziono tu {0}). Zastępuje ReShade.</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">Przeznaczone dla 64-bitowych gier D3D12; ta gra wygląda na {0}.</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">Działa wewnątrz DLSS, FSR lub XeSS gry, gdy ją ma, a gdy nie ma — na gotowym obrazie. 64-bitowe D3D9, D3D11, D3D12, Vulkan i OpenGL. Zastępuje ReShade.</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">Przeznaczone dla 64-bitowych gier D3D9, D3D11, D3D12, Vulkan i OpenGL; ta gra wygląda na {0}.</sys:String>
   <sys:String x:Key="Str.ApiSection">API graficzne</sys:String>
   <sys:String x:Key="Str.Group64">Gry 64-bitowe</sys:String>
   <sys:String x:Key="Str.Group32">Gry 32-bitowe (eksperymentalne)</sys:String>

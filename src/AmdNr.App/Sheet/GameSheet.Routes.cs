@@ -32,10 +32,39 @@ public partial class GameSheet
     private void ShowRoutes(GameCard card, GraphicsDetection graphics)
     {
         _lastReShade = card.Entry.Preset.IsOptiScaler() ? graphics.ReShadeRoute : card.Entry.Preset;
+        ShowRecommendation(card, graphics);
+
+        // Neither card is checked while the route is the person's to pick.
+        var undecided = RouteUndecided(card);
+        _setting = true;
+        RouteOpti.IsChecked = !undecided && card.Entry.Preset.IsOptiScaler();
+        RouteReShade.IsChecked = !undecided && !card.Entry.Preset.IsOptiScaler();
+        _setting = false;
+        FillPresets(graphics);
+        ShowChosenRoute();
+    }
+
+    /// <summary>Whether the OptiScaler version in question also runs on games without an upscaler (from 0.5.0
+    /// on): the one picked in the list while the OptiScaler route is shown, else the game's
+    /// (<see cref="Library.OptiEverywhere"/>). It moves the recommendation: such a version is recommended on
+    /// every API it runs on, an older one only for D3D12 games with an upscaler.</summary>
+    private bool OptiEverywhere(GameCard card) =>
+        _version?.Opti is { } opti ? Work.OptiRunsEverywhere(opti.Version) : Library.OptiEverywhere(card);
+
+    /// <summary>The API this game runs OptiScaler on, which names the file it goes in as when nothing else
+    /// does. Null on a version older than 0.5.0, where it is always dxgi.dll.</summary>
+    private GraphicsApi? OptiApi(GameCard card) =>
+        OptiEverywhere(card) ? (card.Graphics ?? GraphicsDetector.Detect(card.Path)).OptiApi(true) : null;
+
+    /// <summary>Which card says Recommended and Installed, and what each says about this game, for the
+    /// OptiScaler version in question. Shown again when that version changes.</summary>
+    private void ShowRecommendation(GameCard card, GraphicsDetection graphics)
+    {
+        var everywhere = OptiEverywhere(card);
 
         // Recommended is what detection would pick; installed is what is in the folder. A game can
         // carry both on different cards, and that is the case that most needs saying.
-        var recommended = graphics.Preset?.Family();
+        var recommended = graphics.PresetFor(everywhere)?.Family();
         ReShadeRecommended.IsVisible = recommended == RouteFamily.ReShade;
         OptiRecommended.IsVisible = recommended == RouteFamily.OptiScaler;
         ReShadeInstalled.IsVisible = card.InstalledVia == RouteFamily.ReShade;
@@ -48,23 +77,16 @@ public partial class GameSheet
         ReShadeSummary.Text = reshadeFits
             ? Ui.Text("Str.RouteReShadeSummary")
             : Ui.Format("Str.RouteReShadeMisfit", graphics.Tag);
-        RouteOpti.Classes.Set("misfit", !graphics.CanRunOptiScaler);
-        OptiSummary.Text = graphics.CanRunOptiScaler
-            ? graphics.Upscalers.Count > 0
+        var optiFits = graphics.CanRunOptiScalerWith(everywhere);
+        RouteOpti.Classes.Set("misfit", !optiFits);
+        OptiSummary.Text = !optiFits
+            ? Ui.Format(everywhere ? "Str.RouteOptiMisfitAll" : "Str.RouteOptiMisfit", graphics.Tag)
+            : graphics.Upscalers.Count > 0
                 ? Ui.Format("Str.RouteOptiFound", string.Join(", ", graphics.Upscalers.Take(2)))
-                : Ui.Text("Str.RouteOptiSummary")
-            : Ui.Format("Str.RouteOptiMisfit", graphics.Tag);
+                : Ui.Text(everywhere ? "Str.RouteOptiSummaryAll" : "Str.RouteOptiSummary");
         OptiMismatchText.Text = OptiSummary.Text;
-        OptiMismatchBox.IsVisible = !graphics.CanRunOptiScaler;
-
-        // Neither card is checked while the route is the person's to pick.
-        var undecided = RouteUndecided(card);
-        _setting = true;
-        RouteOpti.IsChecked = !undecided && card.Entry.Preset.IsOptiScaler();
-        RouteReShade.IsChecked = !undecided && !card.Entry.Preset.IsOptiScaler();
-        _setting = false;
-        FillPresets(graphics);
-        ShowChosenRoute();
+        OptiMismatchBox.IsVisible = !optiFits;
+        ShowApiHint(graphics);
     }
 
     /// <summary>The ReShade APIs, grouped by what they are for. The group the detected width says can
@@ -326,6 +348,7 @@ public partial class GameSheet
         Remember(card, _version);
         Library.Save();
         (box == OptiVersionBox ? OptiVersionNote : VersionNote).Text = VersionNoteText();
+        if (box == OptiVersionBox) ShowRecommendation(card, card.Graphics ?? GraphicsDetector.Detect(card.Path));
         ShowRuntime();
         ShowMochizuki();
         ShowInstallLabel();
@@ -399,11 +422,13 @@ public partial class GameSheet
         _ = RefreshAsync();
     }
 
-    /// <summary>Records a chosen version on the game, in the field for the kind of version it is.</summary>
-    private static void Remember(GameCard card, VersionChoice choice)
+    /// <summary>Records a chosen version on the game, in the field for the kind of version it is. The newest is
+    /// recorded as no pick, so the game follows the next release instead of staying on this one.</summary>
+    private void Remember(GameCard card, VersionChoice choice)
     {
-        if (choice.Opti is { } opti) card.Entry.OptiScalerVersion = opti.Version;
-        else card.Entry.AddonVersion = choice.Version.ToString();
+        var newest = _versions.Count > 0 && choice.Version == _versions.Max(v => v.Version);
+        if (choice.Opti is { } opti) card.Entry.OptiScalerVersion = newest ? null : opti.Version;
+        else card.Entry.AddonVersion = newest ? null : choice.Version.ToString();
     }
 
     /// <summary>What pressing Install will actually do here, said on the button: install, put the

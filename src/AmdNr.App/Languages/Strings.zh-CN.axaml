@@ -318,6 +318,8 @@
   <sys:String x:Key="Str.RouteOptiSummary">在游戏的 DLSS、FSR 或 XeSS 内部运行，使用游戏自身的深度和运动信息。会替代 ReShade。</sys:String>
   <sys:String x:Key="Str.RouteOptiFound">在游戏的超分辨率组件内部运行（此处找到了 {0}）。会替代 ReShade。</sys:String>
   <sys:String x:Key="Str.RouteOptiMisfit">专为 64 位 D3D12 游戏设计；这款游戏被识别为 {0}。</sys:String>
+  <sys:String x:Key="Str.RouteOptiSummaryAll">游戏有 DLSS、FSR 或 XeSS 时在其中运行，没有时在最终画面上运行。支持 64 位 D3D9、D3D11、D3D12、Vulkan 和 OpenGL。替代 ReShade。</sys:String>
+  <sys:String x:Key="Str.RouteOptiMisfitAll">适用于 64 位 D3D9、D3D11、D3D12、Vulkan 和 OpenGL 游戏；此游戏识别为 {0}。</sys:String>
   <sys:String x:Key="Str.ApiSection">图形 API</sys:String>
   <sys:String x:Key="Str.Group64">64 位游戏</sys:String>
   <sys:String x:Key="Str.Group32">32 位游戏（实验性）</sys:String>
