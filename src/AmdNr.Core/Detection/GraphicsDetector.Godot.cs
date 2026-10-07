@@ -2,8 +2,9 @@
 //
 // The executable says nothing useful: it imports opengl32.dll for the Compatibility renderer and loads Vulkan and
 // D3D12 at run time. Until Then read as OpenGL from that import, and Vulkan for every Godot 4 game was wrong the
-// other way: Compatibility is OpenGL (or D3D11 through ANGLE), and from Godot 4.6 a new project's Forward+ and
-// Mobile run on D3D12 on Windows (rendering/rendering_device/driver.windows, d3d12 since 4.6; 4.3 added it).
+// other way: Compatibility is OpenGL (or D3D11 through ANGLE), and Forward+ and Mobile run the driver the project
+// sets in rendering/rendering_device/driver.windows (d3d12 from 4.3 on). The engine's default stays vulkan: 4.6 only
+// has the editor write d3d12 into projects it creates (godotengine/godot#113213), and older projects keep vulkan.
 //
 // The pack is the <exe name>.pck beside the executable or the one embedded at its end. Its header, from Godot's
 // core/io/file_access_pack.cpp: "GDPC", the pack format (2 for 4.0 to 4.3, 3 from 4.4), the engine's major, minor
@@ -137,8 +138,9 @@ public static partial class GraphicsDetector
         return found;
     }
 
-    /// <summary>The renderer the settings name, or, with none, the default of this Godot: Forward+ on Vulkan up to 4.5,
-    /// on D3D12 from 4.6. Settings that cannot be read are the default too, said as a guess.</summary>
+    /// <summary>The renderer the settings name, or, with no driver set, the engine's default, Vulkan, in every 4.x.
+    /// Settings that cannot be read are a guess: Vulkan up to 4.5, and D3D12 from 4.6, whose editor writes d3d12 into
+    /// the projects it creates (godotengine/godot#113213).</summary>
     private static GodotRenderer Renderer(string exeName, int minor, Dictionary<string, string>? settings)
     {
         var version = $"Godot 4.{minor}";
@@ -154,9 +156,9 @@ public static partial class GraphicsDetector
                 : new GodotRenderer(GraphicsApi.OpenGL, $"{exeName} is a {version} game on the Compatibility renderer, which is OpenGL.", false);
         var driver = settings.GetValueOrDefault("rendering/rendering_device/driver.windows")
                      ?? settings.GetValueOrDefault("rendering/rendering_device/driver");
-        var api = driver switch { "d3d12" => GraphicsApi.D3D12, "vulkan" => GraphicsApi.Vulkan, _ => fallback };
+        var api = driver == "d3d12" ? GraphicsApi.D3D12 : GraphicsApi.Vulkan;
         return new GodotRenderer(api, $"{exeName} is a {version} game on the {(method == "mobile" ? "Mobile" : "Forward+")} renderer, "
             + (driver is "d3d12" or "vulkan" ? $"which its project sets to {GraphicsDetection.Short(api)}."
-                : $"on {GraphicsDetection.Short(api)}, that version's default."), false);
+                : "on Vulkan, the engine's default."), false);
     }
 }

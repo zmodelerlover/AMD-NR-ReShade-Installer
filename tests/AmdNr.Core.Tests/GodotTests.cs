@@ -5,8 +5,9 @@ namespace AmdNr.Core.Tests;
 
 /// <summary>Godot 4 imports opengl32.dll for its Compatibility renderer and loads Vulkan or D3D12 at run time, so the
 /// executable says nothing (Until Then read as OpenGL). Its project settings, in its pack, say which: Compatibility is
-/// OpenGL (D3D11 through ANGLE), Forward+ and Mobile run the driver set, or the version's default, Vulkan up to 4.5 and
-/// D3D12 from 4.6. A pack that cannot be read is that default, said as a guess.</summary>
+/// OpenGL (D3D11 through ANGLE), Forward+ and Mobile run the driver set, or the engine's default, Vulkan, in every 4.x
+/// (4.6 only has its editor write d3d12 into new projects, godotengine/godot#113213). A pack that cannot be read is a
+/// guess: Vulkan up to 4.5, D3D12 from 4.6.</summary>
 public class GodotTests
 {
     private static byte[] Project(params (string Key, string Value)[] settings)
@@ -104,8 +105,9 @@ public class GodotTests
         Assert.Equal(GraphicsApi.D3D12, Embedded("godot-d3d12", Pack(4, Project((driver, "d3d12")), format: 3)).Api);
         Assert.Equal(GraphicsApi.Vulkan, Beside("godot-vulkan", Pack(6, Project((method, "mobile"), (driver, "vulkan")), format: 3)).Api);
 
+        // No driver key: the engine's default, Vulkan, from 4.6 too (a project made before 4.6 never got d3d12 written).
         var defaults46 = Beside("godot-46", Pack(6, Project(("application/config/name", "Until Then")), format: 3));
-        Assert.Equal(GraphicsApi.D3D12, defaults46.Api);
+        Assert.Equal(GraphicsApi.Vulkan, defaults46.Api);
         Assert.False(defaults46.Guessed);
         Assert.Equal(GraphicsApi.Vulkan, Embedded("godot-42", Pack(2, Project())).Api);
     }
