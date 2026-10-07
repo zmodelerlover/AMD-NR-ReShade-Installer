@@ -233,6 +233,11 @@ public static partial class Work
             : string.Join(", ", shown);
     }
 
+    /// <summary>A transaction's refusal and that nothing was left behind. Some refusals are sentences of their own
+    /// (<see cref="Engine.OpenElsewhere"/>) and end with a period, so one is not added twice.</summary>
+    internal static string RolledBack(InstallException e) =>
+        $"{e.Message.TrimEnd().TrimEnd('.')}. Nothing was left half-written: the install rolled itself back.";
+
     /// <summary>What a proxy DLL actually is, from its version resource. The filename says nothing:
     /// OptiScaler, DXVK and SpecialK all install as dxgi.dll too, and calling one of them "ReShade
     /// found" sends someone to look for an add-on in a ReShade that is not there.</summary>

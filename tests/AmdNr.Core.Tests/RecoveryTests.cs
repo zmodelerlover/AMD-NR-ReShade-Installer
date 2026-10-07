@@ -126,4 +126,14 @@ public class RecoveryTests
             Clean(c.Install(), $"{c.Name}: install again");
         }
     }
+
+    /// <summary>"... and this line goes away.. Nothing was left half-written": a refusal that is a sentence already
+    /// gets no second period.</summary>
+    [Fact]
+    public void ARolledBackInstallSaysItsReasonWithOnePeriod()
+    {
+        const string tail = ". Nothing was left half-written: the install rolled itself back.";
+        Assert.Equal("Locked" + tail, Work.RolledBack(new InstallException("Locked")));
+        Assert.Equal("close it and this line goes away" + tail, Work.RolledBack(new InstallException("close it and this line goes away.")));
+    }
 }

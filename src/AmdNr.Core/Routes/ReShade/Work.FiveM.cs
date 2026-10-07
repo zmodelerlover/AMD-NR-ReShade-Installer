@@ -130,7 +130,7 @@ public static partial class Work
         catch (InstallException e)
         {
             foreach (var line in log) Narrate(line, report);
-            report.Err($"{e.Message}. Nothing was left half-written: the install rolled itself back.");
+            report.Err(RolledBack(e));
             return report;
         }
 
