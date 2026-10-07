@@ -27,7 +27,7 @@ public class AsiReShadeTests
         Assert.False(Fixture.HasAny(Work.Preflight(game, src, Preset.Dx12, pins), "through the ASI loader"));
 
         // Ultimate ASI Loader: refused, like a second ReShade proxy.
-        Versioned.Write(Path.Combine(game, "version.dll"), "Ultimate ASI Loader", "9.7.4");
+        Versioned.Write(Path.Combine(game, "version.dll"), "Ultimate-ASI-Loader-x64", "9.7.4");
         var loaded = Work.Preflight(game, src, Preset.Dx12, pins);
         Assert.True(loaded.Failed && Fixture.HasAny(loaded, "through the ASI loader version.dll"), loaded.ToLog("loaded"));
         var install = Work.Install(game, src, Preset.Dx12, pins);
@@ -42,7 +42,7 @@ public class AsiReShadeTests
         var (src, pins) = Fixture.Payloads("asi-named");
         File.WriteAllBytes(Path.Combine(game, "Game.exe"), Fixture.PeWithImports(true, ["d3d12.dll"]));
         File.WriteAllBytes(Path.Combine(game, "ReShadeToggle.asi"), Fixture.Pe(true));
-        Versioned.Write(Path.Combine(game, "dinput8.dll"), "Ultimate ASI Loader", "9.7.2");
+        Versioned.Write(Path.Combine(game, "dinput8.dll"), "Ultimate-ASI-Loader-x64", "9.7.2");
         var report = Work.Preflight(game, src, Preset.Dx12, pins);
         Assert.False(Fixture.HasAny(report, "as an ASI plugin") || Fixture.HasAny(report, "through the ASI loader"), report.ToLog("named"));
     }

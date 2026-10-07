@@ -230,10 +230,13 @@ public static partial class Work
                         + "Move it out of the game folder.");
     }
 
-    /// <summary>Ultimate ASI Loader, by its version resource ("Ultimate ASI Loader"). Not by naming .asi in its bytes:
-    /// OptiScaler's dxgi.dll does that too.</summary>
+    /// <summary>Ultimate ASI Loader, by its version resource, which real builds name "Ultimate-ASI-Loader-x64" (6.0.0,
+    /// 9.7.2, 9.7.4). Not by naming .asi in its bytes: OptiScaler's dxgi.dll does that too.</summary>
     private static bool IsAsiLoader(string path) =>
-        Identify(path) is { IsReShade: false, Product: { } product } && product.Contains("ASI Loader", StringComparison.OrdinalIgnoreCase);
+        Identify(path) is { IsReShade: false, Product: { } product } && IsAsiLoaderProduct(product);
+
+    internal static bool IsAsiLoaderProduct(string product) =>
+        product.Replace("-", "").Replace(" ", "").Contains("ASILoader", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>A d3d11.dll in the game's folder that is not ReShade: another mod wrapping Direct3D 11, usually
     /// with Windows' own copy renamed beside it (ori_d3d11.dll), or a bare copy of Windows'. The game makes its
