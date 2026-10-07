@@ -130,6 +130,8 @@ public static partial class Work
     private static void CheckOptiRouteIsReachable(string dir, Report report, bool everywhere)
     {
         var local = GraphicsDetector.Detect(dir);
+        // An engine's default, not read from the game (a Godot 4 pack that cannot be read), says nothing against a route.
+        if (local.Guessed) return;
         if (everywhere)
         {
             if (local.CanRunOptiScalerWith(true)) return;

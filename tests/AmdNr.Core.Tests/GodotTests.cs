@@ -125,6 +125,9 @@ public class GodotTests
         File.WriteAllBytes(Path.Combine(game, "Game.pck"), Pack(4, Project(), format: 3, encrypted: true));
         var (src, pins) = Fixture.Payloads("godot-encrypted-route");
         Assert.False(Fixture.HasAny(Work.Preflight(game, src, Preset.Dx12, pins), "This route needs"));
+        // Nor the OptiScaler route, before 0.5.0 a D3D12 one: a guessed Vulkan is not "not D3D12".
+        var (optiSrc, optiPins) = OptiScalerRouteTests.Payloads("godot-encrypted-opti", "0.4.11-amd-nr");
+        Assert.False(Fixture.HasAny(Work.Preflight(game, optiSrc, Preset.OptiScaler, optiPins), "not D3D12"));
     }
 
     [Fact]
