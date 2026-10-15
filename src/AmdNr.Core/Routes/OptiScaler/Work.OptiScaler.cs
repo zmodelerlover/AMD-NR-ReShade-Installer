@@ -267,10 +267,13 @@ public static partial class Work
         if (iniIsForeign)
             report.Info($"The {OptiScalerIni} here is another build's: it is backed up and this one's goes in, and "
                         + "uninstall puts it back.");
-        // From OptiScaler 0.5.0 on, a game with no upscaler gets the network on the finished frame, and that
-        // runs on danielblnc's runtime only: lmxxf is the default only where the game has an upscaler.
+        // From OptiScaler 0.5.0 on, a game with no upscaler gets the network on the finished frame, and up to 0.5.1
+        // that runs on danielblnc's runtime only: lmxxf is the default only where the game has an upscaler. From 0.5.2
+        // on mochizuki runs there too, the fastest of the three on an RX 9000 (the card mochizuki goes in on), so a
+        // fresh ini runs it there with or without an upscaler; other cards keep danielblnc.
         IReadOnlyList<string> upscalers = everywhere ? GraphicsDetector.UpscalersDeep(dir, null, GraphicsDetector.Detect(dir).Executable) : [];
-        var lmxxf = mochizuki && LmxxfEverywhere(pins) && (!everywhere || upscalers.Count > 0);
+        var runsMochizuki = mochizuki && OptiRunsBridged(pins.OptiScalerVersion);
+        var lmxxf = !runsMochizuki && mochizuki && LmxxfEverywhere(pins) && (!everywhere || upscalers.Count > 0);
         if (everywhere && upscalers.Count == 0)
             report.Info("No DLSS, FSR or XeSS found in this game: OptiScaler runs the network on its finished frame (NR without upscaling).");
         var files = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
@@ -295,7 +298,8 @@ public static partial class Work
             }
             if (VerifiedPayload(src, path, sha, report) is { } bytes)
                 files[destination] = destination == iniName
-                    ? WithoutUpscaler(RunsLmxxf(OnlyInTheGame(dir, bytes, report), lmxxf, !LmxxfWeighted(pins)), everywhere)
+                    ? WithoutUpscaler(RunsMochizuki(RunsLmxxf(OnlyInTheGame(dir, bytes, report), lmxxf, !LmxxfWeighted(pins)),
+                        runsMochizuki), everywhere)
                     : bytes;
         }
         if (x86 && !files.ContainsKey(proxyName))
@@ -367,9 +371,12 @@ public static partial class Work
             });
         if (files.ContainsKey(iniName) && everywhere)
             report.Info($"{OptiScalerIni} has NR without upscaling on: with no upscaler running, OptiScaler runs the network "
-                        + "on the finished frame, HUD included, on danielblnc's runtime. Where the game's DLSS, FSR or XeSS "
-                        + "is on, the network runs inside it instead.");
-        if (files.ContainsKey(iniName) && lmxxf)
+                        + $"on the finished frame, HUD included, on {(runsMochizuki ? "mochizuki" : "danielblnc's runtime")}. "
+                        + "Where the game's DLSS, FSR or XeSS is on, the network runs inside it instead.");
+        if (files.ContainsKey(iniName) && runsMochizuki)
+            report.Info($"{OptiScalerIni} runs mochizuki (NrBackend=mochizuki), the default on RX 9000 cards, with ACO on. "
+                        + "danielblnc and lmxxf are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
+        else if (files.ContainsKey(iniName) && lmxxf)
             report.Info($"{OptiScalerIni} runs lmxxf (NrBackend=lmxxf), the default on RX 9000 cards. danielblnc and "
                         + "mochizuki are beside it: pick another under NR runtime in OptiScaler's Neural tab.");
         else if (!LmxxfWeighted(pins))
@@ -388,7 +395,7 @@ public static partial class Work
                 + "to use it, pick lmxxf under NR runtime in OptiScaler's Neural tab and restart the game.");
         if (mochizuki)
             report.Info(MochizukiInstalled
-                        + (files.ContainsKey(iniName) && lmxxf
+                        + (files.ContainsKey(iniName) && (lmxxf || runsMochizuki)
                             ? ""
                             : $" {OptiScalerIni} keeps the NR runtime it names: to use mochizuki, pick it under NR runtime in "
                               + "OptiScaler's Neural tab and restart the game."));

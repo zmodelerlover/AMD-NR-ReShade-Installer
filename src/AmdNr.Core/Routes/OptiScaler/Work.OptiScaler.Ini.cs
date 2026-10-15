@@ -1,5 +1,6 @@
-// What the OptiScaler route writes into a fresh OptiScaler.ini, and which lmxxf files it carries: lmxxf as the NR
-// runtime on an RX 9000 card with an upscaler and danielblnc anywhere else, NR without upscaling from 0.5.0 on, and
+// What the OptiScaler route writes into a fresh OptiScaler.ini, and which lmxxf files it carries: mochizuki as the NR
+// runtime on an RX 9000 card from 0.5.2 on (lmxxf there with an upscaler before), danielblnc anywhere else, NR
+// without upscaling from 0.5.0 on, and
 // the game as the only process to hook where a launcher beside it loads OptiScaler first.
 
 namespace AmdNr.Core;
@@ -23,6 +24,13 @@ public static partial class Work
             ? System.Text.Encoding.UTF8.GetBytes(Engine.SetIni(text, "DlssNr", "NrBackend", "daniel"))
             : ini;
     }
+
+    /// <summary>From 0.5.2 on, on the RX 9000 card mochizuki goes in on, a fresh OptiScaler.ini runs mochizuki.</summary>
+    private static byte[] RunsMochizuki(byte[] ini, bool wanted) =>
+        wanted
+            ? System.Text.Encoding.UTF8.GetBytes(
+                Engine.SetIni(System.Text.Encoding.UTF8.GetString(ini), "DlssNr", "NrBackend", MochizukiBackend))
+            : ini;
 
     /// <summary>Whether lmxxf's weights are in this install: they are left out on a card lmxxf does not run on
     /// (<see cref="PayloadManifest.WithoutLmxxf"/>).</summary>

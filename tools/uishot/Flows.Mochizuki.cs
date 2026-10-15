@@ -1,7 +1,7 @@
 // mochizuki as a person meets it: on an RX 9000 card a version of OptiScaler that carries it shows the NR
 // runtime section with a word on it, and Install puts the runtime and its dlssnr-amd folder beside OptiScaler
-// with no box to tick; OptiScaler.ini keeps the runtime it names when this OptiScaler has no lmxxf for every
-// RX 9000 card. On any other card nothing of it goes in. Run by the flows in Program.cs with OptiScaler 1.0.2
+// with no box to tick; from OptiScaler 0.5.2 on a fresh OptiScaler.ini runs mochizuki there. On any other card
+// nothing of it goes in. Run by the flows in Program.cs with OptiScaler 1.0.2
 // installed from "releases"; it leaves 1.0.3 installed with mochizuki, for the uninstall flow to take back.
 
 using System.Text.Json.Nodes;
@@ -50,8 +50,8 @@ internal static class MochizukiFlow
         foreach (var file in new[] { "MochizukiNrRuntime.dll", "dlssnr-amd/dlssnr.bin", "dlssnr-amd/prewarm/manifest.txt",
                      "dlssnr-amd/shaders/g_attn.spv", "dlssnr-amd/shaders/runtime/cascade_blur.spv" })
             check(File.Exists(Path.Combine(game, file)), $"with {file}");
-        check(Engine.GetIni(File.ReadAllText(ini), "DlssNr", "NrBackend").Trim() != "mochizuki",
-            "and OptiScaler.ini keeps the runtime it names");
+        check(Engine.GetIni(File.ReadAllText(ini), "DlssNr", "NrBackend").Trim() == "mochizuki",
+            "and OptiScaler.ini runs mochizuki, the default on RX 9000 from 0.5.2 on");
         check(!card.Outdated, "and the folder is not out of date");
 
         // On the ReShade route the same section, for the add-on (v0.6.8 on) to run mochizuki by default.
