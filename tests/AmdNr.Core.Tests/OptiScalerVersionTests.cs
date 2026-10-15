@@ -112,7 +112,7 @@ public class OptiScalerVersionTests
         var offered = shipped.Offered(PayloadManifest.OptiScalerComponent);
         // The newest release is offered first, with its own opti-runtime: 0.4.5, 0.4.4 and 0.4.3 take danielblnc's
         // public 0.4.3, which no earlier OptiScaler accepts, so 0.4.2 keeps 0.4.1 and 0.4.1 keeps 0.4.0.
-        Assert.Equal("0.5.1-amd-nr", offered[0].Version);
+        Assert.Equal("0.5.2-amd-nr", offered[0].Version);
         var newestRuntime = shipped.With(offered[0]).Component(PayloadManifest.OptiRuntimeComponent);
         Assert.Equal("0.6.0", newestRuntime.Version);
         Assert.Equal("195c4a891b6eac4c1cb7671e10ff62bbbe2b17f1dfae1344dc5a6714e4775721", newestRuntime.Files.Single().Sha256);
@@ -141,10 +141,21 @@ public class OptiScalerVersionTests
             var pins = shipped.With(release).Pins();
             foreach (var path in pins.OptiFiles.Keys)
             {
+                // The 32-bit proxies go beside the game, their host in OptiScaler64\ (0.5.2 and later).
+                if (path.StartsWith("x86/", StringComparison.Ordinal))
+                {
+                    var x86 = path == "x86/OptiScalerDx9Host.exe" ? "OptiScaler64/OptiScalerDx9Host.exe" : path[4..];
+                    Assert.True(Engine.IsAllowed(x86), $"{release.Version}: {x86} would be refused");
+                    continue;
+                }
                 var destination = path == Work.OptiScalerDllPayload ? "dxgi.dll"
                     : path == "D3D12_OptiScaler/D3D12Core.dll" ? "OptiScaler/D3D12_OptiScaler/D3D12Core.dll"
                     : path;
                 Assert.True(Engine.IsAllowed(destination), $"{release.Version}: {destination} would be refused");
+                // And the same in a 32-bit game's OptiScaler64\, OptiScaler under its own name.
+                var hosted = "OptiScaler64/" + (path == Work.OptiScalerDllPayload ? path : destination);
+                if (pins.OptiFiles.ContainsKey("x86/OptiScalerDx9Host.exe"))
+                    Assert.True(Engine.IsAllowed(hosted), $"{release.Version}: {hosted} would be refused");
             }
         }
         Assert.Contains("native-game-tiled-assets/block0-ffn.f16", shipped.With(offered[0]).Pins().OptiFiles.Keys);
