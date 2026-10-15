@@ -11,6 +11,7 @@
       dlssnr-amd\dlssnr.bin                  the model
       dlssnr-amd\prewarm\manifest.txt        the prewarm list, made for these shaders
       dlssnr-amd\shaders\...                 files, and one level of folders under it
+      dlssnr-amd\aco\...                     ACO's network (optional), two folder levels
 
   Anything else at the top of -From (OptiScaler.dll, notes, a build's .lib, .exp and obj\) is ignored.
 
@@ -95,7 +96,8 @@ function Written($name) { $name -eq 'pipeline.cache' -or $name -like '*.tmp' -or
 
 $top = Get-ChildItem -LiteralPath $data -Force
 foreach ($item in $top) {
-    $ok = ($item.PSIsContainer -and $item.Name -in 'prewarm', 'shaders') -or (-not $item.PSIsContainer -and $item.Name -eq 'dlssnr.bin')
+    $ok = ($item.PSIsContainer -and $item.Name -in 'prewarm', 'shaders', 'aco', 'int4') -or
+          (-not $item.PSIsContainer -and $item.Name -in 'dlssnr.bin', 'dlssnr-int4.bin')
     if (-not $ok) { Fail "dlssnr-amd\$($item.Name) is not part of a release$(if (Written $item.Name) { ': the runtime wrote it while a game ran' })" }
 }
 $extra = Get-ChildItem -LiteralPath (Join-Path $data 'prewarm') -Force | Where-Object { $_.Name -ne 'manifest.txt' }
@@ -123,6 +125,32 @@ foreach ($item in Get-ChildItem -LiteralPath $shaders -Force) {
         $files.Add([pscustomobject]@{ Path = "dlssnr-amd.shaders.$($item.Name)/$($inner.Name)"; File = $inner.FullName })
         $shaderCount++
     }
+}
+# dlssnr-amd\aco\: ACO's network (OptiScaler's MochizukiAco), files and two levels of folders under it
+# (records\, shaders\, shaders\temporal\), spelled with dots like the shaders.
+function AddTree($dir, $payload, $levels) {
+    foreach ($item in Get-ChildItem -LiteralPath $dir -Force) {
+        $at = "$dir\$($item.Name)".Substring($data.Length + 1)
+        if (Written $item.Name) { Fail "dlssnr-amd\$at was written by the runtime, it does not ship" }
+        Plain $item.Name $(if ($item.PSIsContainer) { 'folder' } else { 'file' })
+        if (-not $item.PSIsContainer) { $files.Add([pscustomobject]@{ Path = "$payload/$($item.Name)"; File = $item.FullName }); continue }
+        if ($levels -eq 0) { Fail "dlssnr-amd\$at is deeper than the app installs" }
+        if ($item.Name.Contains('.')) { Fail "dlssnr-amd\${at}: a folder name with a dot cannot be spelled in a payload path" }
+        AddTree $item.FullName "$payload.$($item.Name)" ($levels - 1)
+    }
+}
+$aco = Join-Path $data 'aco'
+if (Test-Path -LiteralPath $aco) { AddTree $aco 'dlssnr-amd.aco' 3 }
+# int4 mixed: its tables, settings and network in int4\ (two levels: shaders\temporal\), and its weights, made
+# from the model by dlssnr-int4-weights.exe (MZ_MODEL in build-mochizuki-runtime.cmd), beside dlssnr.bin.
+$int4 = Join-Path $data 'int4'
+$int4Weights = Join-Path $data 'dlssnr-int4.bin'
+if ((Test-Path -LiteralPath $int4) -ne (Test-Path -LiteralPath $int4Weights)) {
+    Fail "dlssnr-amd\int4\ and dlssnr-amd\dlssnr-int4.bin ship together: build with MZ_MODEL set, or remove both"
+}
+if (Test-Path -LiteralPath $int4) {
+    AddTree $int4 'dlssnr-amd.int4' 2
+    $files.Add([pscustomobject]@{ Path = 'dlssnr-amd/dlssnr-int4.bin'; File = $int4Weights })
 }
 foreach ($f in $files) { if ($f.Path.Length -gt 128) { Fail "payload path over 128 characters: $($f.Path)" } }
 # Ordinal, not Sort-Object's culture order: the archive's bytes must not depend on the machine's language.

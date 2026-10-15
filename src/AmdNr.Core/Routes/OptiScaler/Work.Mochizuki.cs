@@ -27,6 +27,9 @@ public static partial class Work
     /// <summary>The Vulkan pipeline cache the runtime writes into dlssnr-amd\ while a game runs.</summary>
     private const string MochizukiPipelineCache = "pipeline.cache";
 
+    /// <summary>Where the runtime keeps ACO's network once imported (OptiScaler's MochizukiAco): one .nrb a pipeline.</summary>
+    private const string MochizukiAcoCache = "aco-cache";
+
     /// <summary>Where one mochizuki payload file goes in the game folder. A payload path may be two
     /// levels deep at most -- every app already out there refuses a whole manifest that has a deeper
     /// one -- and the runtime reads files three levels down, so the folder part of a payload path
@@ -137,8 +140,8 @@ public static partial class Work
         + MochizukiLog + ".";
 
     /// <summary>What the mochizuki runtime writes beside its files while a game runs -- the pipeline
-    /// cache, and the temporary file a write cut short leaves -- once the runtime itself is gone, and
-    /// then its folders, deepest first, each only when nothing is left in it. With the runtime still
+    /// cache, ACO's imported network, int4 mixed's own cache and binaries, and the temporary file a write cut short
+    /// leaves -- once the runtime itself is gone, and then its folders, deepest first, each only when nothing is left in it. With the runtime still
     /// here (the game has it open, or it was not this app's) nothing of it is touched.</summary>
     private static void AfterMochizukiUninstall(string dir, Report report)
     {
@@ -146,10 +149,20 @@ public static partial class Work
         if (!Directory.Exists(root) || File.Exists(Path.Combine(dir, MochizukiRuntimeName))) return;
         try
         {
-            foreach (var file in Directory.EnumerateFiles(root).Concat(Leaves(Path.Combine(root, "prewarm"))).ToList())
+            // int4 mixed keeps a pipeline cache of its own and its rewritten pipeline binaries under int4\.
+            var acoCache = Path.Combine(root, MochizukiAcoCache);
+            var int4Binaries = Path.Combine(root, "int4", "pipeline-binaries");
+            foreach (var file in Directory.EnumerateFiles(root).Concat(Leaves(Path.Combine(root, "prewarm")))
+                         .Concat(Leaves(Path.Combine(root, "int4"))).Concat(Leaves(acoCache))
+                         .Concat(Leaves(int4Binaries)).ToList())
             {
                 var name = Path.GetFileName(file);
+                var folder = Path.GetDirectoryName(file);
                 var written = name == MochizukiPipelineCache
+                              || folder == int4Binaries
+                              || folder == acoCache
+                              && (name.EndsWith(".nrb", StringComparison.OrdinalIgnoreCase)
+                                  || name.EndsWith(".nrb.tmp", StringComparison.OrdinalIgnoreCase))
                               || name.EndsWith(".tmp", StringComparison.OrdinalIgnoreCase)
                               && (name.StartsWith(MochizukiPipelineCache + ".", StringComparison.Ordinal)
                                   || name.StartsWith("manifest.txt.", StringComparison.Ordinal));
@@ -159,11 +172,9 @@ public static partial class Work
                 report.Ok($"removed {Engine.MochizukiFolder}\\{Path.GetRelativePath(root, file)}");
             }
 
-            // Two levels below dlssnr-amd at most, which is as deep as anything of ours goes.
-            var folders = Directory.GetDirectories(root)
-                .SelectMany(d => Directory.GetDirectories(d).Append(d))
-                .Append(root);
-            foreach (var folder in folders)
+            // Deepest first, four levels below dlssnr-amd at most (aco\int4\shaders\temporal), which is as deep as
+            // anything of ours goes.
+            foreach (var folder in Below(root, 4).Append(root))
             {
                 if (!Directory.Exists(folder) || Directory.EnumerateFileSystemEntries(folder).Any()) continue;
                 Directory.Delete(folder);
@@ -177,5 +188,8 @@ public static partial class Work
 
         static IEnumerable<string> Leaves(string folder) =>
             Directory.Exists(folder) ? Directory.EnumerateFiles(folder) : [];
+
+        static IEnumerable<string> Below(string folder, int levels) =>
+            levels == 0 ? [] : Directory.GetDirectories(folder).SelectMany(d => Below(d, levels - 1).Append(d));
     }
 }

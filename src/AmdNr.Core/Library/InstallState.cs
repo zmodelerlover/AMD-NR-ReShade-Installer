@@ -16,7 +16,11 @@ public static class InstallState
     public static IReadOnlyList<string> Lines(string dir, PayloadManifest? payload, bool? rdna4)
     {
         var lines = new List<string>();
-        var record = Path.Combine(dir, Route.X64.ManifestFileName());
+        // A 32-bit game's OptiScaler records itself in the 32-bit route's manifest and runs from OptiScaler64\.
+        var record = new[] { Route.X64, Route.X86 }.Select(r => Path.Combine(dir, r.ManifestFileName()))
+            .FirstOrDefault(File.Exists) ?? Path.Combine(dir, Route.X64.ManifestFileName());
+        var host = Path.Combine(dir, "OptiScaler64");
+        var home = File.Exists(Path.Combine(host, Work.OptiScalerIni)) ? host : dir;
         try
         {
             var m = File.Exists(record) ? Manifest.Decode(File.ReadAllText(record)) : null;
@@ -27,9 +31,9 @@ public static class InstallState
             lines.Add($"installed     unreadable record: {e.Message}");
         }
 
-        var version = RuntimeIn(dir, payload);
+        var version = RuntimeIn(home, payload);
         lines.Add($"runtime       {version ?? "-"}");
-        if (OptiNr(dir, version, rdna4) is { } opti) lines.Add($"optiscaler    {opti}");
+        if (OptiNr(home, version, rdna4) is { } opti) lines.Add($"optiscaler    {opti}");
         lines.Add($"reshade log   {FirstLine(Path.Combine(dir, "ReShade.log")) ?? "-"}");
         return lines;
     }

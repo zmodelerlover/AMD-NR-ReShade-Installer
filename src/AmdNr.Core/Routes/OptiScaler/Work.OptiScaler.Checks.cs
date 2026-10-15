@@ -100,6 +100,33 @@ public static partial class Work
             + "uninstall puts them back; the rest of it stays, so remove that mod with its own uninstaller first.");
     }
 
+    /// <summary>A renamed copy of one of Streamline's own DLLs: Streamline loads every sl.*.dll beside it as a plugin,
+    /// and a backup such as sl.common.bak.dll crashes it ("plugin 'sl.common.bak' with priority &lt;= 0"). Only once
+    /// OptiScaler shows an NVIDIA GPU does the game start Streamline, so the ReShade route runs and this one closes on
+    /// launch. The Last of Us Part I with sl.common.dll renamed to sl.common.bak.dll (2026-10-12).</summary>
+    internal static void CheckRenamedStreamline(string dir, Report report)
+    {
+        if (!File.Exists(Path.Combine(dir, "sl.interposer.dll"))) return;
+        string[] renamed;
+        try
+        {
+            renamed = Directory.EnumerateFiles(dir, "sl.*.dll")
+                .Select(Path.GetFileName)
+                .OfType<string>()
+                .Where(n => n.Count(c => c == '.') > 2)
+                .ToArray();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return;
+        }
+        if (renamed.Length == 0) return;
+        report.Warn($"{Joined(renamed)} in this folder {(renamed.Length == 1 ? "is a renamed copy" : "are renamed copies")} "
+                    + "of the game's Streamline files. Streamline loads every sl.*.dll as a plugin and crashes the game "
+                    + "on these once OptiScaler is in. Rename each back to its original name (sl.common.bak.dll to "
+                    + "sl.common.dll), or verify the game's files.");
+    }
+
     private static void CheckUpscaler(string dir, Report report, bool everywhere, string? executable)
     {
         if (everywhere)
@@ -127,17 +154,19 @@ public static partial class Work
                 + "only a warning.");
     }
 
-    private static void CheckOptiRouteIsReachable(string dir, Report report, bool everywhere)
+    private static void CheckOptiRouteIsReachable(string dir, Report report, bool everywhere, bool bridges = false)
     {
         var local = GraphicsDetector.Detect(dir);
         // An engine's default, not read from the game (a Godot 4 pack that cannot be read), says nothing against a route.
         if (local.Guessed) return;
         if (everywhere)
         {
-            if (local.CanRunOptiScalerWith(true)) return;
+            if (local.CanRunOptiScalerWith(true, bridges)) return;
             report.Warn(
-                $"The files here read as {local.Tag}. OptiScaler runs on 64-bit D3D9, D3D11, D3D12, Vulkan and OpenGL "
-                + $"games. {local.Why}");
+                $"The files here read as {local.Tag}. OptiScaler runs on 64-bit D3D9, "
+                + (bridges ? "D3D10, D3D11, D3D12, Vulkan and OpenGL games, and 32-bit D3D9 and D3D10 games. "
+                           : "D3D11, D3D12, Vulkan and OpenGL games. ")
+                + local.Why);
             return;
         }
         if (local.All.Count == 0 || local.All.Contains(GraphicsApi.D3D12)) return;

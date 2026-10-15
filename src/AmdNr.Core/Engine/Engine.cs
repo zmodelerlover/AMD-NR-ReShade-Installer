@@ -250,6 +250,13 @@ public static partial class Engine
     public static bool IsAllowed(string name)
     {
         if (Allowed.Contains(name)) return true;
+        // A 32-bit game's OptiScaler: what a 64-bit game gets beside it, in OptiScaler64\ with the 64-bit host
+        // (Work.OptiHostFolder), and OptiScaler there under its own name, which the host loads.
+        if (name.StartsWith(OptiHostFolder, StringComparison.Ordinal))
+        {
+            var inner = name[OptiHostFolder.Length..];
+            return inner is "OptiScaler.dll" or "OptiScalerDx9Host.exe" || inner.Length > 0 && IsAllowed(inner);
+        }
         if (IsMochizukiData(name)) return true;
         var slash = name.IndexOf('/');
         if (slash <= 0 || name.IndexOf('/', slash + 1) >= 0) return false;
@@ -275,13 +282,17 @@ public static partial class Engine
     /// own (upstream DLSSNR-AMD's), and the names inside come from upstream and change with it.</summary>
     public const string MochizukiFolder = "dlssnr-amd";
 
-    /// <summary>A plain file in dlssnr-amd\, or up to two folders below it: dlssnr-amd\dlssnr.bin,
-    /// dlssnr-amd\prewarm\manifest.txt, dlssnr-amd\shaders\runtime\x.spv. Nothing deeper, nothing
-    /// that climbs.</summary>
+    /// <summary>The folder of a 32-bit game's OptiScaler and its 64-bit host, with its slash.</summary>
+    private const string OptiHostFolder = "OptiScaler64/";
+
+    /// <summary>A plain file in dlssnr-amd\, or up to four folders below it: dlssnr-amd\dlssnr.bin,
+    /// dlssnr-amd\prewarm\manifest.txt, dlssnr-amd\shaders\runtime\x.spv, and ACO's networks in
+    /// dlssnr-amd\aco\shaders\temporal\x.spv and dlssnr-amd\aco\int4\shaders\temporal\x.spv. Nothing deeper,
+    /// nothing that climbs.</summary>
     private static bool IsMochizukiData(string name)
     {
         var segments = name.Split('/');
-        if (segments.Length is < 2 or > 4 || segments[0] != MochizukiFolder) return false;
+        if (segments.Length is < 2 or > 6 || segments[0] != MochizukiFolder) return false;
         return segments.Skip(1).All(s => s.Length is > 0 and <= 96 && s is not ("." or "..")
                                          && s.IndexOfAny(Path.GetInvalidFileNameChars()) < 0);
     }

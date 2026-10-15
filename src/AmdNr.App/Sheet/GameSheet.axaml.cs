@@ -191,9 +191,10 @@ public partial class GameSheet : UserControl
     private void ShowApiHint(GraphicsDetection graphics)
     {
         var everywhere = _card is { } card && OptiEverywhere(card);
-        var recommended = graphics.RecommendedFor(everywhere);
-        ApiHint.Text = graphics.PresetFor(everywhere) is null && graphics.All.Count > 0 ? Ui.Text("Str.NoRoute")
-            : graphics.NeedsRendererSwitchFor(everywhere)
+        var bridges = _card is { } bridged && OptiBridges(bridged);
+        var recommended = graphics.RecommendedFor(everywhere, bridges);
+        ApiHint.Text = graphics.PresetFor(everywhere, bridges) is null && graphics.All.Count > 0 ? Ui.Text("Str.NoRoute")
+            : graphics.NeedsRendererSwitchFor(everywhere, bridges)
                 ? Ui.Format("Str.SwitchRenderer",
                       GraphicsDetection.Short(recommended),
                       string.Join(", ", graphics.All.Select(GraphicsDetection.Short)))

@@ -231,9 +231,14 @@ public sealed class Library(Session session)
     /// 0.5.0 on, see <see cref="Work.OptiRunsEverywhere"/>): the version picked for it, else the newest the
     /// payload offers. That decides whether OptiScaler is recommended on every API it runs on, or only for
     /// D3D12 games with an upscaler.</summary>
-    public bool OptiEverywhere(GameCard card) =>
-        Work.OptiRunsEverywhere(card.Entry.OptiScalerVersion
-                                ?? session.Manifest?.Offered(PayloadManifest.OptiScalerComponent).FirstOrDefault()?.Version);
+    public bool OptiEverywhere(GameCard card) => Work.OptiRunsEverywhere(OptiVersion(card));
+
+    /// <summary>Whether that OptiScaler also runs D3D10 and 32-bit D3D9 and D3D10 games (<see cref="Work.OptiRunsBridged"/>).</summary>
+    public bool OptiBridges(GameCard card) => Work.OptiRunsBridged(OptiVersion(card));
+
+    private string? OptiVersion(GameCard card) =>
+        card.Entry.OptiScalerVersion
+        ?? session.Manifest?.Offered(PayloadManifest.OptiScalerComponent).FirstOrDefault()?.Version;
 
     /// <summary>What the game renders with: its own files first, then what the API database knows
     /// about it. Only reads, so it runs on any thread.</summary>
@@ -249,7 +254,7 @@ public sealed class Library(Session session)
     public void Apply(GameCard card, GraphicsDetection detection)
     {
         card.Graphics = detection;
-        if (!card.Entry.PresetChosen && detection.PresetFor(OptiEverywhere(card)) is { } preset) card.Entry.Preset = preset;
+        if (!card.Entry.PresetChosen && detection.PresetFor(OptiEverywhere(card), OptiBridges(card)) is { } preset) card.Entry.Preset = preset;
         // Nothing recommends a route and nobody chose one: the route installed there is the game's.
         else if (!card.Entry.PresetChosen && card.InstalledVia == RouteFamily.OptiScaler) card.Entry.Preset = Preset.OptiScaler;
     }

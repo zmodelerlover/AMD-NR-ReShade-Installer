@@ -129,6 +129,10 @@ public sealed class PayloadManifest
     /// already published refuse that folder: they never ask for a component they do not know.</summary>
     public const string LmxxfGfx1200Component = "lmxxf-gfx1200";
 
+    /// <summary>OptiScaler 0.5.2's 32-bit proxies and their 64-bit host (x86/ in its package), for 32-bit D3D9 and
+    /// D3D10 games. A component of its own for the same reason as <see cref="LmxxfGfx1200Component"/>.</summary>
+    public const string OptiX86Component = "optiscaler-x86";
+
     /// <summary>The mochizuki runtime, which OptiScaler 0.4.0 and later can drive: the runtime, its
     /// shaders and its prewarm list in one archive, and its model on its own. Only ever inside a
     /// release, and installed only when it is asked for.</summary>
@@ -141,8 +145,8 @@ public sealed class PayloadManifest
     public static readonly IReadOnlySet<string> OnDemand =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            OptiScalerComponent, OptiRuntimeComponent, LmxxfWeightsComponent, LmxxfGfx1200Component, MochizukiComponent,
-            MochizukiModelComponent,
+            OptiScalerComponent, OptiRuntimeComponent, LmxxfWeightsComponent, LmxxfGfx1200Component, OptiX86Component,
+            MochizukiComponent, MochizukiModelComponent,
         };
 
     /// <summary>The SHA-256 a pin carries until the bytes it stands for exist: 64 zeros. A release
@@ -391,7 +395,7 @@ public sealed class PayloadManifest
         // and the other routes must keep installing from it.
         // The lmxxf weights go in with OptiScaler itself, so they are pinned the same way.
         var optiFiles = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var name in new[] { OptiScalerComponent, LmxxfWeightsComponent, LmxxfGfx1200Component })
+        foreach (var name in new[] { OptiScalerComponent, LmxxfWeightsComponent, LmxxfGfx1200Component, OptiX86Component })
             if (Components.TryGetValue(name, out var component))
                 foreach (var f in component.Installed)
                     optiFiles[f.RelativePath] = Engine.Lower(f.Sha256);

@@ -391,7 +391,8 @@ public partial class GameSheet
     private static string[] ComponentsFor(Preset preset, bool mochizuki = false) =>
         preset.IsOptiScaler()
             ? [PayloadManifest.OptiScalerComponent, PayloadManifest.OptiRuntimeComponent, PayloadManifest.RuntimeComponent,
-               PayloadManifest.LmxxfWeightsComponent, PayloadManifest.LmxxfGfx1200Component, .. Mochizuki(mochizuki)]
+               PayloadManifest.LmxxfWeightsComponent, PayloadManifest.LmxxfGfx1200Component, PayloadManifest.OptiX86Component,
+               .. Mochizuki(mochizuki)]
             : preset.Route() == Route.X86
                 ? [PayloadManifest.BridgeComponent, PayloadManifest.X86ExtrasComponent,
                    PayloadManifest.RuntimeComponent, PayloadManifest.ShaderComponent, .. Mochizuki(mochizuki)]

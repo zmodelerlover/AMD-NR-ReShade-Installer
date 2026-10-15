@@ -52,20 +52,25 @@ public partial class GameSheet
     private bool OptiEverywhere(GameCard card) =>
         _version?.Opti is { } opti ? Work.OptiRunsEverywhere(opti.Version) : Library.OptiEverywhere(card);
 
+    /// <summary>The same for D3D10 and the 32-bit games (<see cref="Work.OptiRunsBridged"/>).</summary>
+    private bool OptiBridges(GameCard card) =>
+        _version?.Opti is { } opti ? Work.OptiRunsBridged(opti.Version) : Library.OptiBridges(card);
+
     /// <summary>The API this game runs OptiScaler on, which names the file it goes in as when nothing else
     /// does. Null on a version older than 0.5.0, where it is always dxgi.dll.</summary>
     private GraphicsApi? OptiApi(GameCard card) =>
-        OptiEverywhere(card) ? (card.Graphics ?? GraphicsDetector.Detect(card.Path)).OptiApi(true) : null;
+        OptiEverywhere(card) ? (card.Graphics ?? GraphicsDetector.Detect(card.Path)).OptiApi(true, OptiBridges(card)) : null;
 
     /// <summary>Which card says Recommended and Installed, and what each says about this game, for the
     /// OptiScaler version in question. Shown again when that version changes.</summary>
     private void ShowRecommendation(GameCard card, GraphicsDetection graphics)
     {
         var everywhere = OptiEverywhere(card);
+        var bridges = OptiBridges(card);
 
         // Recommended is what detection would pick; installed is what is in the folder. A game can
         // carry both on different cards, and that is the case that most needs saying.
-        var recommended = graphics.PresetFor(everywhere)?.Family();
+        var recommended = graphics.PresetFor(everywhere, bridges)?.Family();
         ReShadeRecommended.IsVisible = recommended == RouteFamily.ReShade;
         OptiRecommended.IsVisible = recommended == RouteFamily.OptiScaler;
         ReShadeInstalled.IsVisible = card.InstalledVia == RouteFamily.ReShade;
@@ -78,7 +83,7 @@ public partial class GameSheet
         ReShadeSummary.Text = reshadeFits
             ? Ui.Text("Str.RouteReShadeSummary")
             : Ui.Format("Str.RouteReShadeMisfit", graphics.Tag);
-        var optiFits = graphics.CanRunOptiScalerWith(everywhere);
+        var optiFits = graphics.CanRunOptiScalerWith(everywhere, bridges);
         RouteOpti.Classes.Set("misfit", !optiFits);
         OptiSummary.Text = !optiFits
             ? Ui.Format(everywhere ? "Str.RouteOptiMisfitAll" : "Str.RouteOptiMisfit", graphics.Tag)

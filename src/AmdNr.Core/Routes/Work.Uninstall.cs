@@ -100,6 +100,14 @@ public static partial class Work
         foreach (var route in unreadable) gone += SetAside(dir, route, report);
         PruneEmpty(dir, [Engine.BackupDir, Engine.LegacyBackupDir, ShaderFolder, "reshade-shaders"], report);
         AfterMochizukiUninstall(dir, report);
+        // A 32-bit game's OptiScaler folder holds what the host and the proxy write while the game runs.
+        var hostDir = Path.Combine(dir, OptiHostFolder);
+        if (opti && Directory.Exists(hostDir))
+        {
+            gone += SweepDroppings(hostDir, report);
+            foreach (var name in OptiHostDroppings) gone += RemoveFile(hostDir, name, report);
+            AfterMochizukiUninstall(hostDir, report);
+        }
         if (opti) AfterOptiScalerUninstall(dir, recorded.Count > 0, report);
 
         if (gone == 0) report.Warn("Nothing of ours was in that folder.");
@@ -323,7 +331,11 @@ public static partial class Work
         MochizukiLog,
     ];
 
-    internal static readonly string[] DroppingFolders = ["amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures"];
+    /// <summary>The logs a 32-bit game's OptiScaler host and its proxies write in OptiScaler64\.</summary>
+    private static readonly string[] OptiHostDroppings =
+        ["OptiScaler.previous.log", "dx9-host.log", "dx9-x86.log", "dxgi-x86.log"];
+
+    internal static readonly string[] DroppingFolders =["amd-nr-runtime", "dlss5-runtime", "amd-nr-captures", "dlss5-captures"];
 
     /// <summary>What the add-on itself writes while a game runs: the unpacked runtime, its logs,
     /// its capture folder. They are never in a manifest, because nothing here put them there, so

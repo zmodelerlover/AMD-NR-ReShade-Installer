@@ -6,7 +6,7 @@ namespace AmdNr.Core.Tests;
 /// <summary>The mochizuki runtime OptiScaler 0.4.0 carries: how the payload lists it, when it is
 /// offered, where each file goes, the one ini key it sets, and how uninstall takes it back together
 /// with what the runtime writes while a game runs.</summary>
-public class MochizukiTests
+public partial class MochizukiTests
 {
     private const string RuntimeFile = "dlssnr_amd_runtime-0.3.1.dll";
     private const string ModelPath = "dlssnr-amd/dlssnr.bin";
@@ -26,13 +26,17 @@ public class MochizukiTests
         "MochizukiNrRuntime.dll", "dlssnr-amd.prewarm/manifest.txt", "dlssnr-amd.shaders/g_attn.spv",
         "dlssnr-amd.shaders/shader-constants.txt", "dlssnr-amd.shaders.runtime/cascade_blur.spv",
         "dlssnr-amd.shaders.temporal/shader-constants.txt", "dlssnr-amd/LICENSE-DLSSNR-AMD.txt",
+        "dlssnr-amd.aco.shaders.temporal/temporal_pre_fp32.spv", "dlssnr-amd.aco.int4.shaders.temporal/temporal_pre_fp32.spv",
+        "dlssnr-amd/dlssnr-int4.bin",
     ];
 
     private static readonly string[] Destinations =
     [
         "MochizukiNrRuntime.dll", "dlssnr-amd/prewarm/manifest.txt", "dlssnr-amd/shaders/g_attn.spv",
         "dlssnr-amd/shaders/shader-constants.txt", "dlssnr-amd/shaders/runtime/cascade_blur.spv",
-        "dlssnr-amd/shaders/temporal/shader-constants.txt", "dlssnr-amd/LICENSE-DLSSNR-AMD.txt", ModelPath,
+        "dlssnr-amd/shaders/temporal/shader-constants.txt", "dlssnr-amd/LICENSE-DLSSNR-AMD.txt",
+        "dlssnr-amd/aco/shaders/temporal/temporal_pre_fp32.spv", "dlssnr-amd/aco/int4/shaders/temporal/temporal_pre_fp32.spv",
+        "dlssnr-amd/dlssnr-int4.bin", ModelPath,
     ];
 
     private static string Content(string path, string tag) => path == "OptiScaler.ini" ? Ini : $"{tag} {path}";
@@ -139,7 +143,7 @@ public class MochizukiTests
         foreach (var destination in Destinations) Assert.True(Engine.IsAllowed(destination), destination);
 
         // Nothing deeper, nothing that climbs, no other folder, not the runtime under another name.
-        Assert.False(Engine.IsAllowed("dlssnr-amd/shaders/runtime/deeper/x.spv"));
+        Assert.False(Engine.IsAllowed("dlssnr-amd/aco/int4/shaders/temporal/deeper/x.spv"));
         Assert.False(Engine.IsAllowed("dlssnr-amd/../dxgi.dll"));
         Assert.False(Engine.IsAllowed("dlssnr-amd/shaders/.."));
         Assert.False(Engine.IsAllowed("dlssnr-amd/"));
@@ -329,6 +333,14 @@ public class MochizukiTests
         File.WriteAllText(Path.Combine(data, "prewarm", "manifest.txt.4242.4.tmp"), "half");
         File.WriteAllText(Path.Combine(data, "prewarm", "manifest.txt"), "rewritten for this driver");
         File.WriteAllText(Path.Combine(game, "mochizuki_nr.log"), "[mochizuki] prewarm 32 pipelines");
+        // ...with ACO: its network imported, one file a pipeline, and one cut short.
+        Directory.CreateDirectory(Path.Combine(data, "aco-cache"));
+        File.WriteAllText(Path.Combine(data, "aco-cache", "0123456789abcdef.nrb"), "imported");
+        File.WriteAllText(Path.Combine(data, "aco-cache", "fedcba9876543210.nrb.tmp"), "half");
+        // ...and int4 mixed: its own pipeline cache and rewritten binaries.
+        Directory.CreateDirectory(Path.Combine(data, "int4", "pipeline-binaries"));
+        File.WriteAllText(Path.Combine(data, "int4", "pipeline.cache"), "compiled");
+        File.WriteAllText(Path.Combine(data, "int4", "pipeline-binaries", "0123.bin"), "rewritten");
 
         var gone = Work.Uninstall(game, Preset.OptiScaler);
         Assert.False(gone.Failed, gone.ToLog("uninstall"));
@@ -422,70 +434,5 @@ public class MochizukiTests
         Assert.False(report.Failed, report.ToLog("install unticked"));
         Assert.Equal("[DlssNr]\nNrBackend=mochizuki\n", File.ReadAllText(Path.Combine(game, Work.OptiScalerIni)));
         Assert.Contains(report.Lines, l => l.Level == Level.Warn && l.Text.Contains("still names mochizuki", StringComparison.Ordinal));
-    }
-
-    /// <summary>A game folder with mochizuki 0.4.0 copied in by hand, as OptiScaler's own notes say to.</summary>
-    private static string HandCopied(string label)
-    {
-        var game = Game(label);
-        foreach (var (path, destination) in MochizukiPaths.Zip(Destinations).Append((ModelPath, ModelPath)))
-        {
-            var full = Path.Combine(game, destination);
-            Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-            File.WriteAllText(full, Content(path, path == ModelPath ? "model" : "0.4.0"));
-        }
-        return game;
-    }
-
-    [Fact]
-    public void OverAHandCopyThePrewarmListTheRuntimeRewroteDoesNotStopTheNextInstall()
-    {
-        var game = HandCopied("hand");
-        var (src, pins) = Staged("hand");
-        var first = Work.Install(game, src, Preset.OptiScaler, pins, mochizuki: true);
-        Assert.False(first.Failed, first.ToLog("install"));
-        var list = Path.Combine(game, "dlssnr-amd", "prewarm", "manifest.txt");
-        var manifest = Path.Combine(game, Route.X64.ManifestFileName());
-        Assert.Contains(Manifest.Decode(File.ReadAllText(manifest)).Entries, e => e.Name == "dlssnr-amd/prewarm/manifest.txt" && !e.Owned);
-
-        // The runtime makes the list again for this driver: the same build keeps it...
-        File.WriteAllText(list, "mochizuki-prewarm 1\nrewritten for this driver\n");
-        var again = Work.Install(game, src, Preset.OptiScaler, pins, mochizuki: true);
-        Assert.False(again.Failed, again.ToLog("reinstall"));
-        Assert.Equal("mochizuki-prewarm 1\nrewritten for this driver\n", File.ReadAllText(list));
-
-        // ...and a newer one replaces it, and from then on the list is this app's.
-        var (newer, newerPins) = Staged("hand-newer", "0.4.1");
-        var update = Work.Install(game, newer, Preset.OptiScaler, newerPins, mochizuki: true);
-        Assert.False(update.Failed, update.ToLog("update"));
-        Assert.Equal(Content("dlssnr-amd.prewarm/manifest.txt", "0.4.1"), File.ReadAllText(list));
-        Assert.Contains(Manifest.Decode(File.ReadAllText(manifest)).Entries,
-            e => e.Name == "dlssnr-amd/prewarm/manifest.txt" && e.Owned && e.Backup.Length == 0);
-
-        // Uninstall puts the hand copy back where it was replaced; the list, which the runtime makes
-        // again on its first start, goes.
-        var gone = Work.Uninstall(game, Preset.OptiScaler, removeConfig: true);
-        Assert.False(gone.Failed, gone.ToLog("uninstall"));
-        Assert.Equal(Content("MochizukiNrRuntime.dll", "0.4.0"), File.ReadAllText(Path.Combine(game, "MochizukiNrRuntime.dll")));
-        Assert.Equal(Content("dlssnr-amd.shaders/g_attn.spv", "0.4.0"),
-            File.ReadAllText(Path.Combine(game, "dlssnr-amd", "shaders", "g_attn.spv")));
-        Assert.False(File.Exists(list));
-    }
-
-    [Fact]
-    public void UntickedOverAHandCopyTheCopyStaysAndOnlyTheRecordGoes()
-    {
-        var game = HandCopied("hand-untick");
-        var (src, pins) = Staged("hand-untick");
-        Assert.False(Work.Install(game, src, Preset.OptiScaler, pins, mochizuki: true).Failed);
-
-        var report = Work.Install(game, src, Preset.OptiScaler, pins);
-        Assert.False(report.Failed, report.ToLog("install unticked"));
-        Assert.True(Fixture.HasAny(report, "this app did not put it there"), report.ToLog("install unticked"));
-        foreach (var (path, destination) in MochizukiPaths.Zip(Destinations))
-            Assert.Equal(Content(path, "0.4.0"), File.ReadAllText(Path.Combine(game, destination)));
-        var m = Manifest.Decode(File.ReadAllText(Path.Combine(game, Route.X64.ManifestFileName())));
-        Assert.DoesNotContain(m.Entries, e => e.Name.StartsWith("dlssnr-amd", StringComparison.Ordinal) || e.Name == "MochizukiNrRuntime.dll");
-        Assert.False(Work.HasMochizuki(game));
     }
 }

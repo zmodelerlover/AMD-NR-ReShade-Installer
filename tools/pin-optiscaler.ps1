@@ -27,7 +27,8 @@
   The RX 9060 series' lmxxf kernels (lmxxf-modules-gfx1200\, OptiScaler 0.4.9 and later) are a name
   the published installers refuse, so they never go into the optiscaler component: they are copied
   into <Out>\lmxxf-gfx1200-<version>.zip (fixed order and timestamp) and pinned as the lmxxf-gfx1200
-  component, which only installers that know it ask for. The upload command is printed.
+  component, which only installers that know it ask for. The upload command is printed. The 32-bit proxies
+  and their 64-bit host (x86\, OptiScaler 0.5.2 and later) go the same way, as optiscaler-x86.
 
   A release carrying LmxxfNrRuntime.dll gets the lmxxf weights component of the newest release that
   has one, when it has none of its own. Nothing else in the release (the mochizuki components) is
@@ -99,7 +100,12 @@ function KnownToOlderApps($destination) {
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $invalid = [IO.Path]::GetInvalidFileNameChars()
 $extract = [System.Collections.Generic.List[object]]::new()
-$gfx1200 = [System.Collections.Generic.List[object]]::new()   # (path, bytes) of lmxxf-modules-gfx1200/*
+# Folders of the archive the published installers refuse, each pinned as a component of its own that only the
+# installers that know it ask for: (path, bytes) of each file, by component.
+$sides = [ordered]@{
+    'lmxxf-gfx1200'  = @{ Prefix = 'lmxxf-modules-gfx1200/'; Label = 'lmxxf RX 9060 kernels'; Files = [System.Collections.Generic.List[object]]::new() }
+    'optiscaler-x86' = @{ Prefix = 'x86/'; Label = 'OptiScaler 32-bit proxies and host'; Files = [System.Collections.Generic.List[object]]::new() }
+}
 $sums = @{}
 $unknown = @()
 $archive = [IO.Compression.ZipFile]::OpenRead($Zip)
@@ -126,18 +132,18 @@ try {
         foreach ($s in $segments) {
             if ($s.Length -eq 0 -or $s.Length -gt 96 -or $s -in '.', '..' -or $s.IndexOfAny($invalid) -ge 0) { Fail "unusable name in the archive: $full" }
         }
-        $isGfx1200 = $full -like 'lmxxf-modules-gfx1200/*'
-        if (-not $isGfx1200 -and -not (KnownToOlderApps $full)) { $unknown += $full }
+        $side = $sides.Keys | Where-Object { $full.StartsWith($sides[$_].Prefix, [StringComparison]::Ordinal) } | Select-Object -First 1
+        if (-not $side -and -not (KnownToOlderApps $full)) { $unknown += $full }
 
         $stream = $entry.Open()
         try { $sha = Sha256Stream $stream } finally { $stream.Dispose() }
         if ($sums.ContainsKey($full) -and $sums[$full] -ne $sha) { Fail "$full hashes to $sha, and the archive's SHA256SUMS.txt says $($sums[$full])" }
         $pin = [ordered]@{ name = $segments[-1]; path = $path; size = $entry.Length; sha256 = $sha }
-        if ($isGfx1200) {
+        if ($side) {
             $ms = [IO.MemoryStream]::new()
             $s2 = $entry.Open()
             try { $s2.CopyTo($ms) } finally { $s2.Dispose() }
-            $gfx1200.Add([pscustomobject]@{ Pin = $pin; Bytes = $ms.ToArray() })
+            $sides[$side].Files.Add([pscustomobject]@{ Pin = $pin; Bytes = $ms.ToArray() })
         } else {
             $extract.Add($pin)
         }
@@ -180,33 +186,35 @@ if ($old -and ($old.Value.files | Where-Object { $_.sha256 -ne ('0' * 64) -and $
 }
 $release.components | Add-Member -NotePropertyName optiscaler -NotePropertyValue $component -Force
 
-# The RX 9060 kernels: an archive of their own, under the HF path its url names.
-if ($gfx1200.Count -gt 0) {
-    if (-not $Out) { $Out = Join-Path $root "publish-lmxxf-gfx1200-$Version" }   # publish-*/ is ignored by git
-    New-Item -ItemType Directory -Force -Path $Out | Out-Null
-    $gName = "lmxxf-gfx1200-$Version.zip"
-    $gZip = Join-Path $Out $gName
+# Each side folder: an archive of its own, under the HF path its url names.
+foreach ($sideName in $sides.Keys) {
+    $sideFiles = $sides[$sideName].Files
+    if ($sideFiles.Count -eq 0) { continue }
+    $sideOut = if ($Out) { $Out } else { Join-Path $root "publish-$sideName-$Version" }   # publish-*/ is ignored by git
+    New-Item -ItemType Directory -Force -Path $sideOut | Out-Null
+    $gName = "$sideName-$Version.zip"
+    $gZip = Join-Path $sideOut $gName
     if (Test-Path -LiteralPath $gZip) { Remove-Item -LiteralPath $gZip -Force }
     $fs = [IO.File]::Open($gZip, [IO.FileMode]::CreateNew)
     $zipOut = [IO.Compression.ZipArchive]::new($fs, [IO.Compression.ZipArchiveMode]::Create)
     try {
-        foreach ($g in ($gfx1200 | Sort-Object { $_.Pin.path } -CaseSensitive)) {
+        foreach ($g in ($sideFiles | Sort-Object { $_.Pin.path } -CaseSensitive)) {
             $e = $zipOut.CreateEntry($g.Pin.path, [IO.Compression.CompressionLevel]::Optimal)
             $e.LastWriteTime = [DateTimeOffset]::new(2026, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
             $w = $e.Open()
             try { $w.Write($g.Bytes, 0, $g.Bytes.Length) } finally { $w.Dispose() }
         }
     } finally { $zipOut.Dispose(); $fs.Dispose() }
-    $gUrl = "https://huggingface.co/datasets/$Repo/resolve/main/lmxxf-gfx1200/$Version/$gName"
+    $gUrl = "https://huggingface.co/datasets/$Repo/resolve/main/$sideName/$Version/$gName"
     $gComponent = [ordered]@{
         version   = $Version
         published = $Published
         files     = @([ordered]@{ name = $gName; size = (Get-Item -LiteralPath $gZip).Length; sha256 = (Sha256File $gZip); url = $gUrl })
-        extract   = @($gfx1200 | ForEach-Object { $_.Pin } | Sort-Object { $_.path } -CaseSensitive)
+        extract   = @($sideFiles | ForEach-Object { $_.Pin } | Sort-Object { $_.path } -CaseSensitive)
     }
-    $release.components | Add-Member -NotePropertyName 'lmxxf-gfx1200' -NotePropertyValue $gComponent -Force
-    Good "lmxxf-gfx1200: $($gfx1200.Count) files in $gZip"
-    Note "hf upload $Repo `"$gZip`" lmxxf-gfx1200/$Version/$gName --repo-type dataset --commit-message `"lmxxf RX 9060 kernels $Version`""
+    $release.components | Add-Member -NotePropertyName $sideName -NotePropertyValue $gComponent -Force
+    Good "${sideName}: $($sideFiles.Count) files in $gZip"
+    Note "hf upload $Repo `"$gZip`" $sideName/$Version/$gName --repo-type dataset --commit-message `"$($sides[$sideName].Label) $Version`""
 }
 
 if (($extract | Where-Object { $_.path -eq 'LmxxfNrRuntime.dll' }) -and -not $release.components.PSObject.Properties['lmxxf-weights']) {
