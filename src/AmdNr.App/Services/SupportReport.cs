@@ -41,6 +41,10 @@ public static class SupportReport
         "OptiScaler.log", "OptiScaler.ini", "amd_bridge.log", "amd_presr.log",
     ];
 
+    /// <summary>What a 32-bit game's OptiScaler host and its proxies write beside OptiScaler.log.</summary>
+    private static readonly string[] HostEvidence =
+        ["OptiScaler.previous.log", "dx9-host.log", "dx9-x86.log", "dxgi-x86.log"];
+
     /// <summary>A single file this big is taken in full; past it, the tail is taken and the cut is
     /// noted. A ReShade log from a long session is the only thing here that ever grows.</summary>
     private const int MaxFileBytes = 2 * 1024 * 1024;
@@ -85,6 +89,17 @@ public static class SupportReport
                 var file = Path.Combine(dir, name);
                 if (File.Exists(file)) Copy(zip, new FileInfo(file), $"game/{name}");
             }
+            // A 32-bit game's OptiScaler, its 64-bit host and the proxy all write in OptiScaler64\.
+            var host = Path.Combine(dir, "OptiScaler64");
+            if (Directory.Exists(host))
+            {
+                Text(zip, "game/OptiScaler64/listing.txt", Listing(host));
+                foreach (var name in RuntimeEvidence.Concat(HostEvidence))
+                {
+                    var file = Path.Combine(host, name);
+                    if (File.Exists(file)) Copy(zip, new FileInfo(file), $"game/OptiScaler64/{name}");
+                }
+            }
             // The names before v0.6.5 too: a record the older installers left is read on every install.
             foreach (var manifest in new[] { Route.X64.ManifestFileName(), Engine.ManifestName,
                          "dlss5-neural.install.json", "dlss5-x86bridge.install.json" })
@@ -97,6 +112,18 @@ public static class SupportReport
             // hand would go, and its listing says whether an older install is still sitting there.
             if (card is not null && !Engine.SamePath(dir, card.Path) && Directory.Exists(card.Path))
                 Text(zip, "game/listing-root.txt", Listing(card.Path));
+        }
+
+        // What the crash left outside the game folder: Unity's Player.log, WER's record of it, the dumps.
+        if (card is not null || installFolder is { Length: > 0 })
+        {
+            var dir = installFolder is { Length: > 0 } && File.Exists(installFolder)
+                ? Path.GetDirectoryName(installFolder) : installFolder;
+            var (files, index) = CrashEvidence.Collect([dir, card?.Path],
+                [card?.Entry.Executable, card?.Graphics?.Executable], CrashEvidence.Roots.Machine(), DateTime.Now);
+            Text(zip, "crashes/index.txt", index);
+            foreach (var f in files)
+                Copy(zip, f.File, $"crashes/{f.Name}", whole: f.Whole);
         }
 
         // FiveM writes in two places under FiveM.app, neither of them beside FiveM.exe: ReShade and the
@@ -246,6 +273,8 @@ public static class SupportReport
         o.AppendLine("  config/         what the app is configured with and what it downloaded");
         o.AppendLine("  game/           the game folder's listing, and what ReShade and the add-on");
         o.AppendLine("                  wrote there at run time -- ReShade.log is usually the answer");
+        o.AppendLine("  crashes/        Unity's Player.log, Windows' crash reports and dumps of the game,");
+        o.AppendLine("                  from the last 14 days; index.txt says where each came from");
         return o.ToString();
     }
 
@@ -356,7 +385,8 @@ public static class SupportReport
         stream.Write(Encoding.UTF8.GetBytes(content));
     }
 
-    private static void Copy(ZipArchive zip, FileInfo file, string name)
+    /// <param name="whole">A dump cut short cannot be opened, so it is never cut.</param>
+    private static void Copy(ZipArchive zip, FileInfo file, string name, bool whole = false)
     {
         try
         {
@@ -365,7 +395,7 @@ public static class SupportReport
                 FileShare.ReadWrite | FileShare.Delete);
 
             using var target = zip.CreateEntry(name).Open();
-            if (source.Length > MaxFileBytes)
+            if (!whole && source.Length > MaxFileBytes)
             {
                 target.Write(Encoding.UTF8.GetBytes(
                     $"[the first {source.Length - MaxFileBytes:N0} bytes were cut; the end is what matters here]\n\n"));
