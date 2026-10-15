@@ -81,4 +81,30 @@ public class HeldFilesTests
         Work.CheckLocalHip(Fixture.Temp("no-hip"), none, system);
         Assert.Empty(none.Lines);
     }
+
+    /// <summary>The Last of Us Part I closed on launch with OptiScaler: sl.common.dll had been renamed to
+    /// sl.common.bak.dll, which Streamline loads as a plugin and crashes on. Streamline's own names are not warned
+    /// about, and neither is a folder without Streamline.</summary>
+    [Fact]
+    public void ARenamedStreamlineFileIsWarnedAbout()
+    {
+        var dir = Fixture.Temp("renamed-sl");
+        foreach (var name in new[] { "sl.interposer.dll", "sl.dlss.dll", "sl.common.bak.dll" })
+            File.WriteAllBytes(Path.Combine(dir, name), [1]);
+
+        var report = new Report();
+        Work.CheckRenamedStreamline(dir, report);
+        Assert.Contains("sl.common.bak.dll", Assert.Single(report.Lines, l => l.Item1 == Level.Warn).Item2);
+
+        File.Move(Path.Combine(dir, "sl.common.bak.dll"), Path.Combine(dir, "sl.common.dll"));
+        var fine = new Report();
+        Work.CheckRenamedStreamline(dir, fine);
+        Assert.Empty(fine.Lines);
+
+        var noStreamline = Fixture.Temp("renamed-sl-none");
+        File.WriteAllBytes(Path.Combine(noStreamline, "sl.common.bak.dll"), [1]);
+        var none = new Report();
+        Work.CheckRenamedStreamline(noStreamline, none);
+        Assert.Empty(none.Lines);
+    }
 }

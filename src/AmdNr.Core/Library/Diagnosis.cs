@@ -32,6 +32,15 @@ public static partial class Diagnosis
         new(["amd_presr.log", SessionLog.AddonLog], l => l.Contains("HIP device enumeration failed", StringComparison.OrdinalIgnoreCase),
             "HIP found no GPU, so the network never ran. Usually an amdhip64_7.dll copied into the game folder that does "
             + "not match the driver: move it out (the driver has its own in System32), or reinstall the AMD driver."),
+        new(["OptiScaler.log"], l => l.Contains("with priority <= 0 which is not allowed", StringComparison.OrdinalIgnoreCase),
+            "The game's Streamline crashed on a renamed copy of one of its own files (sl.common.bak.dll, say): it loads "
+            + "every sl.*.dll as a plugin. Rename the file back to its original name (sl.common.dll), or verify the "
+            + "game's files."),
+        new(["OptiScaler.log"], l => l.Contains("RTSS is hooked into the game while frame generation runs", StringComparison.OrdinalIgnoreCase),
+            "RivaTuner Statistics Server (RTSS, also started by MSI Afterburner) was hooked into the game while frame "
+            + "generation ran: it holds frame generation's presents back, which shows as stutter and a lower base frame "
+            + "rate. Close it while playing, or turn its hooking off for this game. OptiScaler's FPS limit goes through "
+            + "RTSS too and counts the generated frames."),
         new([SessionLog.RuntimeLog], l => l.StartsWith("CRASH:", StringComparison.Ordinal),
             "danielblnc's runtime caught the game crashing in several sessions: the first CRASH line is the evidence, and "
             + "the report's dlssnr_on_amd.log has them all.", AtLeast: 3),

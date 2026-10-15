@@ -31,6 +31,17 @@ public class DiagnosisTests
             "1506500 HIP runtime: amdhip64_7.dll source=default\n1514187 HIP device enumeration failed: code=100 devices=0\n");
         Assert.Contains(Diagnosis.Of(hip, null, true), f => f.Cause.Contains("HIP found no GPU") && f.Evidence.StartsWith("amd_presr.log"));
 
+        // The Last of Us Part I: sl.common.dll renamed to sl.common.bak.dll crashed the game's Streamline.
+        var sl = Fixture.Temp("diagnosis-sl");
+        File.WriteAllText(Path.Combine(sl, "OptiScaler.log"),
+            "[E] StreamlineHooks::streamlineLogCallback_sl1 [streamline][error]pluginmanager.cpp:547[mapPlugins] Detected plugin 'sl.common.bak' with priority <= 0 which is not allowed\n");
+        Assert.Contains(Diagnosis.Of(sl, null, true), f => f.Cause.Contains("renamed copy") && f.Evidence.StartsWith("OptiScaler.log"));
+
+        // Cities: Skylines: RTSS hooked in held XeFG's presents back, stutter and a third of the base frame rate gone.
+        var rtss = Fixture.Temp("diagnosis-rtss");
+        File.WriteAllText(Path.Combine(rtss, "OptiScaler.log"),
+            "[16:05:11.444638] [W] FGHooks::FGPresent RTSS is hooked into the game while frame generation runs: it stalls frame generation's presents (stutter, lower base frame rate). Close RivaTuner Statistics Server, or turn its hooking off for this game\n");
+        Assert.Contains(Diagnosis.Of(rtss, null, true), f => f.Cause.Contains("RivaTuner") && f.Evidence.StartsWith("OptiScaler.log"));
         // Whole words only: "chip" and "relationship" beside a 719 are not a GPU reset.
         var quiet = Fixture.Temp("diagnosis-quiet");
         File.WriteAllText(Path.Combine(quiet, SessionLog.RuntimeLog), "chip temperature error 719\nrelationship error 719 frames\n");
